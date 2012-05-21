@@ -17,11 +17,10 @@ import setuptools
 import sys
 
 
-requirements = ["httplib2", "prettytable"]
-if sys.version_info < (2, 6):
-    requirements.append("simplejson")
-if sys.version_info < (2, 7):
-    requirements.append("argparse")
+from cinderclient.openstack.common import setup
+
+requires = setup.parse_requirements()
+depend_links = setup.parse_dependency_links()
 
 
 def read_file(file_name):
@@ -38,7 +37,9 @@ setuptools.setup(
     license="Apache License, Version 2.0",
     url="https://github.com/openstack/python-cinderclient",
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
-    install_requires=requirements,
+    cmdclass=setup.get_cmdclass(),
+    install_requires=requires,
+    dependency_links=depend_links,
     tests_require=["nose", "mock"],
     test_suite="nose.collector",
     classifiers=[

@@ -1,4 +1,5 @@
 include AUTHORS
+include ChangeLog
 include HACKING
 include LICENSE
 include README.rst
