@@ -33,6 +33,49 @@ class Volume(base.Resource):
         """
         self.manager.delete(self)
 
+    def attach(self, instance_uuid, mountpoint):
+        """
+        Set attachment metadata.
+
+        :param instance_uuid: uuid of the attaching instance.
+        :param mountpoint: mountpoint on the attaching instance.
+        """
+        return self.manager.attach(self, instance_uuid, mountpoint)
+
+    def detach(self):
+        """
+        Clear attachment metadata.
+        """
+        return self.manager.detach(self)
+
+    def reserve(self, volume):
+        """
+        Reserve this volume.
+        """
+        return self.manager.reserve(self)
+
+    def unreserve(self, volume):
+        """
+        Unreserve this volume.
+        """
+        return self.manager.unreserve(self)
+
+    def initialize_connection(self, volume, connector):
+        """
+        Initialize a volume connection.
+
+        :param connector: connector dict from nova.
+        """
+        return self.manager.initialize_connection(self, connector)
+
+    def terminate_connection(self, volume, connector):
+        """
+        Terminate a volume connection.
+
+        :param connector: connector dict from nova.
+        """
+        return self.manager.terminate_connection(self, connector)
+
 
 class VolumeManager(base.ManagerWithFind):
     """
@@ -133,3 +176,73 @@ class VolumeManager(base.ManagerWithFind):
         """
         self._delete("/servers/%s/os-volume_attachments/%s" %
                      (server_id, attachment_id,))
+
+    def _action(self, action, volume, info=None, **kwargs):
+        """
+        Perform a volume "action."
+        """
+        body = {action: info}
+        self.run_hooks('modify_body_for_action', body, **kwargs)
+        url = '/volumes/%s/action' % base.getid(volume)
+        return self.api.client.post(url, body=body)
+
+    def attach(self, volume, instance_uuid, mountpoint):
+        """
+        Set attachment metadata.
+
+        :param server: The :class:`Volume` (or its ID)
+                       you would like to attach.
+        :param instance_uuid: uuid of the attaching instance.
+        :param mountpoint: mountpoint on the attaching instance.
+        """
+        return self._action('os-attach',
+                            volume,
+                            {'instance_uuid': instance_uuid,
+                             'mountpoint': mountpoint})
+
+    def detach(self, volume):
+        """
+        Clear attachment metadata.
+
+        :param server: The :class:`Volume` (or its ID)
+                       you would like to detach.
+        """
+        return self._action('os-detach', volume)
+
+    def reserve(self, volume):
+        """
+        Reserve this volume.
+
+        :param server: The :class:`Volume` (or its ID)
+                       you would like to reserve.
+        """
+        return self._action('os-reserve', volume)
+
+    def unreserve(self, volume):
+        """
+        Unreserve this volume.
+
+        :param server: The :class:`Volume` (or its ID)
+                       you would like to unreserve.
+        """
+        return self._action('os-unreserve', volume)
+
+    def initialize_connection(self, volume, connector):
+        """
+        Initialize a volume connection.
+
+        :param server: The :class:`Volume` (or its ID).
+        :param connector: connector dict from nova.
+        """
+        return self._action('os-initialize_connection', volume,
+                            {'connector': connector})[1]['connection_info']
+
+    def terminate_connection(self, volume, connector):
+        """
+        Terminate a volume connection.
+
+        :param server: The :class:`Volume` (or its ID).
+        :param connector: connector dict from nova.
+        """
+        self._action('os-terminate_connection', volume,
+                     {'connector': connector})

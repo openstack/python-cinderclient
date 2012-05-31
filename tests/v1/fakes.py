@@ -145,6 +145,28 @@ class FakeHTTPClient(base_client.HTTPClient):
         r = {'volume': self.get_volumes_detail()[1]['volumes'][0]}
         return (200, r)
 
+    def post_volumes_1234_action(self, body, **kw):
+        _body = None
+        resp = 202
+        assert len(body.keys()) == 1
+        action = body.keys()[0]
+        if action == 'os-attach':
+            assert body[action].keys() == ['instance_uuid', 'mountpoint']
+        elif action == 'os-detach':
+            assert body[action] == None
+        elif action == 'os-reserve':
+            assert body[action] == None
+        elif action == 'os-unreserve':
+            assert body[action] == None
+        elif action == 'os-initialize_connection':
+            assert body[action].keys() == ['connector']
+            return (202, {'connection_info': 'foos'})
+        elif action == 'os-terminate_connection':
+            assert body[action].keys() == ['connector']
+        else:
+            raise AssertionError("Unexpected server action: %s" % action)
+        return (resp, _body)
+
     def post_servers(self, body, **kw):
         assert set(body.keys()) <= set(['server', 'os:scheduler_hints'])
         fakes.assert_has_keys(body['server'],
@@ -167,6 +189,9 @@ class FakeHTTPClient(base_client.HTTPClient):
         assert body.keys() == ['server']
         fakes.assert_has_keys(body['server'], optional=['name', 'adminPass'])
         return (204, None)
+
+    def post_volumes(self, **kw):
+        return (202, {'volume': {}})
 
     def delete_servers_1234(self, **kw):
         return (202, None)
