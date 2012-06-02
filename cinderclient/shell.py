@@ -69,7 +69,7 @@ class OpenStackCinderShell(object):
         parser = CinderClientArgumentParser(
             prog='cinder',
             description=__doc__.strip(),
-            epilog='See "cinder help COMMAND" '\
+            epilog='See "cinder help COMMAND" '
                    'for help on a specific command.',
             add_help=False,
             formatter_class=OpenStackHelpFormatter,
