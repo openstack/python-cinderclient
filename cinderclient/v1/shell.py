@@ -100,7 +100,7 @@ def do_list(cs, args):
         servers = [s.get('server_id') for s in vol.attachments]
         setattr(vol, 'attached_to', ','.join(map(str, servers)))
     utils.print_list(volumes, ['ID', 'Status', 'Display Name',
-                        'Size', 'Volume Type', 'Attached to'])
+                     'Size', 'Volume Type', 'Attached to'])
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of the volume.')
@@ -112,31 +112,32 @@ def do_show(cs, args):
 
 
 @utils.arg('size',
-    metavar='<size>',
-    type=int,
-    help='Size of volume in GB')
-@utils.arg('--snapshot_id',
+           metavar='<size>',
+           type=int,
+           help='Size of volume in GB')
+@utils.arg(
+    '--snapshot_id',
     metavar='<snapshot_id>',
     help='Optional snapshot id to create the volume from. (Default=None)',
     default=None)
 @utils.arg('--display_name', metavar='<display_name>',
-            help='Optional volume name. (Default=None)',
-            default=None)
+           help='Optional volume name. (Default=None)',
+           default=None)
 @utils.arg('--display_description', metavar='<display_description>',
-            help='Optional volume description. (Default=None)',
-            default=None)
+           help='Optional volume description. (Default=None)',
+           default=None)
 @utils.arg('--volume_type',
-    metavar='<volume_type>',
-    help='Optional volume type. (Default=None)',
-    default=None)
+           metavar='<volume_type>',
+           help='Optional volume type. (Default=None)',
+           default=None)
 @utils.service_type('volume')
 def do_create(cs, args):
     """Add a new volume."""
     cs.volumes.create(args.size,
-                        args.snapshot_id,
-                        args.display_name,
-                        args.display_description,
-                        args.volume_type)
+                      args.snapshot_id,
+                      args.display_name,
+                      args.display_description,
+                      args.volume_type)
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of the volume to delete.')
@@ -152,8 +153,8 @@ def do_snapshot_list(cs, args):
     """List all the snapshots."""
     snapshots = cs.volume_snapshots.list()
     _translate_volume_snapshot_keys(snapshots)
-    utils.print_list(snapshots, ['ID', 'Volume ID', 'Status', 'Display Name',
-                        'Size'])
+    utils.print_list(snapshots,
+                     ['ID', 'Volume ID', 'Status', 'Display Name', 'Size'])
 
 
 @utils.arg('snapshot', metavar='<snapshot>', help='ID of the snapshot.')
@@ -165,31 +166,32 @@ def do_snapshot_show(cs, args):
 
 
 @utils.arg('volume_id',
-    metavar='<volume_id>',
-    help='ID of the volume to snapshot')
+           metavar='<volume_id>',
+           help='ID of the volume to snapshot')
 @utils.arg('--force',
-    metavar='<True|False>',
-    help='Optional flag to indicate whether to snapshot a volume even if its '
-        'attached to an instance. (Default=False)',
-    default=False)
+           metavar='<True|False>',
+           help='Optional flag to indicate whether '
+           'to snapshot a volume even if its '
+           'attached to an instance. (Default=False)',
+           default=False)
 @utils.arg('--display_name', metavar='<display_name>',
-            help='Optional snapshot name. (Default=None)',
-            default=None)
+           help='Optional snapshot name. (Default=None)',
+           default=None)
 @utils.arg('--display_description', metavar='<display_description>',
-            help='Optional snapshot description. (Default=None)',
-            default=None)
+           help='Optional snapshot description. (Default=None)',
+           default=None)
 @utils.service_type('volume')
 def do_snapshot_create(cs, args):
     """Add a new snapshot."""
     cs.volume_snapshots.create(args.volume_id,
-                        args.force,
-                        args.display_name,
-                        args.display_description)
+                               args.force,
+                               args.display_name,
+                               args.display_description)
 
 
 @utils.arg('snapshot_id',
-    metavar='<snapshot_id>',
-    help='ID of the snapshot to delete.')
+           metavar='<snapshot_id>',
+           help='ID of the snapshot to delete.')
 @utils.service_type('volume')
 def do_snapshot_delete(cs, args):
     """Remove a snapshot."""
@@ -209,8 +211,8 @@ def do_type_list(cs, args):
 
 
 @utils.arg('name',
-     metavar='<name>',
-     help="Name of the new flavor")
+           metavar='<name>',
+           help="Name of the new flavor")
 @utils.service_type('volume')
 def do_type_create(cs, args):
     """Create a new volume type."""
@@ -219,8 +221,8 @@ def do_type_create(cs, args):
 
 
 @utils.arg('id',
-     metavar='<id>',
-     help="Unique ID of the volume type to delete")
+           metavar='<id>',
+           help="Unique ID of the volume type to delete")
 @utils.service_type('volume')
 def do_type_delete(cs, args):
     """Delete a specific flavor"""

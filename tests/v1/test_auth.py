@@ -42,8 +42,7 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
         }
         auth_response = httplib2.Response({
             "status": 200,
-            "body": json.dumps(resp),
-            })
+            "body": json.dumps(resp), })
 
         mock_request = mock.Mock(return_value=(auth_response,
                                                json.dumps(resp)))
@@ -85,8 +84,7 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
         resp = {"unauthorized": {"message": "Unauthorized", "code": "401"}}
         auth_response = httplib2.Response({
             "status": 401,
-            "body": json.dumps(resp),
-            })
+            "body": json.dumps(resp), })
 
         mock_request = mock.Mock(return_value=(auth_response,
                                                json.dumps(resp)))
@@ -138,8 +136,8 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
              "body": correct_response}
         ]
 
-        responses = [(to_http_response(resp), resp['body']) \
-                        for resp in dict_responses]
+        responses = [(to_http_response(resp), resp['body'])
+                     for resp in dict_responses]
 
         def side_effect(*args, **kwargs):
             return responses.pop(0)
@@ -159,9 +157,9 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
                     'passwordCredentials': {
                         'username': cs.client.user,
                         'password': cs.client.password,
-                     },
-                     'tenantName': cs.client.projectid,
-                 },
+                    },
+                    'tenantName': cs.client.projectid,
+                },
             }
 
             token_url = cs.client.auth_url + "/tokens"
@@ -214,9 +212,10 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
                 ],
             },
         }
-        auth_response = httplib2.Response({
-            "status": 200,
-            "body": json.dumps(resp),
+        auth_response = httplib2.Response(
+            {
+                "status": 200,
+                "body": json.dumps(resp),
             })
 
         mock_request = mock.Mock(return_value=(auth_response,

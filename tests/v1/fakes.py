@@ -120,10 +120,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                 "maxServerMeta": 5,
                 "maxImageMeta": 5,
                 "maxPersonality": 5,
-                "maxPersonalitySize": 10240
-            },
-        },
-    })
+                "maxPersonalitySize": 10240}, }, })
 
     #
     # Servers
@@ -141,8 +138,7 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (200, {"volumes": [
             {'id': 1234,
              'name': 'sample-volume',
-             'attachments': [{'server_id': 1234}]
-            },
+             'attachments': [{'server_id': 1234}]},
         ]})
 
     def get_volumes_1234(self, **kw):
@@ -152,8 +148,8 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_servers(self, body, **kw):
         assert set(body.keys()) <= set(['server', 'os:scheduler_hints'])
         fakes.assert_has_keys(body['server'],
-                        required=['name', 'imageRef', 'flavorRef'],
-                        optional=['metadata', 'personality'])
+                              required=['name', 'imageRef', 'flavorRef'],
+                              optional=['metadata', 'personality'])
         if 'personality' in body['server']:
             for pfile in body['server']['personality']:
                 fakes.assert_has_keys(pfile, required=['path', 'contents'])
@@ -194,18 +190,19 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (200, {'data': 'Fake diagnostics'})
 
     def get_servers_1234_actions(self, **kw):
-        return (200, {'actions': [
-            {
-                'action': 'rebuild',
-                'error': None,
-                'created_at': '2011-12-30 11:45:36'
-            },
-            {
-                'action': 'reboot',
-                'error': 'Failed!',
-                'created_at': '2011-12-30 11:40:29'
-            },
-        ]})
+        return (
+            200, {'actions': [
+                {
+                    'action': 'rebuild',
+                    'error': None,
+                    'created_at': '2011-12-30 11:45:36'
+                },
+                {
+                    'action': 'reboot',
+                    'error': 'Failed!',
+                    'created_at': '2011-12-30 11:40:29'
+                },
+            ]})
 
     #
     # Server Addresses
@@ -350,8 +347,8 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def get_os_floating_ips_1(self, **kw):
         return (200, {'floating_ip':
-            {'id': 1, 'fixed_ip': '10.0.0.1', 'ip': '11.0.0.1'}
-        })
+                {'id': 1, 'fixed_ip': '10.0.0.1', 'ip': '11.0.0.1'}
+                })
 
     def post_os_floating_ips(self, body, **kw):
         return (202, self.get_os_floating_ips_1()[1])
@@ -359,12 +356,12 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_os_floating_ips(self, body):
         if body.get('pool'):
             return (200, {'floating_ip':
-                {'id': 1, 'fixed_ip': '10.0.0.1', 'ip': '11.0.0.1',
-                                                            'pool': 'cinder'}})
+                    {'id': 1, 'fixed_ip': '10.0.0.1', 'ip': '11.0.0.1',
+                     'pool': 'cinder'}})
         else:
             return (200, {'floating_ip':
-                {'id': 1, 'fixed_ip': '10.0.0.1', 'ip': '11.0.0.1',
-                                                            'pool': None}})
+                    {'id': 1, 'fixed_ip': '10.0.0.1', 'ip': '11.0.0.1',
+                     'pool': None}})
 
     def delete_os_floating_ips_1(self, **kw):
         return (204, None)
@@ -378,41 +375,41 @@ class FakeHTTPClient(base_client.HTTPClient):
         if kw.get('ip'):
             return (205, {'dns_entries':
                           [{'dns_entry':
-                             {'ip': kw.get('ip'),
-                              'name': "host1",
-                              'type': "A",
-                              'domain': 'testdomain'}},
+                            {'ip': kw.get('ip'),
+                             'name': "host1",
+                             'type': "A",
+                             'domain': 'testdomain'}},
                            {'dns_entry':
-                             {'ip': kw.get('ip'),
-                              'name': "host2",
-                              'type': "A",
-                              'domain': 'testdomain'}}]})
+                            {'ip': kw.get('ip'),
+                             'name': "host2",
+                             'type': "A",
+                             'domain': 'testdomain'}}]})
         else:
             return (404, None)
 
     def get_os_floating_ip_dns_testdomain_entries_testname(self, **kw):
         return (205, {'dns_entry':
-                        {'ip': "10.10.10.10",
-                         'name': 'testname',
-                         'type': "A",
-                         'domain': 'testdomain'}})
+                      {'ip': "10.10.10.10",
+                       'name': 'testname',
+                       'type': "A",
+                       'domain': 'testdomain'}})
 
     def put_os_floating_ip_dns_testdomain(self, body, **kw):
         if body['domain_entry']['scope'] == 'private':
             fakes.assert_has_keys(body['domain_entry'],
-                            required=['availability_zone', 'scope'])
+                                  required=['availability_zone', 'scope'])
         elif body['domain_entry']['scope'] == 'public':
             fakes.assert_has_keys(body['domain_entry'],
-                            required=['project', 'scope'])
+                                  required=['project', 'scope'])
 
         else:
             fakes.assert_has_keys(body['domain_entry'],
-                            required=['project', 'scope'])
+                                  required=['project', 'scope'])
         return (205, None)
 
     def put_os_floating_ip_dns_testdomain_entries_testname(self, body, **kw):
         fakes.assert_has_keys(body['dns_entry'],
-                        required=['ip', 'dns_type'])
+                              required=['ip', 'dns_type'])
         return (205, None)
 
     def delete_os_floating_ip_dns_testdomain(self, **kw):
@@ -471,7 +468,7 @@ class FakeHTTPClient(base_client.HTTPClient):
         fakes.assert_has_keys(body['metadata'],
                               required=['test_key'])
         return (200,
-            {'metadata': self.get_images_1()[1]['image']['metadata']})
+                {'metadata': self.get_images_1()[1]['image']['metadata']})
 
     def delete_images_1(self, **kw):
         return (204, None)
@@ -588,14 +585,16 @@ class FakeHTTPClient(base_client.HTTPClient):
     # Security Groups
     #
     def get_os_security_groups(self, **kw):
-        return (200, {"security_groups": [
-                {'id': 1, 'name': 'test', 'description': 'FAKE_SECURITY_GROUP'}
-        ]})
+        return (200, {"security_groups":
+                      [
+                          {'id': 1, 'name': 'test',
+                           'description': 'FAKE_SECURITY_GROUP'}
+                      ]})
 
     def get_os_security_groups_1(self, **kw):
         return (200, {"security_group":
                 {'id': 1, 'name': 'test', 'description': 'FAKE_SECURITY_GROUP'}
-        })
+                })
 
     def delete_os_security_groups_1(self, **kw):
         return (202, None)
@@ -605,7 +604,7 @@ class FakeHTTPClient(base_client.HTTPClient):
         fakes.assert_has_keys(body['security_group'],
                               required=['name', 'description'])
         r = {'security_group':
-                self.get_os_security_groups()[1]['security_groups'][0]}
+             self.get_os_security_groups()[1]['security_groups'][0]}
         return (202, r)
 
     #
@@ -616,7 +615,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                 {'id': 1, 'parent_group_id': 1, 'group_id': 2,
                  'ip_protocol': 'TCP', 'from_port': '22', 'to_port': 22,
                  'cidr': '10.0.0.0/8'}
-        ]})
+                ]})
 
     def delete_os_security_group_rules_1(self, **kw):
         return (202, None)
@@ -624,11 +623,11 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_os_security_group_rules(self, body, **kw):
         assert body.keys() == ['security_group_rule']
         fakes.assert_has_keys(body['security_group_rule'],
-            required=['parent_group_id'],
-            optional=['group_id', 'ip_protocol', 'from_port',
-                      'to_port', 'cidr'])
+                              required=['parent_group_id'],
+                              optional=['group_id', 'ip_protocol', 'from_port',
+                                        'to_port', 'cidr'])
         r = {'security_group_rule':
-            self.get_os_security_group_rules()[1]['security_group_rules'][0]}
+             self.get_os_security_group_rules()[1]['security_group_rules'][0]}
         return (202, r)
 
     #

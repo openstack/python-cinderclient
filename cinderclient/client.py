@@ -160,12 +160,12 @@ class HTTPClient(httplib2.Http):
                     self.auth_token = self.service_catalog.get_token()
 
                 management_url = self.service_catalog.url_for(
-                               attr='region',
-                               filter_value=self.region_name,
-                               endpoint_type=self.endpoint_type,
-                               service_type=self.service_type,
-                               service_name=self.service_name,
-                               volume_service_name=self.volume_service_name,)
+                    attr='region',
+                    filter_value=self.region_name,
+                    endpoint_type=self.endpoint_type,
+                    service_type=self.service_type,
+                    service_name=self.service_name,
+                    volume_service_name=self.volume_service_name)
                 self.management_url = management_url.rstrip('/')
                 return None
             except exceptions.AmbiguousEndpoints:
@@ -219,8 +219,8 @@ class HTTPClient(httplib2.Http):
         # TODO(sandy): Assume admin endpoint is 35357 for now.
         # Ideally this is going to have to be provided by the service catalog.
         new_netloc = netloc.replace(':%d' % port, ':%d' % (35357,))
-        admin_url = urlparse.urlunsplit(
-                        (scheme, new_netloc, path, query, frag))
+        admin_url = urlparse.urlunsplit((scheme, new_netloc,
+                                         path, query, frag))
 
         auth_url = self.auth_url
         if self.version == "v2.0":
@@ -277,8 +277,8 @@ class HTTPClient(httplib2.Http):
     def _v2_auth(self, url):
         """Authenticate against a v2.0 auth service."""
         body = {"auth": {
-                   "passwordCredentials": {"username": self.user,
-                                           "password": self.password}}}
+            "passwordCredentials": {"username": self.user,
+                                    "password": self.password}}}
 
         if self.projectid:
             body['auth']['tenantName'] = self.projectid
@@ -289,9 +289,9 @@ class HTTPClient(httplib2.Http):
         """Authenticate against the Rackspace auth service."""
         body = {"auth": {
                 "RAX-KSKEY:apiKeyCredentials": {
-                        "username": self.user,
-                        "apiKey": self.password,
-                        "tenantName": self.projectid}}}
+                    "username": self.user,
+                    "apiKey": self.password,
+                    "tenantName": self.projectid}}}
 
         self._authenticate(url, body)
 
@@ -319,7 +319,7 @@ def get_client_class(version):
         client_path = version_map[str(version)]
     except (KeyError, ValueError):
         msg = "Invalid client version '%s'. must be one of: %s" % (
-              (version, ', '.join(version_map.keys())))
+            (version, ', '.join(version_map.keys())))
         raise exceptions.UnsupportedVersion(msg)
 
     return utils.import_class(client_path)

@@ -207,8 +207,8 @@ def print_help():
     python-cinderclient development uses virtualenv to track and manage Python
     dependencies while in development and testing.
 
-    To activate the python-cinderclient virtualenv for the extent of your current
-    shell session you can run:
+    To activate the python-cinderclient virtualenv for the extent of your
+    current shell session you can run:
 
     $ source .venv/bin/activate
 

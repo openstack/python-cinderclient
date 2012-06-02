@@ -29,8 +29,8 @@ class ServiceCatalog(object):
         return self.catalog['access']['token']['id']
 
     def url_for(self, attr=None, filter_value=None,
-                    service_type=None, endpoint_type='publicURL',
-                    service_name=None, volume_service_name=None):
+                service_type=None, endpoint_type='publicURL',
+                service_name=None, volume_service_name=None):
         """Fetch the public URL from the Compute service for
         a particular endpoint attribute. If none given, return
         the first. See tests for sample service catalog."""
@@ -72,6 +72,6 @@ class ServiceCatalog(object):
             raise cinderclient.exceptions.EndpointNotFound()
         elif len(matching_endpoints) > 1:
             raise cinderclient.exceptions.AmbiguousEndpoints(
-                    endpoints=matching_endpoints)
+                endpoints=matching_endpoints)
         else:
             return matching_endpoints[0][endpoint_type]

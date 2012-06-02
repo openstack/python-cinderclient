@@ -117,7 +117,8 @@ class HTTPNotImplemented(ClientException):
 #
 # Instead, we have to hardcode it:
 _code_map = dict((c.http_status, c) for c in [BadRequest, Unauthorized,
-                   Forbidden, NotFound, OverLimit, HTTPNotImplemented])
+                                              Forbidden, NotFound,
+                                              OverLimit, HTTPNotImplemented])
 
 
 def from_response(response, body):

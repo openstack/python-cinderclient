@@ -69,7 +69,7 @@ class OpenStackCinderShell(object):
         parser = CinderClientArgumentParser(
             prog='cinder',
             description=__doc__.strip(),
-            epilog='See "cinder help COMMAND" '\
+            epilog='See "cinder help COMMAND" '
                    'for help on a specific command.',
             add_help=False,
             formatter_class=OpenStackHelpFormatter,
@@ -77,87 +77,93 @@ class OpenStackCinderShell(object):
 
         # Global arguments
         parser.add_argument('-h', '--help',
-            action='store_true',
-            help=argparse.SUPPRESS,
-        )
+                            action='store_true',
+                            help=argparse.SUPPRESS)
 
         parser.add_argument('--debug',
-            default=False,
-            action='store_true',
-            help="Print debugging output")
+                            default=False,
+                            action='store_true',
+                            help="Print debugging output")
 
         parser.add_argument('--os_username',
-            default=utils.env('OS_USERNAME', 'CINDER_USERNAME'),
-            help='Defaults to env[OS_USERNAME].')
+                            default=utils.env('OS_USERNAME',
+                                              'CINDER_USERNAME'),
+                            help='Defaults to env[OS_USERNAME].')
 
         parser.add_argument('--os_password',
-            default=utils.env('OS_PASSWORD', 'CINDER_PASSWORD'),
-            help='Defaults to env[OS_PASSWORD].')
+                            default=utils.env('OS_PASSWORD',
+                                              'CINDER_PASSWORD'),
+                            help='Defaults to env[OS_PASSWORD].')
 
         parser.add_argument('--os_tenant_name',
-            default=utils.env('OS_TENANT_NAME', 'CINDER_PROJECT_ID'),
-            help='Defaults to env[OS_TENANT_NAME].')
+                            default=utils.env('OS_TENANT_NAME',
+                                              'CINDER_PROJECT_ID'),
+                            help='Defaults to env[OS_TENANT_NAME].')
 
         parser.add_argument('--os_auth_url',
-            default=utils.env('OS_AUTH_URL', 'CINDER_URL'),
-            help='Defaults to env[OS_AUTH_URL].')
+                            default=utils.env('OS_AUTH_URL',
+                                              'CINDER_URL'),
+                            help='Defaults to env[OS_AUTH_URL].')
 
         parser.add_argument('--os_region_name',
-            default=utils.env('OS_REGION_NAME', 'CINDER_REGION_NAME'),
-            help='Defaults to env[OS_REGION_NAME].')
+                            default=utils.env('OS_REGION_NAME',
+                                              'CINDER_REGION_NAME'),
+                            help='Defaults to env[OS_REGION_NAME].')
 
         parser.add_argument('--service_type',
-            help='Defaults to compute for most actions')
+                            help='Defaults to compute for most actions')
 
         parser.add_argument('--service_name',
-            default=utils.env('CINDER_SERVICE_NAME'),
-            help='Defaults to env[CINDER_SERVICE_NAME]')
+                            default=utils.env('CINDER_SERVICE_NAME'),
+                            help='Defaults to env[CINDER_SERVICE_NAME]')
 
         parser.add_argument('--volume_service_name',
-            default=utils.env('CINDER_VOLUME_SERVICE_NAME'),
-            help='Defaults to env[CINDER_VOLUME_SERVICE_NAME]')
+                            default=utils.env('CINDER_VOLUME_SERVICE_NAME'),
+                            help='Defaults to env[CINDER_VOLUME_SERVICE_NAME]')
 
         parser.add_argument('--endpoint_type',
-            default=utils.env('CINDER_ENDPOINT_TYPE',
-                        default=DEFAULT_CINDER_ENDPOINT_TYPE),
-            help='Defaults to env[CINDER_ENDPOINT_TYPE] or '
-                    + DEFAULT_CINDER_ENDPOINT_TYPE + '.')
+                            default=utils.env('CINDER_ENDPOINT_TYPE',
+                            default=DEFAULT_CINDER_ENDPOINT_TYPE),
+                            help='Defaults to env[CINDER_ENDPOINT_TYPE] or '
+                            + DEFAULT_CINDER_ENDPOINT_TYPE + '.')
 
         parser.add_argument('--os_volume_api_version',
-            default=utils.env('OS_VOLUME_API_VERSION',
-            default=DEFAULT_OS_VOLUME_API_VERSION),
-            help='Accepts 1, defaults to env[OS_VOLUME_API_VERSION].')
+                            default=utils.env('OS_VOLUME_API_VERSION',
+                            default=DEFAULT_OS_VOLUME_API_VERSION),
+                            help='Accepts 1,defaults '
+                                 'to env[OS_VOLUME_API_VERSION].')
 
         parser.add_argument('--insecure',
-            default=utils.env('CINDERCLIENT_INSECURE', default=False),
-            action='store_true',
-            help=argparse.SUPPRESS)
+                            default=utils.env('CINDERCLIENT_INSECURE',
+                                              default=False),
+                            action='store_true',
+                            help=argparse.SUPPRESS)
 
         # FIXME(dtroyer): The args below are here for diablo compatibility,
         #                 remove them in folsum cycle
 
         # alias for --os_username, left in for backwards compatibility
         parser.add_argument('--username',
-            help='Deprecated')
+                            help='Deprecated')
 
         # alias for --os_region_name, left in for backwards compatibility
         parser.add_argument('--region_name',
-            help='Deprecated')
+                            help='Deprecated')
 
         # alias for --os_password, left in for backwards compatibility
         parser.add_argument('--apikey', '--password', dest='apikey',
-            default=utils.env('CINDER_API_KEY'),
-            help='Deprecated')
+                            default=utils.env('CINDER_API_KEY'),
+                            help='Deprecated')
 
         # alias for --os_tenant_name, left in for backward compatibility
         parser.add_argument('--projectid', '--tenant_name', dest='projectid',
-            default=utils.env('CINDER_PROJECT_ID'),
-            help='Deprecated')
+                            default=utils.env('CINDER_PROJECT_ID'),
+                            help='Deprecated')
 
         # alias for --os_auth_url, left in for backward compatibility
         parser.add_argument('--url', '--auth_url', dest='url',
-            default=utils.env('CINDER_URL'),
-            help='Deprecated')
+                            default=utils.env('CINDER_URL'),
+                            help='Deprecated')
 
         return parser
 
@@ -222,10 +228,11 @@ class OpenStackCinderShell(object):
             yield name, module
 
     def _add_bash_completion_subparser(self, subparsers):
-        subparser = subparsers.add_parser('bash_completion',
+        subparser = subparsers.add_parser(
+            'bash_completion',
             add_help=False,
-            formatter_class=OpenStackHelpFormatter
-        )
+            formatter_class=OpenStackHelpFormatter)
+
         self.subcommands['bash_completion'] = subparser
         subparser.set_defaults(func=self.do_bash_completion)
 
@@ -238,16 +245,17 @@ class OpenStackCinderShell(object):
             help = desc.strip().split('\n')[0]
             arguments = getattr(callback, 'arguments', [])
 
-            subparser = subparsers.add_parser(command,
+            subparser = subparsers.add_parser(
+                command,
                 help=help,
                 description=desc,
                 add_help=False,
-                formatter_class=OpenStackHelpFormatter
-            )
+                formatter_class=OpenStackHelpFormatter)
+
             subparser.add_argument('-h', '--help',
-                action='help',
-                help=argparse.SUPPRESS,
-            )
+                                   action='help',
+                                   help=argparse.SUPPRESS,)
+
             self.subcommands[command] = subparser
             for (args, kwargs) in arguments:
                 subparser.add_argument(*args, **kwargs)
@@ -273,11 +281,11 @@ class OpenStackCinderShell(object):
 
         # build available subcommands based on version
         self.extensions = self._discover_extensions(
-                options.os_volume_api_version)
+            options.os_volume_api_version)
         self._run_extension_hooks('__pre_parse_args__')
 
         subcommand_parser = self.get_subcommand_parser(
-                options.os_volume_api_version)
+            options.os_volume_api_version)
         self.parser = subcommand_parser
 
         if options.help and len(args) == 0:
@@ -296,16 +304,16 @@ class OpenStackCinderShell(object):
             return 0
 
         (os_username, os_password, os_tenant_name, os_auth_url,
-                os_region_name, endpoint_type, insecure,
-                service_type, service_name, volume_service_name,
-                username, apikey, projectid, url, region_name) = (
-                        args.os_username, args.os_password,
-                        args.os_tenant_name, args.os_auth_url,
-                        args.os_region_name, args.endpoint_type,
-                        args.insecure, args.service_type, args.service_name,
-                        args.volume_service_name, args.username,
-                        args.apikey, args.projectid,
-                        args.url, args.region_name)
+         os_region_name, endpoint_type, insecure,
+         service_type, service_name, volume_service_name,
+         username, apikey, projectid, url, region_name) = (
+             args.os_username, args.os_password,
+             args.os_tenant_name, args.os_auth_url,
+             args.os_region_name, args.endpoint_type,
+             args.insecure, args.service_type, args.service_name,
+             args.volume_service_name, args.username,
+             args.apikey, args.projectid,
+             args.url, args.region_name)
 
         if not endpoint_type:
             endpoint_type = DEFAULT_CINDER_ENDPOINT_TYPE
@@ -320,31 +328,33 @@ class OpenStackCinderShell(object):
         if not utils.isunauthenticated(args.func):
             if not os_username:
                 if not username:
-                    raise exc.CommandError("You must provide a username "
-                            "via either --os_username or env[OS_USERNAME]")
+                    raise exc.CommandError(
+                        "You must provide a username "
+                        "via either --os_username or env[OS_USERNAME]")
                 else:
                     os_username = username
 
             if not os_password:
                 if not apikey:
                     raise exc.CommandError("You must provide a password "
-                            "via either --os_password or via "
-                            "env[OS_PASSWORD]")
+                                           "via either --os_password or via "
+                                           "env[OS_PASSWORD]")
                 else:
                     os_password = apikey
 
             if not os_tenant_name:
                 if not projectid:
                     raise exc.CommandError("You must provide a tenant name "
-                            "via either --os_tenant_name or "
-                            "env[OS_TENANT_NAME]")
+                                           "via either --os_tenant_name or "
+                                           "env[OS_TENANT_NAME]")
                 else:
                     os_tenant_name = projectid
 
             if not os_auth_url:
                 if not url:
-                    raise exc.CommandError("You must provide an auth url "
-                            "via either --os_auth_url or env[OS_AUTH_URL]")
+                    raise exc.CommandError(
+                        "You must provide an auth url "
+                        "via either --os_auth_url or env[OS_AUTH_URL]")
                 else:
                     os_auth_url = url
 
@@ -352,19 +362,23 @@ class OpenStackCinderShell(object):
                 os_region_name = region_name
 
         if not os_tenant_name:
-            raise exc.CommandError("You must provide a tenant name "
-                    "via either --os_tenant_name or env[OS_TENANT_NAME]")
+            raise exc.CommandError(
+                "You must provide a tenant name "
+                "via either --os_tenant_name or env[OS_TENANT_NAME]")
 
         if not os_auth_url:
-            raise exc.CommandError("You must provide an auth url "
-                    "via either --os_auth_url or env[OS_AUTH_URL]")
+            raise exc.CommandError(
+                "You must provide an auth url "
+                "via either --os_auth_url or env[OS_AUTH_URL]")
 
         self.cs = client.Client(options.os_volume_api_version, os_username,
-                os_password, os_tenant_name, os_auth_url, insecure,
-                region_name=os_region_name, endpoint_type=endpoint_type,
-                extensions=self.extensions, service_type=service_type,
-                service_name=service_name,
-                volume_service_name=volume_service_name)
+                                os_password, os_tenant_name, os_auth_url,
+                                insecure, region_name=os_region_name,
+                                endpoint_type=endpoint_type,
+                                extensions=self.extensions,
+                                service_type=service_type,
+                                service_name=service_name,
+                                volume_service_name=volume_service_name)
 
         try:
             if not utils.isunauthenticated(args.func):
@@ -398,7 +412,7 @@ class OpenStackCinderShell(object):
         print ' '.join(commands | options)
 
     @utils.arg('command', metavar='<subcommand>', nargs='?',
-                    help='Display help for <subcommand>')
+               help='Display help for <subcommand>')
     def do_help(self, args):
         """
         Display help about this program or one of its subcommands.

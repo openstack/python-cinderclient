@@ -41,8 +41,8 @@ class VolumeManager(base.ManagerWithFind):
     resource_class = Volume
 
     def create(self, size, snapshot_id=None,
-                    display_name=None, display_description=None,
-                    volume_type=None):
+               display_name=None, display_description=None,
+               volume_type=None):
         """
         Create a volume.
 
@@ -54,10 +54,10 @@ class VolumeManager(base.ManagerWithFind):
         :rtype: :class:`Volume`
         """
         body = {'volume': {'size': size,
-                            'snapshot_id': snapshot_id,
-                            'display_name': display_name,
-                            'display_description': display_description,
-                            'volume_type': volume_type}}
+                           'snapshot_id': snapshot_id,
+                           'display_name': display_name,
+                           'display_description': display_description,
+                           'volume_type': volume_type}}
         return self._create('/volumes', body, 'volume')
 
     def get(self, volume_id):
@@ -98,9 +98,9 @@ class VolumeManager(base.ManagerWithFind):
         :rtype: :class:`Volume`
         """
         body = {'volumeAttachment': {'volumeId': volume_id,
-                            'device': device}}
+                                     'device': device}}
         return self._create("/servers/%s/os-volume_attachments" % server_id,
-            body, "volumeAttachment")
+                            body, "volumeAttachment")
 
     def get_server_volume(self, server_id, attachment_id):
         """
@@ -112,7 +112,7 @@ class VolumeManager(base.ManagerWithFind):
         :rtype: :class:`Volume`
         """
         return self._get("/servers/%s/os-volume_attachments/%s" % (server_id,
-            attachment_id,), "volumeAttachment")
+                         attachment_id,), "volumeAttachment")
 
     def get_server_volumes(self, server_id):
         """
@@ -122,7 +122,7 @@ class VolumeManager(base.ManagerWithFind):
         :rtype: list of :class:`Volume`
         """
         return self._list("/servers/%s/os-volume_attachments" % server_id,
-            "volumeAttachments")
+                          "volumeAttachments")
 
     def delete_server_volume(self, server_id, attachment_id):
         """
@@ -132,4 +132,4 @@ class VolumeManager(base.ManagerWithFind):
         :param attachment_id: The ID of the attachment
         """
         self._delete("/servers/%s/os-volume_attachments/%s" %
-                                        (server_id, attachment_id,))
+                     (server_id, attachment_id,))
