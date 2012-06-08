@@ -17,6 +17,9 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.append(os.path.abspath('.'))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
+sys.path.insert(0, ROOT)
 
 # -- General configuration -----------------------------------------------------
 
@@ -64,7 +67,7 @@ release = '2.6.10'
 
 # List of directories, relative to source directory, that shouldn't be searched
 # for source files.
-exclude_trees = ['_build']
+exclude_trees = []
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
