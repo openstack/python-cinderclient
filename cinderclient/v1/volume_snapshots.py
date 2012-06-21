@@ -33,6 +33,14 @@ class Snapshot(base.Resource):
         """
         self.manager.delete(self)
 
+    @property
+    def progress(self):
+        return self._info.get('os-extended-snapshot-attributes:progress')
+
+    @property
+    def project_id(self):
+        return self._info.get('os-extended-snapshot-attributes:project_id')
+
 
 class SnapshotManager(base.ManagerWithFind):
     """
