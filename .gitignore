@@ -9,4 +9,5 @@ cover
 AUTHORS
 build
 dist
-python_novaclient.egg-info
+.*egg-info
+cinderclient/versioninfo

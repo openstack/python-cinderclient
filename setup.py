@@ -29,7 +29,7 @@ def read_file(file_name):
 
 setuptools.setup(
     name="python-cinderclient",
-    version="2012.2",
+    version=setup.get_post_version('cinderclient'),
     author="Rackspace, based on work by Jacob Kaplan-Moss",
     author_email="github@racklabs.com",
     description="Client library for OpenStack Nova API.",
