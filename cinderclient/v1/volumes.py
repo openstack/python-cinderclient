@@ -85,7 +85,9 @@ class VolumeManager(base.ManagerWithFind):
 
     def create(self, size, snapshot_id=None,
                display_name=None, display_description=None,
-               volume_type=None):
+               volume_type=None, user_id=None,
+               project_id=None, availability_zone=None,
+               metadata=None):
         """
         Create a volume.
 
@@ -95,12 +97,34 @@ class VolumeManager(base.ManagerWithFind):
         :param display_description: Description of the volume
         :param volume_type: Type of volume
         :rtype: :class:`Volume`
+        :param user_id: User id derived from context
+        :param project_id: Project id derived from context
+        :param availability_zone: Availability Zone to use
+        :param metadata: Optional metadata to set on volume creation
         """
+
+        if volume_type is None:
+            volume_type_id = None
+        else:
+            volume_type_id = volume_type.get('id', None)
+
+        if metadata is None:
+            volume_metadata = {}
+        else:
+            volume_metadata = metadata
+
         body = {'volume': {'size': size,
                            'snapshot_id': snapshot_id,
                            'display_name': display_name,
                            'display_description': display_description,
-                           'volume_type': volume_type}}
+                           'volume_type_id': volume_type_id,
+                           'user_id': user_id,
+                           'project_id': project_id,
+                           'availability_zone': availability_zone,
+                           'status': "creating",
+                           'attach_status': "detached",
+                           'metadata': volume_metadata,
+                           }}
         return self._create('/volumes', body, 'volume')
 
     def get(self, volume_id):
