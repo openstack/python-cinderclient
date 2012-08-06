@@ -76,16 +76,30 @@ class SnapshotManager(base.ManagerWithFind):
         """
         return self._get("/snapshots/%s" % snapshot_id, "snapshot")
 
-    def list(self, detailed=True):
+    def list(self, detailed=True, search_opts=None):
         """
         Get a list of all snapshots.
 
         :rtype: list of :class:`Snapshot`
         """
-        if detailed is True:
-            return self._list("/snapshots/detail", "snapshots")
-        else:
-            return self._list("/snapshots", "snapshots")
+
+        if search_opts is None:
+            search_opts = {}
+
+        qparams = {}
+
+        for opt, val in search_opts.iteritems():
+            if val:
+                qparams[opt] = val
+
+        query_string = "?%s" % urllib.urlencode(qparams) if qparams else ""
+
+        detail = ""
+        if detailed:
+            detail = "/detail"
+
+        return self._list("/snapshots%s%s" % (detail, query_string),
+                          "snapshots")
 
     def delete(self, snapshot):
         """

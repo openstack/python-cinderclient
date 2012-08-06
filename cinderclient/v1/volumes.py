@@ -17,6 +17,7 @@
 Volume interface (1.1 extension).
 """
 
+import urllib
 from cinderclient import base
 
 
@@ -136,16 +137,29 @@ class VolumeManager(base.ManagerWithFind):
         """
         return self._get("/volumes/%s" % volume_id, "volume")
 
-    def list(self, detailed=True):
+    def list(self, detailed=True, search_opts=None):
         """
         Get a list of all volumes.
 
         :rtype: list of :class:`Volume`
         """
-        if detailed is True:
-            return self._list("/volumes/detail", "volumes")
-        else:
-            return self._list("/volumes", "volumes")
+        if search_opts is None:
+            search_opts = {}
+
+        qparams = {}
+
+        for opt, val in search_opts.iteritems():
+            if val:
+                qparams[opt] = val
+
+        query_string = "?%s" % urllib.urlencode(qparams) if qparams else ""
+
+        detail = ""
+        if detailed:
+            detail = "/detail"
+
+        return self._list("/volumes%s%s" % (detail, query_string),
+                          "volumes")
 
     def delete(self, volume):
         """
