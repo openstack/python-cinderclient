@@ -32,7 +32,7 @@ setuptools.setup(
     version=setup.get_post_version('cinderclient'),
     author="Rackspace, based on work by Jacob Kaplan-Moss",
     author_email="github@racklabs.com",
-    description="Client library for OpenStack Nova API.",
+    description="Client library for OpenStack Cinder API.",
     long_description=read_file("README.rst"),
     license="Apache License, Version 2.0",
     url="https://github.com/openstack/python-cinderclient",
