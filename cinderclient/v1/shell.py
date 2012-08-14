@@ -90,6 +90,17 @@ def _translate_volume_snapshot_keys(collection):
                 setattr(item, to_key, item._info[from_key])
 
 
+def _extract_metadata(arg_list):
+    metadata = {}
+    for metadatum in arg_list:
+        assert(metadatum.find('=') > -1), "Improperly formatted metadata "\
+                                          "input (%s)" % metadatum
+        (key, value) = metadatum.split('=', 1)
+        metadata[key] = value
+
+    return metadata
+
+
 @utils.arg('--all_tenants',
            dest='all_tenants',
            metavar='<0|1>',
@@ -148,16 +159,28 @@ def do_show(cs, args):
 @utils.arg('--availability_zone', metavar='<availability_zone>',
            help='Optional availability zone for volume. (Default=None)',
            default=None)
+@utils.arg('--metadata',
+           type=str,
+           nargs='*',
+           metavar='<key=value>',
+           help='Optional metadata kv pairs. (Default=None)',
+           default=None)
 @utils.service_type('volume')
 def do_create(cs, args):
     """Add a new volume."""
+
+    volume_metadata = None
+    if args.metadata is not None:
+        volume_metadata = _extract_metadata(args.metadata)
+
     cs.volumes.create(args.size,
                       args.snapshot_id,
                       args.display_name,
                       args.display_description,
                       args.volume_type,
                       availability_zone=args.availability_zone,
-                      imageRef=args.image_id)
+                      imageRef=args.image_id,
+                      metadata=volume_metadata)
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of the volume to delete.')
