@@ -88,7 +88,7 @@ class VolumeManager(base.ManagerWithFind):
                display_name=None, display_description=None,
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
-               metadata=None):
+               metadata=None, imageRef=None):
         """
         Create a volume.
 
@@ -102,6 +102,7 @@ class VolumeManager(base.ManagerWithFind):
         :param project_id: Project id derived from context
         :param availability_zone: Availability Zone to use
         :param metadata: Optional metadata to set on volume creation
+        :param imageRef: reference to an image stored in glance
         """
 
         if volume_type is None:
@@ -125,6 +126,7 @@ class VolumeManager(base.ManagerWithFind):
                            'status': "creating",
                            'attach_status': "detached",
                            'metadata': volume_metadata,
+                           'imageRef': imageRef,
                            }}
         return self._create('/volumes', body, 'volume')
 
