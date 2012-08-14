@@ -141,6 +141,9 @@ def do_show(cs, args):
            metavar='<volume_type>',
            help='Optional volume type. (Default=None)',
            default=None)
+@utils.arg('--availability_zone', metavar='<availability_zone>',
+           help='Optional availability zone for volume. (Default=None)',
+           default=None)
 @utils.service_type('volume')
 def do_create(cs, args):
     """Add a new volume."""
@@ -148,7 +151,8 @@ def do_create(cs, args):
                       args.snapshot_id,
                       args.display_name,
                       args.display_description,
-                      args.volume_type)
+                      args.volume_type,
+                      availability_zone=args.availability_zone)
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of the volume to delete.')
