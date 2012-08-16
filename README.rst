@@ -80,12 +80,14 @@ You'll find complete documentation on the shell by running
 
     Positional arguments:
       <subcommand>
+        absolute-limits     Print a list of absolute limits for a user
         create              Add a new volume.
         credentials         Show user credentials returned from auth
         delete              Remove a volume.
         endpoints           Discover endpoints that get returned from the
                             authenticate services
         list                List all the volumes.
+        rate-limits         Print a list of rate limits for a user
         show                Show details about a volume.
         snapshot-create     Add a new snapshot.
         snapshot-delete     Remove a snapshot.

@@ -346,3 +346,100 @@ def do_credentials(cs, args):
     catalog = cs.client.service_catalog.catalog
     utils.print_dict(catalog['access']['user'], "User Credentials")
     utils.print_dict(catalog['access']['token'], "Token")
+
+_quota_resources = ['volumes', 'gigabytes']
+
+
+def _quota_show(quotas):
+    quota_dict = {}
+    for resource in _quota_resources:
+        quota_dict[resource] = getattr(quotas, resource, None)
+    utils.print_dict(quota_dict)
+
+
+def _quota_update(manager, identifier, args):
+    updates = {}
+    for resource in _quota_resources:
+        val = getattr(args, resource, None)
+        if val is not None:
+            updates[resource] = val
+
+    if updates:
+        manager.update(identifier, **updates)
+
+
+@utils.arg('tenant', metavar='<tenant_id>',
+           help='UUID of tenant to list the quotas for.')
+@utils.service_type('volume')
+def do_quota_show(cs, args):
+    """List the quotas for a tenant."""
+
+    _quota_show(cs.quotas.get(args.tenant))
+
+
+@utils.arg('tenant', metavar='<tenant_id>',
+           help='UUID of tenant to list the default quotas for.')
+@utils.service_type('volume')
+def do_quota_defaults(cs, args):
+    """List the default quotas for a tenant."""
+
+    _quota_show(cs.quotas.defaults(args.tenant))
+
+
+@utils.arg('tenant', metavar='<tenant_id>',
+           help='UUID of tenant to set the quotas for.')
+@utils.arg('--volumes',
+           metavar='<volumes>',
+           type=int, default=None,
+           help='New value for the "volumes" quota.')
+@utils.arg('--gigabytes',
+           metavar='<gigabytes>',
+           type=int, default=None,
+           help='New value for the "gigabytes" quota.')
+@utils.service_type('volume')
+def do_quota_update(cs, args):
+    """Update the quotas for a tenant."""
+
+    _quota_update(cs.quotas, args.tenant, args)
+
+
+@utils.arg('class_name', metavar='<class>',
+           help='Name of quota class to list the quotas for.')
+@utils.service_type('volume')
+def do_quota_class_show(cs, args):
+    """List the quotas for a quota class."""
+
+    _quota_show(cs.quota_classes.get(args.class_name))
+
+
+@utils.arg('class_name', metavar='<class>',
+           help='Name of quota class to set the quotas for.')
+@utils.arg('--volumes',
+           metavar='<volumes>',
+           type=int, default=None,
+           help='New value for the "volumes" quota.')
+@utils.arg('--gigabytes',
+           metavar='<gigabytes>',
+           type=int, default=None,
+           help='New value for the "gigabytes" quota.')
+@utils.service_type('volume')
+def do_quota_class_update(cs, args):
+    """Update the quotas for a quota class."""
+
+    _quota_update(cs.quota_classes, args.class_name, args)
+
+
+@utils.service_type('volume')
+def do_absolute_limits(cs, args):
+    """Print a list of absolute limits for a user"""
+    limits = cs.limits.get().absolute
+    columns = ['Name', 'Value']
+    utils.print_list(limits, columns)
+
+
+@utils.service_type('volume')
+def do_rate_limits(cs, args):
+    """Print a list of rate limits for a user"""
+    limits = cs.limits.get().rate
+    columns = ['Verb', 'URI', 'Value', 'Remain', 'Unit', 'Next_Available']
+    utils.print_list(limits, columns)
