@@ -230,7 +230,7 @@ class VolumeManager(base.ManagerWithFind):
         """
         Set attachment metadata.
 
-        :param server: The :class:`Volume` (or its ID)
+        :param volume: The :class:`Volume` (or its ID)
                        you would like to attach.
         :param instance_uuid: uuid of the attaching instance.
         :param mountpoint: mountpoint on the attaching instance.
@@ -244,7 +244,7 @@ class VolumeManager(base.ManagerWithFind):
         """
         Clear attachment metadata.
 
-        :param server: The :class:`Volume` (or its ID)
+        :param volume: The :class:`Volume` (or its ID)
                        you would like to detach.
         """
         return self._action('os-detach', volume)
@@ -253,7 +253,7 @@ class VolumeManager(base.ManagerWithFind):
         """
         Reserve this volume.
 
-        :param server: The :class:`Volume` (or its ID)
+        :param volume: The :class:`Volume` (or its ID)
                        you would like to reserve.
         """
         return self._action('os-reserve', volume)
@@ -262,7 +262,7 @@ class VolumeManager(base.ManagerWithFind):
         """
         Unreserve this volume.
 
-        :param server: The :class:`Volume` (or its ID)
+        :param volume: The :class:`Volume` (or its ID)
                        you would like to unreserve.
         """
         return self._action('os-unreserve', volume)
@@ -271,7 +271,7 @@ class VolumeManager(base.ManagerWithFind):
         """
         Initialize a volume connection.
 
-        :param server: The :class:`Volume` (or its ID).
+        :param volume: The :class:`Volume` (or its ID).
         :param connector: connector dict from nova.
         """
         return self._action('os-initialize_connection', volume,
@@ -281,7 +281,7 @@ class VolumeManager(base.ManagerWithFind):
         """
         Terminate a volume connection.
 
-        :param server: The :class:`Volume` (or its ID).
+        :param volume: The :class:`Volume` (or its ID).
         :param connector: connector dict from nova.
         """
         self._action('os-terminate_connection', volume,
