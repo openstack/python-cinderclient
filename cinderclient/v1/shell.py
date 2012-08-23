@@ -15,6 +15,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import argparse
 import os
 import sys
 import time
@@ -101,14 +102,21 @@ def _extract_metadata(arg_list):
     return metadata
 
 
-@utils.arg('--all_tenants',
-           dest='all_tenants',
-           metavar='<0|1>',
-           nargs='?',
-           type=int,
-           const=1,
-           default=0,
-           help='Display information from all tenants (Admin only).')
+@utils.arg(
+    '--all-tenants',
+    dest='all_tenants',
+    metavar='<0|1>',
+    nargs='?',
+    type=int,
+    const=1,
+    default=0,
+    help='Display information from all tenants (Admin only).')
+@utils.arg(
+    '--all_tenants',
+    nargs='?',
+    type=int,
+    const=1,
+    help=argparse.SUPPRESS)
 @utils.service_type('volume')
 def do_list(cs, args):
     """List all the volumes."""
@@ -138,32 +146,58 @@ def do_show(cs, args):
            type=int,
            help='Size of volume in GB')
 @utils.arg(
+    '--snapshot-id',
+    metavar='<snapshot-id>',
+    default=None,
+    help='Create volume from snapshot id (Optional, Default=None)')
+@utils.arg(
     '--snapshot_id',
-    metavar='<snapshot_id>',
-    help='Optional snapshot id to create the volume from. (Default=None)',
-    default=None)
-@utils.arg('--image_id',
-           metavar='<image_id>',
-           help='Optional image id to create the volume from. (Default=None)',
-           default=None)
-@utils.arg('--display_name', metavar='<display_name>',
-           help='Optional volume name. (Default=None)',
-           default=None)
-@utils.arg('--display_description', metavar='<display_description>',
-           help='Optional volume description. (Default=None)',
-           default=None)
-@utils.arg('--volume_type',
-           metavar='<volume_type>',
-           help='Optional volume type. (Default=None)',
-           default=None)
-@utils.arg('--availability_zone', metavar='<availability_zone>',
-           help='Optional availability zone for volume. (Default=None)',
-           default=None)
+    help=argparse.SUPPRESS)
+@utils.arg(
+    '--image-id',
+    metavar='<image-id>',
+    default=None,
+    help='Create volume from image id (Optional, Default=None)')
+@utils.arg(
+    '--image_id',
+    help=argparse.SUPPRESS)
+@utils.arg(
+    '--display-name',
+    metavar='<display-name>',
+    default=None,
+    help='Volume name (Optional, Default=None)')
+@utils.arg(
+    '--display_name',
+    help=argparse.SUPPRESS)
+@utils.arg(
+    '--display-description',
+    metavar='<display-description>',
+    default=None,
+    help='Volume description (Optional, Default=None)')
+@utils.arg(
+    '--display_description',
+    help=argparse.SUPPRESS)
+@utils.arg(
+    '--volume-type',
+    metavar='<volume-type>',
+    default=None,
+    help='Volume type (Optional, Default=None)')
+@utils.arg(
+    '--volume_type',
+    help=argparse.SUPPRESS)
+@utils.arg(
+    '--availability-zone',
+    metavar='<availability-zone>',
+    default=None,
+    help='Availability zone for volume (Optional, Default=None)')
+@utils.arg(
+    '--availability_zone',
+    help=argparse.SUPPRESS)
 @utils.arg('--metadata',
            type=str,
            nargs='*',
            metavar='<key=value>',
-           help='Optional metadata kv pairs. (Default=None)',
+           help='Metadata key=value pairs (Optional, Default=None)',
            default=None)
 @utils.service_type('volume')
 def do_create(cs, args):
@@ -191,14 +225,21 @@ def do_delete(cs, args):
     volume.delete()
 
 
-@utils.arg('--all_tenants',
-           dest='all_tenants',
-           metavar='<0|1>',
-           nargs='?',
-           type=int,
-           const=1,
-           default=0,
-           help='Display information from all tenants (Admin only).')
+@utils.arg(
+    '--all-tenants',
+    dest='all_tenants',
+    metavar='<0|1>',
+    nargs='?',
+    type=int,
+    const=1,
+    default=0,
+    help='Display information from all tenants (Admin only).')
+@utils.arg(
+    '--all_tenants',
+    nargs='?',
+    type=int,
+    const=1,
+    help=argparse.SUPPRESS)
 @utils.service_type('volume')
 def do_snapshot_list(cs, args):
     """List all the snapshots."""
@@ -220,7 +261,7 @@ def do_snapshot_show(cs, args):
 
 
 @utils.arg('volume_id',
-           metavar='<volume_id>',
+           metavar='<volume-id>',
            help='ID of the volume to snapshot')
 @utils.arg('--force',
            metavar='<True|False>',
@@ -228,12 +269,22 @@ def do_snapshot_show(cs, args):
            'to snapshot a volume even if its '
            'attached to an instance. (Default=False)',
            default=False)
-@utils.arg('--display_name', metavar='<display_name>',
-           help='Optional snapshot name. (Default=None)',
-           default=None)
-@utils.arg('--display_description', metavar='<display_description>',
-           help='Optional snapshot description. (Default=None)',
-           default=None)
+@utils.arg(
+    '--display-name',
+    metavar='<display-name>',
+    default=None,
+    help='Optional snapshot name. (Default=None)')
+@utils.arg(
+    '--display_name',
+    help=argparse.SUPPRESS)
+@utils.arg(
+    '--display-description',
+    metavar='<display-description>',
+    default=None,
+    help='Optional snapshot description. (Default=None)')
+@utils.arg(
+    '--display_description',
+    help=argparse.SUPPRESS)
 @utils.service_type('volume')
 def do_snapshot_create(cs, args):
     """Add a new snapshot."""
@@ -244,7 +295,7 @@ def do_snapshot_create(cs, args):
 
 
 @utils.arg('snapshot_id',
-           metavar='<snapshot_id>',
+           metavar='<snapshot-id>',
            help='ID of the snapshot to delete.')
 @utils.service_type('volume')
 def do_snapshot_delete(cs, args):
