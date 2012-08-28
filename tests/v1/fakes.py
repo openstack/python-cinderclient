@@ -21,6 +21,27 @@ from cinderclient.v1 import client
 from tests import fakes
 
 
+def _stub_volume(**kwargs):
+    volume = {
+        'id': '1234',
+        'display_name': None,
+        'display_description': None,
+        "attachments": [],
+        "availability_zone": "cinder",
+        "created_at": "2012-08-27T00:00:00.000000",
+        "display_description": None,
+        "display_name": None,
+        "id": '00000000-0000-0000-0000-000000000000',
+        "metadata": {},
+        "size": 1,
+        "snapshot_id": None,
+        "status": "available",
+        "volume_type": "None",
+    }
+    volume.update(kwargs)
+    return volume
+
+
 def _stub_snapshot(**kwargs):
     snapshot = {
         "created_at": "2012-08-28T16:30:31.000000",
@@ -90,9 +111,22 @@ class FakeHTTPClient(base_client.HTTPClient):
             _stub_snapshot(),
         ]})
 
+    def get_snapshots_1234(self, **kw):
+        return (200, {'snapshot': _stub_snapshot(id='1234')})
+
+    def put_snapshots_1234(self, **kw):
+        snapshot = _stub_snapshot(id='1234')
+        snapshot.update(kw['body']['snapshot'])
+        return (200, {'snapshot': snapshot})
+
     #
-    # volumes
+    # Volumes
     #
+
+    def put_volumes_1234(self, **kw):
+        volume = _stub_volume(id='1234')
+        volume.update(kw['body']['volume'])
+        return (200, {'volume': volume})
 
     def get_volumes(self, **kw):
         return (200, {"volumes": [

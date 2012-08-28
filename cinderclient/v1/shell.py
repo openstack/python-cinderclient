@@ -240,6 +240,23 @@ def do_delete(cs, args):
     volume.delete()
 
 
+@utils.arg('volume', metavar='<volume>', help='ID of the volume to rename.')
+@utils.arg('display_name', nargs='?', metavar='<display-name>',
+           help='New display-name for the volume.')
+@utils.arg('--display-description', metavar='<display-description>',
+           help='Optional volume description. (Default=None)',
+           default=None)
+@utils.service_type('volume')
+def do_rename(cs, args):
+    """Rename a volume."""
+    kwargs = {}
+    if args.display_name is not None:
+        kwargs['display_name'] = args.display_name
+    if args.display_description is not None:
+        kwargs['display_description'] = args.display_description
+    _find_volume(cs, args.volume).update(**kwargs)
+
+
 @utils.arg(
     '--all-tenants',
     dest='all_tenants',
@@ -338,6 +355,23 @@ def do_snapshot_delete(cs, args):
     """Remove a snapshot."""
     snapshot = _find_volume_snapshot(cs, args.snapshot_id)
     snapshot.delete()
+
+
+@utils.arg('snapshot', metavar='<snapshot>', help='ID of the snapshot.')
+@utils.arg('display_name', nargs='?', metavar='<display-name>',
+           help='New display-name for the snapshot.')
+@utils.arg('--display-description', metavar='<display-description>',
+           help='Optional snapshot description. (Default=None)',
+           default=None)
+@utils.service_type('volume')
+def do_snapshot_rename(cs, args):
+    """Rename a snapshot."""
+    kwargs = {}
+    if args.display_name is not None:
+        kwargs['display_name'] = args.display_name
+    if args.display_description is not None:
+        kwargs['display_description'] = args.display_description
+    _find_volume_snapshot(cs, args.snapshot).update(**kwargs)
 
 
 def _print_volume_type_list(vtypes):

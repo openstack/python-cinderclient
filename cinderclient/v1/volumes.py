@@ -34,6 +34,12 @@ class Volume(base.Resource):
         """
         self.manager.delete(self)
 
+    def update(self, **kwargs):
+        """
+        Update the display_name or display_description for this volume.
+        """
+        self.manager.update(self, **kwargs)
+
     def attach(self, instance_uuid, mountpoint):
         """
         Set attachment metadata.
@@ -177,6 +183,19 @@ class VolumeManager(base.ManagerWithFind):
         :param volume: The :class:`Volume` to delete.
         """
         self._delete("/volumes/%s" % base.getid(volume))
+
+    def update(self, volume, **kwargs):
+        """
+        Update the display_name or display_description for a volume.
+
+        :param volume: The :class:`Volume` to delete.
+        """
+        if not kwargs:
+            return
+
+        body = {"volume": kwargs}
+
+        self._update("/volumes/%s" % base.getid(volume), body)
 
     def create_server_volume(self, server_id, volume_id, device):
         """
