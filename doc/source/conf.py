@@ -11,7 +11,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import os
+import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -21,9 +22,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
 sys.path.insert(0, ROOT)
 
-# -- General configuration -----------------------------------------------------
+# -- General configuration ----------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be extensions
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx']
 
@@ -69,7 +71,8 @@ release = '2.6.10'
 # for source files.
 exclude_trees = []
 
-# The reST default role (used for this markup: `text`) to use for all documents.
+# The reST default role (used for this markup: `text`) to use for all
+# documents.
 #default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
@@ -90,7 +93,7 @@ pygments_style = 'sphinx'
 #modindex_common_prefix = []
 
 
-# -- Options for HTML output ---------------------------------------------------
+# -- Options for HTML output --------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
@@ -164,7 +167,7 @@ html_static_path = ['_static']
 htmlhelp_basename = 'python-cinderclientdoc'
 
 
-# -- Options for LaTeX output --------------------------------------------------
+# -- Options for LaTeX output -------------------------------------------------
 
 # The paper size ('letter' or 'a4').
 #latex_paper_size = 'letter'
@@ -173,10 +176,11 @@ htmlhelp_basename = 'python-cinderclientdoc'
 #latex_font_size = '10pt'
 
 # Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title, author, documentclass [howto/manual]).
+# (source start file, target name, title, author, documentclass [howto/manual])
+# .
 latex_documents = [
-  ('index', 'python-cinderclient.tex', u'python-cinderclient Documentation',
-   u'Rackspace - based on work by Jacob Kaplan-Moss', 'manual'),
+    ('index', 'python-cinderclient.tex', u'python-cinderclient Documentation',
+    u'Rackspace - based on work by Jacob Kaplan-Moss', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
