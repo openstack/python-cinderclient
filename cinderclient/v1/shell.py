@@ -117,11 +117,25 @@ def _extract_metadata(arg_list):
     type=int,
     const=1,
     help=argparse.SUPPRESS)
+@utils.arg(
+    '--display-name',
+    metavar='<display-name>',
+    default=None,
+    help='Filter results by display-name')
+@utils.arg(
+    '--status',
+    metavar='<status>',
+    default=None,
+    help='Filter results by status')
 @utils.service_type('volume')
 def do_list(cs, args):
     """List all the volumes."""
     all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
-    search_opts = {'all_tenants': all_tenants}
+    search_opts = {
+        'all_tenants': all_tenants,
+        'display_name': args.display_name,
+        'status': args.status,
+    }
     volumes = cs.volumes.list(search_opts=search_opts)
     _translate_volume_keys(volumes)
 
@@ -240,11 +254,31 @@ def do_delete(cs, args):
     type=int,
     const=1,
     help=argparse.SUPPRESS)
+@utils.arg(
+    '--display-name',
+    metavar='<display-name>',
+    default=None,
+    help='Filter results by display-name')
+@utils.arg(
+    '--status',
+    metavar='<status>',
+    default=None,
+    help='Filter results by status')
+@utils.arg(
+    '--volume-id',
+    metavar='<volume-id>',
+    default=None,
+    help='Filter results by volume-id')
 @utils.service_type('volume')
 def do_snapshot_list(cs, args):
     """List all the snapshots."""
     all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
-    search_opts = {'all_tenants': all_tenants}
+    search_opts = {
+        'all_tenants': all_tenants,
+        'display_name': args.display_name,
+        'status': args.status,
+        'volume_id': args.volume_id,
+    }
 
     snapshots = cs.volume_snapshots.list(search_opts=search_opts)
     _translate_volume_snapshot_keys(snapshots)

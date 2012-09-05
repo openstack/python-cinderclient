@@ -21,6 +21,20 @@ from cinderclient.v1 import client
 from tests import fakes
 
 
+def _stub_snapshot(**kwargs):
+    snapshot = {
+        "created_at": "2012-08-28T16:30:31.000000",
+        "display_description": None,
+        "display_name": None,
+        "id": '11111111-1111-1111-1111-111111111111',
+        "size": 1,
+        "status": "available",
+        "volume_id": '00000000-0000-0000-0000-000000000000',
+    }
+    snapshot.update(kwargs)
+    return snapshot
+
+
 class FakeClient(fakes.FakeClient, client.Client):
 
     def __init__(self, *args, **kwargs):
@@ -121,6 +135,15 @@ class FakeHTTPClient(base_client.HTTPClient):
                 "maxImageMeta": 5,
                 "maxPersonality": 5,
                 "maxPersonalitySize": 10240}, }, })
+
+    #
+    # Snapshots
+    #
+
+    def get_snapshots_detail(self, **kw):
+        return (200, {'snapshots': [
+            _stub_snapshot(),
+        ]})
 
     #
     # Servers
