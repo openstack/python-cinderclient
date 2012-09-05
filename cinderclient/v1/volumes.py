@@ -105,11 +105,6 @@ class VolumeManager(base.ManagerWithFind):
         :param imageRef: reference to an image stored in glance
         """
 
-        if volume_type is None:
-            volume_type_id = None
-        else:
-            volume_type_id = volume_type.get('id', None)
-
         if metadata is None:
             volume_metadata = {}
         else:
@@ -119,7 +114,7 @@ class VolumeManager(base.ManagerWithFind):
                            'snapshot_id': snapshot_id,
                            'display_name': display_name,
                            'display_description': display_description,
-                           'volume_type_id': volume_type_id,
+                           'volume_type': volume_type,
                            'user_id': user_id,
                            'project_id': project_id,
                            'availability_zone': availability_zone,
