@@ -21,10 +21,9 @@ class Client(object):
 
     """
 
-    # FIXME(jesse): project_id isn't required to authenticate
-    def __init__(self, username, api_key, project_id, auth_url,
-                 insecure=False, timeout=None, proxy_tenant_id=None,
-                 proxy_token=None, region_name=None,
+    def __init__(self, username, api_key, project_id=None, auth_url='',
+                 insecure=False, timeout=None, tenant_id=None,
+                 proxy_tenant_id=None, proxy_token=None, region_name=None,
                  endpoint_type='publicURL', extensions=None,
                  service_type='compute', service_name=None,
                  volume_service_name=None):
@@ -51,6 +50,7 @@ class Client(object):
             auth_url,
             insecure=insecure,
             timeout=timeout,
+            tenant_id=tenant_id,
             proxy_token=proxy_token,
             proxy_tenant_id=proxy_tenant_id,
             region_name=region_name,

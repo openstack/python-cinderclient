@@ -39,7 +39,7 @@ class HTTPClient(httplib2.Http):
     USER_AGENT = 'python-cinderclient'
 
     def __init__(self, user, password, projectid, auth_url, insecure=False,
-                 timeout=None, proxy_tenant_id=None,
+                 timeout=None, tenant_id=None, proxy_tenant_id=None,
                  proxy_token=None, region_name=None,
                  endpoint_type='publicURL', service_type=None,
                  service_name=None, volume_service_name=None):
@@ -47,6 +47,7 @@ class HTTPClient(httplib2.Http):
         self.user = user
         self.password = password
         self.projectid = projectid
+        self.tenant_id = tenant_id
         self.auth_url = auth_url.rstrip('/')
         self.version = 'v1'
         self.region_name = region_name
@@ -282,6 +283,8 @@ class HTTPClient(httplib2.Http):
 
         if self.projectid:
             body['auth']['tenantName'] = self.projectid
+        elif self.tenant_id:
+            body['auth']['tenantId'] = self.tenant_id
 
         self._authenticate(url, body)
 

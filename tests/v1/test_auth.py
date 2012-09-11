@@ -78,6 +78,76 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
 
         test_auth_call()
 
+    def test_authenticate_tenant_id(self):
+        cs = client.Client("username", "password", auth_url="auth_url/v2.0",
+                           tenant_id='tenant_id', service_type='compute')
+        resp = {
+            "access": {
+                "token": {
+                    "expires": "12345",
+                    "id": "FAKE_ID",
+                    "tenant": {
+                        "description": None,
+                        "enabled": True,
+                        "id": "tenant_id",
+                        "name": "demo"
+                    }  # tenant associated with token
+                },
+                "serviceCatalog": [
+                    {
+                        "type": "compute",
+                        "endpoints": [
+                            {
+                                "region": "RegionOne",
+                                "adminURL": "http://localhost:8774/v1",
+                                "internalURL": "http://localhost:8774/v1",
+                                "publicURL": "http://localhost:8774/v1/",
+                            },
+                        ],
+                    },
+                ],
+            },
+        }
+        auth_response = httplib2.Response({
+            "status": 200,
+            "body": json.dumps(resp), })
+
+        mock_request = mock.Mock(return_value=(auth_response,
+                                               json.dumps(resp)))
+
+        @mock.patch.object(httplib2.Http, "request", mock_request)
+        def test_auth_call():
+            cs.client.authenticate()
+            headers = {
+                'User-Agent': cs.client.USER_AGENT,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            }
+            body = {
+                'auth': {
+                    'passwordCredentials': {
+                        'username': cs.client.user,
+                        'password': cs.client.password,
+                    },
+                    'tenantId': cs.client.tenant_id,
+                },
+            }
+
+            token_url = cs.client.auth_url + "/tokens"
+            mock_request.assert_called_with(token_url, "POST",
+                                            headers=headers,
+                                            body=json.dumps(body))
+
+            endpoints = resp["access"]["serviceCatalog"][0]['endpoints']
+            public_url = endpoints[0]["publicURL"].rstrip('/')
+            self.assertEqual(cs.client.management_url, public_url)
+            token_id = resp["access"]["token"]["id"]
+            self.assertEqual(cs.client.auth_token, token_id)
+            tenant_id = resp["access"]["token"]["tenant"]["id"]
+            self.assertEqual(cs.client.tenant_id, tenant_id)
+
+        test_auth_call()
+
     def test_authenticate_failure(self):
         cs = client.Client("username", "password", "project_id",
                            "auth_url/v2.0")
