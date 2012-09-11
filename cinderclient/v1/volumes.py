@@ -61,6 +61,18 @@ class Volume(base.Resource):
         """
         return self.manager.unreserve(self)
 
+    def begin_detaching(self, volume):
+        """
+        Begin detaching volume.
+        """
+        return self.manager.begin_detaching(self)
+
+    def roll_detaching(self, volume):
+        """
+        Roll detaching volume.
+        """
+        return self.manager.roll_detaching(self)
+
     def initialize_connection(self, volume, connector):
         """
         Initialize a volume connection.
@@ -266,6 +278,24 @@ class VolumeManager(base.ManagerWithFind):
                        you would like to unreserve.
         """
         return self._action('os-unreserve', volume)
+
+    def begin_detaching(self, volume):
+        """
+        Begin detaching this volume.
+
+        :param volume: The :class:`Volume` (or its ID)
+                       you would like to detach.
+        """
+        return self._action('os-begin_detaching', volume)
+
+    def roll_detaching(self, volume):
+        """
+        Roll detaching this volume.
+
+        :param volume: The :class:`Volume` (or its ID)
+                       you would like to roll detaching.
+        """
+        return self._action('os-roll_detaching', volume)
 
     def initialize_connection(self, volume, connector):
         """
