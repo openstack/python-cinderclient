@@ -17,6 +17,7 @@
 Volume snapshot interface (1.1 extension).
 """
 
+import urllib
 from cinderclient import base
 
 
