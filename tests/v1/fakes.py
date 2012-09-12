@@ -186,6 +186,10 @@ class FakeHTTPClient(base_client.HTTPClient):
             return (202, {'connection_info': 'foos'})
         elif action == 'os-terminate_connection':
             assert body[action].keys() == ['connector']
+        elif action == 'os-begin_detaching':
+            assert body[action] == None
+        elif action == 'os-roll_detaching':
+            assert body[action] == None
         else:
             raise AssertionError("Unexpected server action: %s" % action)
         return (resp, _body)

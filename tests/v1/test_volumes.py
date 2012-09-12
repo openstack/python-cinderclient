@@ -38,17 +38,17 @@ class VolumesTest(utils.TestCase):
 
     def test_unreserve(self):
         v = cs.volumes.get('1234')
-        cs.volumes.reserve(v)
+        cs.volumes.unreserve(v)
         cs.assert_called('POST', '/volumes/1234/action')
 
     def test_begin_detaching(self):
         v = cs.volumes.get('1234')
-        cs.volumes.reserve(v)
+        cs.volumes.begin_detaching(v)
         cs.assert_called('POST', '/volumes/1234/action')
 
     def test_roll_detaching(self):
         v = cs.volumes.get('1234')
-        cs.volumes.reserve(v)
+        cs.volumes.roll_detaching(v)
         cs.assert_called('POST', '/volumes/1234/action')
 
     def test_initialize_connection(self):
