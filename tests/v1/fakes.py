@@ -121,20 +121,20 @@ class FakeHTTPClient(base_client.HTTPClient):
         if action == 'os-attach':
             assert body[action].keys() == ['instance_uuid', 'mountpoint']
         elif action == 'os-detach':
-            assert body[action] == None
+            assert body[action] is None
         elif action == 'os-reserve':
-            assert body[action] == None
+            assert body[action] is None
         elif action == 'os-unreserve':
-            assert body[action] == None
+            assert body[action] is None
         elif action == 'os-initialize_connection':
             assert body[action].keys() == ['connector']
             return (202, {'connection_info': 'foos'})
         elif action == 'os-terminate_connection':
             assert body[action].keys() == ['connector']
         elif action == 'os-begin_detaching':
-            assert body[action] == None
+            assert body[action] is None
         elif action == 'os-roll_detaching':
-            assert body[action] == None
+            assert body[action] is None
         else:
             raise AssertionError("Unexpected server action: %s" % action)
         return (resp, _body)
