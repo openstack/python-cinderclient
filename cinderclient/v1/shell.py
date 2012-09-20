@@ -65,11 +65,11 @@ def _find_volume_snapshot(cs, snapshot):
     return utils.find_resource(cs.volume_snapshots, snapshot)
 
 
-def _print_volume(cs, volume):
+def _print_volume(volume):
     utils.print_dict(volume._info)
 
 
-def _print_volume_snapshot(cs, snapshot):
+def _print_volume_snapshot(snapshot):
     utils.print_dict(snapshot._info)
 
 
@@ -152,7 +152,7 @@ def do_list(cs, args):
 def do_show(cs, args):
     """Show details about a volume."""
     volume = _find_volume(cs, args.volume)
-    _print_volume(cs, volume)
+    _print_volume(volume)
 
 
 @utils.arg('size',
@@ -221,14 +221,15 @@ def do_create(cs, args):
     if args.metadata is not None:
         volume_metadata = _extract_metadata(args.metadata)
 
-    cs.volumes.create(args.size,
-                      args.snapshot_id,
-                      args.display_name,
-                      args.display_description,
-                      args.volume_type,
-                      availability_zone=args.availability_zone,
-                      imageRef=args.image_id,
-                      metadata=volume_metadata)
+    volume = cs.volumes.create(args.size,
+                               args.snapshot_id,
+                               args.display_name,
+                               args.display_description,
+                               args.volume_type,
+                               availability_zone=args.availability_zone,
+                               imageRef=args.image_id,
+                               metadata=volume_metadata)
+    _print_volume(volume)
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of the volume to delete.')
@@ -291,7 +292,7 @@ def do_snapshot_list(cs, args):
 def do_snapshot_show(cs, args):
     """Show details about a snapshot."""
     snapshot = _find_volume_snapshot(cs, args.snapshot)
-    _print_volume_snapshot(cs, snapshot)
+    _print_volume_snapshot(snapshot)
 
 
 @utils.arg('volume_id',
@@ -322,10 +323,11 @@ def do_snapshot_show(cs, args):
 @utils.service_type('volume')
 def do_snapshot_create(cs, args):
     """Add a new snapshot."""
-    cs.volume_snapshots.create(args.volume_id,
-                               args.force,
-                               args.display_name,
-                               args.display_description)
+    snapshot = cs.volume_snapshots.create(args.volume_id,
+                                          args.force,
+                                          args.display_name,
+                                          args.display_description)
+    _print_volume_snapshot(snapshot)
 
 
 @utils.arg('snapshot_id',
