@@ -17,9 +17,7 @@ class Client(object):
 
     Then call methods on its managers::
 
-        >>> client.servers.list()
-        ...
-        >>> client.flavors.list()
+        >>> client.volumes.list()
         ...
 
     """
