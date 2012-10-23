@@ -1,3 +1,4 @@
+import locale
 import os
 import re
 import sys
@@ -179,12 +180,19 @@ def find_resource(manager, name_or_id):
             return manager.find(name=name_or_id)
         except exceptions.NotFound:
             try:
-                # Volumes does not have name, but display_name
-                return manager.find(display_name=name_or_id)
-            except exceptions.NotFound:
-                msg = "No %s with a name or ID of '%s' exists." % \
-                    (manager.resource_class.__name__.lower(), name_or_id)
-                raise exceptions.CommandError(msg)
+                # For command-line arguments that are in Unicode
+                encoding = (locale.getpreferredencoding() or
+                            sys.stdin.encoding or
+                            'UTF-8')
+                return manager.find(display_name=(name_or_id.decode(encoding)))
+            except (UnicodeDecodeError, exceptions.NotFound):
+                try:
+                    # Volumes does not have name, but display_name
+                    return manager.find(display_name=name_or_id)
+                except exceptions.NotFound:
+                    msg = "No %s with a name or ID of '%s' exists." % \
+                        (manager.resource_class.__name__.lower(), name_or_id)
+                    raise exceptions.CommandError(msg)
     except exceptions.NoUniqueMatch:
         msg = ("Multiple %s matches found for '%s', use an ID to be more"
                " specific." % (manager.resource_class.__name__.lower(),
