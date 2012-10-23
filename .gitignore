@@ -9,5 +9,5 @@ cover
 AUTHORS
 build
 dist
-.*egg-info
 cinderclient/versioninfo
+python_cinderclient.egg-info
