@@ -227,3 +227,35 @@ class FakeHTTPClient(base_client.HTTPClient):
                       'metadata_items': [],
                       'volumes': 2,
                       'gigabytes': 1}})
+
+    #
+    # VolumeTypes
+    #
+    def get_types(self, **kw):
+        return (200, {
+            'volume_types': [{'id': 1,
+                              'name': 'test-type-1',
+                              'extra_specs':{}},
+                             {'id': 2,
+                              'name': 'test-type-2',
+                              'extra_specs':{}}]})
+
+    def get_types_1(self, **kw):
+        return (200, {'volume_type': {'id': 1,
+                                      'name': 'test-type-1',
+                                      'extra_specs': {}}})
+
+    def post_types(self, body, **kw):
+        return (202, {'volume_type': {'id': 3,
+                                      'name': 'test-type-3',
+                                      'extra_specs': {}}})
+
+    def post_types_1_extra_specs(self, body, **kw):
+        assert body.keys() == ['extra_specs']
+        return (200, {'extra_specs': {'k': 'v'}})
+
+    def delete_types_1_extra_specs_k(self, **kw):
+        return(204, None)
+
+    def delete_types_1(self, **kw):
+        return (202, None)

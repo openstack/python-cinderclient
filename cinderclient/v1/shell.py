@@ -20,6 +20,7 @@ import os
 import sys
 import time
 
+from cinderclient import exceptions
 from cinderclient import utils
 
 
@@ -91,14 +92,17 @@ def _translate_volume_snapshot_keys(collection):
                 setattr(item, to_key, item._info[from_key])
 
 
-def _extract_metadata(arg_list):
+def _extract_metadata(args):
     metadata = {}
-    for metadatum in arg_list:
-        assert(metadatum.find('=') > -1), "Improperly formatted metadata "\
-                                          "input (%s)" % metadatum
-        (key, value) = metadatum.split('=', 1)
-        metadata[key] = value
+    for metadatum in args.metadata[0]:
+        # unset doesn't require a val, so we have the if/else
+        if '=' in metadatum:
+            (key, value) = metadatum.split('=', 1)
+        else:
+            key = metadatum
+            value = None
 
+        metadata[key] = value
     return metadata
 
 
@@ -219,7 +223,7 @@ def do_create(cs, args):
 
     volume_metadata = None
     if args.metadata is not None:
-        volume_metadata = _extract_metadata(args.metadata)
+        volume_metadata = _extract_metadata(args)
 
     volume = cs.volumes.create(args.size,
                                args.snapshot_id,
@@ -375,7 +379,9 @@ def do_snapshot_rename(cs, args):
 
 
 def _print_volume_type_list(vtypes):
-    utils.print_list(vtypes, ['ID', 'Name'])
+    #_translate_type_keys(vtypes)
+    formatters = {'extra_specs': _print_type_extra_specs}
+    utils.print_list(vtypes, ['ID', 'Name', 'extra_specs'], formatters)
 
 
 @utils.service_type('volume')
@@ -387,7 +393,7 @@ def do_type_list(cs, args):
 
 @utils.arg('name',
            metavar='<name>',
-           help="Name of the new flavor")
+           help="Name of the new volume type")
 @utils.service_type('volume')
 def do_type_create(cs, args):
     """Create a new volume type."""
@@ -400,8 +406,33 @@ def do_type_create(cs, args):
            help="Unique ID of the volume type to delete")
 @utils.service_type('volume')
 def do_type_delete(cs, args):
-    """Delete a specific flavor"""
+    """Delete a specific volume type"""
     cs.volume_types.delete(args.id)
+
+
+@utils.arg('vtype',
+           metavar='<vtype>',
+           help="Name or ID of the volume type")
+@utils.arg('action',
+           metavar='<action>',
+           choices=['set', 'unset'],
+           help="Actions: 'set' or 'unset'")
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           action='append',
+           default=[],
+           help='Extra_specs to set/unset (only key is necessary on unset)')
+@utils.service_type('volume')
+def do_type_key(cs, args):
+    "Set or unset extra_spec for a volume type."""
+    vtype = _find_volume_type(cs, args.vtype)
+    keypair = _extract_metadata(args)
+
+    if args.action == 'set':
+        vtype.set_keys(keypair)
+    elif args.action == 'unset':
+        vtype.unset_keys(keypair.keys())
 
 
 def do_endpoints(cs, args):
@@ -513,3 +544,15 @@ def do_rate_limits(cs, args):
     limits = cs.limits.get().rate
     columns = ['Verb', 'URI', 'Value', 'Remain', 'Unit', 'Next_Available']
     utils.print_list(limits, columns)
+
+
+def _print_type_extra_specs(vol_type):
+    try:
+        return vol_type.get_keys()
+    except exceptions.NotFound:
+        return "N/A"
+
+
+def _find_volume_type(cs, vtype):
+    """Get a volume type by name or ID."""
+    return utils.find_resource(cs.volume_types, vtype)
