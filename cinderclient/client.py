@@ -11,6 +11,10 @@ import httplib2
 import logging
 import os
 import urlparse
+try:
+    from eventlet import sleep
+except ImportError:
+    from time import sleep
 
 try:
     import json
@@ -42,7 +46,7 @@ class HTTPClient(httplib2.Http):
                  timeout=None, tenant_id=None, proxy_tenant_id=None,
                  proxy_token=None, region_name=None,
                  endpoint_type='publicURL', service_type=None,
-                 service_name=None, volume_service_name=None):
+                 service_name=None, volume_service_name=None, retries=None):
         super(HTTPClient, self).__init__(timeout=timeout)
         self.user = user
         self.password = password
@@ -55,6 +59,7 @@ class HTTPClient(httplib2.Http):
         self.service_type = service_type
         self.service_name = service_name
         self.volume_service_name = volume_service_name
+        self.retries = int(retries or 0)
 
         self.management_url = None
         self.auth_token = None
@@ -111,28 +116,47 @@ class HTTPClient(httplib2.Http):
         return resp, body
 
     def _cs_request(self, url, method, **kwargs):
-        if not self.management_url:
-            self.authenticate()
-
-        # Perform the request once. If we get a 401 back then it
-        # might be because the auth token expired, so try to
-        # re-authenticate and try again. If it still fails, bail.
-        try:
+        auth_attempts = 0
+        attempts = 0
+        backoff = 1
+        while True:
+            attempts += 1
+            if not self.management_url or not self.auth_token:
+                self.authenticate()
             kwargs.setdefault('headers', {})['X-Auth-Token'] = self.auth_token
             if self.projectid:
                 kwargs['headers']['X-Auth-Project-Id'] = self.projectid
-
-            resp, body = self.request(self.management_url + url, method,
-                                      **kwargs)
-            return resp, body
-        except exceptions.Unauthorized, ex:
             try:
-                self.authenticate()
                 resp, body = self.request(self.management_url + url, method,
                                           **kwargs)
                 return resp, body
+            except exceptions.BadRequest as e:
+                if attempts > self.retries:
+                    raise
+                # Socket errors show up here (400) when
+                # force_exception_to_status_code = True
+                if e.message != 'n/a':
+                    raise
             except exceptions.Unauthorized:
-                raise ex
+                if auth_attempts > 0:
+                    raise
+                _logger.debug("Unauthorized, reauthenticating.")
+                self.management_url = self.auth_token = None
+                # First reauth. Discount this attempt.
+                attempts -= 1
+                auth_attempts += 1
+                continue
+            except exceptions.ClientException as e:
+                if attempts > self.retries:
+                    raise
+                if 500 <= e.code <= 599:
+                    pass
+                else:
+                    raise
+            _logger.debug("Failed attempt(%s of %s), retrying in %s seconds" %
+                          (attempts, self.retries, backoff))
+            sleep(backoff)
+            backoff *= 2
 
     def get(self, url, **kwargs):
         return self._cs_request(url, 'GET', **kwargs)

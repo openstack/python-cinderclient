@@ -169,6 +169,12 @@ class OpenStackCinderShell(object):
                             action='store_true',
                             help=argparse.SUPPRESS)
 
+        parser.add_argument('--retries',
+                            metavar='<retries>',
+                            type=int,
+                            default=0,
+                            help='Number of retries.')
+
         # FIXME(dtroyer): The args below are here for diablo compatibility,
         #                 remove them in folsum cycle
 
@@ -408,7 +414,8 @@ class OpenStackCinderShell(object):
                                 extensions=self.extensions,
                                 service_type=service_type,
                                 service_name=service_name,
-                                volume_service_name=volume_service_name)
+                                volume_service_name=volume_service_name,
+                                retries=options.retries)
 
         try:
             if not utils.isunauthenticated(args.func):
