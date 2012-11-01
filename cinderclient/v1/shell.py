@@ -379,7 +379,10 @@ def do_snapshot_rename(cs, args):
 
 
 def _print_volume_type_list(vtypes):
-    #_translate_type_keys(vtypes)
+    utils.print_list(vtypes, ['ID', 'Name'])
+
+
+def _print_type_and_extra_specs_list(vtypes):
     formatters = {'extra_specs': _print_type_extra_specs}
     utils.print_list(vtypes, ['ID', 'Name', 'extra_specs'], formatters)
 
@@ -389,6 +392,13 @@ def do_type_list(cs, args):
     """Print a list of available 'volume types'."""
     vtypes = cs.volume_types.list()
     _print_volume_type_list(vtypes)
+
+
+@utils.service_type('volume')
+def do_extra_specs_list(cs, args):
+    """Print a list of current 'volume types and extra specs' (Admin Only)."""
+    vtypes = cs.volume_types.list()
+    _print_type_and_extra_specs_list(vtypes)
 
 
 @utils.arg('name',
