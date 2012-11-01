@@ -13,7 +13,7 @@ mock_request = mock.Mock(return_value=(fake_response, fake_body))
 
 def get_client():
     cl = client.HTTPClient("username", "password",
-                           "project_id", "auth_test")
+                           "project_id", "auth_test", retries=1)
     return cl
 
 
@@ -43,6 +43,66 @@ class ClientTest(utils.TestCase):
             self.assertEqual(body, {"hi": "there"})
 
         test_get_call()
+
+    def test_get_retry_500(self):
+        cl = get_authed_client()
+
+        bad_response = httplib2.Response({"status": 500})
+        bad_body = '{"error": {"message": "FAILED!", "details": "DETAILS!"}}'
+        bad_request = mock.Mock(return_value=(bad_response, bad_body))
+        self.requests = [bad_request, mock_request]
+
+        def request(*args, **kwargs):
+            next_request = self.requests.pop(0)
+            return next_request(*args, **kwargs)
+
+        @mock.patch.object(httplib2.Http, "request", request)
+        @mock.patch('time.time', mock.Mock(return_value=1234))
+        def test_get_call():
+            resp, body = cl.get("/hi")
+
+        test_get_call()
+        self.assertEqual(self.requests, [])
+
+    def test_get_no_retry_400(self):
+        cl = get_authed_client()
+
+        bad_response = httplib2.Response({"status": 400})
+        bad_body = '{"error": {"message": "Bad!", "details": "Terrible!"}}'
+        bad_request = mock.Mock(return_value=(bad_response, bad_body))
+        self.requests = [bad_request, mock_request]
+
+        def request(*args, **kwargs):
+            next_request = self.requests.pop(0)
+            return next_request(*args, **kwargs)
+
+        @mock.patch.object(httplib2.Http, "request", request)
+        @mock.patch('time.time', mock.Mock(return_value=1234))
+        def test_get_call():
+            resp, body = cl.get("/hi")
+
+        self.assertRaises(exceptions.BadRequest, test_get_call)
+        self.assertEqual(self.requests, [mock_request])
+
+    def test_get_retry_400_socket(self):
+        cl = get_authed_client()
+
+        bad_response = httplib2.Response({"status": 400})
+        bad_body = '{"error": {"message": "n/a", "details": "n/a"}}'
+        bad_request = mock.Mock(return_value=(bad_response, bad_body))
+        self.requests = [bad_request, mock_request]
+
+        def request(*args, **kwargs):
+            next_request = self.requests.pop(0)
+            return next_request(*args, **kwargs)
+
+        @mock.patch.object(httplib2.Http, "request", request)
+        @mock.patch('time.time', mock.Mock(return_value=1234))
+        def test_get_call():
+            resp, body = cl.get("/hi")
+
+        test_get_call()
+        self.assertEqual(self.requests, [])
 
     def test_post(self):
         cl = get_authed_client()
