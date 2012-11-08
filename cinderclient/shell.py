@@ -324,7 +324,7 @@ class OpenStackCinderShell(object):
             options.os_volume_api_version)
         self.parser = subcommand_parser
 
-        if options.help and len(args) == 0:
+        if options.help or not argv:
             subcommand_parser.print_help()
             return 0
 

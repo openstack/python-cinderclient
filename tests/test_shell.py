@@ -55,21 +55,15 @@ class ShellTest(utils.TestCase):
             '(?m)^\s+create\s+Add a new volume.',
             '(?m)^See "cinder help COMMAND" for help on a specific command',
         ]
-        for argstr in ['--help', 'help']:
-            help_text = self.shell(argstr)
-            for r in required:
-                self.assertRegexpMatches(help_text, r)
+        help_text = self.shell('help')
+        for r in required:
+            self.assertRegexpMatches(help_text, r)
 
     def test_help_on_subcommand(self):
         required = [
             '^usage: cinder list',
             '(?m)^List all the volumes.',
         ]
-        argstrings = [
-            'list --help',
-            'help list',
-        ]
-        for argstr in argstrings:
-            help_text = self.shell(argstr)
-            for r in required:
-                self.assertRegexpMatches(help_text, r)
+        help_text = self.shell('help list')
+        for r in required:
+            self.assertRegexpMatches(help_text, r)
