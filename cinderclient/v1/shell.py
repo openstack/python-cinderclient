@@ -148,7 +148,7 @@ def do_list(cs, args):
         servers = [s.get('server_id') for s in vol.attachments]
         setattr(vol, 'attached_to', ','.join(map(str, servers)))
     utils.print_list(volumes, ['ID', 'Status', 'Display Name',
-                     'Size', 'Volume Type', 'Attached to'])
+                     'Size', 'Volume Type', 'Bootable', 'Attached to'])
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of the volume.')
