@@ -21,6 +21,7 @@ from cinderclient.openstack.common import setup
 
 requires = setup.parse_requirements()
 depend_links = setup.parse_dependency_links()
+tests_require = setup.parse_requirements(['tools/test-requires'])
 
 
 def read_file(file_name):
@@ -39,8 +40,9 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     cmdclass=setup.get_cmdclass(),
     install_requires=requires,
+    tests_require=tests_require,
+    setup_requires=['setuptools-git>=0.4'],
     dependency_links=depend_links,
-    tests_require=["nose", "mock"],
     test_suite="nose.collector",
     classifiers=[
         "Development Status :: 5 - Production/Stable",

@@ -1,10 +1,5 @@
 include AUTHORS
 include ChangeLog
-include HACKING
-include LICENSE
-include README.rst
-include run_tests.sh tox.ini
 include cinderclient/versioninfo
-recursive-include doc *
-recursive-include tests *
-recursive-include tools *
+exclude .gitignore
+exclude .gitreview
