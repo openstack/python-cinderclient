@@ -81,8 +81,9 @@ class OpenStackCinderShell(object):
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--debug',
-                            default=False,
                             action='store_true',
+                            default=utils.env('CINDERCLIENT_DEBUG',
+                                              default=False),
                             help="Print debugging output")
 
         parser.add_argument('--os-username',
@@ -415,7 +416,8 @@ class OpenStackCinderShell(object):
                                 service_type=service_type,
                                 service_name=service_name,
                                 volume_service_name=volume_service_name,
-                                retries=options.retries)
+                                retries=options.retries,
+                                http_log_debug=args.debug)
 
         try:
             if not utils.isunauthenticated(args.func):

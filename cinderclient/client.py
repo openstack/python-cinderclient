@@ -31,13 +31,6 @@ from cinderclient import service_catalog
 from cinderclient import utils
 
 
-_logger = logging.getLogger(__name__)
-if 'CINDERCLIENT_DEBUG' in os.environ and os.environ['CINDERCLIENT_DEBUG']:
-    ch = logging.StreamHandler()
-    _logger.setLevel(logging.DEBUG)
-    _logger.addHandler(ch)
-
-
 class HTTPClient(httplib2.Http):
 
     USER_AGENT = 'python-cinderclient'
@@ -46,7 +39,8 @@ class HTTPClient(httplib2.Http):
                  timeout=None, tenant_id=None, proxy_tenant_id=None,
                  proxy_token=None, region_name=None,
                  endpoint_type='publicURL', service_type=None,
-                 service_name=None, volume_service_name=None, retries=None):
+                 service_name=None, volume_service_name=None, retries=None,
+                 http_log_debug=False):
         super(HTTPClient, self).__init__(timeout=timeout)
         self.user = user
         self.password = password
@@ -60,6 +54,7 @@ class HTTPClient(httplib2.Http):
         self.service_name = service_name
         self.volume_service_name = volume_service_name
         self.retries = int(retries or 0)
+        self.http_log_debug = http_log_debug
 
         self.management_url = None
         self.auth_token = None
@@ -70,8 +65,14 @@ class HTTPClient(httplib2.Http):
         self.force_exception_to_status_code = True
         self.disable_ssl_certificate_validation = insecure
 
+        self._logger = logging.getLogger(__name__)
+        if self.http_log_debug:
+            ch = logging.StreamHandler()
+            self._logger.setLevel(logging.DEBUG)
+            self._logger.addHandler(ch)
+
     def http_log(self, args, kwargs, resp, body):
-        if not _logger.isEnabledFor(logging.DEBUG):
+        if not self.http_log_debug:
             return
 
         string_parts = ['curl -i']
@@ -85,10 +86,10 @@ class HTTPClient(httplib2.Http):
             header = ' -H "%s: %s"' % (element, kwargs['headers'][element])
             string_parts.append(header)
 
-        _logger.debug("REQ: %s\n" % "".join(string_parts))
+        self._logger.debug("REQ: %s\n" % "".join(string_parts))
         if 'body' in kwargs:
-            _logger.debug("REQ BODY: %s\n" % (kwargs['body']))
-        _logger.debug("RESP:%s %s\n", resp, body)
+            self._logger.debug("REQ BODY: %s\n" % (kwargs['body']))
+        self._logger.debug("RESP:%s %s\n", resp, body)
 
     def request(self, *args, **kwargs):
         kwargs.setdefault('headers', kwargs.get('headers', {}))
@@ -140,7 +141,7 @@ class HTTPClient(httplib2.Http):
             except exceptions.Unauthorized:
                 if auth_attempts > 0:
                     raise
-                _logger.debug("Unauthorized, reauthenticating.")
+                self._logger.debug("Unauthorized, reauthenticating.")
                 self.management_url = self.auth_token = None
                 # First reauth. Discount this attempt.
                 attempts -= 1
@@ -153,8 +154,9 @@ class HTTPClient(httplib2.Http):
                     pass
                 else:
                     raise
-            _logger.debug("Failed attempt(%s of %s), retrying in %s seconds" %
-                          (attempts, self.retries, backoff))
+            self._logger.debug(
+                "Failed attempt(%s of %s), retrying in %s seconds" %
+                (attempts, self.retries, backoff))
             sleep(backoff)
             backoff *= 2
 
@@ -223,7 +225,7 @@ class HTTPClient(httplib2.Http):
         # GET ...:5001/v2.0/tokens/#####/endpoints
         url = '/'.join([url, 'tokens', '%s?belongsTo=%s'
                         % (self.proxy_token, self.proxy_tenant_id)])
-        _logger.debug("Using Endpoint URL: %s" % url)
+        self._logger.debug("Using Endpoint URL: %s" % url)
         resp, body = self.request(url, "GET",
                                   headers={'X-Auth_Token': self.auth_token})
         return self._extract_service_catalog(url, resp, body,
