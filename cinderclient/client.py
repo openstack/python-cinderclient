@@ -71,13 +71,13 @@ class HTTPClient(httplib2.Http):
             self._logger.setLevel(logging.DEBUG)
             self._logger.addHandler(ch)
 
-    def http_log(self, args, kwargs, resp, body):
+    def http_log_req(self, args, kwargs):
         if not self.http_log_debug:
             return
 
         string_parts = ['curl -i']
         for element in args:
-            if element in ('GET', 'POST'):
+            if element in ('GET', 'POST', 'DELETE', 'PUT'):
                 string_parts.append(' -X %s' % element)
             else:
                 string_parts.append(' %s' % element)
@@ -86,10 +86,14 @@ class HTTPClient(httplib2.Http):
             header = ' -H "%s: %s"' % (element, kwargs['headers'][element])
             string_parts.append(header)
 
-        self._logger.debug("REQ: %s\n" % "".join(string_parts))
         if 'body' in kwargs:
-            self._logger.debug("REQ BODY: %s\n" % (kwargs['body']))
-        self._logger.debug("RESP:%s %s\n", resp, body)
+            string_parts.append(" -d '%s'" % (kwargs['body']))
+        self._logger.debug("\nREQ: %s\n" % "".join(string_parts))
+
+    def http_log_resp(self, resp, body):
+        if not self.http_log_debug:
+            return
+        self._logger.debug("RESP: %s\nRESP BODY: %s\n", resp, body)
 
     def request(self, *args, **kwargs):
         kwargs.setdefault('headers', kwargs.get('headers', {}))
@@ -99,9 +103,9 @@ class HTTPClient(httplib2.Http):
             kwargs['headers']['Content-Type'] = 'application/json'
             kwargs['body'] = json.dumps(kwargs['body'])
 
+        self.http_log_req(args, kwargs)
         resp, body = super(HTTPClient, self).request(*args, **kwargs)
-
-        self.http_log(args, kwargs, resp, body)
+        self.http_log_resp(resp, body)
 
         if body:
             try:
