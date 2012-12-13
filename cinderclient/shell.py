@@ -20,7 +20,6 @@ Command-line interface to the OpenStack Volume API.
 
 import argparse
 import glob
-import httplib2
 import imp
 import itertools
 import os
@@ -163,6 +162,13 @@ class OpenStackCinderShell(object):
                                  'to env[OS_VOLUME_API_VERSION].')
         parser.add_argument('--os_volume_api_version',
                             help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-cacert',
+                            metavar='<ca-certificate>',
+                            default=utils.env('OS_CACERT', default=None),
+                            help='Specify a CA bundle file to use in '
+                            'verifying a TLS (https) server certificate. '
+                            'Defaults to env[OS_CACERT]')
 
         parser.add_argument('--insecure',
                             default=utils.env('CINDERCLIENT_INSECURE',
@@ -308,8 +314,6 @@ class OpenStackCinderShell(object):
         logger.setLevel(logging.DEBUG)
         logger.addHandler(streamhandler)
 
-        httplib2.debuglevel = 1
-
     def main(self, argv):
         # Parse args once to find version and debug settings
         parser = self.get_base_parser()
@@ -343,14 +347,14 @@ class OpenStackCinderShell(object):
         (os_username, os_password, os_tenant_name, os_auth_url,
          os_region_name, endpoint_type, insecure,
          service_type, service_name, volume_service_name,
-         username, apikey, projectid, url, region_name) = (
+         username, apikey, projectid, url, region_name, cacert) = (
              args.os_username, args.os_password,
              args.os_tenant_name, args.os_auth_url,
              args.os_region_name, args.endpoint_type,
              args.insecure, args.service_type, args.service_name,
              args.volume_service_name, args.username,
              args.apikey, args.projectid,
-             args.url, args.region_name)
+             args.url, args.region_name, args.os_cacert)
 
         if not endpoint_type:
             endpoint_type = DEFAULT_CINDER_ENDPOINT_TYPE
@@ -417,7 +421,8 @@ class OpenStackCinderShell(object):
                                 service_name=service_name,
                                 volume_service_name=volume_service_name,
                                 retries=options.retries,
-                                http_log_debug=args.debug)
+                                http_log_debug=args.debug,
+                                cacert=cacert)
 
         try:
             if not utils.isunauthenticated(args.func):

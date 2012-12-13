@@ -7,9 +7,9 @@
 OpenStack Client interface. Handles the REST calls and responses.
 """
 
-import httplib2
 import logging
 import os
+import sys
 import urlparse
 try:
     from eventlet import sleep
@@ -26,22 +26,27 @@ if not hasattr(urlparse, 'parse_qsl'):
     import cgi
     urlparse.parse_qsl = cgi.parse_qsl
 
+import requests
+
 from cinderclient import exceptions
 from cinderclient import service_catalog
 from cinderclient import utils
 
 
-class HTTPClient(httplib2.Http):
+class HTTPClient(object):
 
     USER_AGENT = 'python-cinderclient'
+
+    requests_config = {
+        'danger_mode': False,
+    }
 
     def __init__(self, user, password, projectid, auth_url, insecure=False,
                  timeout=None, tenant_id=None, proxy_tenant_id=None,
                  proxy_token=None, region_name=None,
                  endpoint_type='publicURL', service_type=None,
                  service_name=None, volume_service_name=None, retries=None,
-                 http_log_debug=False):
-        super(HTTPClient, self).__init__(timeout=timeout)
+                 http_log_debug=False, cacert=None):
         self.user = user
         self.password = password
         self.projectid = projectid
@@ -61,15 +66,20 @@ class HTTPClient(httplib2.Http):
         self.proxy_token = proxy_token
         self.proxy_tenant_id = proxy_tenant_id
 
-        # httplib2 overrides
-        self.force_exception_to_status_code = True
-        self.disable_ssl_certificate_validation = insecure
+        if insecure:
+            self.verify_cert = False
+        else:
+            if cacert:
+                self.verify_cert = cacert
+            else:
+                self.verify_cert = True
 
         self._logger = logging.getLogger(__name__)
         if self.http_log_debug:
             ch = logging.StreamHandler()
             self._logger.setLevel(logging.DEBUG)
             self._logger.addHandler(ch)
+            self.requests_config['verbose'] = sys.stderr
 
     def http_log_req(self, args, kwargs):
         if not self.http_log_debug:
@@ -90,32 +100,43 @@ class HTTPClient(httplib2.Http):
             string_parts.append(" -d '%s'" % (kwargs['body']))
         self._logger.debug("\nREQ: %s\n" % "".join(string_parts))
 
-    def http_log_resp(self, resp, body):
+    def http_log_resp(self, resp):
         if not self.http_log_debug:
             return
-        self._logger.debug("RESP: %s\nRESP BODY: %s\n", resp, body)
+        self._logger.debug(
+            "RESP: [%s] %s\nRESP BODY: %s\n",
+            resp.status_code,
+            resp.headers,
+            resp.text)
 
-    def request(self, *args, **kwargs):
+    def request(self, url, method, **kwargs):
         kwargs.setdefault('headers', kwargs.get('headers', {}))
         kwargs['headers']['User-Agent'] = self.USER_AGENT
         kwargs['headers']['Accept'] = 'application/json'
         if 'body' in kwargs:
             kwargs['headers']['Content-Type'] = 'application/json'
-            kwargs['body'] = json.dumps(kwargs['body'])
+            kwargs['data'] = json.dumps(kwargs['body'])
+            del kwargs['body']
 
-        self.http_log_req(args, kwargs)
-        resp, body = super(HTTPClient, self).request(*args, **kwargs)
-        self.http_log_resp(resp, body)
+        self.http_log_req((url, method,), kwargs)
+        resp = requests.request(
+            method,
+            url,
+            verify=self.verify_cert,
+            config=self.requests_config,
+            **kwargs)
+        self.http_log_resp(resp)
 
-        if body:
+        if resp.text:
             try:
-                body = json.loads(body)
+                body = json.loads(resp.text)
             except ValueError:
                 pass
+                body = None
         else:
             body = None
 
-        if resp.status >= 400:
+        if resp.status_code >= 400:
             raise exceptions.from_response(resp, body)
 
         return resp, body
@@ -138,10 +159,6 @@ class HTTPClient(httplib2.Http):
             except exceptions.BadRequest as e:
                 if attempts > self.retries:
                     raise
-                # Socket errors show up here (400) when
-                # force_exception_to_status_code = True
-                if e.message != 'n/a':
-                    raise
             except exceptions.Unauthorized:
                 if auth_attempts > 0:
                     raise
@@ -158,6 +175,10 @@ class HTTPClient(httplib2.Http):
                     pass
                 else:
                     raise
+            except requests.exceptions.ConnectionError as e:
+                # Catch a connection refused from requests.request
+                self._logger.debug("Connection refused: %s" % e)
+                raise
             self._logger.debug(
                 "Failed attempt(%s of %s), retrying in %s seconds" %
                 (attempts, self.retries, backoff))
@@ -181,7 +202,7 @@ class HTTPClient(httplib2.Http):
         We may get redirected to another site, fail or actually get
         back a service catalog with a token and our endpoints."""
 
-        if resp.status == 200:  # content must always present
+        if resp.status_code == 200:  # content must always present
             try:
                 self.auth_url = url
                 self.service_catalog = \
@@ -209,7 +230,7 @@ class HTTPClient(httplib2.Http):
                 print "Could not find any suitable endpoint. Correct region?"
                 raise
 
-        elif resp.status == 305:
+        elif resp.status_code == 305:
             return resp['location']
         else:
             raise exceptions.from_response(resp, body)
@@ -292,16 +313,16 @@ class HTTPClient(httplib2.Http):
             headers['X-Auth-Project-Id'] = self.projectid
 
         resp, body = self.request(url, 'GET', headers=headers)
-        if resp.status in (200, 204):  # in some cases we get No Content
+        if resp.status_code in (200, 204):  # in some cases we get No Content
             try:
                 mgmt_header = 'x-server-management-url'
-                self.management_url = resp[mgmt_header].rstrip('/')
-                self.auth_token = resp['x-auth-token']
+                self.management_url = resp.headers[mgmt_header].rstrip('/')
+                self.auth_token = resp.headers['x-auth-token']
                 self.auth_url = url
-            except KeyError:
+            except (KeyError, TypeError):
                 raise exceptions.AuthorizationFailure()
-        elif resp.status == 305:
-            return resp['location']
+        elif resp.status_code == 305:
+            return resp.headers['location']
         else:
             raise exceptions.from_response(resp, body)
 
@@ -333,13 +354,11 @@ class HTTPClient(httplib2.Http):
         token_url = url + "/tokens"
 
         # Make sure we follow redirects when trying to reach Keystone
-        tmp_follow_all_redirects = self.follow_all_redirects
-        self.follow_all_redirects = True
-
-        try:
-            resp, body = self.request(token_url, "POST", body=body)
-        finally:
-            self.follow_all_redirects = tmp_follow_all_redirects
+        resp, body = self.request(
+            token_url,
+            "POST",
+            body=body,
+            allow_redirects=True)
 
         return self._extract_service_catalog(url, resp, body)
 

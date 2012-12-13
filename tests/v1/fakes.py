@@ -13,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import httplib2
 import urlparse
 
 from cinderclient import client as base_client
 from cinderclient.v1 import client
 from tests import fakes
+import tests.utils as utils
 
 
 def _stub_volume(**kwargs):
@@ -97,28 +97,35 @@ class FakeHTTPClient(base_client.HTTPClient):
         # Note the call
         self.callstack.append((method, url, kwargs.get('body', None)))
 
-        status, body = getattr(self, callback)(**kwargs)
+        status, headers, body = getattr(self, callback)(**kwargs)
+        r = utils.TestResponse({
+            "status_code": status,
+            "text": body,
+            "headers": headers,
+        })
+        return r, body
+
         if hasattr(status, 'items'):
-            return httplib2.Response(status), body
+            return utils.TestResponse(status), body
         else:
-            return httplib2.Response({"status": status}), body
+            return utils.TestResponse({"status": status}), body
 
     #
     # Snapshots
     #
 
     def get_snapshots_detail(self, **kw):
-        return (200, {'snapshots': [
+        return (200, {}, {'snapshots': [
             _stub_snapshot(),
         ]})
 
     def get_snapshots_1234(self, **kw):
-        return (200, {'snapshot': _stub_snapshot(id='1234')})
+        return (200, {}, {'snapshot': _stub_snapshot(id='1234')})
 
     def put_snapshots_1234(self, **kw):
         snapshot = _stub_snapshot(id='1234')
         snapshot.update(kw['body']['snapshot'])
-        return (200, {'snapshot': snapshot})
+        return (200, {}, {'snapshot': snapshot})
 
     #
     # Volumes
@@ -127,10 +134,10 @@ class FakeHTTPClient(base_client.HTTPClient):
     def put_volumes_1234(self, **kw):
         volume = _stub_volume(id='1234')
         volume.update(kw['body']['volume'])
-        return (200, {'volume': volume})
+        return (200, {}, {'volume': volume})
 
     def get_volumes(self, **kw):
-        return (200, {"volumes": [
+        return (200, {}, {"volumes": [
             {'id': 1234, 'name': 'sample-volume'},
             {'id': 5678, 'name': 'sample-volume2'}
         ]})
@@ -138,15 +145,15 @@ class FakeHTTPClient(base_client.HTTPClient):
     # TODO(jdg): This will need to change
     # at the very least it's not complete
     def get_volumes_detail(self, **kw):
-        return (200, {"volumes": [
+        return (200, {}, {"volumes": [
             {'id': 1234,
              'name': 'sample-volume',
              'attachments': [{'server_id': 1234}]},
         ]})
 
     def get_volumes_1234(self, **kw):
-        r = {'volume': self.get_volumes_detail()[1]['volumes'][0]}
-        return (200, r)
+        r = {'volume': self.get_volumes_detail()[2]['volumes'][0]}
+        return (200, {}, r)
 
     def post_volumes_1234_action(self, body, **kw):
         _body = None
@@ -163,7 +170,7 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert body[action] is None
         elif action == 'os-initialize_connection':
             assert body[action].keys() == ['connector']
-            return (202, {'connection_info': 'foos'})
+            return (202, {}, {'connection_info': 'foos'})
         elif action == 'os-terminate_connection':
             assert body[action].keys() == ['connector']
         elif action == 'os-begin_detaching':
@@ -172,68 +179,68 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert body[action] is None
         else:
             raise AssertionError("Unexpected server action: %s" % action)
-        return (resp, _body)
+        return (resp, {}, _body)
 
     def post_volumes(self, **kw):
-        return (202, {'volume': {}})
+        return (202, {}, {'volume': {}})
 
     def delete_volumes_1234(self, **kw):
-        return (202, None)
+        return (202, {}, None)
 
     #
     # Quotas
     #
 
     def get_os_quota_sets_test(self, **kw):
-        return (200, {'quota_set': {
-                      'tenant_id': 'test',
-                      'metadata_items': [],
-                      'volumes': 1,
-                      'gigabytes': 1}})
+        return (200, {}, {'quota_set': {
+                          'tenant_id': 'test',
+                          'metadata_items': [],
+                          'volumes': 1,
+                          'gigabytes': 1}})
 
     def get_os_quota_sets_test_defaults(self):
-        return (200, {'quota_set': {
-                      'tenant_id': 'test',
-                      'metadata_items': [],
-                      'volumes': 1,
-                      'gigabytes': 1}})
+        return (200, {}, {'quota_set': {
+                          'tenant_id': 'test',
+                          'metadata_items': [],
+                          'volumes': 1,
+                          'gigabytes': 1}})
 
     def put_os_quota_sets_test(self, body, **kw):
         assert body.keys() == ['quota_set']
         fakes.assert_has_keys(body['quota_set'],
                               required=['tenant_id'])
-        return (200, {'quota_set': {
-                      'tenant_id': 'test',
-                      'metadata_items': [],
-                      'volumes': 2,
-                      'gigabytes': 1}})
+        return (200, {}, {'quota_set': {
+                          'tenant_id': 'test',
+                          'metadata_items': [],
+                          'volumes': 2,
+                          'gigabytes': 1}})
 
     #
     # Quota Classes
     #
 
     def get_os_quota_class_sets_test(self, **kw):
-        return (200, {'quota_class_set': {
-                      'class_name': 'test',
-                      'metadata_items': [],
-                      'volumes': 1,
-                      'gigabytes': 1}})
+        return (200, {}, {'quota_class_set': {
+                          'class_name': 'test',
+                          'metadata_items': [],
+                          'volumes': 1,
+                          'gigabytes': 1}})
 
     def put_os_quota_class_sets_test(self, body, **kw):
         assert body.keys() == ['quota_class_set']
         fakes.assert_has_keys(body['quota_class_set'],
                               required=['class_name'])
-        return (200, {'quota_class_set': {
-                      'class_name': 'test',
-                      'metadata_items': [],
-                      'volumes': 2,
-                      'gigabytes': 1}})
+        return (200, {}, {'quota_class_set': {
+                          'class_name': 'test',
+                          'metadata_items': [],
+                          'volumes': 2,
+                          'gigabytes': 1}})
 
     #
     # VolumeTypes
     #
     def get_types(self, **kw):
-        return (200, {
+        return (200, {}, {
             'volume_types': [{'id': 1,
                               'name': 'test-type-1',
                               'extra_specs':{}},
@@ -242,21 +249,21 @@ class FakeHTTPClient(base_client.HTTPClient):
                               'extra_specs':{}}]})
 
     def get_types_1(self, **kw):
-        return (200, {'volume_type': {'id': 1,
-                                      'name': 'test-type-1',
-                                      'extra_specs': {}}})
+        return (200, {}, {'volume_type': {'id': 1,
+                          'name': 'test-type-1',
+                          'extra_specs': {}}})
 
     def post_types(self, body, **kw):
-        return (202, {'volume_type': {'id': 3,
-                                      'name': 'test-type-3',
-                                      'extra_specs': {}}})
+        return (202, {}, {'volume_type': {'id': 3,
+                          'name': 'test-type-3',
+                          'extra_specs': {}}})
 
     def post_types_1_extra_specs(self, body, **kw):
         assert body.keys() == ['extra_specs']
-        return (200, {'extra_specs': {'k': 'v'}})
+        return (200, {}, {'extra_specs': {'k': 'v'}})
 
     def delete_types_1_extra_specs_k(self, **kw):
-        return(204, None)
+        return(204, {}, None)
 
     def delete_types_1(self, **kw):
-        return (202, None)
+        return (202, {}, None)
