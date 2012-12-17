@@ -61,7 +61,8 @@ class FakeClient(fakes.FakeClient, client.Client):
 
     def __init__(self, *args, **kwargs):
         client.Client.__init__(self, 'username', 'password',
-                               'project_id', 'auth_url')
+                               'project_id', 'auth_url',
+                               extensions=kwargs.get('extensions'))
         self.client = FakeHTTPClient(**kwargs)
 
 
@@ -96,7 +97,6 @@ class FakeHTTPClient(base_client.HTTPClient):
 
         # Note the call
         self.callstack.append((method, url, kwargs.get('body', None)))
-
         status, headers, body = getattr(self, callback)(**kwargs)
         r = utils.TestResponse({
             "status_code": status,
@@ -267,3 +267,29 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def delete_types_1(self, **kw):
         return (202, {}, None)
+
+    #
+    # List all extensions
+    #
+    def get_extensions(self, **kw):
+        exts = [
+            {
+                "alias": "FAKE-1",
+                "description": "Fake extension number 1",
+                "links": [],
+                "name": "Fake1",
+                "namespace": ("http://docs.openstack.org/"
+                              "/ext/fake1/api/v1.1"),
+                "updated": "2011-06-09T00:00:00+00:00"
+            },
+            {
+                "alias": "FAKE-2",
+                "description": "Fake extension number 2",
+                "links": [],
+                "name": "Fake2",
+                "namespace": ("http://docs.openstack.org/"
+                              "/ext/fake1/api/v1.1"),
+                "updated": "2011-06-09T00:00:00+00:00"
+            },
+        ]
+        return (200, {}, {"extensions": exts, })
