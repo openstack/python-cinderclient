@@ -172,6 +172,14 @@ def do_show(cs, args):
     '--snapshot_id',
     help=argparse.SUPPRESS)
 @utils.arg(
+    '--source-volid',
+    metavar='<source-volid>',
+    default=None,
+    help='Create volume from volume id (Optional, Default=None)')
+@utils.arg(
+    '--source_volid',
+    help=argparse.SUPPRESS)
+@utils.arg(
     '--image-id',
     metavar='<image-id>',
     default=None,
@@ -227,6 +235,7 @@ def do_create(cs, args):
 
     volume = cs.volumes.create(args.size,
                                args.snapshot_id,
+                               args.source_volid,
                                args.display_name,
                                args.display_description,
                                args.volume_type,

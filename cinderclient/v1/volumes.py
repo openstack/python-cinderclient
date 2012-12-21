@@ -102,7 +102,7 @@ class VolumeManager(base.ManagerWithFind):
     """
     resource_class = Volume
 
-    def create(self, size, snapshot_id=None,
+    def create(self, size, snapshot_id=None, source_volid=None,
                display_name=None, display_description=None,
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
@@ -121,6 +121,7 @@ class VolumeManager(base.ManagerWithFind):
         :param availability_zone: Availability Zone to use
         :param metadata: Optional metadata to set on volume creation
         :param imageRef: reference to an image stored in glance
+        :param source_volid: ID of source volume to clone from
         """
 
         if metadata is None:
@@ -140,6 +141,7 @@ class VolumeManager(base.ManagerWithFind):
                            'attach_status': "detached",
                            'metadata': volume_metadata,
                            'imageRef': imageRef,
+                           'source_volid': source_volid,
                            }}
         return self._create('/volumes', body, 'volume')
 
