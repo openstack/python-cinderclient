@@ -17,6 +17,8 @@
 
 import os
 
+import fixtures
+
 from cinderclient import client
 from cinderclient import shell
 from tests.v1 import fakes
@@ -25,17 +27,21 @@ from tests import utils
 
 class ShellTest(utils.TestCase):
 
+    FAKE_ENV = {
+        'CINDER_USERNAME': 'username',
+        'CINDER_PASSWORD': 'password',
+        'CINDER_PROJECT_ID': 'project_id',
+        'OS_COMPUTE_API_VERSION': '1.1',
+        'CINDER_URL': 'http://no.where',
+    }
+
     # Patch os.environ to avoid required auth info.
     def setUp(self):
         """Run before each test."""
-        self.old_environment = os.environ.copy()
-        os.environ = {
-            'CINDER_USERNAME': 'username',
-            'CINDER_PASSWORD': 'password',
-            'CINDER_PROJECT_ID': 'project_id',
-            'OS_COMPUTE_API_VERSION': '1.1',
-            'CINDER_URL': 'http://no.where',
-        }
+        super(ShellTest, self).setUp()
+        for var in self.FAKE_ENV:
+            self.useFixture(fixtures.EnvironmentVariable(var,
+                                                         self.FAKE_ENV[var]))
 
         self.shell = shell.OpenStackCinderShell()
 
@@ -44,7 +50,6 @@ class ShellTest(utils.TestCase):
         client.get_client_class = lambda *_: fakes.FakeClient
 
     def tearDown(self):
-        os.environ = self.old_environment
         # For some method like test_image_meta_bad_action we are
         # testing a SystemExit to be thrown and object self.shell has
         # no time to get instantatiated which is OK in this case, so
@@ -54,6 +59,7 @@ class ShellTest(utils.TestCase):
 
         #HACK(bcwaldon): replace this when we start using stubs
         client.get_client_class = self.old_get_client_class
+        super(ShellTest, self).tearDown()
 
     def run_command(self, cmd):
         self.shell.main(cmd.split())
