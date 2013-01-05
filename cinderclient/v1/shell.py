@@ -270,6 +270,31 @@ def do_rename(cs, args):
     _find_volume(cs, args.volume).update(**kwargs)
 
 
+@utils.arg('volume',
+           metavar='<volume>',
+           help='ID of the volume to update metadata on.')
+@utils.arg('action',
+           metavar='<action>',
+           choices=['set', 'unset'],
+           help="Actions: 'set' or 'unset'")
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           action='append',
+           default=[],
+           help='Metadata to set/unset (only key is necessary on unset)')
+@utils.service_type('volume')
+def do_metadata(cs, args):
+    """Set or Delete metadata on a volume."""
+    volume = _find_volume(cs, args.volume)
+    metadata = _extract_metadata(args)
+
+    if args.action == 'set':
+        cs.volumes.set_metadata(volume, metadata)
+    elif args.action == 'unset':
+        cs.volumes.delete_metadata(volume, metadata.keys())
+
+
 @utils.arg(
     '--all-tenants',
     dest='all_tenants',

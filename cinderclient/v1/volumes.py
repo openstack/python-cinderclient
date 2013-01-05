@@ -95,6 +95,15 @@ class Volume(base.Resource):
         """
         return self.manager.terminate_connection(self, connector)
 
+    def set_metadata(self, volume, metadata):
+        """
+        Set or Append metadata to a volume.
+
+        :param type : The :class: `Volume` to set metadata on
+        :param metadata: A dict of key/value pairs to set
+        """
+        return self.manager.set_metadata(self, metadata)
+
 
 class VolumeManager(base.ManagerWithFind):
     """
@@ -286,3 +295,24 @@ class VolumeManager(base.ManagerWithFind):
         """
         self._action('os-terminate_connection', volume,
                      {'connector': connector})
+
+    def set_metadata(self, volume, metadata):
+        """
+        Update/Set a volumes metadata.
+
+        :param volume: The :class:`Volume`.
+        :param metadata: A list of keys to be set.
+        """
+        body = {'metadata': metadata}
+        return self._create("/volumes/%s/metadata" % base.getid(volume),
+                            body, "metadata")
+
+    def delete_metadata(self, volume, keys):
+        """
+        Delete specified keys from volumes metadata.
+
+        :param volume: The :class:`Volume`.
+        :param metadata: A list of keys to be removed.
+        """
+        for k in keys:
+            self._delete("/volumes/%s/metadata/%s" % (base.getid(volume), k))

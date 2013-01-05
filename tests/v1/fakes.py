@@ -269,6 +269,21 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (202, {}, None)
 
     #
+    # Set/Unset metadata
+    #
+    def delete_volumes_1234_metadata_test_key(self, **kw):
+        return (204, {}, None)
+
+    def delete_volumes_1234_metadata_key1(self, **kw):
+        return (204, {}, None)
+
+    def delete_volumes_1234_metadata_key2(self, **kw):
+        return (204, {}, None)
+
+    def post_volumes_1234_metadata(self, **kw):
+        return (204, {}, {'metadata': {'test_key': 'test_value'}})
+
+    #
     # List all extensions
     #
     def get_extensions(self, **kw):

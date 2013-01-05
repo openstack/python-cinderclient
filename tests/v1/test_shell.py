@@ -140,3 +140,18 @@ class ShellTest(utils.TestCase):
         # noop, the only all will be the lookup
         self.run_command('snapshot-rename 1234')
         self.assert_called('GET', '/snapshots/1234')
+
+    def test_set_metadata_set(self):
+        self.run_command('metadata 1234 set key1=val1 key2=val2')
+        self.assert_called('POST', '/volumes/1234/metadata',
+                           {'metadata': {'key1': 'val1', 'key2': 'val2'}})
+
+    def test_set_metadata_delete_dict(self):
+        self.run_command('metadata 1234 unset key1=val1 key2=val2')
+        self.assert_called('DELETE', '/volumes/1234/metadata/key1')
+        self.assert_called('DELETE', '/volumes/1234/metadata/key2', pos=-2)
+
+    def test_set_metadata_delete_keys(self):
+        self.run_command('metadata 1234 unset key1 key2')
+        self.assert_called('DELETE', '/volumes/1234/metadata/key1')
+        self.assert_called('DELETE', '/volumes/1234/metadata/key2', pos=-2)
