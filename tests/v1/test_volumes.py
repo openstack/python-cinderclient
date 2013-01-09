@@ -1,4 +1,3 @@
-from cinderclient.v1 import volumes
 from tests import utils
 from tests.v1 import fakes
 
@@ -18,7 +17,7 @@ class VolumesTest(utils.TestCase):
         cs.assert_called('DELETE', '/volumes/1234')
 
     def test_create_keypair(self):
-        kp = cs.volumes.create(1)
+        cs.volumes.create(1)
         cs.assert_called('POST', '/volumes')
 
     def test_attach(self):
@@ -60,3 +59,13 @@ class VolumesTest(utils.TestCase):
         v = cs.volumes.get('1234')
         cs.volumes.terminate_connection(v, {})
         cs.assert_called('POST', '/volumes/1234/action')
+
+    def test_set_metadata(self):
+        cs.volumes.set_metadata(1234, {'k1': 'v1'})
+        cs.assert_called('POST', '/volumes/1234/metadata',
+                         {'metadata': {'k1': 'v1'}})
+
+    def test_delete_metadata(self):
+        keys = ['key1']
+        cs.volumes.delete_metadata(1234, keys)
+        cs.assert_called('DELETE', '/volumes/1234/metadata/key1')
