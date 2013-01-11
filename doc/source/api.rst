@@ -2,7 +2,7 @@ The :mod:`cinderclient` Python API
 ==================================
 
 .. module:: cinderclient
-   :synopsis: A client for the OpenStack Nova API.
+   :synopsis: A client for the OpenStack Cinder API.
 
 .. currentmodule:: cinderclient
 
