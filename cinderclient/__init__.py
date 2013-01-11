@@ -14,23 +14,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import os
-import inspect
+from cinderclient.openstack.common import version
 
-
-def _get_client_version():
-    """Read version from versioninfo file."""
-    mod_abspath = inspect.getabsfile(inspect.currentframe())
-    client_path = os.path.dirname(mod_abspath)
-    version_path = os.path.join(client_path, 'versioninfo')
-
-    if os.path.exists(version_path):
-        version = open(version_path).read().strip()
-    else:
-        version = "Unknown, couldn't find versioninfo file at %s"\
-                  % version_path
-
-    return version
-
-
-__version__ = _get_client_version()
+version_info = version.VersionInfo('python-cinderclient')
+# We have a circular import problem when we first run python setup.py sdist
+# It's harmless, so deflect it.
+try:
+    __version__ = version_info.version_string()
+except AttributeError:
+    __version__ = None
