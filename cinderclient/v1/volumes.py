@@ -104,6 +104,14 @@ class Volume(base.Resource):
         """
         return self.manager.set_metadata(self, metadata)
 
+    def upload_to_image(self, force, image_name, container_format,
+                        disk_format):
+        """
+        Upload a volume to image service as an image.
+        """
+        self.manager.upload_to_image(self, force, image_name, container_format,
+                                     disk_format)
+
 
 class VolumeManager(base.ManagerWithFind):
     """
@@ -316,3 +324,17 @@ class VolumeManager(base.ManagerWithFind):
         """
         for k in keys:
             self._delete("/volumes/%s/metadata/%s" % (base.getid(volume), k))
+
+    def upload_to_image(self, volume, force, image_name, container_format,
+                        disk_format):
+        """
+        Upload volume to image service as image.
+
+        :param volume: The :class:`Volume` to upload.
+        """
+        return self._action('os-volume_upload_image',
+                            volume,
+                            {'force': force,
+                            'image_name': image_name,
+                            'container_format': container_format,
+                            'disk_format': disk_format})

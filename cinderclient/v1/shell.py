@@ -356,7 +356,7 @@ def do_snapshot_show(cs, args):
 @utils.arg('--force',
            metavar='<True|False>',
            help='Optional flag to indicate whether '
-           'to snapshot a volume even if its '
+           'to snapshot a volume even if it\'s '
            'attached to an instance. (Default=False)',
            default=False)
 @utils.arg(
@@ -600,3 +600,35 @@ def _print_type_extra_specs(vol_type):
 def _find_volume_type(cs, vtype):
     """Get a volume type by name or ID."""
     return utils.find_resource(cs.volume_types, vtype)
+
+
+@utils.arg('volume_id',
+           metavar='<volume-id>',
+           help='ID of the volume to snapshot')
+@utils.arg('--force',
+           metavar='<True|False>',
+           help='Optional flag to indicate whether '
+           'to upload a volume even if it\'s '
+           'attached to an instance. (Default=False)',
+           default=False)
+@utils.arg('--container-format',
+           metavar='<container-format>',
+           help='Optional type for container format '
+           '(Default=bare)',
+           default='bare')
+@utils.arg('--disk-format',
+           metavar='<disk-format>',
+           help='Optional type for disk format '
+           '(Default=raw)',
+           default='raw')
+@utils.arg('image_name',
+           metavar='<image-name>',
+           help='Name for created image')
+@utils.service_type('volume')
+def do_upload_to_image(cs, args):
+    """Upload volume to image service as image."""
+    volume = _find_volume(cs, args.volume_id)
+    volume.upload_to_image(args.force,
+                           args.image_name,
+                           args.container_format,
+                           args.disk_format)

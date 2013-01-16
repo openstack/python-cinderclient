@@ -55,7 +55,7 @@ class ShellTest(utils.TestCase):
         help_text = self.shell('help')
         for r in required:
             self.assertThat(help_text,
-                            matchers.MatchesRegex(r, re.DOTALL|re.MULTILINE))
+                            matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
 
     def test_help_on_subcommand(self):
         required = [
@@ -65,4 +65,4 @@ class ShellTest(utils.TestCase):
         help_text = self.shell('help list')
         for r in required:
             self.assertThat(help_text,
-                            matchers.MatchesRegex(r, re.DOTALL|re.MULTILINE))
+                            matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
