@@ -79,6 +79,10 @@ class OpenStackCinderShell(object):
                             action='store_true',
                             help=argparse.SUPPRESS)
 
+        parser.add_argument('--version',
+                            action='version',
+                            version=cinderclient.__version__)
+
         parser.add_argument('--debug',
                             action='store_true',
                             default=utils.env('CINDERCLIENT_DEBUG',
