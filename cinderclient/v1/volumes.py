@@ -112,6 +112,14 @@ class Volume(base.Resource):
         self.manager.upload_to_image(self, force, image_name, container_format,
                                      disk_format)
 
+    def force_delete(self):
+        """
+        Delete the specififed volume ignoring it's current state.
+
+        :param volume: The UUID of the volume to force-delete.
+        """
+        self.manager.force_delete(self)
+
 
 class VolumeManager(base.ManagerWithFind):
     """
@@ -338,3 +346,6 @@ class VolumeManager(base.ManagerWithFind):
                             'image_name': image_name,
                             'container_format': container_format,
                             'disk_format': disk_format})
+
+    def force_delete(self, volume):
+        return self._action('os-force_delete', base.getid(volume))
