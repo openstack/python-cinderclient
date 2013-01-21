@@ -432,7 +432,7 @@ class OpenStackCinderShell(object):
             if not utils.isunauthenticated(args.func):
                 self.cs.authenticate()
         except exc.Unauthorized:
-            raise exc.CommandError("Invalid OpenStack Nova credentials.")
+            raise exc.CommandError("Invalid OpenStack Cinder credentials.")
         except exc.AuthorizationFailure:
             raise exc.CommandError("Unable to authorize user")
 
