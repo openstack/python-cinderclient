@@ -253,6 +253,14 @@ def do_delete(cs, args):
     volume.delete()
 
 
+@utils.arg('volume', metavar='<volume>', help='ID of the volume to delete.')
+@utils.service_type('volume')
+def do_force_delete(cs, args):
+    """Attempt forced removal of a volume, regardless of it's state."""
+    volume = _find_volume(cs, args.volume)
+    volume.force_delete()
+
+
 @utils.arg('volume', metavar='<volume>', help='ID of the volume to rename.')
 @utils.arg('display_name', nargs='?', metavar='<display-name>',
            help='New display-name for the volume.')
