@@ -43,7 +43,6 @@ setuptools.setup(
     tests_require=tests_require,
     setup_requires=['setuptools-git>=0.4'],
     dependency_links=depend_links,
-    test_suite="nose.collector",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",

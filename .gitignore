@@ -1,6 +1,8 @@
 .coverage
 .venv
 .tox
+.testrepository
+subunit.log
 *,cover
 cover
 *.pyc
