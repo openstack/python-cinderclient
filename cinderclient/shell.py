@@ -15,7 +15,7 @@
 #    under the License.
 
 """
-Command-line interface to the OpenStack Volume API.
+Command-line interface to the OpenStack Cinder API.
 """
 
 import argparse
