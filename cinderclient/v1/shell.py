@@ -94,7 +94,7 @@ def _translate_volume_snapshot_keys(collection):
 
 def _extract_metadata(args):
     metadata = {}
-    for metadatum in args.metadata[0]:
+    for metadatum in args.metadata:
         # unset doesn't require a val, so we have the if/else
         if '=' in metadatum:
             (key, value) = metadatum.split('=', 1)
@@ -288,7 +288,6 @@ def do_rename(cs, args):
 @utils.arg('metadata',
            metavar='<key=value>',
            nargs='+',
-           action='append',
            default=[],
            help='Metadata to set/unset (only key is necessary on unset)')
 @utils.service_type('volume')

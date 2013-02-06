@@ -21,6 +21,7 @@ import fixtures
 
 from cinderclient import client
 from cinderclient import shell
+from cinderclient.v1 import shell as shell_v1
 from tests.v1 import fakes
 from tests import utils
 
@@ -69,6 +70,25 @@ class ShellTest(utils.TestCase):
 
     def assert_called_anytime(self, method, url, body=None):
         return self.shell.cs.assert_called_anytime(method, url, body)
+
+    def test_extract_metadata(self):
+        # mimic the result of argparse's parse_args() method
+        class Arguments:
+            def __init__(self, metadata=[]):
+                self.metadata = metadata
+
+        inputs = [
+            ([], {}),
+            (["key=value"], {"key": "value"}),
+            (["key"], {"key": None}),
+            (["k1=v1", "k2=v2"], {"k1": "v1", "k2": "v2"}),
+            (["k1=v1", "k2"], {"k1": "v1", "k2": None}),
+            (["k1", "k2=v2"], {"k1": None, "k2": "v2"})
+        ]
+
+        for input in inputs:
+            args = Arguments(metadata=input[0])
+            self.assertEquals(shell_v1._extract_metadata(args), input[1])
 
     def test_list(self):
         self.run_command('list')
