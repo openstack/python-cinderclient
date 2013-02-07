@@ -1,5 +1,4 @@
 include AUTHORS
 include ChangeLog
-include cinderclient/versioninfo
 exclude .gitignore
 exclude .gitreview
