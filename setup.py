@@ -42,6 +42,7 @@ setuptools.setup(
     cmdclass=setup.get_cmdclass(),
     install_requires=requires,
     tests_require=tests_require,
+    setup_requires=['setuptools-git>=0.4'],
     dependency_links=depend_links,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
