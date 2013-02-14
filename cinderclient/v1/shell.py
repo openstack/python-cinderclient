@@ -470,20 +470,21 @@ def do_type_delete(cs, args):
            help="Actions: 'set' or 'unset'")
 @utils.arg('metadata',
            metavar='<key=value>',
-           nargs='+',
-           action='append',
-           default=[],
+           nargs='*',
+           default=None,
            help='Extra_specs to set/unset (only key is necessary on unset)')
 @utils.service_type('volume')
 def do_type_key(cs, args):
     "Set or unset extra_spec for a volume type."""
     vtype = _find_volume_type(cs, args.vtype)
-    keypair = _extract_metadata(args)
 
-    if args.action == 'set':
-        vtype.set_keys(keypair)
-    elif args.action == 'unset':
-        vtype.unset_keys(keypair.keys())
+    if args.metadata is not None:
+        keypair = _extract_metadata(args)
+
+        if args.action == 'set':
+            vtype.set_keys(keypair)
+        elif args.action == 'unset':
+            vtype.unset_keys(keypair.keys())
 
 
 def do_endpoints(cs, args):
