@@ -612,7 +612,7 @@ def _find_volume_type(cs, vtype):
 
 @utils.arg('volume_id',
            metavar='<volume-id>',
-           help='ID of the volume to snapshot')
+           help='ID of the volume to upload to an image')
 @utils.arg('--force',
            metavar='<True|False>',
            help='Optional flag to indicate whether '
