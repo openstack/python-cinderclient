@@ -1,6 +1,4 @@
-# Copyright 2010 Jacob Kaplan-Moss
-
-# Copyright 2011 OpenStack LLC.
+# Copyright 2013 OpenStack LLC.
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -15,15 +13,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import os
-
 import fixtures
 
 from cinderclient import client
 from cinderclient import shell
-from cinderclient.v1 import shell as shell_v1
-from tests.v1 import fakes
 from tests import utils
+from tests.v2 import fakes
 
 
 class ShellTest(utils.TestCase):
@@ -32,7 +27,7 @@ class ShellTest(utils.TestCase):
         'CINDER_USERNAME': 'username',
         'CINDER_PASSWORD': 'password',
         'CINDER_PROJECT_ID': 'project_id',
-        'OS_VOLUME_API_VERSION': '1.1',
+        'OS_VOLUME_API_VERSION': '2',
         'CINDER_URL': 'http://no.where',
     }
 
@@ -71,25 +66,6 @@ class ShellTest(utils.TestCase):
     def assert_called_anytime(self, method, url, body=None):
         return self.shell.cs.assert_called_anytime(method, url, body)
 
-    def test_extract_metadata(self):
-        # mimic the result of argparse's parse_args() method
-        class Arguments:
-            def __init__(self, metadata=[]):
-                self.metadata = metadata
-
-        inputs = [
-            ([], {}),
-            (["key=value"], {"key": "value"}),
-            (["key"], {"key": None}),
-            (["k1=v1", "k2=v2"], {"k1": "v1", "k2": "v2"}),
-            (["k1=v1", "k2"], {"k1": "v1", "k2": None}),
-            (["k1", "k2=v2"], {"k1": None, "k2": "v2"})
-        ]
-
-        for input in inputs:
-            args = Arguments(metadata=input[0])
-            self.assertEquals(shell_v1._extract_metadata(args), input[1])
-
     def test_list(self):
         self.run_command('list')
         # NOTE(jdg): we default to detail currently
@@ -99,9 +75,9 @@ class ShellTest(utils.TestCase):
         self.run_command('list --status=available')
         self.assert_called('GET', '/volumes/detail?status=available')
 
-    def test_list_filter_display_name(self):
-        self.run_command('list --display-name=1234')
-        self.assert_called('GET', '/volumes/detail?display_name=1234')
+    def test_list_filter_name(self):
+        self.run_command('list --name=1234')
+        self.assert_called('GET', '/volumes/detail?name=1234')
 
     def test_list_all_tenants(self):
         self.run_command('list --all-tenants=1')
@@ -127,18 +103,18 @@ class ShellTest(utils.TestCase):
     def test_rename(self):
         # basic rename with positional agruments
         self.run_command('rename 1234 new-name')
-        expected = {'volume': {'display_name': 'new-name'}}
+        expected = {'volume': {'name': 'new-name'}}
         self.assert_called('PUT', '/volumes/1234', body=expected)
         # change description only
-        self.run_command('rename 1234 --display-description=new-description')
-        expected = {'volume': {'display_description': 'new-description'}}
+        self.run_command('rename 1234 --description=new-description')
+        expected = {'volume': {'description': 'new-description'}}
         self.assert_called('PUT', '/volumes/1234', body=expected)
         # rename and change description
         self.run_command('rename 1234 new-name '
-                         '--display-description=new-description')
+                         '--description=new-description')
         expected = {'volume': {
-            'display_name': 'new-name',
-            'display_description': 'new-description',
+            'name': 'new-name',
+            'description': 'new-description',
         }}
         self.assert_called('PUT', '/volumes/1234', body=expected)
         # noop, the only all will be the lookup
@@ -148,19 +124,19 @@ class ShellTest(utils.TestCase):
     def test_rename_snapshot(self):
         # basic rename with positional agruments
         self.run_command('snapshot-rename 1234 new-name')
-        expected = {'snapshot': {'display_name': 'new-name'}}
+        expected = {'snapshot': {'name': 'new-name'}}
         self.assert_called('PUT', '/snapshots/1234', body=expected)
         # change description only
         self.run_command('snapshot-rename 1234 '
-                         '--display-description=new-description')
-        expected = {'snapshot': {'display_description': 'new-description'}}
+                         '--description=new-description')
+        expected = {'snapshot': {'description': 'new-description'}}
         self.assert_called('PUT', '/snapshots/1234', body=expected)
         # snapshot-rename and change description
         self.run_command('snapshot-rename 1234 new-name '
-                         '--display-description=new-description')
+                         '--description=new-description')
         expected = {'snapshot': {
-            'display_name': 'new-name',
-            'display_description': 'new-description',
+            'name': 'new-name',
+            'description': 'new-description',
         }}
         self.assert_called('PUT', '/snapshots/1234', body=expected)
         # noop, the only all will be the lookup

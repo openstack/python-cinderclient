@@ -32,6 +32,7 @@ from cinderclient import exceptions as exc
 import cinderclient.extension
 from cinderclient import utils
 from cinderclient.v1 import shell as shell_v1
+from cinderclient.v2 import shell as shell_v2
 
 DEFAULT_OS_VOLUME_API_VERSION = "1"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
@@ -162,7 +163,7 @@ class OpenStackCinderShell(object):
                             metavar='<compute-api-ver>',
                             default=utils.env('OS_VOLUME_API_VERSION',
                             default=DEFAULT_OS_VOLUME_API_VERSION),
-                            help='Accepts 1,defaults '
+                            help='Accepts 1 or 2,defaults '
                                  'to env[OS_VOLUME_API_VERSION].')
         parser.add_argument('--os_volume_api_version',
                             help=argparse.SUPPRESS)
@@ -223,7 +224,7 @@ class OpenStackCinderShell(object):
         try:
             actions_module = {
                 '1.1': shell_v1,
-                '2': shell_v1,
+                '2': shell_v2,
             }[version]
         except KeyError:
             actions_module = shell_v1
