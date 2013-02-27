@@ -1,4 +1,3 @@
-import locale
 import os
 import re
 import sys
@@ -7,6 +6,7 @@ import uuid
 import prettytable
 
 from cinderclient import exceptions
+from cinderclient.openstack.common import strutils
 
 
 def arg(*args, **kwargs):
@@ -143,14 +143,14 @@ def print_list(objs, fields, formatters={}):
                 row.append(data)
         pt.add_row(row)
 
-    print pt.get_string(sortby=fields[0])
+    print strutils.safe_encode(pt.get_string(sortby=fields[0]))
 
 
 def print_dict(d, property="Property"):
     pt = prettytable.PrettyTable([property, 'Value'], caching=False)
     pt.aligns = ['l', 'l']
     [pt.add_row(list(r)) for r in d.iteritems()]
-    print pt.get_string(sortby=property)
+    print strutils.safe_encode(pt.get_string(sortby=property))
 
 
 def find_resource(manager, name_or_id):
@@ -164,7 +164,7 @@ def find_resource(manager, name_or_id):
 
     # now try to get entity as uuid
     try:
-        uuid.UUID(str(name_or_id))
+        uuid.UUID(strutils.safe_decode(name_or_id))
         return manager.get(name_or_id)
     except (ValueError, exceptions.NotFound):
         pass
@@ -180,11 +180,7 @@ def find_resource(manager, name_or_id):
             return manager.find(name=name_or_id)
         except exceptions.NotFound:
             try:
-                # For command-line arguments that are in Unicode
-                encoding = (locale.getpreferredencoding() or
-                            sys.stdin.encoding or
-                            'UTF-8')
-                return manager.find(display_name=(name_or_id.decode(encoding)))
+                return manager.find(display_name=name_or_id)
             except (UnicodeDecodeError, exceptions.NotFound):
                 try:
                     # Volumes does not have name, but display_name

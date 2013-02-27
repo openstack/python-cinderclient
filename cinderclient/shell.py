@@ -30,6 +30,7 @@ import logging
 from cinderclient import client
 from cinderclient import exceptions as exc
 import cinderclient.extension
+from cinderclient.openstack.common import strutils
 from cinderclient import utils
 from cinderclient.v1 import shell as shell_v1
 from cinderclient.v2 import shell as shell_v2
@@ -486,13 +487,16 @@ class OpenStackHelpFormatter(argparse.HelpFormatter):
 
 def main():
     try:
-        OpenStackCinderShell().main(sys.argv[1:])
+        OpenStackCinderShell().main(map(strutils.safe_decode, sys.argv[1:]))
     except KeyboardInterrupt:
         print >> sys.stderr, "... terminating cinder client"
         sys.exit(130)
     except Exception, e:
         logger.debug(e, exc_info=1)
-        print >> sys.stderr, "ERROR: %s" % e.message
+        message = e.message
+        if not isinstance(message, basestring):
+            message = str(message)
+        print >> sys.stderr, "ERROR: %s" % strutils.safe_encode(message)
         sys.exit(1)
 
 
