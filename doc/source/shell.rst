@@ -39,9 +39,9 @@ For example, in Bash you'd use::
     export OS_TENANT_NAME=myproject
     export OS_AUTH_URL=http://...
     export OS_VOLUME_API_VERSION=1
-    
+
 From there, all shell commands take the form::
-    
+
     cinder <command> [arguments...]
 
 Run :program:`cinder help` to get a full list of all possible commands,
