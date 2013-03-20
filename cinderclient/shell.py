@@ -487,7 +487,9 @@ class OpenStackHelpFormatter(argparse.HelpFormatter):
 def main():
     try:
         OpenStackCinderShell().main(sys.argv[1:])
-
+    except KeyboardInterrupt:
+        print >> sys.stderr, "... terminating cinder client"
+        sys.exit(130)
     except Exception, e:
         logger.debug(e, exc_info=1)
         print >> sys.stderr, "ERROR: %s" % e.message
