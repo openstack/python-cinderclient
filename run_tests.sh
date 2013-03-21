@@ -32,6 +32,7 @@ function process_option {
     -p|--pep8) just_pep8=1;;
     -P|--no-pep8) no_pep8=1;;
     -c|--coverage) coverage=1;;
+    -d|--debug) debug=1;;
     -*) testropts="$testropts $1";;
     *) testrargs="$testrargs $1"
   esac
@@ -50,6 +51,7 @@ wrapper=""
 just_pep8=0
 no_pep8=0
 coverage=0
+debug=0
 
 LANG=en_US.UTF-8
 LANGUAGE=en_US:en
@@ -72,6 +74,20 @@ function init_testr {
 function run_tests {
   # Cleanup *pyc
   ${wrapper} find . -type f -name "*.pyc" -delete
+
+  if [ $debug -eq 1 ]; then
+    if [ "$testropts" = "" ] && [ "$testrargs" = "" ]; then
+      # Default to running all tests if specific test is not
+      # provided.
+      testrargs="discover ./tests"
+    fi
+    ${wrapper} python -m testtools.run $testropts $testrargs
+
+    # Short circuit because all of the testr and coverage stuff
+    # below does not make sense when running testtools.run for
+    # debugging purposes.
+    return $?
+  fi
 
   if [ $coverage -eq 1 ]; then
     # Do not test test_coverage_ext when gathering coverage.
