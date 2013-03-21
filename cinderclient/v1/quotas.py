@@ -36,11 +36,12 @@ class QuotaSetManager(base.ManagerWithFind):
             tenant_id = tenant_id.tenant_id
         return self._get("/os-quota-sets/%s" % (tenant_id), "quota_set")
 
-    def update(self, tenant_id, volumes=None, gigabytes=None):
+    def update(self, tenant_id, volumes=None, snapshots=None, gigabytes=None):
 
         body = {'quota_set': {
                 'tenant_id': tenant_id,
                 'volumes': volumes,
+                'snapshots': snapshots,
                 'gigabytes': gigabytes}}
 
         for key in body['quota_set'].keys():

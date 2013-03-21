@@ -203,6 +203,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'tenant_id': 'test',
                           'metadata_items': [],
                           'volumes': 1,
+                          'snapshots': 1,
                           'gigabytes': 1}})
 
     def get_os_quota_sets_test_defaults(self):
@@ -210,6 +211,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'tenant_id': 'test',
                           'metadata_items': [],
                           'volumes': 1,
+                          'snapshots': 1,
                           'gigabytes': 1}})
 
     def put_os_quota_sets_test(self, body, **kw):
@@ -220,6 +222,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'tenant_id': 'test',
                           'metadata_items': [],
                           'volumes': 2,
+                          'snapshots': 2,
                           'gigabytes': 1}})
 
     #
@@ -231,6 +234,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'class_name': 'test',
                           'metadata_items': [],
                           'volumes': 1,
+                          'snapshots': 1,
                           'gigabytes': 1}})
 
     def put_os_quota_class_sets_test(self, body, **kw):
@@ -241,6 +245,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'class_name': 'test',
                           'metadata_items': [],
                           'volumes': 2,
+                          'snapshots': 2,
                           'gigabytes': 1}})
 
     #

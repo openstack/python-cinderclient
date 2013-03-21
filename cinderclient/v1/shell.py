@@ -500,7 +500,7 @@ def do_credentials(cs, args):
     utils.print_dict(catalog['access']['user'], "User Credentials")
     utils.print_dict(catalog['access']['token'], "Token")
 
-_quota_resources = ['volumes', 'gigabytes']
+_quota_resources = ['volumes', 'snapshots', 'gigabytes']
 
 
 def _quota_show(quotas):
@@ -545,6 +545,10 @@ def do_quota_defaults(cs, args):
            metavar='<volumes>',
            type=int, default=None,
            help='New value for the "volumes" quota.')
+@utils.arg('--snapshots',
+           metavar='<snapshots>',
+           type=int, default=None,
+           help='New value for the "snapshots" quota.')
 @utils.arg('--gigabytes',
            metavar='<gigabytes>',
            type=int, default=None,
@@ -571,6 +575,10 @@ def do_quota_class_show(cs, args):
            metavar='<volumes>',
            type=int, default=None,
            help='New value for the "volumes" quota.')
+@utils.arg('--snapshots',
+           metavar='<snapshots>',
+           type=int, default=None,
+           help='New value for the "snapshots" quota.')
 @utils.arg('--gigabytes',
            metavar='<gigabytes>',
            type=int, default=None,
