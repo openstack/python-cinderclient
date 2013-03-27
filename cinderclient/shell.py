@@ -114,6 +114,14 @@ class OpenStackCinderShell(object):
         parser.add_argument('--os_tenant_name',
                             help=argparse.SUPPRESS)
 
+        parser.add_argument('--os-tenant-id',
+                            metavar='<auth-tenant-id>',
+                            default=utils.env('OS_TENANT_ID',
+                                              'CINDER_TENANT_ID'),
+                            help='Defaults to env[OS_TENANT_ID].')
+        parser.add_argument('--os_tenant_id',
+                            help=argparse.SUPPRESS)
+
         parser.add_argument('--os-auth-url',
                             metavar='<auth-url>',
                             default=utils.env('OS_AUTH_URL',
@@ -350,13 +358,14 @@ class OpenStackCinderShell(object):
             return 0
 
         (os_username, os_password, os_tenant_name, os_auth_url,
-         os_region_name, endpoint_type, insecure,
+         os_region_name, os_tenant_id, endpoint_type, insecure,
          service_type, service_name, volume_service_name,
          username, apikey, projectid, url, region_name, cacert) = (
              args.os_username, args.os_password,
              args.os_tenant_name, args.os_auth_url,
-             args.os_region_name, args.endpoint_type,
-             args.insecure, args.service_type, args.service_name,
+             args.os_region_name, args.os_tenant_id,
+             args.endpoint_type, args.insecure,
+             args.service_type, args.service_name,
              args.volume_service_name, args.username,
              args.apikey, args.projectid,
              args.url, args.region_name, args.os_cacert)
@@ -388,11 +397,11 @@ class OpenStackCinderShell(object):
                 else:
                     os_password = apikey
 
-            if not os_tenant_name:
+            if not (os_tenant_name or os_tenant_id):
                 if not projectid:
-                    raise exc.CommandError("You must provide a tenant name "
-                                           "via either --os-tenant-name or "
-                                           "env[OS_TENANT_NAME]")
+                    raise exc.CommandError("You must provide a tenant_id "
+                                           "via either --os-tenant-id or "
+                                           "env[OS_TENANT_ID]")
                 else:
                     os_tenant_name = projectid
 
@@ -407,10 +416,10 @@ class OpenStackCinderShell(object):
             if not os_region_name and region_name:
                 os_region_name = region_name
 
-        if not os_tenant_name:
+        if not (os_tenant_name or os_tenant_id):
             raise exc.CommandError(
-                "You must provide a tenant name "
-                "via either --os-tenant-name or env[OS_TENANT_NAME]")
+                "You must provide a tenant_id "
+                "via either --os-tenant-id or env[OS_TENANT_ID]")
 
         if not os_auth_url:
             raise exc.CommandError(
@@ -420,6 +429,7 @@ class OpenStackCinderShell(object):
         self.cs = client.Client(options.os_volume_api_version, os_username,
                                 os_password, os_tenant_name, os_auth_url,
                                 insecure, region_name=os_region_name,
+                                tenant_id=os_tenant_id,
                                 endpoint_type=endpoint_type,
                                 extensions=self.extensions,
                                 service_type=service_type,
