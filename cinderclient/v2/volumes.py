@@ -90,7 +90,7 @@ class Volume(base.Resource):
                                      disk_format)
 
     def force_delete(self):
-        """Delete the specififed volume ignoring it's current state.
+        """Delete the specified volume ignoring its current state.
 
         :param volume: The UUID of the volume to force-delete.
         """

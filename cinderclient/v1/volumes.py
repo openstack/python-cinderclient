@@ -22,27 +22,20 @@ from cinderclient import base
 
 
 class Volume(base.Resource):
-    """
-    A volume is an extra block level storage to the OpenStack instances.
-    """
+    """A volume is an extra block level storage to the OpenStack instances."""
     def __repr__(self):
         return "<Volume: %s>" % self.id
 
     def delete(self):
-        """
-        Delete this volume.
-        """
+        """Delete this volume."""
         self.manager.delete(self)
 
     def update(self, **kwargs):
-        """
-        Update the display_name or display_description for this volume.
-        """
+        """Update the display_name or display_description for this volume."""
         self.manager.update(self, **kwargs)
 
     def attach(self, instance_uuid, mountpoint):
-        """
-        Set attachment metadata.
+        """Set attachment metadata.
 
         :param instance_uuid: uuid of the attaching instance.
         :param mountpoint: mountpoint on the attaching instance.
@@ -50,54 +43,41 @@ class Volume(base.Resource):
         return self.manager.attach(self, instance_uuid, mountpoint)
 
     def detach(self):
-        """
-        Clear attachment metadata.
-        """
+        """Clear attachment metadata."""
         return self.manager.detach(self)
 
     def reserve(self, volume):
-        """
-        Reserve this volume.
-        """
+        """Reserve this volume."""
         return self.manager.reserve(self)
 
     def unreserve(self, volume):
-        """
-        Unreserve this volume.
-        """
+        """Unreserve this volume."""
         return self.manager.unreserve(self)
 
     def begin_detaching(self, volume):
-        """
-        Begin detaching volume.
-        """
+        """Begin detaching volume."""
         return self.manager.begin_detaching(self)
 
     def roll_detaching(self, volume):
-        """
-        Roll detaching volume.
-        """
+        """Roll detaching volume."""
         return self.manager.roll_detaching(self)
 
     def initialize_connection(self, volume, connector):
-        """
-        Initialize a volume connection.
+        """Initialize a volume connection.
 
         :param connector: connector dict from nova.
         """
         return self.manager.initialize_connection(self, connector)
 
     def terminate_connection(self, volume, connector):
-        """
-        Terminate a volume connection.
+        """Terminate a volume connection.
 
         :param connector: connector dict from nova.
         """
         return self.manager.terminate_connection(self, connector)
 
     def set_metadata(self, volume, metadata):
-        """
-        Set or Append metadata to a volume.
+        """Set or Append metadata to a volume.
 
         :param type : The :class: `Volume` to set metadata on
         :param metadata: A dict of key/value pairs to set
@@ -106,15 +86,12 @@ class Volume(base.Resource):
 
     def upload_to_image(self, force, image_name, container_format,
                         disk_format):
-        """
-        Upload a volume to image service as an image.
-        """
+        """Upload a volume to image service as an image."""
         self.manager.upload_to_image(self, force, image_name, container_format,
                                      disk_format)
 
     def force_delete(self):
-        """
-        Delete the specififed volume ignoring it's current state.
+        """Delete the specified volume ignoring its current state.
 
         :param volume: The UUID of the volume to force-delete.
         """
