@@ -9,7 +9,6 @@ OpenStack Client interface. Handles the REST calls and responses.
 
 import logging
 import os
-import sys
 import urlparse
 try:
     from eventlet import sleep
