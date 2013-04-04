@@ -248,7 +248,7 @@ class HTTPClient(object):
                         % (self.proxy_token, self.proxy_tenant_id)])
         self._logger.debug("Using Endpoint URL: %s" % url)
         resp, body = self.request(url, "GET",
-                                  headers={'X-Auth_Token': self.auth_token})
+                                  headers={'X-Auth-Token': self.auth_token})
         return self._extract_service_catalog(url, resp, body,
                                              extract_token=False)
 
