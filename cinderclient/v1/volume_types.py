@@ -65,7 +65,7 @@ class VolumeType(base.Resource):
         # the return in the loop resulted in ony ONE key being unset.
         # since on success the return was NONE, we'll only interrupt the loop
         # and return if there's an error
-        result = None
+        resp = None
         for k in keys:
             resp = self.manager._delete(
                 "/types/%s/extra_specs/%s" % (
