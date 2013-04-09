@@ -456,7 +456,8 @@ class OpenStackCinderShell(object):
             extension.run_hooks(hook_type, *args, **kwargs)
 
     def do_bash_completion(self, args):
-        """
+        """Print arguments for bash_completion.
+
         Prints all of the commands and options to stdout so that the
         cinder.bash_completion script doesn't have to hard code them.
         """

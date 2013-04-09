@@ -256,7 +256,7 @@ def do_delete(cs, args):
 @utils.arg('volume', metavar='<volume>', help='ID of the volume to delete.')
 @utils.service_type('volume')
 def do_force_delete(cs, args):
-    """Attempt forced removal of a volume, regardless of it's state."""
+    """Attempt forced removal of a volume, regardless of its state."""
     volume = _find_volume(cs, args.volume)
     volume.force_delete()
 
