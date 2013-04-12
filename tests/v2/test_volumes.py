@@ -32,7 +32,7 @@ class VolumesTest(utils.TestCase):
         cs.volumes.delete(v)
         cs.assert_called('DELETE', '/volumes/1234')
 
-    def test_create_keypair(self):
+    def test_create_volume(self):
         cs.volumes.create(1)
         cs.assert_called('POST', '/volumes')
 
