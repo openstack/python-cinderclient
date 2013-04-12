@@ -5,6 +5,8 @@ from cinderclient.v1 import quotas
 from cinderclient.v1 import volumes
 from cinderclient.v1 import volume_snapshots
 from cinderclient.v1 import volume_types
+from cinderclient.v1 import volume_backups
+from cinderclient.v1 import volume_backups_restore
 
 
 class Client(object):
@@ -41,6 +43,8 @@ class Client(object):
         self.volume_types = volume_types.VolumeTypeManager(self)
         self.quota_classes = quota_classes.QuotaClassSetManager(self)
         self.quotas = quotas.QuotaSetManager(self)
+        self.backups = volume_backups.VolumeBackupManager(self)
+        self.restores = volume_backups_restore.VolumeBackupRestoreManager(self)
 
         # Add in any extensions...
         if extensions:

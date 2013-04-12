@@ -62,26 +62,31 @@ def _find_volume_snapshot(cs, snapshot):
     return utils.find_resource(cs.volume_snapshots, snapshot)
 
 
+def _find_backup(cs, backup):
+    """Get a backup by ID."""
+    return utils.find_resource(cs.backups, backup)
+
+
 def _print_volume_snapshot(snapshot):
     utils.print_dict(snapshot._info)
 
 
-def _translate_volume_keys(collection):
-    convert = [('volumeType', 'volume_type')]
+def _translate_keys(collection, convert):
     for item in collection:
         keys = item.__dict__.keys()
         for from_key, to_key in convert:
             if from_key in keys and to_key not in keys:
                 setattr(item, to_key, item._info[from_key])
+
+
+def _translate_volume_keys(collection):
+    convert = [('volumeType', 'volume_type')]
+    _translate_keys(collection, convert)
 
 
 def _translate_volume_snapshot_keys(collection):
     convert = [('volumeId', 'volume_id')]
-    for item in collection:
-        keys = item.__dict__.keys()
-        for from_key, to_key in convert:
-            if from_key in keys and to_key not in keys:
-                setattr(item, to_key, item._info[from_key])
+    _translate_keys(collection, convert)
 
 
 def _extract_metadata(args):
@@ -703,3 +708,78 @@ def do_upload_to_image(cs, args):
                            args.image_name,
                            args.container_format,
                            args.disk_format)
+
+
+@utils.arg('volume', metavar='<volume>',
+           help='ID of the volume to backup.')
+@utils.arg('--container', metavar='<container>',
+           help='Optional backup container name. (Default=None)',
+           default=None)
+@utils.arg('--display-name',
+           help=argparse.SUPPRESS)
+@utils.arg('--name', metavar='<name>',
+           help='Optional backup name. (Default=None)',
+           default=None)
+@utils.arg('--display-description',
+           help=argparse.SUPPRESS)
+@utils.arg('--description',
+           metavar='<description>',
+           default=None,
+           help='Options backup description (Default=None)')
+@utils.service_type('volume')
+def do_backup_create(cs, args):
+    """Creates a backup."""
+    if args.display_name is not None:
+        args.name = args.display_name
+
+    if args.display_description is not None:
+        args.description = args.display_description
+
+    cs.backups.create(args.volume,
+                      args.container,
+                      args.name,
+                      args.description)
+
+
+@utils.arg('backup', metavar='<backup>', help='ID of the backup.')
+@utils.service_type('volume')
+def do_backup_show(cs, args):
+    """Show details about a backup."""
+    backup = _find_backup(cs, args.backup)
+    info = dict()
+    info.update(backup._info)
+
+    if 'links' in info:
+        info.pop('links')
+
+    utils.print_dict(info)
+
+
+@utils.service_type('volume')
+def do_backup_list(cs, args):
+    """List all the backups."""
+    backups = cs.backups.list()
+    columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'Object Count',
+               'Container']
+    utils.print_list(backups, columns)
+
+
+@utils.arg('backup', metavar='<backup>',
+           help='ID of the backup to delete.')
+@utils.service_type('volume')
+def do_backup_delete(cs, args):
+    """Remove a backup."""
+    backup = _find_backup(cs, args.backup)
+    backup.delete()
+
+
+@utils.arg('backup', metavar='<backup>',
+           help='ID of the backup to restore.')
+@utils.arg('--volume-id', metavar='<volume-id>',
+           help='Optional ID of the volume to restore to.',
+           default=None)
+@utils.service_type('volume')
+def do_backup_restore(cs, args):
+    """Restore a backup."""
+    cs.restores.restore(args.backup,
+                        args.volume_id)
