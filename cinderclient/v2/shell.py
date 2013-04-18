@@ -223,6 +223,12 @@ def do_show(cs, args):
            metavar='<key=value>',
            help='Metadata key=value pairs (Optional, Default=None)',
            default=None)
+@utils.arg('--hint',
+           metavar='<key=value>',
+           dest='scheduler_hints',
+           action='append',
+           default=[],
+           help='Scheduler hint like in nova')
 @utils.service_type('volume')
 def do_create(cs, args):
     """Add a new volume."""
@@ -237,6 +243,21 @@ def do_create(cs, args):
     if args.metadata is not None:
         volume_metadata = _extract_metadata(args)
 
+    #NOTE(N.S.): take this piece from novaclient
+    hints = {}
+    if args.scheduler_hints:
+        for hint in args.scheduler_hints:
+            key, _sep, value = hint.partition('=')
+            # NOTE(vish): multiple copies of the same hint will
+            #             result in a list of values
+            if key in hints:
+                if isinstance(hints[key], basestring):
+                    hints[key] = [hints[key]]
+                hints[key] += [value]
+            else:
+                hints[key] = value
+    #NOTE(N.S.): end of the taken piece
+
     volume = cs.volumes.create(args.size,
                                args.snapshot_id,
                                args.source_volid,
@@ -245,10 +266,11 @@ def do_create(cs, args):
                                args.volume_type,
                                availability_zone=args.availability_zone,
                                imageRef=args.image_id,
-                               metadata=volume_metadata)
+                               metadata=volume_metadata,
+                               scheduler_hints=hints)
 
     info = dict()
-    volume = cs.volumes.get(info['id'])
+    volume = cs.volumes.get(volume.id)
     info.update(volume._info)
 
     info.pop('links')

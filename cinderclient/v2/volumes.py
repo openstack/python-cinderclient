@@ -105,7 +105,7 @@ class VolumeManager(base.ManagerWithFind):
                name=None, description=None,
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
-               metadata=None, imageRef=None):
+               metadata=None, imageRef=None, scheduler_hints=None):
         """Create a volume.
 
         :param size: Size of volume in GB
@@ -120,7 +120,9 @@ class VolumeManager(base.ManagerWithFind):
         :param metadata: Optional metadata to set on volume creation
         :param imageRef: reference to an image stored in glance
         :param source_volid: ID of source volume to clone from
-        """
+        :param scheduler_hints: (optional extension) arbitrary key-value pairs
+                            specified by the client to help boot an instance
+       """
 
         if metadata is None:
             volume_metadata = {}
@@ -140,6 +142,7 @@ class VolumeManager(base.ManagerWithFind):
                            'metadata': volume_metadata,
                            'imageRef': imageRef,
                            'source_volid': source_volid,
+                           'scheduler_hints': scheduler_hints,
                            }}
         return self._create('/volumes', body, 'volume')
 
