@@ -143,7 +143,8 @@ def print_list(objs, fields, formatters={}):
                 row.append(data)
         pt.add_row(row)
 
-    print strutils.safe_encode(pt.get_string(sortby=fields[0]))
+    if len(objs) > 0:
+        print strutils.safe_encode(pt.get_string(sortby=fields[0]))
 
 
 def print_dict(d, property="Property"):
