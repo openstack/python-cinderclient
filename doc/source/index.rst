@@ -27,8 +27,16 @@ Once you've configured your authentication parameters, you can run ``cinder help
 
 Release Notes
 =============
+1.0.4
+-----
+* Added suport for backup-service commands
+.. _1163546: http://bugs.launchpad.net/python-cinderclient/+bug/1163546
+.. _1161857: http://bugs.launchpad.net/python-cinderclient/+bug/1161857
+.. _1160898: http://bugs.launchpad.net/python-cinderclient/+bug/1160898
+.. _1161857: http://bugs.launchpad.net/python-cinderclient/+bug/1161857
+.. _1156994: http://bugs.launchpad.net/python-cinderclient/+bug/1156994
 
-1.1.0
+1.0.3
 -----
 
 * Added support for V2 Cinder API
