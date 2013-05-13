@@ -105,7 +105,7 @@ class VolumeTypeManager(base.ManagerWithFind):
         """
         self._delete("/types/%s" % base.getid(volume_type))
 
-    def create(self, name):
+    def create(self, name, extra_specs={}):
         """
         Create a volume type.
 
@@ -116,6 +116,7 @@ class VolumeTypeManager(base.ManagerWithFind):
         body = {
             "volume_type": {
                 "name": name,
+                "extra_specs": extra_specs
             }
         }
 
