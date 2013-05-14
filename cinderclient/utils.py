@@ -158,7 +158,7 @@ def print_list(objs, fields, formatters={}):
                 row.append(data)
         pt.add_row(row)
 
-    if len(objs) > 0:
+    if len(pt._rows) > 0:
         print strutils.safe_encode(pt.get_string(sortby=fields[0]))
 
 
