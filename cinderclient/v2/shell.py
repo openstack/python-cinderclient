@@ -248,7 +248,7 @@ def do_create(cs, args):
                                metadata=volume_metadata)
 
     info = dict()
-    volume = cs.volumes.get(info['id'])
+    volume = cs.volumes.get(volume.id)
     info.update(volume._info)
 
     info.pop('links')
