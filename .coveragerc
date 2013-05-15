@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = cinderclient
+omit = cinderclient/openstack/*
+
+[report]
+ignore-errors = True
