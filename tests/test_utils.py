@@ -1,3 +1,6 @@
+import collections
+import StringIO
+import sys
 
 from cinderclient import exceptions
 from cinderclient import utils
@@ -73,3 +76,51 @@ class FindResourceTestCase(test_utils.TestCase):
     def test_find_by_str_displayname(self):
         output = utils.find_resource(self.manager, 'entity_three')
         self.assertEqual(output, self.manager.get('4242'))
+
+
+class CaptureStdout(object):
+    """Context manager for capturing stdout from statments in its's block"""
+    def __enter__(self):
+        self.real_stdout = sys.stdout
+        self.stringio = StringIO.StringIO()
+        sys.stdout = self.stringio
+        return self
+
+    def __exit__(self, *args):
+        sys.stdout = self.real_stdout
+        self.stringio.seek(0)
+        self.read = self.stringio.read
+
+
+class PrintListTestCase(test_utils.TestCase):
+
+    def test_print_list_with_list(self):
+        Row = collections.namedtuple('Row', ['a', 'b'])
+        to_print = [Row(a=1, b=2), Row(a=3, b=4)]
+        with CaptureStdout() as cso:
+            utils.print_list(to_print, ['a', 'b'])
+        self.assertEqual(cso.read(), """\
++---+---+
+| a | b |
++---+---+
+| 1 | 2 |
+| 3 | 4 |
++---+---+
+""")
+
+    def test_print_list_with_generator(self):
+        Row = collections.namedtuple('Row', ['a', 'b'])
+
+        def gen_rows():
+            for row in [Row(a=1, b=2), Row(a=3, b=4)]:
+                yield row
+        with CaptureStdout() as cso:
+            utils.print_list(gen_rows(), ['a', 'b'])
+        self.assertEqual(cso.read(), """\
++---+---+
+| a | b |
++---+---+
+| 1 | 2 |
+| 3 | 4 |
++---+---+
+""")
