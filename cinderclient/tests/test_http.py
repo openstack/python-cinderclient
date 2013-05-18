@@ -4,7 +4,7 @@ import requests
 
 from cinderclient import client
 from cinderclient import exceptions
-from tests import utils
+from cinderclient.tests import utils
 
 
 fake_response = utils.TestResponse({

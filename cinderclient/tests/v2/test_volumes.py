@@ -14,8 +14,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from tests import utils
-from tests.v2 import fakes
+from cinderclient.tests import utils
+from cinderclient.tests.v2 import fakes
 
 
 cs = fakes.FakeClient()

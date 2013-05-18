@@ -2,7 +2,7 @@
 import cinderclient.client
 import cinderclient.v1.client
 import cinderclient.v2.client
-from tests import utils
+from cinderclient.tests import utils
 
 
 class ClientTest(utils.TestCase):

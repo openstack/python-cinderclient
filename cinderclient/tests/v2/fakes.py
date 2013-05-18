@@ -1,5 +1,4 @@
-# Copyright (c) 2011 X.commerce, a business unit of eBay Inc.
-# Copyright 2011 OpenStack, LLC
+# Copyright 2013 OpenStack, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,28 +15,36 @@
 import urlparse
 
 from cinderclient import client as base_client
-from cinderclient.v1 import client
-from tests import fakes
-import tests.utils as utils
+from cinderclient.tests import fakes
+import cinderclient.tests.utils as utils
+from cinderclient.v2 import client
 
 
 def _stub_volume(**kwargs):
     volume = {
         'id': '1234',
-        'display_name': None,
-        'display_description': None,
+        'name': None,
+        'description': None,
         "attachments": [],
         "bootable": "false",
         "availability_zone": "cinder",
         "created_at": "2012-08-27T00:00:00.000000",
-        "display_description": None,
-        "display_name": None,
         "id": '00000000-0000-0000-0000-000000000000',
         "metadata": {},
         "size": 1,
         "snapshot_id": None,
         "status": "available",
         "volume_type": "None",
+        "links": [
+            {
+                "href": "http://localhost/v2/fake/volumes/1234",
+                "rel": "self"
+            },
+            {
+                "href": "http://localhost/fake/volumes/1234",
+                "rel": "bookmark"
+            }
+        ],
     }
     volume.update(kwargs)
     return volume
@@ -58,7 +65,7 @@ def _stub_snapshot(**kwargs):
 
 
 def _self_href(base_uri, tenant_id, backup_id):
-    return '%s/v1/%s/backups/%s' % (base_uri, tenant_id, backup_id)
+    return '%s/v2/%s/backups/%s' % (base_uri, tenant_id, backup_id)
 
 
 def _bookmark_href(base_uri, tenant_id, backup_id):

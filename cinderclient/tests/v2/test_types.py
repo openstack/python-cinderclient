@@ -15,8 +15,8 @@
 #    under the License.
 
 from cinderclient.v2 import volume_types
-from tests import utils
-from tests.v2 import fakes
+from cinderclient.tests import utils
+from cinderclient.tests.v2 import fakes
 
 cs = fakes.FakeClient()
 

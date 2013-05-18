@@ -1,7 +1,7 @@
 from cinderclient import exceptions
 from cinderclient.v1 import volume_types
-from tests import utils
-from tests.v1 import fakes
+from cinderclient.tests import utils
+from cinderclient.tests.v1 import fakes
 
 cs = fakes.FakeClient()
 

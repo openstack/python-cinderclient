@@ -1,6 +1,6 @@
 from cinderclient import exceptions
 from cinderclient import service_catalog
-from tests import utils
+from cinderclient.tests import utils
 
 
 # Taken directly from keystone/content/common/samples/auth.json

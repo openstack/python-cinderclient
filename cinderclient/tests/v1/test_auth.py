@@ -1,27 +1,11 @@
-# Copyright (c) 2013 OpenStack, LLC.
-#
-# All Rights Reserved.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License"); you may
-#    not use this file except in compliance with the License. You may obtain
-#    a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#    License for the specific language governing permissions and limitations
-#    under the License.
-
 import json
-
 import mock
+
 import requests
 
+from cinderclient.v1 import client
 from cinderclient import exceptions
-from cinderclient.v2 import client
-from tests import utils
+from cinderclient.tests import utils
 
 
 class AuthenticateAgainstKeystoneTests(utils.TestCase):
@@ -40,9 +24,9 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
                         "endpoints": [
                             {
                                 "region": "RegionOne",
-                                "adminURL": "http://localhost:8774/v2",
-                                "internalURL": "http://localhost:8774/v2",
-                                "publicURL": "http://localhost:8774/v2/",
+                                "adminURL": "http://localhost:8774/v1",
+                                "internalURL": "http://localhost:8774/v1",
+                                "publicURL": "http://localhost:8774/v1/",
                             },
                         ],
                     },
@@ -112,9 +96,9 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
                         "endpoints": [
                             {
                                 "region": "RegionOne",
-                                "adminURL": "http://localhost:8774/v2",
-                                "internalURL": "http://localhost:8774/v2",
-                                "publicURL": "http://localhost:8774/v2/",
+                                "adminURL": "http://localhost:8774/v1",
+                                "internalURL": "http://localhost:8774/v1",
+                                "publicURL": "http://localhost:8774/v1/",
                             },
                         ],
                     },
@@ -184,7 +168,7 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
 
     def test_auth_redirect(self):
         cs = client.Client("username", "password", "project_id",
-                           "auth_url/v2", service_type='compute')
+                           "auth_url/v1", service_type='compute')
         dict_correct_response = {
             "access": {
                 "token": {
@@ -196,10 +180,10 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
                         "type": "compute",
                         "endpoints": [
                             {
-                                "adminURL": "http://localhost:8774/v2",
+                                "adminURL": "http://localhost:8774/v1",
                                 "region": "RegionOne",
-                                "internalURL": "http://localhost:8774/v2",
-                                "publicURL": "http://localhost:8774/v2/",
+                                "internalURL": "http://localhost:8774/v1",
+                                "publicURL": "http://localhost:8774/v1/",
                             },
                         ],
                     },
@@ -277,25 +261,25 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
                 },
                 "serviceCatalog": [
                     {
-                        "adminURL": "http://localhost:8774/v2",
+                        "adminURL": "http://localhost:8774/v1",
                         "type": "compute",
                         "name": "Compute CLoud",
                         "endpoints": [
                             {
                                 "region": "RegionOne",
-                                "internalURL": "http://localhost:8774/v2",
-                                "publicURL": "http://localhost:8774/v2/",
+                                "internalURL": "http://localhost:8774/v1",
+                                "publicURL": "http://localhost:8774/v1/",
                             },
                         ],
                     },
                     {
-                        "adminURL": "http://localhost:8774/v2",
+                        "adminURL": "http://localhost:8774/v1",
                         "type": "compute",
                         "name": "Hyper-compute Cloud",
                         "endpoints": [
                             {
-                                "internalURL": "http://localhost:8774/v2",
-                                "publicURL": "http://localhost:8774/v2/",
+                                "internalURL": "http://localhost:8774/v1",
+                                "publicURL": "http://localhost:8774/v1/",
                             },
                         ],
                     },
@@ -320,7 +304,7 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
 class AuthenticationTests(utils.TestCase):
     def test_authenticate_success(self):
         cs = client.Client("username", "password", "project_id", "auth_url")
-        management_url = 'https://localhost/v2.1/443470'
+        management_url = 'https://localhost/v1.1/443470'
         auth_response = utils.TestResponse({
             'status_code': 204,
             'headers': {

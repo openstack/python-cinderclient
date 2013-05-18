@@ -1,5 +1,5 @@
-from tests import utils
-from tests.v1 import fakes
+from cinderclient.tests import utils
+from cinderclient.tests.v1 import fakes
 
 
 cs = fakes.FakeClient()

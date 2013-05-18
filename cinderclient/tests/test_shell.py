@@ -8,7 +8,7 @@ from testtools import matchers
 
 from cinderclient import exceptions
 import cinderclient.shell
-from tests import utils
+from cinderclient.tests import utils
 
 
 class ShellTest(utils.TestCase):
