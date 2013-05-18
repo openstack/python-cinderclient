@@ -14,9 +14,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient.openstack.common import version
+__all__ = ['__version__']
 
-version_info = version.VersionInfo('python-cinderclient')
+import pbr.version
+
+version_info = pbr.version.VersionInfo('python-cinderclient')
 # We have a circular import problem when we first run python setup.py sdist
 # It's harmless, so deflect it.
 try:
