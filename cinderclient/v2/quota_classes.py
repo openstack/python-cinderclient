@@ -27,7 +27,7 @@ class QuotaClassSet(base.Resource):
         self.manager.update(self.class_name, *args, **kwargs)
 
 
-class QuotaClassSetManager(base.ManagerWithFind):
+class QuotaClassSetManager(base.Manager):
     resource_class = QuotaClassSet
 
     def get(self, class_name):
