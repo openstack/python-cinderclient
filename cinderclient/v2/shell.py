@@ -22,7 +22,7 @@ import time
 
 import six
 
-from cinderclient import exceptions
+from cinderclient.openstack.common.apiclient import exceptions
 from cinderclient import utils
 
 

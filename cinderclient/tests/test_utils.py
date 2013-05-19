@@ -3,7 +3,7 @@ import sys
 
 from six import moves
 
-from cinderclient import exceptions
+from cinderclient.openstack.common.apiclient import exceptions
 from cinderclient import utils
 from cinderclient import base
 from cinderclient.tests import utils as test_utils
