@@ -82,7 +82,7 @@ class HTTPClient(object):
                 self.verify_cert = True
 
         self._logger = logging.getLogger(__name__)
-        if self.http_log_debug:
+        if self.http_log_debug and not self._logger.handlers:
             ch = logging.StreamHandler()
             self._logger.setLevel(logging.DEBUG)
             self._logger.addHandler(ch)
