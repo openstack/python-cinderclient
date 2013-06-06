@@ -27,7 +27,7 @@ class VolumeBackupsRestore(base.Resource):
         return "<VolumeBackupsRestore: %s>" % self.id
 
 
-class VolumeBackupRestoreManager(base.ManagerWithFind):
+class VolumeBackupRestoreManager(base.Manager):
     """Manage :class:`VolumeBackupsRestore` resources."""
     resource_class = VolumeBackupsRestore
 
