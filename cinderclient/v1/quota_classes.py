@@ -38,11 +38,13 @@ class QuotaClassSetManager(base.Manager):
     def update(self,
                class_name,
                volumes=None,
+               snapshots=None,
                gigabytes=None):
 
         body = {'quota_class_set': {
                 'class_name': class_name,
                 'volumes': volumes,
+                'snapshots': snapshots,
                 'gigabytes': gigabytes}}
 
         for key in body['quota_class_set'].keys():
