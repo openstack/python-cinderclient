@@ -33,7 +33,8 @@ class ServiceCatalog(object):
                 service_name=None, volume_service_name=None):
         """Fetch the public URL from the Compute service for
         a particular endpoint attribute. If none given, return
-        the first. See tests for sample service catalog."""
+        the first. See tests for sample service catalog.
+        """
         matching_endpoints = []
         if 'endpoints' in self.catalog:
             # We have a bastardized service catalog. Treat it special. :/
@@ -44,7 +45,7 @@ class ServiceCatalog(object):
                 raise cinderclient.exceptions.EndpointNotFound()
 
         # We don't always get a service catalog back ...
-        if not 'serviceCatalog' in self.catalog['access']:
+        if 'serviceCatalog' not in self.catalog['access']:
             return None
 
         # Full catalog ...

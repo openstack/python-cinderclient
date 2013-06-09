@@ -20,7 +20,7 @@ class QuotaSet(base.Resource):
 
     @property
     def id(self):
-        """Needed by base.Resource to self-refresh and be indexed"""
+        """Needed by base.Resource to self-refresh and be indexed."""
         return self.tenant_id
 
     def update(self, *args, **kwargs):

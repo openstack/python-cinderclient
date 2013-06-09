@@ -507,7 +507,7 @@ def do_type_create(cs, args):
            help="Unique ID of the volume type to delete")
 @utils.service_type('volume')
 def do_type_delete(cs, args):
-    """Delete a specific volume type"""
+    """Delete a specific volume type."""
     cs.volume_types.delete(args.id)
 
 
@@ -537,14 +537,14 @@ def do_type_key(cs, args):
 
 
 def do_endpoints(cs, args):
-    """Discover endpoints that get returned from the authenticate services"""
+    """Discover endpoints that get returned from the authenticate services."""
     catalog = cs.client.service_catalog.catalog
     for e in catalog['access']['serviceCatalog']:
         utils.print_dict(e['endpoints'][0], e['name'])
 
 
 def do_credentials(cs, args):
-    """Show user credentials returned from auth"""
+    """Show user credentials returned from auth."""
     catalog = cs.client.service_catalog.catalog
     utils.print_dict(catalog['access']['user'], "User Credentials")
     utils.print_dict(catalog['access']['token'], "Token")

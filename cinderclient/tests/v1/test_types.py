@@ -1,4 +1,3 @@
-from cinderclient import exceptions
 from cinderclient.v1 import volume_types
 from cinderclient.tests import utils
 from cinderclient.tests.v1 import fakes
