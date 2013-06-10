@@ -32,7 +32,7 @@ class ShellTest(utils.TestCase):
         'CINDER_USERNAME': 'username',
         'CINDER_PASSWORD': 'password',
         'CINDER_PROJECT_ID': 'project_id',
-        'OS_VOLUME_API_VERSION': '1.1',
+        'OS_VOLUME_API_VERSION': '1',
         'CINDER_URL': 'http://no.where',
     }
 

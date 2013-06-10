@@ -369,6 +369,17 @@ class HTTPClient(object):
 
         return self._extract_service_catalog(url, resp, body)
 
+    def get_volume_api_version_from_endpoint(self):
+        magic_tuple = urlparse.urlsplit(self.management_url)
+        scheme, netloc, path, query, frag = magic_tuple
+        v = path.split("/")[1]
+        valid_versions = ['v1', 'v2']
+        if v not in valid_versions:
+            msg = "Invalid client version '%s'. must be one of: %s" % (
+                  (v, ', '.join(valid_versions)))
+            raise exceptions.UnsupportedVersion(msg)
+        return v[1:]
+
 
 def get_client_class(version):
     version_map = {
