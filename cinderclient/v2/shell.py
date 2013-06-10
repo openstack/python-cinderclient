@@ -13,6 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from __future__ import print_function
+
 import argparse
 import os
 import sys
@@ -35,17 +37,17 @@ def _poll_for_status(poll_fn, obj_id, action, final_ok_states,
         sys.stdout.write(msg)
         sys.stdout.flush()
 
-    print
+    print()
     while True:
         obj = poll_fn(obj_id)
         status = obj.status.lower()
         progress = getattr(obj, 'progress', None) or 0
         if status in final_ok_states:
             print_progress(100)
-            print "\nFinished"
+            print("\nFinished")
             break
         elif status == "error":
-            print "\nError %(action)s instance" % locals()
+            print("\nError %(action)s instance" % locals())
             break
         else:
             print_progress(progress)

@@ -18,6 +18,8 @@
 Command-line interface to the OpenStack Cinder API.
 """
 
+from __future__ import print_function
+
 import argparse
 import glob
 import imp
@@ -470,7 +472,7 @@ class OpenStackCinderShell(object):
 
         commands.remove('bash-completion')
         commands.remove('bash_completion')
-        print ' '.join(commands | options)
+        print(' '.join(commands | options))
 
     @utils.arg('command', metavar='<subcommand>', nargs='?',
                help='Display help for <subcommand>')
@@ -500,14 +502,14 @@ def main():
     try:
         OpenStackCinderShell().main(map(strutils.safe_decode, sys.argv[1:]))
     except KeyboardInterrupt:
-        print >> sys.stderr, "... terminating cinder client"
+        print("... terminating cinder client", file=sys.stderr)
         sys.exit(130)
-    except Exception, e:
+    except Exception as e:
         logger.debug(e, exc_info=1)
         message = e.message
         if not isinstance(message, basestring):
             message = str(message)
-        print >> sys.stderr, "ERROR: %s" % strutils.safe_encode(message)
+        print("ERROR: %s" % strutils.safe_encode(message), file=sys.stderr)
         sys.exit(1)
 
 

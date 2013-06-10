@@ -19,6 +19,8 @@
 OpenStack Client interface. Handles the REST calls and responses.
 """
 
+from __future__ import print_function
+
 import logging
 import os
 import urlparse
@@ -229,13 +231,13 @@ class HTTPClient(object):
                 self.management_url = management_url.rstrip('/')
                 return None
             except exceptions.AmbiguousEndpoints:
-                print "Found more than one valid endpoint. Use a more " \
-                      "restrictive filter"
+                print("Found more than one valid endpoint. Use a more "
+                      "restrictive filter")
                 raise
             except KeyError:
                 raise exceptions.AuthorizationFailure()
             except exceptions.EndpointNotFound:
-                print "Could not find any suitable endpoint. Correct region?"
+                print("Could not find any suitable endpoint. Correct region?")
                 raise
 
         elif resp.status_code == 305:
