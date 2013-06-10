@@ -900,3 +900,15 @@ def do_transfer_show(cs, args):
         info.pop('links')
 
     utils.print_dict(info)
+
+
+@utils.arg('volume', metavar='<volume>', help='ID of the volume to extend.')
+@utils.arg('new-size',
+           metavar='<new_size>',
+           type=int,
+           help='New size of volume in GB')
+@utils.service_type('volume')
+def do_extend(cs, args):
+    """Attempt to extend the size of an existing volume."""
+    volume = _find_volume(cs, args.volume)
+    cs.volumes.extend_volume(volume, args.new_size)
