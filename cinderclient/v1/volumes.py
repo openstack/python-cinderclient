@@ -18,6 +18,7 @@ Volume interface (1.1 extension).
 """
 
 import urllib
+import six
 from cinderclient import base
 
 
@@ -167,7 +168,7 @@ class VolumeManager(base.ManagerWithFind):
 
         qparams = {}
 
-        for opt, val in search_opts.iteritems():
+        for opt, val in six.iteritems(search_opts):
             if val:
                 qparams[opt] = val
 

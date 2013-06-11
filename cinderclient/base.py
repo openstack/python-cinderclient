@@ -22,6 +22,9 @@ import abc
 import contextlib
 import hashlib
 import os
+
+import six
+
 from cinderclient import exceptions
 from cinderclient import utils
 
@@ -248,7 +251,7 @@ class Resource(object):
         return None
 
     def _add_details(self, info):
-        for (k, v) in info.iteritems():
+        for (k, v) in six.iteritems(info):
             try:
                 setattr(self, k, v)
             except AttributeError:

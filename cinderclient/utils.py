@@ -18,6 +18,7 @@ import re
 import sys
 import uuid
 
+import six
 import prettytable
 
 from cinderclient import exceptions
@@ -165,7 +166,7 @@ def print_list(objs, fields, formatters={}):
 def print_dict(d, property="Property"):
     pt = prettytable.PrettyTable([property, 'Value'], caching=False)
     pt.aligns = ['l', 'l']
-    [pt.add_row(list(r)) for r in d.iteritems()]
+    [pt.add_row(list(r)) for r in six.iteritems(d)]
     print strutils.safe_encode(pt.get_string(sortby=property))
 
 

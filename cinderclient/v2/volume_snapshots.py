@@ -15,6 +15,7 @@
 
 """Volume snapshot interface (1.1 extension)."""
 
+import six
 import urllib
 
 from cinderclient import base
@@ -83,7 +84,7 @@ class SnapshotManager(base.ManagerWithFind):
 
         qparams = {}
 
-        for opt, val in search_opts.iteritems():
+        for opt, val in six.iteritems(search_opts):
             if val:
                 qparams[opt] = val
 
