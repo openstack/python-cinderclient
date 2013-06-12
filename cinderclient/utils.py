@@ -13,6 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from __future__ import print_function
+
 import os
 import re
 import sys
@@ -160,14 +162,14 @@ def print_list(objs, fields, formatters={}):
         pt.add_row(row)
 
     if len(pt._rows) > 0:
-        print strutils.safe_encode(pt.get_string(sortby=fields[0]))
+        print(strutils.safe_encode(pt.get_string(sortby=fields[0])))
 
 
 def print_dict(d, property="Property"):
     pt = prettytable.PrettyTable([property, 'Value'], caching=False)
     pt.aligns = ['l', 'l']
     [pt.add_row(list(r)) for r in six.iteritems(d)]
-    print strutils.safe_encode(pt.get_string(sortby=property))
+    print(strutils.safe_encode(pt.get_string(sortby=property)))
 
 
 def find_resource(manager, name_or_id):

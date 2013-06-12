@@ -6,6 +6,8 @@ wrong the tests might raise AssertionError. I've indicated in comments the
 places where actual behavior differs from the spec.
 """
 
+from __future__ import print_function
+
 
 def assert_has_keys(dict, required=[], optional=[]):
     keys = dict.keys()
@@ -58,9 +60,9 @@ class FakeClient(object):
             try:
                 assert entry[2] == body
             except AssertionError:
-                print entry[2]
-                print "!="
-                print body
+                print(entry[2])
+                print("!=")
+                print(body)
                 raise
 
         self.client.callstack = []
