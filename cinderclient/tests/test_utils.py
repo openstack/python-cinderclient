@@ -79,7 +79,7 @@ class FindResourceTestCase(test_utils.TestCase):
 
 
 class CaptureStdout(object):
-    """Context manager for capturing stdout from statments in its's block"""
+    """Context manager for capturing stdout from statments in its's block."""
     def __enter__(self):
         self.real_stdout = sys.stdout
         self.stringio = StringIO.StringIO()
