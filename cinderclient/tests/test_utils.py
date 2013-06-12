@@ -1,6 +1,7 @@
 import collections
-import StringIO
 import sys
+
+from six import moves
 
 from cinderclient import exceptions
 from cinderclient import utils
@@ -82,7 +83,7 @@ class CaptureStdout(object):
     """Context manager for capturing stdout from statments in its's block."""
     def __enter__(self):
         self.real_stdout = sys.stdout
-        self.stringio = StringIO.StringIO()
+        self.stringio = moves.StringIO()
         sys.stdout = self.stringio
         return self
 

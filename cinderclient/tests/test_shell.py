@@ -1,8 +1,8 @@
-import cStringIO
 import re
 import sys
 
 import fixtures
+from six import moves
 from testtools import matchers
 
 from cinderclient import exceptions
@@ -29,7 +29,7 @@ class ShellTest(utils.TestCase):
     def shell(self, argstr):
         orig = sys.stdout
         try:
-            sys.stdout = cStringIO.StringIO()
+            sys.stdout = moves.StringIO()
             _shell = cinderclient.shell.OpenStackCinderShell()
             _shell.main(argstr.split())
         except SystemExit:
