@@ -166,11 +166,10 @@ class Manager(utils.HookableMixin):
         return body
 
 
-class ManagerWithFind(Manager):
+class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):
     """
     Like a `Manager`, but with additional `find()`/`findall()` methods.
     """
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def list(self):
