@@ -278,6 +278,18 @@ def do_force_delete(cs, args):
     volume.force_delete()
 
 
+@utils.arg('volume', metavar='<volume>', help='ID of the volume to modify.')
+@utils.arg('--state', metavar='<state>', default='available',
+           help=('Indicate which state to assign the volume. Options include '
+                 'available, error, creating, deleting, error_deleting. If no '
+                 'state is provided, available will be used.'))
+@utils.service_type('volume')
+def do_reset_state(cs, args):
+    """Explicitly update the state of a volume."""
+    volume = _find_volume(cs, args.volume)
+    volume.reset_state(args.state)
+
+
 @utils.arg('volume',
            metavar='<volume>',
            help='ID of the volume to rename.')

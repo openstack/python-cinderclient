@@ -157,3 +157,13 @@ class ShellTest(utils.TestCase):
         self.run_command('metadata 1234 unset key1 key2')
         self.assert_called('DELETE', '/volumes/1234/metadata/key1')
         self.assert_called('DELETE', '/volumes/1234/metadata/key2', pos=-2)
+
+    def test_reset_state(self):
+        self.run_command('reset-state 1234')
+        expected = {'os-reset_status': {'status': 'available'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_reset_state_with_flag(self):
+        self.run_command('reset-state --state error 1234')
+        expected = {'os-reset_status': {'status': 'error'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
