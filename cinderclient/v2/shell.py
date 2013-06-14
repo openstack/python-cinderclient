@@ -170,9 +170,7 @@ def do_show(cs, args):
     volume = _find_volume(cs, args.volume)
     info.update(volume._info)
 
-    if 'links' in info:
-        info.pop('links')
-
+    info.pop('links', None)
     utils.print_dict(info)
 
 
@@ -282,8 +280,7 @@ def do_create(cs, args):
     volume = cs.volumes.get(volume.id)
     info.update(volume._info)
 
-    info.pop('links')
-
+    info.pop('links', None)
     utils.print_dict(info)
 
 
@@ -792,9 +789,7 @@ def do_backup_show(cs, args):
     info = dict()
     info.update(backup._info)
 
-    if 'links' in info:
-        info.pop('links')
-
+    info.pop('links', None)
     utils.print_dict(info)
 
 
@@ -847,9 +842,7 @@ def do_transfer_create(cs, args):
     info = dict()
     info.update(transfer._info)
 
-    if 'links' in info:
-        info.pop('links')
-
+    info.pop('links', None)
     utils.print_dict(info)
 
 
@@ -873,9 +866,7 @@ def do_transfer_accept(cs, args):
     info = dict()
     info.update(transfer._info)
 
-    if 'links' in info:
-        info.pop('links')
-
+    info.pop('links', None)
     utils.print_dict(info)
 
 
@@ -896,7 +887,5 @@ def do_transfer_show(cs, args):
     info = dict()
     info.update(transfer._info)
 
-    if 'links' in info:
-        info.pop('links')
-
+    info.pop('links', None)
     utils.print_dict(info)
