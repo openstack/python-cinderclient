@@ -44,7 +44,7 @@ class QuotaClassSetManager(base.Manager):
                 'volumes': volumes,
                 'gigabytes': gigabytes}}
 
-        for key in body['quota_class_set'].keys():
+        for key in list(body['quota_class_set'].keys()):
             if body['quota_class_set'][key] is None:
                 body['quota_class_set'].pop(key)
 

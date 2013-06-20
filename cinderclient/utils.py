@@ -217,7 +217,7 @@ def find_resource(manager, name_or_id):
 
 def _format_servers_list_networks(server):
     output = []
-    for (network, addresses) in server.networks.items():
+    for (network, addresses) in list(server.networks.items()):
         if len(addresses) == 0:
             continue
         addresses_csv = ', '.join(addresses)

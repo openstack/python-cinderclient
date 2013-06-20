@@ -45,7 +45,7 @@ class QuotaSetManager(base.Manager):
                 'snapshots': snapshots,
                 'gigabytes': gigabytes}}
 
-        for key in body['quota_set'].keys():
+        for key in list(body['quota_set'].keys()):
             if body['quota_set'][key] is None:
                 body['quota_set'].pop(key)
 

@@ -10,7 +10,7 @@ from __future__ import print_function
 
 
 def assert_has_keys(dict, required=[], optional=[]):
-    keys = dict.keys()
+    keys = list(dict.keys())
     for k in required:
         try:
             assert k in keys

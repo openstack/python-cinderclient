@@ -465,9 +465,9 @@ class OpenStackCinderShell(object):
         """
         commands = set()
         options = set()
-        for sc_str, sc in self.subcommands.items():
+        for sc_str, sc in list(self.subcommands.items()):
             commands.add(sc_str)
-            for option in sc._optionals._option_string_actions.keys():
+            for option in list(sc._optionals._option_string_actions.keys()):
                 options.add(option)
 
         commands.remove('bash-completion')

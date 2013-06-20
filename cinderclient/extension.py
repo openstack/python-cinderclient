@@ -29,7 +29,7 @@ class Extension(utils.HookableMixin):
 
     def _parse_extension_module(self):
         self.manager_class = None
-        for attr_name, attr_value in self.module.__dict__.items():
+        for attr_name, attr_value in list(self.module.__dict__.items()):
             if attr_name in self.SUPPORTED_HOOKS:
                 self.add_hook(attr_name, attr_value)
             elif utils.safe_issubclass(attr_value, base.Manager):

@@ -83,7 +83,7 @@ def _print_volume_snapshot(snapshot):
 
 def _translate_keys(collection, convert):
     for item in collection:
-        keys = item.__dict__.keys()
+        keys = list(item.__dict__.keys())
         for from_key, to_key in convert:
             if from_key in keys and to_key not in keys:
                 setattr(item, to_key, item._info[from_key])
@@ -306,7 +306,7 @@ def do_metadata(cs, args):
     if args.action == 'set':
         cs.volumes.set_metadata(volume, metadata)
     elif args.action == 'unset':
-        cs.volumes.delete_metadata(volume, metadata.keys())
+        cs.volumes.delete_metadata(volume, list(metadata.keys()))
 
 
 @utils.arg(
@@ -491,7 +491,7 @@ def do_type_key(cs, args):
         if args.action == 'set':
             vtype.set_keys(keypair)
         elif args.action == 'unset':
-            vtype.unset_keys(keypair.keys())
+            vtype.unset_keys(list(keypair.keys()))
 
 
 def do_endpoints(cs, args):

@@ -11,7 +11,7 @@ class Limits(base.Resource):
 
     @property
     def absolute(self):
-        for (name, value) in self._info['absolute'].items():
+        for (name, value) in list(self._info['absolute'].items()):
             yield AbsoluteLimit(name, value)
 
     @property

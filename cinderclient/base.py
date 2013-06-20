@@ -201,7 +201,7 @@ class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):
         the Python side.
         """
         found = []
-        searches = kwargs.items()
+        searches = list(kwargs.items())
 
         for obj in self.list():
             try:
@@ -270,8 +270,8 @@ class Resource(object):
             return self.__dict__[k]
 
     def __repr__(self):
-        reprkeys = sorted(k for k in self.__dict__.keys() if k[0] != '_' and
-                          k != 'manager')
+        reprkeys = sorted(k for k in list(self.__dict__.keys()) if k[0] != '_'
+                          and k != 'manager')
         info = ", ".join("%s=%s" % (k, getattr(self, k)) for k in reprkeys)
         return "<%s %s>" % (self.__class__.__name__, info)
 
