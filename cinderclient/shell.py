@@ -29,6 +29,8 @@ import pkgutil
 import sys
 import logging
 
+import six
+
 from cinderclient import client
 from cinderclient import exceptions as exc
 import cinderclient.extension
@@ -500,14 +502,18 @@ class OpenStackHelpFormatter(argparse.HelpFormatter):
 
 def main():
     try:
-        OpenStackCinderShell().main(map(strutils.safe_decode, sys.argv[1:]))
+        if sys.version_info >= (3, 0):
+            OpenStackCinderShell().main(sys.argv[1:])
+        else:
+            OpenStackCinderShell().main(map(strutils.safe_decode,
+                                        sys.argv[1:]))
     except KeyboardInterrupt:
         print("... terminating cinder client", file=sys.stderr)
         sys.exit(130)
     except Exception as e:
         logger.debug(e, exc_info=1)
         message = e.message
-        if not isinstance(message, basestring):
+        if not isinstance(message, six.string_types):
             message = str(message)
         print("ERROR: %s" % strutils.safe_encode(message), file=sys.stderr)
         sys.exit(1)
