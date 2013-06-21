@@ -29,7 +29,7 @@ class QuotaClassSetsTest(utils.TestCase):
 
     def test_update_quota(self):
         q = cs.quota_classes.get('test')
-        q.update(volumes=2)
+        q.update(volumes=2, snapshots=2)
         cs.assert_called('PUT', '/os-quota-class-sets/test')
 
     def test_refresh_quota(self):
