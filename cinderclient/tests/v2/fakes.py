@@ -121,6 +121,44 @@ def _stub_restore():
     return {'volume_id': '712f4980-5ac1-41e5-9383-390aa7c9f58b'}
 
 
+def _stub_transfer_full(id, base_uri, tenant_id):
+    return {
+        'id': id,
+        'name': 'transfer',
+        'volume_id': '8c05f861-6052-4df6-b3e0-0aebfbe686cc',
+        'created_at': '2013-04-12T08:16:37.000000',
+        'auth_key': '123456',
+        'links': [
+            {
+                'href': _self_href(base_uri, tenant_id, id),
+                'rel': 'self'
+            },
+            {
+                'href': _bookmark_href(base_uri, tenant_id, id),
+                'rel': 'bookmark'
+            }
+        ]
+    }
+
+
+def _stub_transfer(id, base_uri, tenant_id):
+    return {
+        'id': id,
+        'name': 'transfer',
+        'volume_id': '8c05f861-6052-4df6-b3e0-0aebfbe686cc',
+        'links': [
+            {
+                'href': _self_href(base_uri, tenant_id, id),
+                'rel': 'self'
+            },
+            {
+                'href': _bookmark_href(base_uri, tenant_id, id),
+                'rel': 'bookmark'
+            }
+        ]
+    }
+
+
 class FakeClient(fakes.FakeClient, client.Client):
 
     def __init__(self, *args, **kwargs):
@@ -412,3 +450,42 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_backups_76a17945_3c6f_435c_975b_b5685db10b62_restore(self, **kw):
         return (200, {},
                 {'restore': _stub_restore()})
+
+    #
+    # VolumeTransfers
+    #
+
+    def get_os_volume_transfer_5678(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        transfer1 = '5678'
+        return (200, {},
+                {'transfer':
+                 _stub_transfer_full(transfer1, base_uri, tenant_id)})
+
+    def get_os_volume_transfer_detail(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        transfer1 = '5678'
+        transfer2 = 'f625ec3e-13dd-4498-a22a-50afd534cc41'
+        return (200, {},
+                {'transfers': [
+                    _stub_transfer_full(transfer1, base_uri, tenant_id),
+                    _stub_transfer_full(transfer2, base_uri, tenant_id)]})
+
+    def delete_os_volume_transfer_5678(self, **kw):
+        return (202, {}, None)
+
+    def post_os_volume_transfer(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        transfer1 = '5678'
+        return (202, {},
+                {'transfer': _stub_transfer(transfer1, base_uri, tenant_id)})
+
+    def post_os_volume_transfer_5678_accept(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        transfer1 = '5678'
+        return (200, {},
+                {'transfer': _stub_transfer(transfer1, base_uri, tenant_id)})

@@ -69,6 +69,11 @@ def _find_backup(cs, backup):
     return utils.find_resource(cs.backups, backup)
 
 
+def _find_transfer(cs, transfer):
+    """Get a transfer by ID."""
+    return utils.find_resource(cs.transfers, transfer)
+
+
 def _print_volume_snapshot(snapshot):
     utils.print_dict(snapshot._info)
 
@@ -807,3 +812,77 @@ def do_backup_restore(cs, args):
     """Restore a backup."""
     cs.restores.restore(args.backup,
                         args.volume_id)
+
+
+@utils.arg('volume', metavar='<volume>',
+           help='ID of the volume to transfer.')
+@utils.arg('--name',
+           metavar='<name>',
+           default=None,
+           help='Optional transfer name. (Default=None)')
+@utils.arg('--display-name',
+           help=argparse.SUPPRESS)
+@utils.service_type('volume')
+def do_transfer_create(cs, args):
+    """Creates a volume transfer."""
+    if args.display_name is not None:
+        args.name = args.display_name
+
+    transfer = cs.transfers.create(args.volume,
+                                   args.name)
+    info = dict()
+    info.update(transfer._info)
+
+    if 'links' in info:
+        info.pop('links')
+
+    utils.print_dict(info)
+
+
+@utils.arg('transfer', metavar='<transfer>',
+           help='ID of the transfer to delete.')
+@utils.service_type('volume')
+def do_transfer_delete(cs, args):
+    """Undo a transfer."""
+    transfer = _find_transfer(cs, args.transfer)
+    transfer.delete()
+
+
+@utils.arg('transfer', metavar='<transfer>',
+           help='ID of the transfer to accept.')
+@utils.arg('auth_key', metavar='<auth_key>',
+           help='Auth key of the transfer to accept.')
+@utils.service_type('volume')
+def do_transfer_accept(cs, args):
+    """Accepts a volume transfer."""
+    transfer = cs.transfers.accept(args.transfer, args.auth_key)
+    info = dict()
+    info.update(transfer._info)
+
+    if 'links' in info:
+        info.pop('links')
+
+    utils.print_dict(info)
+
+
+@utils.service_type('volume')
+def do_transfer_list(cs, args):
+    """List all the transfers."""
+    transfers = cs.transfers.list()
+    columns = ['ID', 'Volume ID', 'Name']
+    utils.print_list(transfers, columns)
+
+
+@utils.arg('transfer', metavar='<transfer>',
+           help='ID of the transfer to accept.')
+@utils.service_type('volume')
+def do_transfer_show(cs, args):
+    """Show details about a transfer."""
+    transfer = _find_transfer(cs, args.transfer)
+    info = dict()
+    info.update(transfer._info)
+
+    if 'links' in info:
+        info.pop('links')
+
+    utils.print_dict(info)
