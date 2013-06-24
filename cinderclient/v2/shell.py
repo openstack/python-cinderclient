@@ -20,6 +20,8 @@ import os
 import sys
 import time
 
+import six
+
 from cinderclient import exceptions
 from cinderclient import utils
 
@@ -258,7 +260,7 @@ def do_create(cs, args):
             # NOTE(vish): multiple copies of the same hint will
             #             result in a list of values
             if key in hints:
-                if isinstance(hints[key], basestring):
+                if isinstance(hints[key], six.string_types):
                     hints[key] = [hints[key]]
                 hints[key] += [value]
             else:
