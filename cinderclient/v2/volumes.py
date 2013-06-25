@@ -100,6 +100,10 @@ class Volume(base.Resource):
         """
         self.manager.force_delete(self)
 
+    def reset_state(self, state):
+        """Update the volume with the provided state."""
+        self.manager.reset_state(self, state)
+
 
 class VolumeManager(base.ManagerWithFind):
     """Manage :class:`Volume` resources."""
@@ -313,3 +317,7 @@ class VolumeManager(base.ManagerWithFind):
 
     def force_delete(self, volume):
         return self._action('os-force_delete', base.getid(volume))
+
+    def reset_state(self, volume, state):
+        """Update the provided volume with the provided state."""
+        return self._action('os-reset_status', volume, {'status': state})

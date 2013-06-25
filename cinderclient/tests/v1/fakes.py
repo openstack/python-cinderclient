@@ -281,8 +281,10 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert body[action] is None
         elif action == 'os-roll_detaching':
             assert body[action] is None
+        elif action == 'os-reset_status':
+            assert 'status' in body[action]
         else:
-            raise AssertionError("Unexpected server action: %s" % action)
+            raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)
 
     def post_volumes(self, **kw):
