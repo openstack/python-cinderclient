@@ -452,6 +452,15 @@ class OpenStackCinderShell(object):
         except exc.AuthorizationFailure:
             raise exc.CommandError("Unable to authorize user")
 
+        endpoint_api_version = self.cs.get_volume_api_version_from_endpoint()
+        if endpoint_api_version != options.os_volume_api_version:
+            msg = (("Volume API version is set to %s "
+                    "but you are accessing a %s endpoint. "
+                    "Change its value via either --os-volume-api-version "
+                    "or env[OS_VOLUME_API_VERSION]")
+                   % (options.os_volume_api_version, endpoint_api_version))
+            raise exc.InvalidAPIVersion(msg)
+
         args.func(self.cs, args)
 
     def _run_extension_hooks(self, hook_type, *args, **kwargs):

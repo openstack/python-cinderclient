@@ -167,6 +167,9 @@ class FakeClient(fakes.FakeClient, client.Client):
                                extensions=kwargs.get('extensions'))
         self.client = FakeHTTPClient(**kwargs)
 
+    def get_volume_api_version_from_endpoint(self):
+        return self.client.get_volume_api_version_from_endpoint()
+
 
 class FakeHTTPClient(base_client.HTTPClient):
 
@@ -175,6 +178,7 @@ class FakeHTTPClient(base_client.HTTPClient):
         self.password = 'password'
         self.auth_url = 'auth_url'
         self.callstack = []
+        self.management_url = 'http://10.0.2.15:8776/v2/fake'
 
     def _cs_request(self, url, method, **kwargs):
         # Check that certain things are called correctly
@@ -211,6 +215,11 @@ class FakeHTTPClient(base_client.HTTPClient):
             return utils.TestResponse(status), body
         else:
             return utils.TestResponse({"status": status}), body
+
+    def get_volume_api_version_from_endpoint(self):
+        magic_tuple = urlparse.urlsplit(self.management_url)
+        scheme, netloc, path, query, frag = magic_tuple
+        return path.lstrip('/').split('/')[0][1:]
 
     #
     # Snapshots

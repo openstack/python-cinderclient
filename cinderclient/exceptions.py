@@ -11,6 +11,10 @@ class UnsupportedVersion(Exception):
     pass
 
 
+class InvalidAPIVersion(Exception):
+    pass
+
+
 class CommandError(Exception):
     pass
 
