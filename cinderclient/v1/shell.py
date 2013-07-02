@@ -443,6 +443,21 @@ def do_snapshot_rename(cs, args):
     _find_volume_snapshot(cs, args.snapshot).update(**kwargs)
 
 
+@utils.arg('snapshot', metavar='<snapshot>',
+           help='ID of the snapshot to modify.')
+@utils.arg('--state', metavar='<state>',
+           default='available',
+           help=('Indicate which state to assign the snapshot. '
+                 'Options include available, error, creating, deleting, '
+                 'error_deleting. If no state is provided, '
+                 'available will be used.'))
+@utils.service_type('volume')
+def do_snapshot_reset_state(cs, args):
+    """Explicitly update the state of a snapshot."""
+    snapshot = _find_volume_snapshot(cs, args.snapshot)
+    snapshot.reset_state(args.state)
+
+
 def _print_volume_type_list(vtypes):
     utils.print_list(vtypes, ['ID', 'Name'])
 

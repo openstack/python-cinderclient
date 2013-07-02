@@ -45,6 +45,10 @@ class Snapshot(base.Resource):
     def project_id(self):
         return self._info.get('os-extended-snapshot-attributes:project_id')
 
+    def reset_state(self, state):
+        """Update the snapshot with the provided state."""
+        self.manager.reset_state(self, state)
+
 
 class SnapshotManager(base.ManagerWithFind):
     """Manage :class:`Snapshot` resources."""
@@ -118,3 +122,14 @@ class SnapshotManager(base.ManagerWithFind):
         body = {"snapshot": kwargs}
 
         self._update("/snapshots/%s" % base.getid(snapshot), body)
+
+    def reset_state(self, snapshot, state):
+        """Update the specified snapshot with the provided state."""
+        return self._action('os-reset_status', snapshot, {'status': state})
+
+    def _action(self, action, snapshot, info=None, **kwargs):
+        """Perform a snapshot action."""
+        body = {action: info}
+        self.run_hooks('modify_body_for_action', body, **kwargs)
+        url = '/snapshots/%s/action' % base.getid(snapshot)
+        return self.api.client.post(url, body=body)

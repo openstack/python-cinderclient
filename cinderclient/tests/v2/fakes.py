@@ -238,6 +238,17 @@ class FakeHTTPClient(base_client.HTTPClient):
         snapshot.update(kw['body']['snapshot'])
         return (200, {}, {'snapshot': snapshot})
 
+    def post_snapshots_1234_action(self, body, **kw):
+        _body = None
+        resp = 202
+        assert len(body.keys()) == 1
+        action = body.keys()[0]
+        if action == 'os-reset_status':
+            assert 'status' in body['os-reset_status']
+        else:
+            raise AssertionError('Unexpected action: %s" % action')
+        return (resp, {}, _body)
+
     #
     # Volumes
     #
