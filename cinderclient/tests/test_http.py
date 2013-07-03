@@ -3,7 +3,7 @@ import mock
 import requests
 
 from cinderclient import client
-from cinderclient import exceptions
+from cinderclient.openstack.common.apiclient import exceptions
 from cinderclient.tests import utils
 
 

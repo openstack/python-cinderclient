@@ -5,7 +5,7 @@ import fixtures
 from six import moves
 from testtools import matchers
 
-from cinderclient import exceptions
+from cinderclient.openstack.common.apiclient import exceptions
 import cinderclient.shell
 from cinderclient.tests import utils
 
