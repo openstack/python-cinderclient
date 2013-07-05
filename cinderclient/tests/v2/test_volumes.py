@@ -85,3 +85,8 @@ class VolumesTest(utils.TestCase):
         keys = ['key1']
         cs.volumes.delete_metadata(1234, keys)
         cs.assert_called('DELETE', '/volumes/1234/metadata/key1')
+
+    def test_extend(self):
+        v = cs.volumes.get('1234')
+        cs.volumes.extend(v, 2)
+        cs.assert_called('POST', '/volumes/1234/action')
