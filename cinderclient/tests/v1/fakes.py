@@ -152,6 +152,10 @@ def _stub_transfer(id, base_uri, tenant_id):
     }
 
 
+def _stub_extend(id, new_size):
+    return {'volume_id': '712f4980-5ac1-41e5-9383-390aa7c9f58b'}
+
+
 class FakeClient(fakes.FakeClient, client.Client):
 
     def __init__(self, *args, **kwargs):
@@ -294,6 +298,8 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert body[action] is None
         elif action == 'os-reset_status':
             assert 'status' in body[action]
+        elif action == 'os-extend':
+            assert body[action].keys() == ['new_size']
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)
