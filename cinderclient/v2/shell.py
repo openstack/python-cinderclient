@@ -915,4 +915,4 @@ def do_transfer_show(cs, args):
 def do_extend(cs, args):
     """Attempt to extend the size of an existing volume."""
     volume = _find_volume(cs, args.volume)
-    cs.volumes.extend_volume(volume, args.new_size)
+    cs.volumes.extend(volume, args.new_size)
