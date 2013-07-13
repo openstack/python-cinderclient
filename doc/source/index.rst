@@ -27,6 +27,23 @@ Once you've configured your authentication parameters, you can run ``cinder help
 
 Release Notes
 =============
+1.0.5
+-----
+* Add support for scheduler-hints
+* Add support to extend volumes
+* Add support to reset state on volumes and snapshots
+* Add snapshot support for quota class
+
+.. _1190853: http://bugs.launchpad.net/python-cinderclient/+bug/1190853
+.. _1190731: http://bugs.launchpad.net/python-cinderclient/+bug/1190731
+.. _1169455: http://bugs.launchpad.net/python-cinderclient/+bug/1169455
+.. _1188452: http://bugs.launchpad.net/python-cinderclient/+bug/1188452
+.. _1180393: http://bugs.launchpad.net/python-cinderclient/+bug/1180393
+.. _1182678: http://bugs.launchpad.net/python-cinderclient/+bug/1182678
+.. _1179008: http://bugs.launchpad.net/python-cinderclient/+bug/1179008
+.. _1180059: http://bugs.launchpad.net/python-cinderclient/+bug/1180059
+.. _1170565: http://bugs.launchpad.net/python-cinderclient/+bug/1170565
+
 1.0.4
 -----
 * Added suport for backup-service commands
