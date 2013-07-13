@@ -105,6 +105,15 @@ class Volume(base.Resource):
         """Update the volume with the provided state."""
         self.manager.reset_state(self, state)
 
+    def extend(self, volume, new_size):
+        """Extend the size of the specified volume.
+
+        :param volume: The UUID of the volume to extend
+        :param new_size: The desired size to extend volume to.
+        """
+
+        self.manager.extend(self, volume, new_size)
+
 
 class VolumeManager(base.ManagerWithFind):
     """
@@ -338,3 +347,8 @@ class VolumeManager(base.ManagerWithFind):
     def reset_state(self, volume, state):
         """Update the provided volume with the provided state."""
         return self._action('os-reset_status', volume, {'status': state})
+
+    def extend(self, volume, new_size):
+        return self._action('os-extend',
+                            base.getid(volume),
+                            {'new_size': new_size})
