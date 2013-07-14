@@ -17,6 +17,7 @@ from cinderclient import client
 from cinderclient.v2 import limits
 from cinderclient.v2 import quota_classes
 from cinderclient.v2 import quotas
+from cinderclient.v2 import services
 from cinderclient.v2 import volumes
 from cinderclient.v2 import volume_snapshots
 from cinderclient.v2 import volume_types
@@ -60,6 +61,7 @@ class Client(object):
         self.backups = volume_backups.VolumeBackupManager(self)
         self.restores = volume_backups_restore.VolumeBackupRestoreManager(self)
         self.transfers = volume_transfers.VolumeTransferManager(self)
+        self.services = services.ServiceManager(self)
 
         # Add in any extensions...
         if extensions:
