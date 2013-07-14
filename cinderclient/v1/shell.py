@@ -86,6 +86,10 @@ def _print_volume_snapshot(snapshot):
     utils.print_dict(snapshot._info)
 
 
+def _print_volume_image(image):
+    utils.print_dict(image[1]['os-volume_upload_image'])
+
+
 def _translate_keys(collection, convert):
     for item in collection:
         keys = list(item.__dict__.keys())
@@ -683,10 +687,10 @@ def _find_volume_type(cs, vtype):
 def do_upload_to_image(cs, args):
     """Upload volume to image service as image."""
     volume = _find_volume(cs, args.volume_id)
-    volume.upload_to_image(args.force,
-                           args.image_name,
-                           args.container_format,
-                           args.disk_format)
+    _print_volume_image(volume.upload_to_image(args.force,
+                                               args.image_name,
+                                               args.container_format,
+                                               args.disk_format))
 
 
 @utils.arg('volume', metavar='<volume>',
