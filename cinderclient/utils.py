@@ -23,7 +23,7 @@ import uuid
 import six
 import prettytable
 
-from cinderclient.openstack.common.apiclient import exceptions
+from cinderclient import exceptions
 from cinderclient.openstack.common import strutils
 
 

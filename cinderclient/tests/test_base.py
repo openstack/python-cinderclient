@@ -1,5 +1,5 @@
 from cinderclient import base
-from cinderclient.openstack.common.apiclient import exceptions
+from cinderclient import exceptions
 from cinderclient.v1 import volumes
 from cinderclient.tests import utils
 from cinderclient.tests.v1 import fakes

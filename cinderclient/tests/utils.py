@@ -29,11 +29,10 @@ class TestResponse(requests.Response):
 
     def __init__(self, data):
         self._text = None
-        self.headers = {}
         super(TestResponse, self)
         if isinstance(data, dict):
             self.status_code = data.get('status_code', None)
-            self.headers = data.get('headers') or {}
+            self.headers = data.get('headers', None)
             # Fake the text attribute to streamline Response creation
             self._text = data.get('text', None)
         else:

@@ -1,4 +1,4 @@
-from cinderclient.openstack.common.apiclient import exceptions
+from cinderclient import exceptions
 from cinderclient import service_catalog
 from cinderclient.tests import utils
 
