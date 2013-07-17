@@ -46,7 +46,7 @@ if not hasattr(urlparse, 'parse_qsl'):
 
 import requests
 
-from cinderclient.openstack.common.apiclient import exceptions
+from cinderclient import exceptions
 from cinderclient import service_catalog
 from cinderclient import utils
 
@@ -151,7 +151,7 @@ class HTTPClient(object):
             body = None
 
         if resp.status_code >= 400:
-            raise exceptions.from_response(resp, method, url)
+            raise exceptions.from_response(resp, body)
 
         return resp, body
 
@@ -185,7 +185,7 @@ class HTTPClient(object):
             except exceptions.ClientException as e:
                 if attempts > self.retries:
                     raise
-                if 500 <= e.http_status <= 599:
+                if 500 <= e.code <= 599:
                     pass
                 else:
                     raise
@@ -211,16 +211,15 @@ class HTTPClient(object):
     def delete(self, url, **kwargs):
         return self._cs_request(url, 'DELETE', **kwargs)
 
-    def _extract_service_catalog(self, auth_url, url, method,
-                                 extract_token=True, **kwargs):
+    def _extract_service_catalog(self, url, resp, body, extract_token=True):
         """See what the auth service told us and process the response.
         We may get redirected to another site, fail or actually get
         back a service catalog with a token and our endpoints.
         """
-        resp, body = self.request(url, method, **kwargs)
+
         if resp.status_code == 200:  # content must always present
             try:
-                self.auth_url = auth_url
+                self.auth_url = url
                 self.service_catalog = \
                     service_catalog.ServiceCatalog(body)
 
@@ -249,7 +248,7 @@ class HTTPClient(object):
         elif resp.status_code == 305:
             return resp['location']
         else:
-            raise exceptions.from_response(resp, method, url)
+            raise exceptions.from_response(resp, body)
 
     def _fetch_endpoints_from_auth(self, url):
         """We have a token, but don't know the final endpoint for
@@ -264,14 +263,13 @@ class HTTPClient(object):
         """
 
         # GET ...:5001/v2.0/tokens/#####/endpoints
-        auth_url = url
         url = '/'.join([url, 'tokens', '%s?belongsTo=%s'
                         % (self.proxy_token, self.proxy_tenant_id)])
         self._logger.debug("Using Endpoint URL: %s" % url)
-        return self._extract_service_catalog(
-            auth_url,
-            url, "GET", headers={'X-Auth-Token': self.auth_token},
-            extract_token=False)
+        resp, body = self.request(url, "GET",
+                                  headers={'X-Auth-Token': self.auth_token})
+        return self._extract_service_catalog(url, resp, body,
+                                             extract_token=False)
 
     def authenticate(self):
         magic_tuple = urlparse.urlsplit(self.auth_url)
@@ -322,9 +320,7 @@ class HTTPClient(object):
 
     def _v1_auth(self, url):
         if self.proxy_token:
-            raise exceptions.AuthorizationFailure(
-                "This form of authentication does not support looking up"
-                " endpoints from an existing token.")
+            raise exceptions.NoTokenLookupException()
 
         headers = {'X-Auth-User': self.user,
                    'X-Auth-Key': self.password}
@@ -343,7 +339,7 @@ class HTTPClient(object):
         elif resp.status_code == 305:
             return resp.headers['location']
         else:
-            raise exceptions.from_response(resp, "GET", url)
+            raise exceptions.from_response(resp, body)
 
     def _v2_auth(self, url):
         """Authenticate against a v2.0 auth service."""
@@ -373,12 +369,13 @@ class HTTPClient(object):
         token_url = url + "/tokens"
 
         # Make sure we follow redirects when trying to reach Keystone
-        return self._extract_service_catalog(
-            url,
+        resp, body = self.request(
             token_url,
             "POST",
             body=body,
             allow_redirects=True)
+
+        return self._extract_service_catalog(url, resp, body)
 
     def get_volume_api_version_from_endpoint(self):
         magic_tuple = urlparse.urlsplit(self.management_url)

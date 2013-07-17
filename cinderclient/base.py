@@ -25,7 +25,7 @@ import os
 
 import six
 
-from cinderclient.openstack.common.apiclient import exceptions
+from cinderclient import exceptions
 from cinderclient import utils
 
 

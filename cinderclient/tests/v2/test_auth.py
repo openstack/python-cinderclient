@@ -19,7 +19,7 @@ import json
 import mock
 import requests
 
-from cinderclient.openstack.common.apiclient import exceptions
+from cinderclient import exceptions
 from cinderclient.v2 import client
 from cinderclient.tests import utils
 

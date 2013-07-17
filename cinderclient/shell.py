@@ -32,8 +32,8 @@ import logging
 import six
 
 from cinderclient import client
+from cinderclient import exceptions as exc
 import cinderclient.extension
-from cinderclient.openstack.common.apiclient import exceptions as exc
 from cinderclient.openstack.common import strutils
 from cinderclient import utils
 from cinderclient.v1 import shell as shell_v1
