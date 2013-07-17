@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import datetime
+
 try:
     import urlparse
 except ImportError:
@@ -510,3 +512,49 @@ class FakeHTTPClient(base_client.HTTPClient):
         transfer1 = '5678'
         return (200, {},
                 {'transfer': _stub_transfer(transfer1, base_uri, tenant_id)})
+
+    #
+    # Services
+    #
+    def get_os_services(self, **kw):
+        host = kw.get('host', None)
+        binary = kw.get('binary', None)
+        services = [
+            {
+                'binary': 'cinder-volume',
+                'host': 'host1',
+                'zone': 'cinder',
+                'status': 'enabled',
+                'state': 'up',
+                'updated_at': datetime(2012, 10, 29, 13, 42, 2)
+            },
+            {
+                'binary': 'cinder-volume',
+                'host': 'host2',
+                'zone': 'cinder',
+                'status': 'disabled',
+                'state': 'down',
+                'updated_at': datetime(2012, 9, 18, 8, 3, 38)
+            },
+            {
+                'binary': 'cinder-scheduler',
+                'host': 'host2',
+                'zone': 'cinder',
+                'status': 'disabled',
+                'state': 'down',
+                'updated_at': datetime(2012, 9, 18, 8, 3, 38)
+            },
+        ]
+        if host:
+            services = filter(lambda i: i['host'] == host, services)
+        if binary:
+            services = filter(lambda i: i['binary'] == binary, services)
+        return (200, {}, {'services': services})
+
+    def put_os_services_enable(self, body, **kw):
+        return (200, {}, {'host': body['host'], 'binary': body['binary'],
+                'status': 'disabled'})
+
+    def put_os_services_disable(self, body, **kw):
+        return (200, {}, {'host': body['host'], 'binary': body['binary'],
+                'status': 'enabled'})

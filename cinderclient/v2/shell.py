@@ -916,3 +916,31 @@ def do_extend(cs, args):
     """Attempt to extend the size of an existing volume."""
     volume = _find_volume(cs, args.volume)
     cs.volumes.extend(volume, args.new_size)
+
+
+@utils.arg('--host', metavar='<hostname>', default=None,
+           help='Name of host.')
+@utils.arg('--binary', metavar='<binary>', default=None,
+           help='Service binary.')
+@utils.service_type('volume')
+def do_service_list(cs, args):
+    """List all the services. Filter by host & service binary."""
+    result = cs.services.list(host=args.host, binary=args.binary)
+    columns = ["Binary", "Host", "Zone", "Status", "State", "Updated_at"]
+    utils.print_list(result, columns)
+
+
+@utils.arg('host', metavar='<hostname>', help='Name of host.')
+@utils.arg('binary', metavar='<binary>', help='Service binary.')
+@utils.service_type('volume')
+def do_service_enable(cs, args):
+    """Enable the service."""
+    cs.services.enable(args.host, args.binary)
+
+
+@utils.arg('host', metavar='<hostname>', help='Name of host.')
+@utils.arg('binary', metavar='<binary>', help='Service binary.')
+@utils.service_type('volume')
+def do_service_disable(cs, args):
+    """Disable the service."""
+    cs.services.disable(args.host, args.binary)
