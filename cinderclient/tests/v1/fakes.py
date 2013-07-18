@@ -308,6 +308,9 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert 'status' in body[action]
         elif action == 'os-extend':
             assert body[action].keys() == ['new_size']
+        elif action == 'os-migrate_volume':
+            assert 'host' in body[action]
+            assert 'force_host_copy' in body[action]
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)

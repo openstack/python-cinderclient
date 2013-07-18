@@ -112,6 +112,15 @@ class Volume(base.Resource):
 
         self.manager.extend(self, volume, new_size)
 
+    def migrate_volume(self, host, force_host_copy):
+        """Migrate the volume to a new host."""
+        self.manager.migrate_volume(self, host, force_host_copy)
+
+#    def migrate_volume_completion(self, old_volume, new_volume, error):
+#        """Complete the migration of the volume."""
+#        self.manager.migrate_volume_completion(self, old_volume,
+#                                               new_volume, error)
+
 
 class VolumeManager(base.ManagerWithFind):
     """Manage :class:`Volume` resources."""
@@ -343,3 +352,28 @@ class VolumeManager(base.ManagerWithFind):
         :return: a dictionary of volume encryption metadata
         """
         return self._get("/volumes/%s/encryption" % volume_id)._info
+
+    def migrate_volume(self, volume, host, force_host_copy):
+        """Migrate volume to new host.
+
+        :param volume: The :class:`Volume` to migrate
+        :param host: The destination host
+        :param force_host_copy: Skip driver optimizations
+        """
+
+        return self._action('os-migrate_volume',
+                            volume,
+                            {'host': host, 'force_host_copy': force_host_copy})
+
+    def migrate_volume_completion(self, old_volume, new_volume, error):
+        """Complete the migration from the old volume to the temp new one.
+
+        :param old_volume: The original :class:`Volume` in the migration
+        :param new_volume: The new temporary :class:`Volume` in the migration
+        :param error: Inform of an error to cause migration cleanup
+        """
+
+        new_volume_id = base.getid(new_volume)
+        return self._action('os-migrate_volume_completion',
+                            old_volume,
+                            {'new_volume': new_volume_id, 'error': error})[1]
