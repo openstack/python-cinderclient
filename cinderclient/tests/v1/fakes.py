@@ -244,8 +244,10 @@ class FakeHTTPClient(base_client.HTTPClient):
         action = body.keys()[0]
         if action == 'os-reset_status':
             assert 'status' in body['os-reset_status']
+        elif action == 'os-update_snapshot_status':
+            assert 'status' in body['os-update_snapshot_status']
         else:
-            raise AssertionError('Unexpected action: %s" % action')
+            raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)
 
     #
