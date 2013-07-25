@@ -90,8 +90,8 @@ class Volume(base.Resource):
     def upload_to_image(self, force, image_name, container_format,
                         disk_format):
         """Upload a volume to image service as an image."""
-        self.manager.upload_to_image(self, force, image_name, container_format,
-                                     disk_format)
+        return self.manager.upload_to_image(self, force, image_name,
+                                            container_format, disk_format)
 
     def force_delete(self):
         """Delete the specified volume ignoring its current state.
