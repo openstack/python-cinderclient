@@ -18,12 +18,14 @@
 from __future__ import print_function
 
 import argparse
+import copy
 import os
 import sys
 import time
 
 from cinderclient import exceptions
 from cinderclient import utils
+from cinderclient.v1 import availability_zones
 
 
 def _poll_for_status(poll_fn, obj_id, action, final_ok_states,
@@ -105,6 +107,11 @@ def _translate_volume_keys(collection):
 
 def _translate_volume_snapshot_keys(collection):
     convert = [('displayName', 'display_name'), ('volumeId', 'volume_id')]
+    _translate_keys(collection, convert)
+
+
+def _translate_availability_zone_keys(collection):
+    convert = [('zoneName', 'name'), ('zoneState', 'status')]
     _translate_keys(collection, convert)
 
 
@@ -863,3 +870,63 @@ def do_service_enable(cs, args):
 def do_service_disable(cs, args):
     """Disable the service."""
     cs.services.disable(args.host, args.binary)
+
+
+def _treeizeAvailabilityZone(zone):
+    """Build a tree view for availability zones."""
+    AvailabilityZone = availability_zones.AvailabilityZone
+
+    az = AvailabilityZone(zone.manager,
+                          copy.deepcopy(zone._info), zone._loaded)
+    result = []
+
+    # Zone tree view item
+    az.zoneName = zone.zoneName
+    az.zoneState = ('available'
+                    if zone.zoneState['available'] else 'not available')
+    az._info['zoneName'] = az.zoneName
+    az._info['zoneState'] = az.zoneState
+    result.append(az)
+
+    if getattr(zone, "hosts", None) and zone.hosts is not None:
+        for (host, services) in zone.hosts.items():
+            # Host tree view item
+            az = AvailabilityZone(zone.manager,
+                                  copy.deepcopy(zone._info), zone._loaded)
+            az.zoneName = '|- %s' % host
+            az.zoneState = ''
+            az._info['zoneName'] = az.zoneName
+            az._info['zoneState'] = az.zoneState
+            result.append(az)
+
+            for (svc, state) in services.items():
+                # Service tree view item
+                az = AvailabilityZone(zone.manager,
+                                      copy.deepcopy(zone._info), zone._loaded)
+                az.zoneName = '| |- %s' % svc
+                az.zoneState = '%s %s %s' % (
+                               'enabled' if state['active'] else 'disabled',
+                               ':-)' if state['available'] else 'XXX',
+                               state['updated_at'])
+                az._info['zoneName'] = az.zoneName
+                az._info['zoneState'] = az.zoneState
+                result.append(az)
+    return result
+
+
+@utils.service_type('volume')
+def do_availability_zone_list(cs, _args):
+    """List all the availability zones."""
+    try:
+        availability_zones = cs.availability_zones.list()
+    except exceptions.Forbidden as e:  # policy doesn't allow probably
+        try:
+            availability_zones = cs.availability_zones.list(detailed=False)
+        except Exception:
+            raise e
+
+    result = []
+    for zone in availability_zones:
+        result += _treeizeAvailabilityZone(zone)
+    _translate_availability_zone_keys(result)
+    utils.print_list(result, ['Name', 'Status'])

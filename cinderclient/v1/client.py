@@ -14,6 +14,7 @@
 #    under the License.
 
 from cinderclient import client
+from cinderclient.v1 import availability_zones
 from cinderclient.v1 import limits
 from cinderclient.v1 import quota_classes
 from cinderclient.v1 import quotas
@@ -64,6 +65,8 @@ class Client(object):
         self.restores = volume_backups_restore.VolumeBackupRestoreManager(self)
         self.transfers = volume_transfers.VolumeTransferManager(self)
         self.services = services.ServiceManager(self)
+        self.availability_zones = \
+            availability_zones.AvailabilityZoneManager(self)
 
         # Add in any extensions...
         if extensions:

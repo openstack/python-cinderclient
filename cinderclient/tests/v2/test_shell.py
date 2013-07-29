@@ -83,6 +83,10 @@ class ShellTest(utils.TestCase):
         self.run_command('list --all-tenants=1')
         self.assert_called('GET', '/volumes/detail?all_tenants=1')
 
+    def test_list_availability_zone(self):
+        self.run_command('availability-zone-list')
+        self.assert_called('GET', '/os-availability-zone')
+
     def test_show(self):
         self.run_command('show 1234')
         self.assert_called('GET', '/volumes/1234')
