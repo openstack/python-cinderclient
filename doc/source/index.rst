@@ -24,6 +24,8 @@ In order to use the CLI, you must provide your OpenStack username, password, ten
 
 Once you've configured your authentication parameters, you can run ``cinder help`` to see a complete listing of available commands.
 
+See also :doc:`/man/cinder`.
+
 
 Release Notes
 =============
