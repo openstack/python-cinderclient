@@ -34,20 +34,10 @@ class QuotaClassSetManager(base.Manager):
         return self._get("/os-quota-class-sets/%s" % (class_name),
                          "quota_class_set")
 
-    def update(self,
-               class_name,
-               volumes=None,
-               snapshots=None,
-               gigabytes=None):
+    def update(self, class_name, **updates):
+        body = {'quota_class_set': {'class_name': class_name}}
 
-        body = {'quota_class_set': {
-                'class_name': class_name,
-                'volumes': volumes,
-                'snapshots': snapshots,
-                'gigabytes': gigabytes}}
-
-        for key in list(body['quota_class_set'].keys()):
-            if body['quota_class_set'][key] is None:
-                body['quota_class_set'].pop(key)
+        for update in updates.keys():
+            body['quota_class_set'][update] = updates[update]
 
         self._update('/os-quota-class-sets/%s' % (class_name), body)

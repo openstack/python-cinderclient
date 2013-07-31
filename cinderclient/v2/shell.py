@@ -620,12 +620,19 @@ def do_credentials(cs, args):
     utils.print_dict(catalog['access']['user'], "User Credentials")
     utils.print_dict(catalog['access']['token'], "Token")
 
+
 _quota_resources = ['volumes', 'snapshots', 'gigabytes']
 
 
 def _quota_show(quotas):
     quota_dict = {}
-    for resource in _quota_resources:
+    for resource in quotas._info.keys():
+        good_name = False
+        for name in _quota_resources:
+            if resource.startswith(name):
+                good_name = True
+        if not good_name:
+            continue
         quota_dict[resource] = getattr(quotas, resource, None)
     utils.print_dict(quota_dict)
 
@@ -635,6 +642,8 @@ def _quota_update(manager, identifier, args):
     for resource in _quota_resources:
         val = getattr(args, resource, None)
         if val is not None:
+            if args.volume_type:
+                resource = resource + '_%s' % args.volume_type
             updates[resource] = val
 
     if updates:
@@ -676,6 +685,10 @@ def do_quota_defaults(cs, args):
            metavar='<gigabytes>',
            type=int, default=None,
            help='New value for the "gigabytes" quota.')
+@utils.arg('--volume-type',
+           metavar='<volume_type_name>',
+           default=None,
+           help='Volume type (Optional, Default=None)')
 @utils.service_type('volume')
 def do_quota_update(cs, args):
     """Update the quotas for a tenant."""
@@ -708,6 +721,10 @@ def do_quota_class_show(cs, args):
            metavar='<gigabytes>',
            type=int, default=None,
            help='New value for the "gigabytes" quota.')
+@utils.arg('--volume-type',
+           metavar='<volume_type_name>',
+           default=None,
+           help='Volume type (Optional, Default=None)')
 @utils.service_type('volume')
 def do_quota_class_update(cs, args):
     """Update the quotas for a quota class."""
