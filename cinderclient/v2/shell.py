@@ -470,11 +470,6 @@ def do_snapshot_create(cs, args):
     if args.display_description is not None:
         args.description = args.display_description
 
-    if not args.force.lower() in ['true', '1', 'yes', 'y',
-                                  'false', '0', 'no', 'n']:
-        msg = "Parameter 'force' does not support value '%s'" % args.force
-        raise exceptions.BadRequest(msg)
-
     snapshot = cs.volume_snapshots.create(args.volume_id,
                                           args.force,
                                           args.name,
