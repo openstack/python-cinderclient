@@ -53,7 +53,7 @@ def _poll_for_status(poll_fn, obj_id, action, final_ok_states,
             print("\nFinished")
             break
         elif status == "error":
-            print("\nError %(action)s instance" % locals())
+            print("\nError %(action)s instance" % {'action': action})
             break
         else:
             print_progress(progress)

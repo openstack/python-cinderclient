@@ -88,8 +88,12 @@ def get_resource_manager_extra_kwargs(f, args, allow_conflicts=False):
 
         conflicting_keys = set(hook_kwargs.keys()) & set(extra_kwargs.keys())
         if conflicting_keys and not allow_conflicts:
-            raise Exception("Hook '%(hook_name)s' is attempting to redefine"
-                            " attributes '%(conflicting_keys)s'" % locals())
+            msg = ("Hook '%(hook_name)s' is attempting to redefine attributes "
+                   "'%(conflicting_keys)s'" % {
+                       'hook_name': hook_name,
+                       'conflicting_keys': conflicting_keys
+                   })
+            raise Exception(msg)
 
         extra_kwargs.update(hook_kwargs)
 
