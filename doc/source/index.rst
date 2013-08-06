@@ -31,6 +31,8 @@ Release Notes
 =============
 1.0.5
 -----
+* Add CLI man page
+* Add Availability Zone list command
 * Add support for scheduler-hints
 * Add support to extend volumes
 * Add support to reset state on volumes and snapshots
