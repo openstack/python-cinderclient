@@ -27,7 +27,7 @@ from cinderclient.tests import utils
 class AuthenticateAgainstKeystoneTests(utils.TestCase):
     def test_authenticate_success(self):
         cs = client.Client("username", "password", "project_id",
-                           "auth_url/v2.0", service_type='compute')
+                           "http://localhost:8776/v2", service_type='volumev2')
         resp = {
             "access": {
                 "token": {
@@ -36,13 +36,13 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
                 },
                 "serviceCatalog": [
                     {
-                        "type": "compute",
+                        "type": "volumev2",
                         "endpoints": [
                             {
                                 "region": "RegionOne",
-                                "adminURL": "http://localhost:8774/v2",
-                                "internalURL": "http://localhost:8774/v2",
-                                "publicURL": "http://localhost:8774/v2/",
+                                "adminURL": "http://localhost:8776/v2",
+                                "internalURL": "http://localhost:8776/v2",
+                                "publicURL": "http://localhost:8776/v2",
                             },
                         ],
                     },
@@ -92,8 +92,9 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
         test_auth_call()
 
     def test_authenticate_tenant_id(self):
-        cs = client.Client("username", "password", auth_url="auth_url/v2.0",
-                           tenant_id='tenant_id', service_type='compute')
+        cs = client.Client("username", "password",
+                           auth_url="http://localhost:8776/v2",
+                           tenant_id='tenant_id', service_type='volumev2')
         resp = {
             "access": {
                 "token": {
@@ -108,13 +109,13 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
                 },
                 "serviceCatalog": [
                     {
-                        "type": "compute",
+                        "type": 'volumev2',
                         "endpoints": [
                             {
                                 "region": "RegionOne",
-                                "adminURL": "http://localhost:8774/v2",
-                                "internalURL": "http://localhost:8774/v2",
-                                "publicURL": "http://localhost:8774/v2/",
+                                "adminURL": "http://localhost:8776/v2",
+                                "internalURL": "http://localhost:8776/v2",
+                                "publicURL": "http://localhost:8776/v2",
                             },
                         ],
                     },
@@ -167,7 +168,7 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
 
     def test_authenticate_failure(self):
         cs = client.Client("username", "password", "project_id",
-                           "auth_url/v2.0")
+                           "http://localhost:8776/v2")
         resp = {"unauthorized": {"message": "Unauthorized", "code": "401"}}
         auth_response = utils.TestResponse({
             "status_code": 401,
@@ -184,7 +185,7 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
 
     def test_auth_redirect(self):
         cs = client.Client("username", "password", "project_id",
-                           "auth_url/v2", service_type='compute')
+                           "http://localhost:8776/v2", service_type='volumev2')
         dict_correct_response = {
             "access": {
                 "token": {
@@ -193,13 +194,13 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
                 },
                 "serviceCatalog": [
                     {
-                        "type": "compute",
+                        "type": "volumev2",
                         "endpoints": [
                             {
-                                "adminURL": "http://localhost:8774/v2",
+                                "adminURL": "http://localhost:8776/v2",
                                 "region": "RegionOne",
-                                "internalURL": "http://localhost:8774/v2",
-                                "publicURL": "http://localhost:8774/v2/",
+                                "internalURL": "http://localhost:8776/v2",
+                                "publicURL": "http://localhost:8776/v2/",
                             },
                         ],
                     },
@@ -268,7 +269,7 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
 
     def test_ambiguous_endpoints(self):
         cs = client.Client("username", "password", "project_id",
-                           "auth_url/v2.0", service_type='compute')
+                           "http://localhost:8776/v2", service_type='volumev2')
         resp = {
             "access": {
                 "token": {
@@ -277,25 +278,25 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
                 },
                 "serviceCatalog": [
                     {
-                        "adminURL": "http://localhost:8774/v2",
-                        "type": "compute",
-                        "name": "Compute CLoud",
+                        "adminURL": "http://localhost:8776/v1",
+                        "type": "volumev2",
+                        "name": "Cinder Volume Service",
                         "endpoints": [
                             {
                                 "region": "RegionOne",
-                                "internalURL": "http://localhost:8774/v2",
-                                "publicURL": "http://localhost:8774/v2/",
+                                "internalURL": "http://localhost:8776/v1",
+                                "publicURL": "http://localhost:8776/v1",
                             },
                         ],
                     },
                     {
-                        "adminURL": "http://localhost:8774/v2",
-                        "type": "compute",
-                        "name": "Hyper-compute Cloud",
+                        "adminURL": "http://localhost:8776/v2",
+                        "type": "volumev2",
+                        "name": "Cinder Volume V2",
                         "endpoints": [
                             {
-                                "internalURL": "http://localhost:8774/v2",
-                                "publicURL": "http://localhost:8774/v2/",
+                                "internalURL": "http://localhost:8776/v2",
+                                "publicURL": "http://localhost:8776/v2",
                             },
                         ],
                     },

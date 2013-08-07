@@ -44,7 +44,7 @@ class Client(object):
                  insecure=False, timeout=None, tenant_id=None,
                  proxy_tenant_id=None, proxy_token=None, region_name=None,
                  endpoint_type='publicURL', extensions=None,
-                 service_type='volume', service_name=None,
+                 service_type='volumev2', service_name=None,
                  volume_service_name=None, retries=None,
                  http_log_debug=False,
                  cacert=None):

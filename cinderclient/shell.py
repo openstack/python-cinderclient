@@ -41,7 +41,7 @@ from cinderclient.v2 import shell as shell_v2
 
 DEFAULT_OS_VOLUME_API_VERSION = "1"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
-DEFAULT_CINDER_SERVICE_TYPE = 'compute'
+DEFAULT_CINDER_SERVICE_TYPE = 'volume'
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +145,7 @@ class OpenStackCinderShell(object):
 
         parser.add_argument('--service-type',
                             metavar='<service-type>',
-                            help='Defaults to compute for most actions')
+                            help='Defaults to volume for most actions')
         parser.add_argument('--service_type',
                             help=argparse.SUPPRESS)
 
@@ -173,7 +173,7 @@ class OpenStackCinderShell(object):
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-volume-api-version',
-                            metavar='<compute-api-ver>',
+                            metavar='<volume-api-ver>',
                             default=utils.env('OS_VOLUME_API_VERSION',
                             default=DEFAULT_OS_VOLUME_API_VERSION),
                             help='Accepts 1 or 2,defaults '
