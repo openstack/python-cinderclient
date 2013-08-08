@@ -105,7 +105,7 @@ class ShellTest(utils.TestCase):
                            'status=available&volume_id=1234')
 
     def test_rename(self):
-        # basic rename with positional agruments
+        # basic rename with positional arguments
         self.run_command('rename 1234 new-name')
         expected = {'volume': {'name': 'new-name'}}
         self.assert_called('PUT', '/volumes/1234', body=expected)
@@ -121,12 +121,12 @@ class ShellTest(utils.TestCase):
             'description': 'new-description',
         }}
         self.assert_called('PUT', '/volumes/1234', body=expected)
-        # noop, the only all will be the lookup
-        self.run_command('rename 1234')
-        self.assert_called('GET', '/volumes/1234')
+
+        # Call rename with no arguments
+        self.assertRaises(SystemExit, self.run_command, 'rename')
 
     def test_rename_snapshot(self):
-        # basic rename with positional agruments
+        # basic rename with positional arguments
         self.run_command('snapshot-rename 1234 new-name')
         expected = {'snapshot': {'name': 'new-name'}}
         self.assert_called('PUT', '/snapshots/1234', body=expected)
@@ -143,9 +143,9 @@ class ShellTest(utils.TestCase):
             'description': 'new-description',
         }}
         self.assert_called('PUT', '/snapshots/1234', body=expected)
-        # noop, the only all will be the lookup
-        self.run_command('snapshot-rename 1234')
-        self.assert_called('GET', '/snapshots/1234')
+
+        # Call snapshot-rename with no arguments
+        self.assertRaises(SystemExit, self.run_command, 'snapshot-rename')
 
     def test_set_metadata_set(self):
         self.run_command('metadata 1234 set key1=val1 key2=val2')

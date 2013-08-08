@@ -317,6 +317,11 @@ def do_rename(cs, args):
         kwargs['display_name'] = args.display_name
     if args.display_description is not None:
         kwargs['display_description'] = args.display_description
+
+    if not any(kwargs):
+        msg = 'Must supply either display-name or display-description.'
+        raise exceptions.ClientException(code=1, message=msg)
+
     utils.find_volume(cs, args.volume).update(**kwargs)
 
 
@@ -461,6 +466,11 @@ def do_snapshot_rename(cs, args):
         kwargs['display_name'] = args.display_name
     if args.display_description is not None:
         kwargs['display_description'] = args.display_description
+
+    if not any(kwargs):
+        msg = 'Must supply either display-name or display-description.'
+        raise exceptions.ClientException(code=1, message=msg)
+
     _find_volume_snapshot(cs, args.snapshot).update(**kwargs)
 
 
