@@ -818,10 +818,18 @@ def do_backup_create(cs, args):
     if args.display_description is not None:
         args.description = args.display_description
 
-    cs.backups.create(args.volume,
-                      args.container,
-                      args.name,
-                      args.description)
+    backup = cs.backups.create(args.volume,
+                               args.container,
+                               args.name,
+                               args.description)
+
+    info = {"volume_id": args.volume}
+    info.update(backup._info)
+
+    if 'links' in info:
+        info.pop('links')
+
+    utils.print_dict(info)
 
 
 @utils.arg('backup', metavar='<backup>', help='ID of the backup.')

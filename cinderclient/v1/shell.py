@@ -731,10 +731,18 @@ def do_upload_to_image(cs, args):
 @utils.service_type('volume')
 def do_backup_create(cs, args):
     """Creates a backup."""
-    cs.backups.create(args.volume,
-                      args.container,
-                      args.display_name,
-                      args.display_description)
+    backup = cs.backups.create(args.volume,
+                               args.container,
+                               args.display_name,
+                               args.display_description)
+
+    info = {"volume_id": args.volume}
+    info.update(backup._info)
+
+    if 'links' in info:
+        info.pop('links')
+
+    utils.print_dict(info)
 
 
 @utils.arg('backup', metavar='<backup>', help='ID of the backup.')
