@@ -53,6 +53,11 @@ class EndpointNotFound(Exception):
     pass
 
 
+class ConnectionError(Exception):
+    """Could not open a connection to the API service."""
+    pass
+
+
 class AmbiguousEndpoints(Exception):
     """Found more than one matching endpoint in Service Catalog."""
     def __init__(self, endpoints=None):
