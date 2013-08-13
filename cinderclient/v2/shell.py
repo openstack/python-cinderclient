@@ -146,6 +146,12 @@ def _extract_metadata(args):
            metavar='<status>',
            default=None,
            help='Filter results by status')
+@utils.arg('--metadata',
+           type=str,
+           nargs='*',
+           metavar='<key=value>',
+           help='Filter results by metadata',
+           default=None)
 @utils.service_type('volumev2')
 def do_list(cs, args):
     """List all the volumes."""
@@ -158,6 +164,7 @@ def do_list(cs, args):
         'all_tenants': all_tenants,
         'name': args.name,
         'status': args.status,
+        'metadata': _extract_metadata(args) if args.metadata else None,
     }
     volumes = cs.volumes.list(search_opts=search_opts)
     _translate_volume_keys(volumes)
