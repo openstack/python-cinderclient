@@ -79,6 +79,7 @@ class HTTPClient(object):
         self.auth_token = None
         self.proxy_token = proxy_token
         self.proxy_tenant_id = proxy_tenant_id
+        self.timeout = timeout
 
         if insecure:
             self.verify_cert = False
@@ -133,6 +134,8 @@ class HTTPClient(object):
             kwargs['data'] = json.dumps(kwargs['body'])
             del kwargs['body']
 
+        if self.timeout:
+            kwargs.setdefault('timeout', self.timeout)
         self.http_log_req((url, method,), kwargs)
         resp = requests.request(
             method,
