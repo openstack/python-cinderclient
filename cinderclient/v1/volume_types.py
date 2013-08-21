@@ -55,7 +55,7 @@ class VolumeType(base.Resource):
 
     def unset_keys(self, keys):
         """
-        Unset extra specs on a volue type.
+        Unset extra specs on a volume type.
 
         :param type_id: The :class:`VolumeType` to unset extra spec on
         :param keys: A list of keys to be unset

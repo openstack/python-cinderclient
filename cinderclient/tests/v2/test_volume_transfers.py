@@ -20,7 +20,7 @@ from cinderclient.tests.v1 import fakes
 cs = fakes.FakeClient()
 
 
-class VolumeTRansfersTest(utils.TestCase):
+class VolumeTransfersTest(utils.TestCase):
 
     def test_create(self):
         cs.transfers.create('1234')

@@ -134,13 +134,13 @@ class VolumeManager(base.ManagerWithFind):
         :param display_name: Name of the volume
         :param display_description: Description of the volume
         :param volume_type: Type of volume
-        :rtype: :class:`Volume`
         :param user_id: User id derived from context
         :param project_id: Project id derived from context
         :param availability_zone: Availability Zone to use
         :param metadata: Optional metadata to set on volume creation
         :param imageRef: reference to an image stored in glance
         :param source_volid: ID of source volume to clone from
+        :rtype: :class:`Volume`
         """
 
         if metadata is None:
@@ -352,3 +352,12 @@ class VolumeManager(base.ManagerWithFind):
         return self._action('os-extend',
                             base.getid(volume),
                             {'new_size': new_size})
+
+    def get_encryption_metadata(self, volume_id):
+        """
+        Retrieve the encryption metadata from the desired volume.
+
+        :param volume_id: the id of the volume to query
+        :return: a dictionary of volume encryption metadata
+        """
+        return self._get("/volumes/%s/encryption" % volume_id)._info

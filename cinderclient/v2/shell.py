@@ -1032,3 +1032,86 @@ def do_availability_zone_list(cs, _args):
         result += _treeizeAvailabilityZone(zone)
     _translate_availability_zone_keys(result)
     utils.print_list(result, ['Name', 'Status'])
+
+
+def _print_volume_encryption_type_list(encryption_types):
+    """
+    Display a tabularized list of volume encryption types.
+
+    :param encryption_types: a list of :class: VolumeEncryptionType instances
+    """
+    utils.print_list(encryption_types, ['Volume Type ID', 'Provider',
+                                        'Cipher', 'Key Size',
+                                        'Control Location'])
+
+
+@utils.service_type('volumev2')
+def do_encryption_type_list(cs, args):
+    """List encryption type information for all volume types (Admin Only)."""
+    result = cs.volume_encryption_types.list()
+    utils.print_list(result, ['Volume Type ID', 'Provider', 'Cipher',
+                              'Key Size', 'Control Location'])
+
+
+@utils.arg('volume_type',
+           metavar='<volume_type>',
+           type=str,
+           help="Name or ID of the volume type")
+@utils.service_type('volumev2')
+def do_encryption_type_show(cs, args):
+    """Show the encryption type information for a volume type (Admin Only)."""
+    volume_type = _find_volume_type(cs, args.volume_type)
+
+    result = cs.volume_encryption_types.get(volume_type)
+
+    # Display result or an empty table if no result
+    if hasattr(result, 'volume_type_id'):
+        _print_volume_encryption_type_list([result])
+    else:
+        _print_volume_encryption_type_list([])
+
+
+@utils.arg('volume_type',
+           metavar='<volume_type>',
+           type=str,
+           help="Name or ID of the volume type")
+@utils.arg('provider',
+           metavar='<provider>',
+           type=str,
+           help="Class providing encryption support (e.g. LuksEncryptor)")
+@utils.arg('--cipher',
+           metavar='<cipher>',
+           type=str,
+           required=False,
+           default=None,
+           help="Encryption algorithm/mode to use (e.g., aes-xts-plain64) "
+           "(Optional, Default=None)")
+@utils.arg('--key_size',
+           metavar='<key_size>',
+           type=int,
+           required=False,
+           default=None,
+           help="Size of the encryption key, in bits (e.g., 128, 256) "
+           "(Optional, Default=None)")
+@utils.arg('--control_location',
+           metavar='<control_location>',
+           choices=['front-end', 'back-end'],
+           type=str,
+           required=False,
+           default=None,
+           help="Notional service where encryption is performed (e.g., "
+           "front-end=Nova). Values: 'front-end', 'back-end' "
+           "(Optional, Default=None)")
+@utils.service_type('volumev2')
+def do_encryption_type_create(cs, args):
+    """Create a new encryption type for a volume type (Admin Only)."""
+    volume_type = _find_volume_type(cs, args.volume_type)
+
+    body = {}
+    body['provider'] = args.provider
+    body['cipher'] = args.cipher
+    body['key_size'] = args.key_size
+    body['control_location'] = args.control_location
+
+    result = cs.volume_encryption_types.create(volume_type, body)
+    _print_volume_encryption_type_list([result])
