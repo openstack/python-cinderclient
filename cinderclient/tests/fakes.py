@@ -78,8 +78,6 @@ class FakeClient(object):
                 print(body)
                 raise
 
-        self.client.callstack = []
-
     def clear_callstack(self):
         self.client.callstack = []
 
