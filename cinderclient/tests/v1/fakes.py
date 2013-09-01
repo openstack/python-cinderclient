@@ -278,6 +278,10 @@ class FakeHTTPClient(base_client.HTTPClient):
         r = {'volume': self.get_volumes_detail()[2]['volumes'][0]}
         return (200, {}, r)
 
+    def get_volumes_1234_encryption(self, **kw):
+        r = {'encryption_key_id': 'id'}
+        return (200, {}, r)
+
     def post_volumes_1234_action(self, body, **kw):
         _body = None
         resp = 202
@@ -385,6 +389,11 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'name': 'test-type-1',
                           'extra_specs': {}}})
 
+    def get_types_2(self, **kw):
+        return (200, {}, {'volume_type': {'id': 2,
+                          'name': 'test-type-2',
+                          'extra_specs': {}}})
+
     def post_types(self, body, **kw):
         return (202, {}, {'volume_type': {'id': 3,
                           'name': 'test-type-3',
@@ -399,6 +408,23 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def delete_types_1(self, **kw):
         return (202, {}, None)
+
+    #
+    # VolumeEncryptionTypes
+    #
+    def get_types_1_encryption(self, **kw):
+        return (200, {}, {'id': 1, 'volume_type_id': 1, 'provider': 'test',
+                          'cipher': 'test', 'key_size': 1,
+                          'control_location': 'front'})
+
+    def get_types_2_encryption(self, **kw):
+        return (200, {}, {})
+
+    def post_types_2_encryption(self, body, **kw):
+        return (200, {}, {'encryption': {}})
+
+    def put_types_1_encryption_1(self, body, **kw):
+        return (200, {}, {})
 
     #
     # Set/Unset metadata
