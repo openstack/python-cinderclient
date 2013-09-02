@@ -35,7 +35,7 @@ class VolumesTest(utils.TestCase):
 
     def test_attach(self):
         v = cs.volumes.get('1234')
-        cs.volumes.attach(v, 1, '/dev/vdc')
+        cs.volumes.attach(v, 1, '/dev/vdc', mode='rw')
         cs.assert_called('POST', '/volumes/1234/action')
 
     def test_detach(self):

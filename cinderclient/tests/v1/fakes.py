@@ -321,6 +321,7 @@ class FakeHTTPClient(base_client.HTTPClient):
         action = list(body)[0]
         if action == 'os-attach':
             assert sorted(list(body[action])) == ['instance_uuid',
+                                                  'mode',
                                                   'mountpoint']
         elif action == 'os-detach':
             assert body[action] is None
