@@ -116,6 +116,34 @@ def _stub_restore():
     return {'volume_id': '712f4980-5ac1-41e5-9383-390aa7c9f58b'}
 
 
+def _stub_qos_full(id, base_uri, tenant_id, name=None, specs=None):
+    if not name:
+        name = 'fake-name'
+    if not specs:
+        specs = {}
+
+    return {
+        'qos_specs': {
+            'id': id,
+            'name': name,
+            'consumer': 'back-end',
+            'specs': specs,
+        },
+        'links': {
+            'href': _bookmark_href(base_uri, tenant_id, id),
+            'rel': 'bookmark'
+        }
+    }
+
+
+def _stub_qos_associates(id, name):
+    return {
+        'assoications_type': 'volume_type',
+        'name': name,
+        'id': id,
+    }
+
+
 def _stub_transfer_full(id, base_uri, tenant_id):
     return {
         'id': id,
@@ -504,6 +532,68 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_backups_76a17945_3c6f_435c_975b_b5685db10b62_restore(self, **kw):
         return (200, {},
                 {'restore': _stub_restore()})
+
+    #
+    # QoSSpecs
+    #
+
+    def get_qos_specs_1B6B6A04_A927_4AEB_810B_B7BAAD49F57C(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        qos_id1 = '1B6B6A04-A927-4AEB-810B-B7BAAD49F57C'
+        return (200, {},
+                _stub_qos_full(qos_id1, base_uri, tenant_id))
+
+    def get_qos_specs(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        qos_id1 = '1B6B6A04-A927-4AEB-810B-B7BAAD49F57C'
+        qos_id2 = '0FD8DD14-A396-4E55-9573-1FE59042E95B'
+        return (200, {},
+                {'qos_specs': [
+                    _stub_qos_full(qos_id1, base_uri, tenant_id, 'name-1'),
+                    _stub_qos_full(qos_id2, base_uri, tenant_id)]})
+
+    def post_qos_specs(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        qos_id = '1B6B6A04-A927-4AEB-810B-B7BAAD49F57C'
+        qos_name = 'qos-name'
+        return (202, {},
+                _stub_qos_full(qos_id, base_uri, tenant_id, qos_name))
+
+    def put_qos_specs_1B6B6A04_A927_4AEB_810B_B7BAAD49F57C(self, **kw):
+        return (202, {}, None)
+
+    def put_qos_specs_1B6B6A04_A927_4AEB_810B_B7BAAD49F57C_delete_keys(
+            self, **kw):
+        return (202, {}, None)
+
+    def delete_qos_specs_1B6B6A04_A927_4AEB_810B_B7BAAD49F57C(self, **kw):
+        return (202, {}, None)
+
+    def get_qos_specs_1B6B6A04_A927_4AEB_810B_B7BAAD49F57C_associations(
+            self, **kw):
+        type_id1 = '4230B13A-7A37-4E84-B777-EFBA6FCEE4FF'
+        type_id2 = '4230B13A-AB37-4E84-B777-EFBA6FCEE4FF'
+        type_name1 = 'type1'
+        type_name2 = 'type2'
+        return (202, {},
+                {'qos_associations': [
+                    _stub_qos_associates(type_id1, type_name1),
+                    _stub_qos_associates(type_id2, type_name2)]})
+
+    def get_qos_specs_1B6B6A04_A927_4AEB_810B_B7BAAD49F57C_associate(
+            self, **kw):
+        return (202, {}, None)
+
+    def get_qos_specs_1B6B6A04_A927_4AEB_810B_B7BAAD49F57C_disassociate(
+            self, **kw):
+        return (202, {}, None)
+
+    def get_qos_specs_1B6B6A04_A927_4AEB_810B_B7BAAD49F57C_disassociate_all(
+            self, **kw):
+        return (202, {}, None)
 
     #
     # VolumeTransfers

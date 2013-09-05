@@ -16,6 +16,7 @@
 from cinderclient import client
 from cinderclient.v1 import availability_zones
 from cinderclient.v2 import limits
+from cinderclient.v2 import qos_specs
 from cinderclient.v2 import quota_classes
 from cinderclient.v2 import quotas
 from cinderclient.v2 import services
@@ -60,6 +61,7 @@ class Client(object):
         self.volume_types = volume_types.VolumeTypeManager(self)
         self.volume_encryption_types = \
             volume_encryption_types.VolumeEncryptionTypeManager(self)
+        self.qos_specs = qos_specs.QoSSpecsManager(self)
         self.quota_classes = quota_classes.QuotaClassSetManager(self)
         self.quotas = quotas.QuotaSetManager(self)
         self.backups = volume_backups.VolumeBackupManager(self)
