@@ -304,3 +304,12 @@ class ShellTest(utils.TestCase):
                          1234 key1=val1 key2=val2')
         self.assert_called('PUT', '/snapshots/1234/metadata',
                            {'metadata': {'key1': 'val1', 'key2': 'val2'}})
+
+    def test_readonly_mode_update(self):
+        self.run_command('readonly-mode-update 1234 True')
+        expected = {'os-update_readonly_flag': {'readonly': True}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+        self.run_command('readonly-mode-update 1234 False')
+        expected = {'os-update_readonly_flag': {'readonly': False}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
