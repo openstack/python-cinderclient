@@ -325,7 +325,19 @@ class ShellTest(utils.TestCase):
         self.assert_called('PUT', '/os-services/disable',
                            {"binary": "cinder-volume", "host": "host"})
 
-    def test_service_disable(self):
+    def test_service_enable(self):
         self.run_command('service-enable host cinder-volume')
         self.assert_called('PUT', '/os-services/enable',
                            {"binary": "cinder-volume", "host": "host"})
+
+    def test_retype_with_policy(self):
+        self.run_command('retype 1234 foo --migration-policy=on-demand')
+        expected = {'os-retype': {'new_type': 'foo',
+                                  'migration_policy': 'on-demand'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_retype_default_policy(self):
+        self.run_command('retype 1234 foo')
+        expected = {'os-retype': {'new_type': 'foo',
+                                  'migration_policy': 'never'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)

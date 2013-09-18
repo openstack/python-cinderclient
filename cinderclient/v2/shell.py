@@ -900,6 +900,19 @@ def do_migrate(cs, args):
 
 
 @utils.arg('volume', metavar='<volume>',
+           help='Name or ID of the volume to retype')
+@utils.arg('new_type', metavar='<volume-type>', help='New volume type')
+@utils.arg('--migration-policy', metavar='<never|on-demand>', required=False,
+           choices=['never', 'on-demand'], default='never',
+           help='Policy on migrating the volume during the retype.')
+@utils.service_type('volumev2')
+def do_retype(cs, args):
+    """Change the volume's type."""
+    volume = utils.find_volume(cs, args.volume)
+    volume.retype(args.new_type, args.migration_policy)
+
+
+@utils.arg('volume', metavar='<volume>',
            help='Name or ID of the volume to backup.')
 @utils.arg('--container', metavar='<container>',
            help='Optional backup container name. (Default=None)',

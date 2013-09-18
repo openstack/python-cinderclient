@@ -109,3 +109,10 @@ class VolumesTest(utils.TestCase):
         v = cs.volumes.get('1234')
         cs.volumes.update_readonly_flag(v, True)
         cs.assert_called('POST', '/volumes/1234/action')
+
+    def test_retype(self):
+        v = cs.volumes.get('1234')
+        cs.volumes.retype(v, 'foo', 'on-demand')
+        cs.assert_called('POST', '/volumes/1234/action',
+                         {'os-retype': {'new_type': 'foo',
+                                        'migration_policy': 'on-demand'}})

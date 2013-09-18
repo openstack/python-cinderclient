@@ -360,6 +360,8 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert 'force_host_copy' in body[action]
         elif action == 'os-update_readonly_flag':
             assert list(body[action]) == ['readonly']
+        elif action == 'os-retype':
+            assert 'new_type' in body[action]
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)
