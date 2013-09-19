@@ -1,4 +1,4 @@
-# Copyright 2011 OpenStack LLC.
+# Copyright (c) 2011 OpenStack Foundation
 # Copyright 2011, Piston Cloud Computing, Inc.
 #
 # All Rights Reserved.
