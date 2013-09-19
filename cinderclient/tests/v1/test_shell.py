@@ -266,3 +266,29 @@ class ShellTest(utils.TestCase):
         expected = {'os-migrate_volume': {'force_host_copy': 'True',
                                           'host': 'fakehost'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_snapshot_metadata_set(self):
+        self.run_command('snapshot-metadata 1234 set key1=val1 key2=val2')
+        self.assert_called('POST', '/snapshots/1234/metadata',
+                           {'metadata': {'key1': 'val1', 'key2': 'val2'}})
+
+    def test_snapshot_metadata_unset_dict(self):
+        self.run_command('snapshot-metadata 1234 unset key1=val1 key2=val2')
+        self.assert_called('DELETE', '/snapshots/1234/metadata/key1')
+        self.assert_called('DELETE', '/snapshots/1234/metadata/key2', pos=-2)
+
+    def test_snapshot_metadata_unset_keys(self):
+        self.run_command('snapshot-metadata 1234 unset key1 key2')
+        self.assert_called('DELETE', '/snapshots/1234/metadata/key1')
+        self.assert_called('DELETE', '/snapshots/1234/metadata/key2', pos=-2)
+
+    def test_volume_metadata_update_all(self):
+        self.run_command('metadata-update-all 1234 key1=val1 key2=val2')
+        self.assert_called('PUT', '/volumes/1234/metadata',
+                           {'metadata': {'key1': 'val1', 'key2': 'val2'}})
+
+    def test_snapshot_metadata_update_all(self):
+        self.run_command('snapshot-metadata-update-all\
+                         1234 key1=val1 key2=val2')
+        self.assert_called('PUT', '/snapshots/1234/metadata',
+                           {'metadata': {'key1': 'val1', 'key2': 'val2'}})

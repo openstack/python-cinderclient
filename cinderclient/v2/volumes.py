@@ -121,6 +121,10 @@ class Volume(base.Resource):
 #        self.manager.migrate_volume_completion(self, old_volume,
 #                                               new_volume, error)
 
+    def update_all_metadata(self, metadata):
+        """Update all metadata of this volume."""
+        return self.manager.update_all_metadata(self, metadata)
+
 
 class VolumeManager(base.ManagerWithFind):
     """Manage :class:`Volume` resources."""
@@ -314,7 +318,7 @@ class VolumeManager(base.ManagerWithFind):
         """Delete specified keys from volumes metadata.
 
         :param volume: The :class:`Volume`.
-        :param metadata: A list of keys to be removed.
+        :param keys: A list of keys to be removed.
         """
         for k in keys:
             self._delete("/volumes/%s/metadata/%s" % (base.getid(volume), k))
@@ -377,3 +381,13 @@ class VolumeManager(base.ManagerWithFind):
         return self._action('os-migrate_volume_completion',
                             old_volume,
                             {'new_volume': new_volume_id, 'error': error})[1]
+
+    def update_all_metadata(self, volume, metadata):
+        """Update all metadata of a volume.
+
+        :param volume: The :class:`Volume`.
+        :param metadata: A list of keys to be updated.
+        """
+        body = {'metadata': metadata}
+        return self._update("/volumes/%s/metadata" % base.getid(volume),
+                            body)
