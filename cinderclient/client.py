@@ -384,13 +384,14 @@ class HTTPClient(object):
     def get_volume_api_version_from_endpoint(self):
         magic_tuple = urlparse.urlsplit(self.management_url)
         scheme, netloc, path, query, frag = magic_tuple
-        v = path.split("/")[1]
+        components = path.split("/")
         valid_versions = ['v1', 'v2']
-        if v not in valid_versions:
-            msg = "Invalid client version '%s'. must be one of: %s" % (
-                  (v, ', '.join(valid_versions)))
-            raise exceptions.UnsupportedVersion(msg)
-        return v[1:]
+        for version in valid_versions:
+            if version in components:
+                return version[1:]
+        msg = "Invalid client version '%s'. must be one of: %s" % (
+            (version, ', '.join(valid_versions)))
+        raise exceptions.UnsupportedVersion(msg)
 
 
 def get_client_class(version):
