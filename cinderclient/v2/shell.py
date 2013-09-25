@@ -58,11 +58,6 @@ def _poll_for_status(poll_fn, obj_id, action, final_ok_states,
             time.sleep(poll_period)
 
 
-def _find_volume(cs, volume):
-    """Get a volume by name or ID."""
-    return utils.find_resource(cs.volumes, volume)
-
-
 def _find_volume_snapshot(cs, snapshot):
     """Get a volume snapshot by name or ID."""
     return utils.find_resource(cs.volume_snapshots, snapshot)
@@ -185,7 +180,7 @@ def do_list(cs, args):
 def do_show(cs, args):
     """Show details about a volume."""
     info = dict()
-    volume = _find_volume(cs, args.volume)
+    volume = utils.find_volume(cs, args.volume)
     info.update(volume._info)
 
     info.pop('links', None)
@@ -308,7 +303,7 @@ def do_create(cs, args):
 @utils.service_type('volumev2')
 def do_delete(cs, args):
     """Remove a volume."""
-    volume = _find_volume(cs, args.volume)
+    volume = utils.find_volume(cs, args.volume)
     volume.delete()
 
 
@@ -318,7 +313,7 @@ def do_delete(cs, args):
 @utils.service_type('volumev2')
 def do_force_delete(cs, args):
     """Attempt forced removal of a volume, regardless of its state."""
-    volume = _find_volume(cs, args.volume)
+    volume = utils.find_volume(cs, args.volume)
     volume.force_delete()
 
 
@@ -331,7 +326,7 @@ def do_force_delete(cs, args):
 @utils.service_type('volumev2')
 def do_reset_state(cs, args):
     """Explicitly update the state of a volume."""
-    volume = _find_volume(cs, args.volume)
+    volume = utils.find_volume(cs, args.volume)
     volume.reset_state(args.state)
 
 
@@ -361,7 +356,7 @@ def do_rename(cs, args):
     elif args.description is not None:
         kwargs['description'] = args.description
 
-    _find_volume(cs, args.volume).update(**kwargs)
+    utils.find_volume(cs, args.volume).update(**kwargs)
 
 
 @utils.arg('volume',
@@ -380,7 +375,7 @@ def do_rename(cs, args):
 @utils.service_type('volumev2')
 def do_metadata(cs, args):
     """Set or Delete metadata on a volume."""
-    volume = _find_volume(cs, args.volume)
+    volume = utils.find_volume(cs, args.volume)
     metadata = _extract_metadata(args)
 
     if args.action == 'set':
@@ -451,9 +446,9 @@ def do_snapshot_show(cs, args):
     _print_volume_snapshot(snapshot)
 
 
-@utils.arg('volume-id',
-           metavar='<volume-id>',
-           help='ID of the volume to snapshot')
+@utils.arg('volume',
+           metavar='<volume>',
+           help='Name or ID of the volume to snapshot')
 @utils.arg('--force',
            metavar='<True|False>',
            help='Optional flag to indicate whether '
@@ -485,7 +480,8 @@ def do_snapshot_create(cs, args):
     if args.display_description is not None:
         args.description = args.display_description
 
-    snapshot = cs.volume_snapshots.create(args.volume_id,
+    volume = utils.find_volume(cs, args.volume)
+    snapshot = cs.volume_snapshots.create(volume.id,
                                           args.force,
                                           args.name,
                                           args.description)
@@ -795,7 +791,7 @@ def _find_volume_type(cs, vtype):
 @utils.service_type('volumev2')
 def do_upload_to_image(cs, args):
     """Upload volume to image service as image."""
-    volume = _find_volume(cs, args.volume)
+    volume = utils.find_volume(cs, args.volume)
     _print_volume_image(volume.upload_to_image(args.force,
                                                args.image_name,
                                                args.container_format,
@@ -817,7 +813,7 @@ def do_migrate(cs, args):
 
 
 @utils.arg('volume', metavar='<volume>',
-           help='ID of the volume to backup.')
+           help='Name or ID of the volume to backup.')
 @utils.arg('--container', metavar='<container>',
            help='Optional backup container name. (Default=None)',
            default=None)
@@ -841,12 +837,13 @@ def do_backup_create(cs, args):
     if args.display_description is not None:
         args.description = args.display_description
 
-    backup = cs.backups.create(args.volume,
+    volume = utils.find_volume(cs, args.volume)
+    backup = cs.backups.create(volume.id,
                                args.container,
                                args.name,
                                args.description)
 
-    info = {"volume_id": args.volume}
+    info = {"volume_id": volume.id}
     info.update(backup._info)
 
     if 'links' in info:
@@ -887,18 +884,21 @@ def do_backup_delete(cs, args):
 
 @utils.arg('backup', metavar='<backup>',
            help='ID of the backup to restore.')
-@utils.arg('--volume-id', metavar='<volume-id>',
-           help='Optional ID of the volume to restore to.',
+@utils.arg('--volume-id', metavar='<volume>',
+           help='Optional ID(or name) of the volume to restore to.',
            default=None)
 @utils.service_type('volumev2')
 def do_backup_restore(cs, args):
     """Restore a backup."""
-    cs.restores.restore(args.backup,
-                        args.volume_id)
+    if args.volume:
+        volume_id = utils.find_volume(cs, args.volume).id
+    else:
+        volume_id = None
+    cs.restores.restore(args.backup, volume_id)
 
 
 @utils.arg('volume', metavar='<volume>',
-           help='ID of the volume to transfer.')
+           help='Name or ID of the volume to transfer.')
 @utils.arg('--name',
            metavar='<name>',
            default=None,
@@ -911,7 +911,8 @@ def do_transfer_create(cs, args):
     if args.display_name is not None:
         args.name = args.display_name
 
-    transfer = cs.transfers.create(args.volume,
+    volume = utils.find_volume(cs, args.volume)
+    transfer = cs.transfers.create(volume.id,
                                    args.name)
     info = dict()
     info.update(transfer._info)
@@ -974,7 +975,7 @@ def do_transfer_show(cs, args):
 @utils.service_type('volumev2')
 def do_extend(cs, args):
     """Attempt to extend the size of an existing volume."""
-    volume = _find_volume(cs, args.volume)
+    volume = utils.find_volume(cs, args.volume)
     cs.volumes.extend(volume, args.new_size)
 
 

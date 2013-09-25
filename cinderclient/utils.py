@@ -230,6 +230,11 @@ def find_resource(manager, name_or_id):
         raise exceptions.CommandError(msg)
 
 
+def find_volume(cs, volume):
+    """Get a volume by name or ID."""
+    return find_resource(cs.volumes, volume)
+
+
 def _format_servers_list_networks(server):
     output = []
     for (network, addresses) in list(server.networks.items()):
