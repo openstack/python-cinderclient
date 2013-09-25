@@ -59,22 +59,22 @@ def _poll_for_status(poll_fn, obj_id, action, final_ok_states,
 
 
 def _find_volume(cs, volume):
-    """Get a volume by ID."""
+    """Get a volume by name or ID."""
     return utils.find_resource(cs.volumes, volume)
 
 
 def _find_volume_snapshot(cs, snapshot):
-    """Get a volume snapshot by ID."""
+    """Get a volume snapshot by name or ID."""
     return utils.find_resource(cs.volume_snapshots, snapshot)
 
 
 def _find_backup(cs, backup):
-    """Get a backup by ID."""
+    """Get a backup by name or ID."""
     return utils.find_resource(cs.backups, backup)
 
 
 def _find_transfer(cs, transfer):
-    """Get a transfer by ID."""
+    """Get a transfer by name or ID."""
     return utils.find_resource(cs.transfers, transfer)
 
 
@@ -180,7 +180,7 @@ def do_list(cs, args):
 
 @utils.arg('volume',
            metavar='<volume>',
-           help='ID of the volume.')
+           help='Name or ID of the volume.')
 @utils.service_type('volumev2')
 def do_show(cs, args):
     """Show details about a volume."""
@@ -304,7 +304,7 @@ def do_create(cs, args):
 
 @utils.arg('volume',
            metavar='<volume>',
-           help='ID of the volume to delete.')
+           help='Name or ID of the volume to delete.')
 @utils.service_type('volumev2')
 def do_delete(cs, args):
     """Remove a volume."""
@@ -314,7 +314,7 @@ def do_delete(cs, args):
 
 @utils.arg('volume',
            metavar='<volume>',
-           help='ID of the volume to delete.')
+           help='Name or ID of the volume to delete.')
 @utils.service_type('volumev2')
 def do_force_delete(cs, args):
     """Attempt forced removal of a volume, regardless of its state."""
@@ -322,7 +322,8 @@ def do_force_delete(cs, args):
     volume.force_delete()
 
 
-@utils.arg('volume', metavar='<volume>', help='ID of the volume to modify.')
+@utils.arg('volume', metavar='<volume>',
+           help='Name or ID of the volume to modify.')
 @utils.arg('--state', metavar='<state>', default='available',
            help=('Indicate which state to assign the volume. Options include '
                  'available, error, creating, deleting, error_deleting. If no '
@@ -336,7 +337,7 @@ def do_reset_state(cs, args):
 
 @utils.arg('volume',
            metavar='<volume>',
-           help='ID of the volume to rename.')
+           help='Name or ID of the volume to rename.')
 @utils.arg('name',
            nargs='?',
            metavar='<name>',
@@ -365,7 +366,7 @@ def do_rename(cs, args):
 
 @utils.arg('volume',
            metavar='<volume>',
-           help='ID of the volume to update metadata on.')
+           help='Name or ID of the volume to update metadata on.')
 @utils.arg('action',
            metavar='<action>',
            choices=['set', 'unset'],
@@ -442,7 +443,7 @@ def do_snapshot_list(cs, args):
 
 @utils.arg('snapshot',
            metavar='<snapshot>',
-           help='ID of the snapshot.')
+           help='Name or ID of the snapshot.')
 @utils.service_type('volumev2')
 def do_snapshot_show(cs, args):
     """Show details about a snapshot."""
@@ -491,17 +492,18 @@ def do_snapshot_create(cs, args):
     _print_volume_snapshot(snapshot)
 
 
-@utils.arg('snapshot-id',
-           metavar='<snapshot-id>',
-           help='ID of the snapshot to delete.')
+@utils.arg('snapshot',
+           metavar='<snapshot>',
+           help='Name or ID of the snapshot to delete.')
 @utils.service_type('volumev2')
 def do_snapshot_delete(cs, args):
     """Remove a snapshot."""
-    snapshot = _find_volume_snapshot(cs, args.snapshot_id)
+    snapshot = _find_volume_snapshot(cs, args.snapshot)
     snapshot.delete()
 
 
-@utils.arg('snapshot', metavar='<snapshot>', help='ID of the snapshot.')
+@utils.arg('snapshot', metavar='<snapshot>',
+           help='Name or ID of the snapshot.')
 @utils.arg('name', nargs='?', metavar='<name>',
            help='New name for the snapshot.')
 @utils.arg('--description', metavar='<description>',
@@ -528,7 +530,7 @@ def do_snapshot_rename(cs, args):
 
 
 @utils.arg('snapshot', metavar='<snapshot>',
-           help='ID of the snapshot to modify.')
+           help='Name or ID of the snapshot to modify.')
 @utils.arg('--state', metavar='<state>',
            default='available',
            help=('Indicate which state to assign the snapshot. '
@@ -762,9 +764,9 @@ def _find_volume_type(cs, vtype):
     return utils.find_resource(cs.volume_types, vtype)
 
 
-@utils.arg('volume-id',
-           metavar='<volume-id>',
-           help='ID of the volume to snapshot')
+@utils.arg('volume',
+           metavar='<volume>',
+           help='Name or ID of the volume to snapshot')
 @utils.arg('--force',
            metavar='<True|False>',
            help='Optional flag to indicate whether '
@@ -793,7 +795,7 @@ def _find_volume_type(cs, vtype):
 @utils.service_type('volumev2')
 def do_upload_to_image(cs, args):
     """Upload volume to image service as image."""
-    volume = _find_volume(cs, args.volume_id)
+    volume = _find_volume(cs, args.volume)
     _print_volume_image(volume.upload_to_image(args.force,
                                                args.image_name,
                                                args.container_format,
@@ -853,7 +855,7 @@ def do_backup_create(cs, args):
     utils.print_dict(info)
 
 
-@utils.arg('backup', metavar='<backup>', help='ID of the backup.')
+@utils.arg('backup', metavar='<backup>', help='Name or ID of the backup.')
 @utils.service_type('volumev2')
 def do_backup_show(cs, args):
     """Show details about a backup."""
@@ -875,7 +877,7 @@ def do_backup_list(cs, args):
 
 
 @utils.arg('backup', metavar='<backup>',
-           help='ID of the backup to delete.')
+           help='Name or ID of the backup to delete.')
 @utils.service_type('volumev2')
 def do_backup_delete(cs, args):
     """Remove a backup."""
@@ -919,7 +921,7 @@ def do_transfer_create(cs, args):
 
 
 @utils.arg('transfer', metavar='<transfer>',
-           help='ID of the transfer to delete.')
+           help='Name or ID of the transfer to delete.')
 @utils.service_type('volumev2')
 def do_transfer_delete(cs, args):
     """Undo a transfer."""
@@ -951,7 +953,7 @@ def do_transfer_list(cs, args):
 
 
 @utils.arg('transfer', metavar='<transfer>',
-           help='ID of the transfer to accept.')
+           help='Name or ID of the transfer to accept.')
 @utils.service_type('volumev2')
 def do_transfer_show(cs, args):
     """Show details about a transfer."""
@@ -963,7 +965,8 @@ def do_transfer_show(cs, args):
     utils.print_dict(info)
 
 
-@utils.arg('volume', metavar='<volume>', help='ID of the volume to extend.')
+@utils.arg('volume', metavar='<volume>',
+           help='Name or ID of the volume to extend.')
 @utils.arg('new-size',
            metavar='<new_size>',
            type=int,
