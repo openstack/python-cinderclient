@@ -1,5 +1,5 @@
 
-# Copyright (c) 2011 OpenStack Foundation
+# Copyright 2011 OpenStack LLC.
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -41,6 +41,7 @@ DEFAULT_OS_VOLUME_API_VERSION = "1"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
 DEFAULT_CINDER_SERVICE_TYPE = 'volume'
 
+logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 
@@ -173,7 +174,7 @@ class OpenStackCinderShell(object):
         parser.add_argument('--os-volume-api-version',
                             metavar='<volume-api-ver>',
                             default=utils.env('OS_VOLUME_API_VERSION',
-                            default=DEFAULT_OS_VOLUME_API_VERSION),
+                            default=None),
                             help='Accepts 1 or 2,defaults '
                                  'to env[OS_VOLUME_API_VERSION].')
         parser.add_argument('--os_volume_api_version',
@@ -327,7 +328,7 @@ class OpenStackCinderShell(object):
         streamhandler = logging.StreamHandler()
         streamformat = "%(levelname)s (%(module)s:%(lineno)d) %(message)s"
         streamhandler.setFormatter(logging.Formatter(streamformat))
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.WARNING)
         logger.addHandler(streamhandler)
 
     def main(self, argv):
@@ -335,6 +336,14 @@ class OpenStackCinderShell(object):
         parser = self.get_base_parser()
         (options, args) = parser.parse_known_args(argv)
         self.setup_debugging(options.debug)
+        api_version_input = True
+
+        if not options.os_volume_api_version:
+            # Environment variable OS_VOLUME_API_VERSION was
+            # not set and '--os-volume-api-version' option doesn't
+            # specify a value.  Fall back to default.
+            options.os_volume_api_version = DEFAULT_OS_VOLUME_API_VERSION
+            api_version_input = False
 
         # build available subcommands based on version
         self.extensions = self._discover_extensions(
@@ -450,14 +459,33 @@ class OpenStackCinderShell(object):
         except exc.AuthorizationFailure:
             raise exc.CommandError("Unable to authorize user")
 
-        endpoint_api_version = self.cs.get_volume_api_version_from_endpoint()
-        if endpoint_api_version != options.os_volume_api_version:
-            msg = (("Volume API version is set to %s "
-                    "but you are accessing a %s endpoint. "
-                    "Change its value via either --os-volume-api-version "
-                    "or env[OS_VOLUME_API_VERSION]")
-                   % (options.os_volume_api_version, endpoint_api_version))
-            raise exc.InvalidAPIVersion(msg)
+        endpoint_api_version = None
+        # Try to get the API version from the endpoint URL.  If that fails fall
+        # back to trying to use what the user specified via
+        # --os-volume-api-version or with the OS_VOLUME_API_VERSION environment
+        # variable.  Fail safe is to use the default API setting.
+        try:
+            endpoint_api_version = \
+                self.cs.get_volume_api_version_from_endpoint()
+            if endpoint_api_version != options.os_volume_api_version:
+                msg = (("Volume API version is set to %s "
+                        "but you are accessing a %s endpoint. "
+                        "Change its value via either --os-volume-api-version "
+                        "or env[OS_VOLUME_API_VERSION]")
+                       % (options.os_volume_api_version, endpoint_api_version))
+                raise exc.InvalidAPIVersion(msg)
+        except exc.UnsupportedVersion:
+            endpoint_api_version = options.os_volume_api_version
+            if api_version_input:
+                logger.warning("Unable to determine the API version via "
+                               "endpoint URL.  Falling back to user "
+                               "specified version: %s" %
+                               endpoint_api_version)
+            else:
+                logger.warning("Unable to determine the API version from "
+                               "endpoint URL or user input.  Falling back to "
+                               "default API version: %s" %
+                               endpoint_api_version)
 
         args.func(self.cs, args)
 
