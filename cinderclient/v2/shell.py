@@ -25,6 +25,7 @@ import six
 
 from cinderclient import exceptions
 from cinderclient import utils
+from cinderclient.openstack.common import strutils
 from cinderclient.v2 import availability_zones
 
 
@@ -73,6 +74,11 @@ def _find_transfer(cs, transfer):
     return utils.find_resource(cs.transfers, transfer)
 
 
+def _find_qos_specs(cs, qos_specs):
+    """Get a qos specs by ID."""
+    return utils.find_resource(cs.qos_specs, qos_specs)
+
+
 def _print_volume_snapshot(snapshot):
     utils.print_dict(snapshot._info)
 
@@ -106,7 +112,7 @@ def _translate_availability_zone_keys(collection):
 
 def _extract_metadata(args):
     metadata = {}
-    for metadatum in args.metadata[0]:
+    for metadatum in args.metadata:
         # unset doesn't require a val, so we have the if/else
         if '=' in metadatum:
             (key, value) = metadatum.split('=', 1)
@@ -369,7 +375,6 @@ def do_rename(cs, args):
 @utils.arg('metadata',
            metavar='<key=value>',
            nargs='+',
-           action='append',
            default=[],
            help='Metadata to set/unset (only key is necessary on unset)')
 @utils.service_type('volumev2')
@@ -592,12 +597,11 @@ def do_type_delete(cs, args):
 @utils.arg('metadata',
            metavar='<key=value>',
            nargs='+',
-           action='append',
            default=[],
            help='Extra_specs to set/unset (only key is necessary on unset)')
 @utils.service_type('volumev2')
 def do_type_key(cs, args):
-    "Set or unset extra_spec for a volume type."""
+    """Set or unset extra_spec for a volume type."""
     vtype = _find_volume_type(cs, args.vtype)
     keypair = _extract_metadata(args)
 
@@ -1148,3 +1152,125 @@ def do_encryption_type_create(cs, args):
 
     result = cs.volume_encryption_types.create(volume_type, body)
     _print_volume_encryption_type_list([result])
+
+
+def _print_qos_specs(qos_specs):
+    utils.print_dict(qos_specs._info)
+
+
+def _print_qos_specs_list(q_specs):
+    utils.print_list(q_specs, ['ID', 'Name', 'Consumer', 'specs'])
+
+
+def _print_qos_specs_and_associations_list(q_specs):
+    utils.print_list(q_specs, ['ID', 'Name', 'Consumer', 'specs'])
+
+
+def _print_associations_list(associations):
+    utils.print_list(associations, ['Association_Type', 'Name', 'ID'])
+
+
+@utils.arg('name',
+           metavar='<name>',
+           help="Name of the new QoS specs")
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           default=[],
+           help='Specifications for QoS')
+@utils.service_type('volumev2')
+def do_qos_create(cs, args):
+    """Create a new qos specs."""
+    keypair = None
+    if args.metadata is not None:
+        keypair = _extract_metadata(args)
+    qos_specs = cs.qos_specs.create(args.name, keypair)
+    _print_qos_specs(qos_specs)
+
+
+@utils.service_type('volumev2')
+def do_qos_list(cs, args):
+    """Get full list of qos specs."""
+    qos_specs = cs.qos_specs.list()
+    _print_qos_specs_list(qos_specs)
+
+
+@utils.arg('qos_specs', metavar='<qos_specs>',
+           help='ID of the qos_specs to show.')
+@utils.service_type('volumev2')
+def do_qos_show(cs, args):
+    """Get a specific qos specs."""
+    qos_specs = _find_qos_specs(cs, args.qos_specs)
+    _print_qos_specs(qos_specs)
+
+
+@utils.arg('qos_specs', metavar='<qos_specs>',
+           help='ID of the qos_specs to delete.')
+@utils.arg('--force',
+           metavar='<True|False>',
+           default=False,
+           help='Optional flag that indicates whether to delete '
+                'specified qos specs even if it is in-use.')
+@utils.service_type('volumev2')
+def do_qos_delete(cs, args):
+    """Delete a specific qos specs."""
+    force = strutils.bool_from_string(args.force)
+    qos_specs = _find_qos_specs(cs, args.qos_specs)
+    cs.qos_specs.delete(qos_specs, force)
+
+
+@utils.arg('qos_specs', metavar='<qos_specs>',
+           help='ID of qos_specs.')
+@utils.arg('vol_type_id', metavar='<volume_type_id>',
+           help='ID of volume type to be associated with.')
+@utils.service_type('volumev2')
+def do_qos_associate(cs, args):
+    """Associate qos specs with specific volume type."""
+    cs.qos_specs.associate(args.qos_specs, args.vol_type_id)
+
+
+@utils.arg('qos_specs', metavar='<qos_specs>',
+           help='ID of qos_specs.')
+@utils.arg('vol_type_id', metavar='<volume_type_id>',
+           help='ID of volume type to be associated with.')
+@utils.service_type('volumev2')
+def do_qos_disassociate(cs, args):
+    """Disassociate qos specs from specific volume type."""
+    cs.qos_specs.disassociate(args.qos_specs, args.vol_type_id)
+
+
+@utils.arg('qos_specs', metavar='<qos_specs>',
+           help='ID of qos_specs to be operate on.')
+@utils.service_type('volumev2')
+def do_qos_disassociate_all(cs, args):
+    """Disassociate qos specs from all of its associations."""
+    cs.qos_specs.disassociate_all(args.qos_specs)
+
+
+@utils.arg('qos_specs', metavar='<qos_specs>',
+           help='ID of qos specs')
+@utils.arg('action',
+           metavar='<action>',
+           choices=['set', 'unset'],
+           help="Actions: 'set' or 'unset'")
+@utils.arg('metadata', metavar='key=value',
+           nargs='+',
+           default=[],
+           help='QoS specs to set/unset (only key is necessary on unset)')
+def do_qos_key(cs, args):
+    """Set or unset specifications for a qos spec."""
+    keypair = _extract_metadata(args)
+
+    if args.action == 'set':
+        cs.qos_specs.set_keys(args.qos_specs, keypair)
+    elif args.action == 'unset':
+        cs.qos_specs.unset_keys(args.qos_specs, list(keypair.keys()))
+
+
+@utils.arg('qos_specs', metavar='<qos_specs>',
+           help='ID of the qos_specs.')
+@utils.service_type('volumev2')
+def do_qos_get_association(cs, args):
+    """Get all associations of specific qos specs."""
+    associations = cs.qos_specs.get_associations(args.qos_specs)
+    _print_associations_list(associations)
