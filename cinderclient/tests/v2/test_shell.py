@@ -238,3 +238,9 @@ class ShellTest(utils.TestCase):
         Test encryption-type-delete shell command.
         """
         self.skipTest("Not implemented")
+
+    def test_migrate_volume(self):
+        self.run_command('migrate 1234 fakehost --force-host-copy=True')
+        expected = {'os-migrate_volume': {'force_host_copy': 'True',
+                                          'host': 'fakehost'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)

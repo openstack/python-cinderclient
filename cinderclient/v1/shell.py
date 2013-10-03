@@ -1065,6 +1065,7 @@ def do_encryption_type_create(cs, args):
 @utils.arg('volume', metavar='<volume>', help='ID of the volume to migrate')
 @utils.arg('host', metavar='<host>', help='Destination host')
 @utils.arg('--force-host-copy', metavar='<True|False>',
+           choices=['True', 'False'], required=False,
            help='Optional flag to force the use of the generic '
            'host-based migration mechanism, bypassing driver '
            'optimizations (Default=False).',
@@ -1072,7 +1073,8 @@ def do_encryption_type_create(cs, args):
 @utils.service_type('volume')
 def do_migrate(cs, args):
     """Migrate the volume to the new host."""
-    volume = _find_volume(cs, args.volume)
+    volume = utils.find_volume(cs, args.volume)
+
     volume.migrate_volume(args.host, args.force_host_copy)
 
 
