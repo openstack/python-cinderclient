@@ -29,6 +29,31 @@ See also :doc:`/man/cinder`.
 
 Release Notes
 =============
+1.0.6
+-----
+* Add support for multiple endpoints
+* Add response info for backup command
+* Add metadata option to cinder list command
+* Add timeout parameter for requests
+* Add update action for snapshot metadata
+* Add encryption metadata support
+* Add volume migrate support
+
+.. _1221104: http://bugs.launchpad.net/python-cinderclient/+bug/1221104
+.. _1220590: http://bugs.launchpad.net/python-cinderclient/+bug/1220590
+.. _1220147: http://bugs.launchpad.net/python-cinderclient/+bug/1220147
+.. _1214176: http://bugs.launchpad.net/python-cinderclient/+bug/1214176
+.. _1210874: http://bugs.launchpad.net/python-cinderclient/+bug/1210874
+.. _1210296: http://bugs.launchpad.net/python-cinderclient/+bug/1210296
+.. _1210292: http://bugs.launchpad.net/python-cinderclient/+bug/1210292
+.. _1207635: http://bugs.launchpad.net/python-cinderclient/+bug/1207635
+.. _1207609: http://bugs.launchpad.net/python-cinderclient/+bug/1207609
+.. _1207260: http://bugs.launchpad.net/python-cinderclient/+bug/1207260
+.. _1206968: http://bugs.launchpad.net/python-cinderclient/+bug/1206968
+.. _1203471: http://bugs.launchpad.net/python-cinderclient/+bug/1203471
+.. _1200214: http://bugs.launchpad.net/python-cinderclient/+bug/1200214
+.. _1195014: http://bugs.launchpad.net/python-cinderclient/+bug/1195014
+
 1.0.5
 -----
 * Add CLI man page
