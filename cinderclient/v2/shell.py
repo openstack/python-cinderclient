@@ -805,7 +805,7 @@ def do_upload_to_image(cs, args):
            'host-based migration mechanism, bypassing driver '
            'optimizations (Default=False).',
            default=False)
-@utils.service_type('volume')
+@utils.service_type('volumev2')
 def do_migrate(cs, args):
     """Migrate the volume to the new host."""
     volume = _find_volume(cs, args.volume)
