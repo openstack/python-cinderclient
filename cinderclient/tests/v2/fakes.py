@@ -275,8 +275,8 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_snapshots_1234_action(self, body, **kw):
         _body = None
         resp = 202
-        assert len(body.keys()) == 1
-        action = body.keys()[0]
+        assert len(list(body)) == 1
+        action = list(body)[0]
         if action == 'os-reset_status':
             assert 'status' in body['os-reset_status']
         elif action == 'os-update_snapshot_status':
@@ -320,10 +320,10 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_volumes_1234_action(self, body, **kw):
         _body = None
         resp = 202
-        assert len(list(body.keys())) == 1
-        action = list(body.keys())[0]
+        assert len(list(body)) == 1
+        action = list(body)[0]
         if action == 'os-attach':
-            assert list(body[action].keys()) == ['instance_uuid', 'mountpoint']
+            assert list(body[action]) == ['instance_uuid', 'mountpoint']
         elif action == 'os-detach':
             assert body[action] is None
         elif action == 'os-reserve':
@@ -331,10 +331,10 @@ class FakeHTTPClient(base_client.HTTPClient):
         elif action == 'os-unreserve':
             assert body[action] is None
         elif action == 'os-initialize_connection':
-            assert list(body[action].keys()) == ['connector']
+            assert list(body[action]) == ['connector']
             return (202, {}, {'connection_info': 'foos'})
         elif action == 'os-terminate_connection':
-            assert list(body[action].keys()) == ['connector']
+            assert list(body[action]) == ['connector']
         elif action == 'os-begin_detaching':
             assert body[action] is None
         elif action == 'os-roll_detaching':
@@ -342,7 +342,7 @@ class FakeHTTPClient(base_client.HTTPClient):
         elif action == 'os-reset_status':
             assert 'status' in body[action]
         elif action == 'os-extend':
-            assert body[action].keys() == ['new_size']
+            assert list(body[action]) == ['new_size']
         elif action == 'os-migrate_volume':
             assert 'host' in body[action]
             assert 'force_host_copy' in body[action]
@@ -377,7 +377,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'gigabytes': 1}})
 
     def put_os_quota_sets_test(self, body, **kw):
-        assert list(body.keys()) == ['quota_set']
+        assert list(body) == ['quota_set']
         fakes.assert_has_keys(body['quota_set'],
                               required=['tenant_id'])
         return (200, {}, {'quota_set': {
@@ -400,7 +400,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'gigabytes': 1}})
 
     def put_os_quota_class_sets_test(self, body, **kw):
-        assert list(body.keys()) == ['quota_class_set']
+        assert list(body) == ['quota_class_set']
         fakes.assert_has_keys(body['quota_class_set'],
                               required=['class_name'])
         return (200, {}, {'quota_class_set': {
@@ -438,7 +438,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'extra_specs': {}}})
 
     def post_types_1_extra_specs(self, body, **kw):
-        assert list(body.keys()) == ['extra_specs']
+        assert list(body) == ['extra_specs']
         return (200, {}, {'extra_specs': {'k': 'v'}})
 
     def delete_types_1_extra_specs_k(self, **kw):

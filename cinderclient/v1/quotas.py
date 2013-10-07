@@ -40,7 +40,7 @@ class QuotaSetManager(base.Manager):
     def update(self, tenant_id, **updates):
         body = {'quota_set': {'tenant_id': tenant_id}}
 
-        for update in updates.keys():
+        for update in updates:
             body['quota_set'][update] = updates[update]
 
         self._update('/os-quota-sets/%s' % (tenant_id), body)

@@ -267,7 +267,7 @@ class NovaTestResult(testtools.TestResult):
         if not self.last_written or (self._now() - time).total_seconds() > 2.0:
             diff = 3.0
             while diff > 2.0:
-                classes =list(self.results.keys())
+                classes =list(self.results)
                 oldest = min(classes, key=lambda x: self.last_time[x])
                 diff = (self._now() - self.last_time[oldest]).total_seconds()
                 self.writeTestCase(oldest)
