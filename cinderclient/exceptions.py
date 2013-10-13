@@ -166,7 +166,7 @@ def from_response(response, body):
         message = "n/a"
         details = "n/a"
         if hasattr(body, 'keys'):
-            error = body[list(body.keys())[0]]
+            error = body[list(body)[0]]
             message = error.get('message', None)
             details = error.get('details', None)
         return cls(code=response.status_code, message=message, details=details,

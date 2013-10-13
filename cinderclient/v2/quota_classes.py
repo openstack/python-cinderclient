@@ -37,7 +37,7 @@ class QuotaClassSetManager(base.Manager):
     def update(self, class_name, **updates):
         body = {'quota_class_set': {'class_name': class_name}}
 
-        for update in updates.keys():
+        for update in updates:
             body['quota_class_set'][update] = updates[update]
 
         self._update('/os-quota-class-sets/%s' % (class_name), body)

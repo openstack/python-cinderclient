@@ -23,12 +23,11 @@ from __future__ import print_function
 
 
 def assert_has_keys(dict, required=[], optional=[]):
-    keys = list(dict.keys())
     for k in required:
         try:
-            assert k in keys
+            assert k in dict
         except AssertionError:
-            extra_keys = set(keys).difference(set(required + optional))
+            extra_keys = set(dict).difference(set(required + optional))
             raise AssertionError("found unexpected keys: %s" %
                                  list(extra_keys))
 
