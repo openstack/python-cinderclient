@@ -540,6 +540,10 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (200, {},
                 {'restore': _stub_restore()})
 
+    def post_backups_1234_restore(self, **kw):
+        return (200, {},
+                {'restore': _stub_restore()})
+
     #
     # QoSSpecs
     #
