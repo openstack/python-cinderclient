@@ -390,7 +390,9 @@ def do_metadata(cs, args):
     if args.action == 'set':
         cs.volumes.set_metadata(volume, metadata)
     elif args.action == 'unset':
-        cs.volumes.delete_metadata(volume, list(metadata))
+        # NOTE(zul): Make sure py2/py3 sorting is the same
+        cs.volumes.delete_metadata(volume, sorted(metadata.keys(),
+                                   reverse=True))
 
 
 @utils.arg('--all-tenants',
