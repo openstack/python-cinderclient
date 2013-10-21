@@ -30,10 +30,11 @@ class QuotaSet(base.Resource):
 class QuotaSetManager(base.Manager):
     resource_class = QuotaSet
 
-    def get(self, tenant_id):
+    def get(self, tenant_id, usage=False):
         if hasattr(tenant_id, 'tenant_id'):
             tenant_id = tenant_id.tenant_id
-        return self._get("/os-quota-sets/%s" % (tenant_id), "quota_set")
+        return self._get("/os-quota-sets/%s?usage=%s" % (tenant_id, usage),
+                         "quota_set")
 
     def update(self, tenant_id, **updates):
         body = {'quota_set': {'tenant_id': tenant_id}}

@@ -168,7 +168,10 @@ def print_list(objs, fields, formatters={}, order_by=None):
                     field_name = field.replace(' ', '_')
                 else:
                     field_name = field.lower().replace(' ', '_')
-                data = getattr(o, field_name, '')
+                if type(o) == dict and field in o:
+                    data = o[field]
+                else:
+                    data = getattr(o, field_name, '')
                 row.append(data)
         pt.add_row(row)
 
