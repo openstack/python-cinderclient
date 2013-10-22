@@ -95,6 +95,14 @@ class ShellTest(utils.TestCase):
         self.run_command('delete 1234')
         self.assert_called('DELETE', '/volumes/1234')
 
+    def test_backup(self):
+        self.run_command('backup-create 1234')
+        self.assert_called('POST', '/backups')
+
+    def test_restore(self):
+        self.run_command('backup-restore 1234')
+        self.assert_called('POST', '/backups/1234/restore')
+
     def test_snapshot_list_filter_volume_id(self):
         self.run_command('snapshot-list --volume-id=1234')
         self.assert_called('GET', '/snapshots/detail?volume_id=1234')
