@@ -926,13 +926,17 @@ def do_backup_delete(cs, args):
 @utils.arg('backup', metavar='<backup>',
            help='ID of the backup to restore.')
 @utils.arg('--volume-id', metavar='<volume>',
+           help=argparse.SUPPRESS,
+           default=None)
+@utils.arg('--volume', metavar='<volume>',
            help='Optional ID(or name) of the volume to restore to.',
            default=None)
 @utils.service_type('volumev2')
 def do_backup_restore(cs, args):
     """Restore a backup."""
-    if args.volume_id:
-        volume_id = utils.find_volume(cs, args.volume_id).id
+    vol = args.volume or args.volume_id
+    if vol:
+        volume_id = utils.find_volume(cs, vol).id
     else:
         volume_id = None
     cs.restores.restore(args.backup, volume_id)
