@@ -108,7 +108,13 @@ class SnapshotManager(base.ManagerWithFind):
             if val:
                 qparams[opt] = val
 
-        query_string = "?%s" % urlencode(qparams) if qparams else ""
+        # Transform the dict to a sequence of two-element tuples in fixed
+        # order, then the encoded string will be consistent in Python 2&3.
+        if qparams:
+            new_qparams = sorted(qparams.items(), key=lambda x: x[0])
+            query_string = "?%s" % urlencode(new_qparams)
+        else:
+            query_string = ""
 
         detail = ""
         if detailed:
