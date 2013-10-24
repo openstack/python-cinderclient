@@ -86,7 +86,7 @@ class ShellTest(utils.TestCase):
 
         for input in inputs:
             args = Arguments(metadata=input[0])
-            self.assertEquals(shell_v1._extract_metadata(args), input[1])
+            self.assertEqual(shell_v1._extract_metadata(args), input[1])
 
     def test_list(self):
         self.run_command('list')
