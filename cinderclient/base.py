@@ -203,7 +203,10 @@ class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):
         found = []
         searches = list(kwargs.items())
 
-        for obj in self.list():
+        # Want to search for all tenants here so that when attempting to delete
+        # that a user like admin doesn't get a failure when trying to delete
+        # another tenant's volume by name.
+        for obj in self.list(search_opts={'all_tenants': 1}):
             try:
                 if all(getattr(obj, attr) == value
                        for (attr, value) in searches):
