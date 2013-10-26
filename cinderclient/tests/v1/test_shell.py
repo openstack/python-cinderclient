@@ -117,6 +117,10 @@ class ShellTest(utils.TestCase):
         self.run_command('delete 1234')
         self.assert_called('DELETE', '/volumes/1234')
 
+    def test_delete_multiple(self):
+        self.run_command('delete 1234 5678')
+        self.assert_called('DELETE', '/volumes/5678')
+
     def test_backup(self):
         self.run_command('backup-create 1234')
         self.assert_called('POST', '/backups')

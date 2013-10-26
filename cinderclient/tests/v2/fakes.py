@@ -304,13 +304,17 @@ class FakeHTTPClient(base_client.HTTPClient):
     # at the very least it's not complete
     def get_volumes_detail(self, **kw):
         return (200, {}, {"volumes": [
-            {'id': 1234,
+            {'id': kw.get('id', 1234),
              'name': 'sample-volume',
              'attachments': [{'server_id': 1234}]},
         ]})
 
     def get_volumes_1234(self, **kw):
-        r = {'volume': self.get_volumes_detail()[2]['volumes'][0]}
+        r = {'volume': self.get_volumes_detail(id=1234)[2]['volumes'][0]}
+        return (200, {}, r)
+
+    def get_volumes_5678(self, **kw):
+        r = {'volume': self.get_volumes_detail(id=5678)[2]['volumes'][0]}
         return (200, {}, r)
 
     def get_volumes_1234_encryption(self, **kw):
@@ -355,6 +359,9 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (202, {}, {'volume': {}})
 
     def delete_volumes_1234(self, **kw):
+        return (202, {}, None)
+
+    def delete_volumes_5678(self, **kw):
         return (202, {}, None)
 
     #
