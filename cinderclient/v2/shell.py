@@ -1331,3 +1331,80 @@ def do_qos_get_association(cs, args):
     """Get all associations of specific qos specs."""
     associations = cs.qos_specs.get_associations(args.qos_specs)
     _print_associations_list(associations)
+
+
+@utils.arg('snapshot',
+           metavar='<snapshot>',
+           help='ID of the snapshot to update metadata on.')
+@utils.arg('action',
+           metavar='<action>',
+           choices=['set', 'unset'],
+           help="Actions: 'set' or 'unset'")
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           default=[],
+           help='Metadata to set/unset (only key is necessary on unset)')
+@utils.service_type('volumev2')
+def do_snapshot_metadata(cs, args):
+    """Set or Delete metadata of a snapshot."""
+    snapshot = _find_volume_snapshot(cs, args.snapshot)
+    metadata = _extract_metadata(args)
+
+    if args.action == 'set':
+        metadata = snapshot.set_metadata(metadata)
+        utils.print_dict(metadata._info)
+    elif args.action == 'unset':
+        snapshot.delete_metadata(list(metadata.keys()))
+
+
+@utils.arg('snapshot', metavar='<snapshot>',
+           help='ID of snapshot')
+@utils.service_type('volumev2')
+def do_snapshot_metadata_show(cs, args):
+    """Show metadata of given snapshot."""
+    snapshot = _find_volume_snapshot(cs, args.snapshot)
+    utils.print_dict(snapshot._info['metadata'], 'Metadata-property')
+
+
+@utils.arg('volume', metavar='<volume>',
+           help='ID of volume')
+@utils.service_type('volumev2')
+def do_metadata_show(cs, args):
+    """Show metadata of given volume."""
+    volume = utils.find_volume(cs, args.volume)
+    utils.print_dict(volume._info['metadata'], 'Metadata-property')
+
+
+@utils.arg('volume',
+           metavar='<volume>',
+           help='ID of the volume to update metadata on.')
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           default=[],
+           help='Metadata entry/entries to update.')
+@utils.service_type('volumev2')
+def do_metadata_update_all(cs, args):
+    """Update all metadata of a volume."""
+    volume = utils.find_volume(cs, args.volume)
+    metadata = _extract_metadata(args)
+    metadata = volume.update_all_metadata(metadata)
+    utils.print_dict(metadata)
+
+
+@utils.arg('snapshot',
+           metavar='<snapshot>',
+           help='ID of the snapshot to update metadata on.')
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           default=[],
+           help='Metadata entry/entries to update')
+@utils.service_type('volumev2')
+def do_snapshot_metadata_update_all(cs, args):
+    """Update all metadata of a snapshot."""
+    snapshot = _find_volume_snapshot(cs, args.snapshot)
+    metadata = _extract_metadata(args)
+    metadata = snapshot.update_all_metadata(metadata)
+    utils.print_dict(metadata)

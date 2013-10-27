@@ -746,3 +746,18 @@ class FakeHTTPClient(base_client.HTTPClient):
                 },
                 ]
         })
+
+    def post_snapshots_1234_metadata(self, **kw):
+        return (200, {}, {"metadata": {"key1": "val1", "key2": "val2"}})
+
+    def delete_snapshots_1234_metadata_key1(self, **kw):
+        return (200, {}, None)
+
+    def delete_snapshots_1234_metadata_key2(self, **kw):
+        return (200, {}, None)
+
+    def put_volumes_1234_metadata(self, **kw):
+        return (200, {}, {"metadata": {"key1": "val1", "key2": "val2"}})
+
+    def put_snapshots_1234_metadata(self, **kw):
+        return (200, {}, {"metadata": {"key1": "val1", "key2": "val2"}})
