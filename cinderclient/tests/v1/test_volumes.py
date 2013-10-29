@@ -101,3 +101,8 @@ class VolumesTest(utils.TestCase):
         cs.volumes.update_all_metadata(1234, {'k1': 'v1'})
         cs.assert_called('PUT', '/volumes/1234/metadata',
                          {'metadata': {'k1': 'v1'}})
+
+    def test_readonly_mode_update(self):
+        v = cs.volumes.get('1234')
+        cs.volumes.update_readonly_flag(v, True)
+        cs.assert_called('POST', '/volumes/1234/action')

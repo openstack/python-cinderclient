@@ -126,6 +126,15 @@ class Volume(base.Resource):
         """Update all metadata of this volume."""
         return self.manager.update_all_metadata(self, metadata)
 
+    def update_readonly_flag(self, volume, read_only):
+        """Update the read-only access mode flag of the specified volume.
+
+        :param volume: The UUID of the volume to update.
+        :param read_only: The value to indicate whether to update volume to
+            read-only access mode.
+        """
+        self.manager.update_readonly_flag(self, volume, read_only)
+
 
 class VolumeManager(base.ManagerWithFind):
     """Manage :class:`Volume` resources."""
@@ -394,3 +403,8 @@ class VolumeManager(base.ManagerWithFind):
         body = {'metadata': metadata}
         return self._update("/volumes/%s/metadata" % base.getid(volume),
                             body)
+
+    def update_readonly_flag(self, volume, flag):
+        return self._action('os-update_readonly_flag',
+                            base.getid(volume),
+                            {'readonly': flag})

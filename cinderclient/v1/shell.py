@@ -1329,3 +1329,17 @@ def do_snapshot_metadata_update_all(cs, args):
     metadata = _extract_metadata(args)
     metadata = snapshot.update_all_metadata(metadata)
     utils.print_dict(metadata)
+
+
+@utils.arg('volume', metavar='<volume>', help='ID of the volume to update.')
+@utils.arg('read_only',
+           metavar='<True|true|False|false>',
+           choices=['True', 'true', 'False', 'false'],
+           help='Flag to indicate whether to update volume to '
+           'read-only access mode.')
+@utils.service_type('volume')
+def do_readonly_mode_update(cs, args):
+    """Update volume read-only access mode read_only."""
+    volume = utils.find_volume(cs, args.volume)
+    cs.volumes.update_readonly_flag(volume,
+                                    strutils.bool_from_string(args.read_only))
