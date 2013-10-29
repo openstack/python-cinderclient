@@ -102,6 +102,7 @@ class ShellTest(utils.TestCase):
 
     def test_delete_multiple(self):
         self.run_command('delete 1234 5678')
+        self.assert_called_anytime('DELETE', '/volumes/1234')
         self.assert_called('DELETE', '/volumes/5678')
 
     def test_backup(self):
