@@ -264,13 +264,13 @@ class ShellTest(utils.TestCase):
 
     def test_snapshot_metadata_unset_dict(self):
         self.run_command('snapshot-metadata 1234 unset key1=val1 key2=val2')
-        self.assert_called('DELETE', '/snapshots/1234/metadata/key1')
-        self.assert_called('DELETE', '/snapshots/1234/metadata/key2', pos=-2)
+        self.assert_called_anytime('DELETE', '/snapshots/1234/metadata/key1')
+        self.assert_called_anytime('DELETE', '/snapshots/1234/metadata/key2')
 
     def test_snapshot_metadata_unset_keys(self):
         self.run_command('snapshot-metadata 1234 unset key1 key2')
-        self.assert_called('DELETE', '/snapshots/1234/metadata/key1')
-        self.assert_called('DELETE', '/snapshots/1234/metadata/key2', pos=-2)
+        self.assert_called_anytime('DELETE', '/snapshots/1234/metadata/key1')
+        self.assert_called_anytime('DELETE', '/snapshots/1234/metadata/key2')
 
     def test_volume_metadata_update_all(self):
         self.run_command('metadata-update-all 1234  key1=val1 key2=val2')
