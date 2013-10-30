@@ -55,7 +55,7 @@ class FakeManager(base.ManagerWithFind):
                 return resource
         raise exceptions.NotFound(resource_id)
 
-    def list(self):
+    def list(self, search_opts):
         return self.resources
 
 
