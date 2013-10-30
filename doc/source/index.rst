@@ -29,6 +29,23 @@ See also :doc:`/man/cinder`.
 
 Release Notes
 =============
+1.0.7
+-----
+* Add support for read-only volumes
+* Add support for setting snapshot metadata
+* Deprecate volume-id arg to backup restore in favor of --volume
+* Add quota-usage command
+* Fix exception deprecation warning message
+* Report error when no args supplied to rename cmd
+
+.. _1241941: http://bugs.launchpad.net/python-cinderclient/+bug/1241941
+.. _1242816: http://bugs.launchpad.net/python-cinderclient/+bug/1242816
+.. _1233311: http://bugs.launchpad.net/python-cinderclient/+bug/1233311
+.. _1227307: http://bugs.launchpad.net/python-cinderclient/+bug/1227307
+.. _1240151: http://bugs.launchpad.net/python-cinderclient/+bug/1240151
+.. _1241682: http://bugs.launchpad.net/python-cinderclient/+bug/1241682
+
+
 1.0.6
 -----
 * Add support for multiple endpoints
@@ -38,6 +55,7 @@ Release Notes
 * Add update action for snapshot metadata
 * Add encryption metadata support
 * Add volume migrate support
+* Add support for QoS specs
 
 .. _1221104: http://bugs.launchpad.net/python-cinderclient/+bug/1221104
 .. _1220590: http://bugs.launchpad.net/python-cinderclient/+bug/1220590

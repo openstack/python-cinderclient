@@ -148,3 +148,5 @@ Quick-start using keystone::
     >>> nt = client.Client(USER, PASS, TENANT, AUTH_URL, service_type="volume")
     >>> nt.volumes.list()
     [...]
+
+See release notes and more at `<http://docs.openstack.org/developer/python-cinderclient/>`_.
