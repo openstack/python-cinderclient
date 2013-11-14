@@ -29,6 +29,9 @@ See also :doc:`/man/cinder`.
 
 Release Notes
 =============
+MASTER
+------
+
 1.0.7
 -----
 * Add support for read-only volumes
