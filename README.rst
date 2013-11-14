@@ -44,13 +44,13 @@ params, but it's easier to just set them as environment variables::
     export OS_TENANT_NAME=myproject
 
 You will also need to define the authentication url with ``--os-auth-url``
-and the version of the API with ``--version``.  Or set them as an environment
-variables as well::
+and the version of the API with ``--os-volume-api-version``.  Or set them as
+environment variables as well::
 
     export OS_AUTH_URL=http://example.com:8774/v1.1/
     export OS_VOLUME_API_VERSION=1
 
-If you are using Keystone, you need to set the CINDER_URL to the keystone
+If you are using Keystone, you need to set the OS_AUTH_URL to the keystone
 endpoint::
 
     export OS_AUTH_URL=http://example.com:5000/v2.0/
