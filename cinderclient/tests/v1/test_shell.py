@@ -275,8 +275,14 @@ class ShellTest(utils.TestCase):
     def test_encryption_type_delete(self):
         """
         Test encryption-type-delete shell command.
+
+        Verify one GET/one DELETE requests are made per command invocation:
+        - one GET request to retrieve the relevant volume type information
+        - one DELETE request to delete the encryption type information
         """
-        self.skipTest("Not implemented")
+        self.run_command('encryption-type-delete 1')
+        self.assert_called('DELETE', '/types/1/encryption/provider')
+        self.assert_called_anytime('GET', '/types/1')
 
     def test_migrate_volume(self):
         self.run_command('migrate 1234 fakehost --force-host-copy=True')

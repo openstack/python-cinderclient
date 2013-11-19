@@ -91,5 +91,10 @@ class VolumeEncryptionTypesTest(utils.TestCase):
     def test_delete(self):
         """
         Unit test for VolumeEncryptionTypesManager.delete
+
+        Verify that one DELETE request is made for encryption type deletion
+        Verify that encryption type deletion returns None
         """
-        self.skipTest("Not implemented")
+        result = cs.volume_encryption_types.delete(1)
+        cs.assert_called('DELETE', '/types/1/encryption/provider')
+        self.assertIsNone(result, "delete result must be None")
