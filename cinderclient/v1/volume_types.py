@@ -80,7 +80,7 @@ class VolumeTypeManager(base.ManagerWithFind):
     """
     resource_class = VolumeType
 
-    def list(self):
+    def list(self, search_opts=None):
         """
         Get a list of all volume types.
 

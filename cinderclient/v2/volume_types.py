@@ -70,7 +70,7 @@ class VolumeTypeManager(base.ManagerWithFind):
     """Manage :class:`VolumeType` resources."""
     resource_class = VolumeType
 
-    def list(self):
+    def list(self, search_opts=None):
         """Get a list of all volume types.
 
         :rtype: list of :class:`VolumeType`.
