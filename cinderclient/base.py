@@ -110,7 +110,7 @@ class Manager(utils.HookableMixin):
         try:
             os.makedirs(cache_dir, 0o755)
         except OSError:
-            # NOTE(kiall): This is typicaly either permission denied while
+            # NOTE(kiall): This is typically either permission denied while
             #              attempting to create the directory, or the directory
             #              already exists. Either way, don't fail.
             pass
@@ -124,7 +124,7 @@ class Manager(utils.HookableMixin):
         try:
             setattr(self, cache_attr, open(path, mode))
         except IOError:
-            # NOTE(kiall): This is typicaly a permission denied while
+            # NOTE(kiall): This is typically a permission denied while
             #              attempting to write the cache file.
             pass
 
