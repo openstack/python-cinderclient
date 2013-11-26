@@ -84,7 +84,7 @@ class Volume(base.Resource):
     def set_metadata(self, volume, metadata):
         """Set or Append metadata to a volume.
 
-        :param type : The :class: `Volume` to set metadata on
+        :param volume : The :class: `Volume` to set metadata on
         :param metadata: A dict of key/value pairs to set
         """
         return self.manager.set_metadata(self, metadata)
