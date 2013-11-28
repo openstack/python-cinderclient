@@ -15,3 +15,7 @@ build
 dist
 cinderclient/versioninfo
 python_cinderclient.egg-info
+
+# Development environment files
+.project
+.pydevproject

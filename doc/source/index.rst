@@ -33,6 +33,7 @@ MASTER
 ------
 * Add support for reset-state on multiple volumes or snapshots at once
 
+.. _1256043: https://bugs.launchpad.net/python-cinderclient/+bug/1256043
 .. _1254951: http://bugs.launchpad.net/python-cinderclient/+bug/1254951
 .. _1254587: http://bugs.launchpad.net/python-cinderclient/+bug/1254587
 .. _1253142: http://bugs.launchpad.net/python-cinderclient/+bug/1253142
