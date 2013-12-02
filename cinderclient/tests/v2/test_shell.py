@@ -341,3 +341,7 @@ class ShellTest(utils.TestCase):
         expected = {'os-retype': {'new_type': 'foo',
                                   'migration_policy': 'never'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_snapshot_delete(self):
+        self.run_command('snapshot-delete 1234')
+        self.assert_called('DELETE', '/snapshots/1234')

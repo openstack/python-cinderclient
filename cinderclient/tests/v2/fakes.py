@@ -291,6 +291,9 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_snapshots_5678_action(self, body, **kw):
         return self.post_snapshots_1234_action(body, **kw)
 
+    def delete_snapshots_1234(self, **kw):
+        return (202, {}, {})
+
     #
     # Volumes
     #

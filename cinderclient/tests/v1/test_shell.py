@@ -351,3 +351,7 @@ class ShellTest(utils.TestCase):
         self.run_command('service-enable host cinder-volume')
         self.assert_called('PUT', '/os-services/enable',
                            {"binary": "cinder-volume", "host": "host"})
+
+    def test_snapshot_delete(self):
+        self.run_command('snapshot-delete 1234')
+        self.assert_called('DELETE', '/snapshots/1234')
