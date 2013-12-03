@@ -1,12 +1,12 @@
 Cinder Client Style Commandments
-=========================
+================================
 
 - Step 1: Read the OpenStack Style Commandments
   http://docs.openstack.org/developer/hacking/
 - Step 2: Read on
 
 Cinder Client Specific Commandments
-----------------------------
+-----------------------------------
 
 General
 -------
@@ -21,7 +21,7 @@ General
         raise  # OKAY
 
 Text encoding
-----------
+-------------
 - All text within python code should be of type 'unicode'.
 
     WRONG:
@@ -59,3 +59,19 @@ Text encoding
     returntext = do_some_magic_with(mytext)
     returnstring = returntext.encode('utf-8')
     outfile.write(returnstring)
+
+Release Notes
+-------------
+- Each patch should add an entry in the doc/source/index.rst file under
+  "MASTER".
+
+- On each new release, the entries under "MASTER" will become the release notes
+  for that release, and "MASTER" will be cleared.
+
+- The format should match existing release notes.  For example, a feature::
+
+    * Add support for function foo
+
+  Or a bug fix::
+
+    .. _1241941: http://bugs.launchpad.net/python-cinderclient/+bug/1241941
