@@ -35,8 +35,6 @@ def _stub_volume(**kwargs):
         "bootable": "false",
         "availability_zone": "cinder",
         "created_at": "2012-08-27T00:00:00.000000",
-        "display_description": None,
-        "display_name": None,
         "id": '00000000-0000-0000-0000-000000000000',
         "metadata": {},
         "size": 1,
