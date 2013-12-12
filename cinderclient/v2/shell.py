@@ -1060,7 +1060,7 @@ def do_transfer_show(cs, args):
 
 @utils.arg('volume', metavar='<volume>',
            help='Name or ID of the volume to extend.')
-@utils.arg('new-size',
+@utils.arg('new_size',
            metavar='<new_size>',
            type=int,
            help='New size of volume in GB')
