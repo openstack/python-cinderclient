@@ -339,7 +339,7 @@ def do_force_delete(cs, args):
                                       "specified volumes.")
 
 
-@utils.arg('volume', metavar='<volume>',
+@utils.arg('volume', metavar='<volume>', nargs='+',
            help='Name or ID of the volume to modify.')
 @utils.arg('--state', metavar='<state>', default='available',
            help=('Indicate which state to assign the volume. Options include '
@@ -348,8 +348,23 @@ def do_force_delete(cs, args):
 @utils.service_type('volumev2')
 def do_reset_state(cs, args):
     """Explicitly update the state of a volume."""
-    volume = utils.find_volume(cs, args.volume)
-    volume.reset_state(args.state)
+    failure_count = 0
+
+    single = (len(args.volume) == 1)
+
+    for volume in args.volume:
+        try:
+            utils.find_volume(cs, volume).reset_state(args.state)
+        except Exception as e:
+            failure_count += 1
+            msg = "Reset state for volume %s failed: %s" % (volume, e)
+            if not single:
+                print(msg)
+
+    if failure_count == len(args.volume):
+        if not single:
+            msg = "Unable to reset the state for any of the specified volumes."
+        raise exceptions.CommandError(msg)
 
 
 @utils.arg('volume',
@@ -556,7 +571,7 @@ def do_snapshot_rename(cs, args):
     _find_volume_snapshot(cs, args.snapshot).update(**kwargs)
 
 
-@utils.arg('snapshot', metavar='<snapshot>',
+@utils.arg('snapshot', metavar='<snapshot>', nargs='+',
            help='Name or ID of the snapshot to modify.')
 @utils.arg('--state', metavar='<state>',
            default='available',
@@ -567,8 +582,24 @@ def do_snapshot_rename(cs, args):
 @utils.service_type('volumev2')
 def do_snapshot_reset_state(cs, args):
     """Explicitly update the state of a snapshot."""
-    snapshot = _find_volume_snapshot(cs, args.snapshot)
-    snapshot.reset_state(args.state)
+    failure_count = 0
+
+    single = (len(args.snapshot) == 1)
+
+    for snapshot in args.snapshot:
+        try:
+            _find_volume_snapshot(cs, snapshot).reset_state(args.state)
+        except Exception as e:
+            failure_count += 1
+            msg = "Reset state for snapshot %s failed: %s" % (snapshot, e)
+            if not single:
+                print(msg)
+
+    if failure_count == len(args.snapshot):
+        if not single:
+            msg = ("Unable to reset the state for any of the the specified "
+                   "snapshots.")
+        raise exceptions.CommandError(msg)
 
 
 def _print_volume_type_list(vtypes):

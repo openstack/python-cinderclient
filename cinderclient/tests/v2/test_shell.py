@@ -190,6 +190,14 @@ class ShellTest(utils.TestCase):
         expected = {'os-reset_status': {'status': 'error'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
 
+    def test_reset_state_multiple(self):
+        self.run_command('reset-state 1234 5678 --state error')
+        expected = {'os-reset_status': {'status': 'error'}}
+        self.assert_called_anytime('POST', '/volumes/1234/action',
+                                   body=expected)
+        self.assert_called_anytime('POST', '/volumes/5678/action',
+                                   body=expected)
+
     def test_snapshot_reset_state(self):
         self.run_command('snapshot-reset-state 1234')
         expected = {'os-reset_status': {'status': 'available'}}
@@ -199,6 +207,14 @@ class ShellTest(utils.TestCase):
         self.run_command('snapshot-reset-state --state error 1234')
         expected = {'os-reset_status': {'status': 'error'}}
         self.assert_called('POST', '/snapshots/1234/action', body=expected)
+
+    def test_snapshot_reset_state_multiple(self):
+        self.run_command('snapshot-reset-state 1234 5678')
+        expected = {'os-reset_status': {'status': 'available'}}
+        self.assert_called_anytime('POST', '/snapshots/1234/action',
+                                   body=expected)
+        self.assert_called_anytime('POST', '/snapshots/5678/action',
+                                   body=expected)
 
     def test_encryption_type_list(self):
         """

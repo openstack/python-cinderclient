@@ -258,6 +258,9 @@ class FakeHTTPClient(base_client.HTTPClient):
     def get_snapshots_1234(self, **kw):
         return (200, {}, {'snapshot': _stub_snapshot(id='1234')})
 
+    def get_snapshots_5678(self, **kw):
+        return (200, {}, {'snapshot': _stub_snapshot(id='5678')})
+
     def put_snapshots_1234(self, **kw):
         snapshot = _stub_snapshot(id='1234')
         snapshot.update(kw['body']['snapshot'])
@@ -275,6 +278,9 @@ class FakeHTTPClient(base_client.HTTPClient):
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)
+
+    def post_snapshots_5678_action(self, body, **kw):
+        return self.post_snapshots_1234_action(body, **kw)
 
     #
     # Volumes
@@ -348,6 +354,9 @@ class FakeHTTPClient(base_client.HTTPClient):
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)
+
+    def post_volumes_5678_action(self, body, **kw):
+        return self.post_volumes_1234_action(body, **kw)
 
     def post_volumes(self, **kw):
         return (202, {}, {'volume': {}})
