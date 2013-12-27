@@ -231,7 +231,7 @@ class VolumeManager(base.ManagerWithFind):
         """
         Update the display_name or display_description for a volume.
 
-        :param volume: The :class:`Volume` to delete.
+        :param volume: The :class:`Volume` to update.
         """
         if not kwargs:
             return

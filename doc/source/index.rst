@@ -39,6 +39,7 @@ MASTER
 .. _1252665: http://bugs.launchpad.net/python-cinderclient/+bug/1252665
 .. _1255876: http://bugs.launchpad.net/python-cinderclient/+bug/1255876
 .. _1251385: http://bugs.launchpad.net/python-cinderclient/+bug/1251385
+.. _1264415: http://bugs.launchpad.net/python-cinderclient/+bug/1264415
 
 1.0.7
 -----
