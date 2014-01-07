@@ -6,9 +6,6 @@ subunit.log
 *,cover
 cover
 *.pyc
-.idea
-.*.sw?
-*~
 AUTHORS
 ChangeLog
 build
