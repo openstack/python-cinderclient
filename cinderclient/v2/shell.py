@@ -296,7 +296,6 @@ def do_create(cs, args):
                                scheduler_hints=hints)
 
     info = dict()
-    volume = cs.volumes.get(volume.id)
     info.update(volume._info)
 
     info.pop('links', None)
