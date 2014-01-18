@@ -36,8 +36,8 @@ class AvailabilityZoneTest(utils.TestCase):
         cs.assert_called('GET', '/os-availability-zone')
 
         for zone in zones:
-            self.assertTrue(isinstance(zone,
-                                       availability_zones.AvailabilityZone))
+            self.assertIsInstance(zone,
+                                  availability_zones.AvailabilityZone)
 
         self.assertEqual(2, len(zones))
 
@@ -57,8 +57,8 @@ class AvailabilityZoneTest(utils.TestCase):
         cs.assert_called('GET', '/os-availability-zone/detail')
 
         for zone in zones:
-            self.assertTrue(isinstance(zone,
-                                       availability_zones.AvailabilityZone))
+            self.assertIsInstance(zone,
+                                  availability_zones.AvailabilityZone)
 
         self.assertEqual(3, len(zones))
 

@@ -26,12 +26,12 @@ class TypesTest(utils.TestCase):
         tl = cs.volume_types.list()
         cs.assert_called('GET', '/types')
         for t in tl:
-            self.assertTrue(isinstance(t, volume_types.VolumeType))
+            self.assertIsInstance(t, volume_types.VolumeType)
 
     def test_create(self):
         t = cs.volume_types.create('test-type-3')
         cs.assert_called('POST', '/types')
-        self.assertTrue(isinstance(t, volume_types.VolumeType))
+        self.assertIsInstance(t, volume_types.VolumeType)
 
     def test_set_key(self):
         t = cs.volume_types.get(1)
