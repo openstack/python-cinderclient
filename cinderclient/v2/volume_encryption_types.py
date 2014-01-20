@@ -36,7 +36,7 @@ class VolumeEncryptionTypeManager(base.ManagerWithFind):
     """
     resource_class = VolumeEncryptionType
 
-    def list(self):
+    def list(self, search_opts=None):
         """
         List all volume encryption types.
 

@@ -64,7 +64,7 @@ class VolumeTransferManager(base.ManagerWithFind):
         """
         return self._get("/os-volume-transfer/%s" % transfer_id, "transfer")
 
-    def list(self, detailed=True):
+    def list(self, detailed=True, search_opts=None):
         """Get a list of all volume transfer.
 
         :rtype: list of :class:`VolumeTransfer`
