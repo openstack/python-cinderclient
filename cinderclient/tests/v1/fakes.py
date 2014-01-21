@@ -696,11 +696,11 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def put_os_services_enable(self, body, **kw):
         return (200, {}, {'host': body['host'], 'binary': body['binary'],
-                'status': 'disabled'})
+                'status': 'enabled'})
 
     def put_os_services_disable(self, body, **kw):
         return (200, {}, {'host': body['host'], 'binary': body['binary'],
-                'status': 'enabled'})
+                'status': 'disabled'})
 
     def get_os_availability_zone(self, **kw):
         return (200, {}, {

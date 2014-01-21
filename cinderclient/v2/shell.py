@@ -1087,7 +1087,9 @@ def do_service_list(cs, args):
 @utils.service_type('volumev2')
 def do_service_enable(cs, args):
     """Enable the service."""
-    cs.services.enable(args.host, args.binary)
+    result = cs.services.enable(args.host, args.binary)
+    columns = ["Host", "Binary", "Status"]
+    utils.print_list([result], columns)
 
 
 @utils.arg('host', metavar='<hostname>', help='Name of host.')
@@ -1095,7 +1097,9 @@ def do_service_enable(cs, args):
 @utils.service_type('volumev2')
 def do_service_disable(cs, args):
     """Disable the service."""
-    cs.services.disable(args.host, args.binary)
+    result = cs.services.disable(args.host, args.binary)
+    columns = ["Host", "Binary", "Status"]
+    utils.print_list([result], columns)
 
 
 def _treeizeAvailabilityZone(zone):
