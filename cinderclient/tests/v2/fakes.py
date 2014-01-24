@@ -484,6 +484,9 @@ class FakeHTTPClient(base_client.HTTPClient):
     def put_types_1_encryption_1(self, body, **kw):
         return (200, {}, {})
 
+    def delete_types_1_encryption_provider(self, **kw):
+        return (202, {}, None)
+
     #
     # Set/Unset metadata
     #

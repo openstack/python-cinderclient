@@ -1147,6 +1147,17 @@ def do_encryption_type_create(cs, args):
     _print_volume_encryption_type_list([result])
 
 
+@utils.arg('volume_type',
+           metavar='<volume_type>',
+           type=str,
+           help="Name or ID of the volume type")
+@utils.service_type('volume')
+def do_encryption_type_delete(cs, args):
+    """Delete the encryption type for a volume type (Admin Only)."""
+    volume_type = _find_volume_type(cs, args.volume_type)
+    cs.volume_encryption_types.delete(volume_type)
+
+
 @utils.arg('volume', metavar='<volume>', help='ID of the volume to migrate')
 @utils.arg('host', metavar='<host>', help='Destination host')
 @utils.arg('--force-host-copy', metavar='<True|False>',
