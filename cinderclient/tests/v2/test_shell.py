@@ -319,3 +319,13 @@ class ShellTest(utils.TestCase):
         self.run_command('readonly-mode-update 1234 False')
         expected = {'os-update_readonly_flag': {'readonly': False}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_service_disable(self):
+        self.run_command('service-disable host cinder-volume')
+        self.assert_called('PUT', '/os-services/disable',
+                           {"binary": "cinder-volume", "host": "host"})
+
+    def test_service_disable(self):
+        self.run_command('service-enable host cinder-volume')
+        self.assert_called('PUT', '/os-services/enable',
+                           {"binary": "cinder-volume", "host": "host"})

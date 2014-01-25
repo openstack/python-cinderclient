@@ -52,11 +52,15 @@ class ServicesTest(utils.TestCase):
         [self.assertEqual(s.binary, 'cinder-volume') for s in svs]
 
     def test_services_enable(self):
-        cs.services.enable('host1', 'cinder-volume')
+        s = cs.services.enable('host1', 'cinder-volume')
         values = {"host": "host1", 'binary': 'cinder-volume'}
         cs.assert_called('PUT', '/os-services/enable', values)
+        self.assertTrue(isinstance(s, services.Service))
+        self.assertEqual(s.status, 'enabled')
 
     def test_services_disable(self):
-        cs.services.disable('host1', 'cinder-volume')
+        s = cs.services.disable('host1', 'cinder-volume')
         values = {"host": "host1", 'binary': 'cinder-volume'}
         cs.assert_called('PUT', '/os-services/disable', values)
+        self.assertTrue(isinstance(s, services.Service))
+        self.assertEqual(s.status, 'disabled')

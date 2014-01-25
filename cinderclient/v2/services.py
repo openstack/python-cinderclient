@@ -48,9 +48,11 @@ class ServiceManager(base.ManagerWithFind):
     def enable(self, host, binary):
         """Enable the service specified by hostname and binary."""
         body = {"host": host, "binary": binary}
-        self._update("/os-services/enable", body)
+        result = self._update("/os-services/enable", body)
+        return self.resource_class(self, result)
 
     def disable(self, host, binary):
         """Enable the service specified by hostname and binary."""
         body = {"host": host, "binary": binary}
-        self._update("/os-services/disable", body)
+        result = self._update("/os-services/disable", body)
+        return self.resource_class(self, result)
