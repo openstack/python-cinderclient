@@ -32,6 +32,7 @@ Release Notes
 MASTER
 ------
 * Add support for reset-state on multiple volumes or snapshots at once
+* Add volume retype command
 
 .. _1265893: https://bugs.launchpad.net/python-cinderclient/+bug/1265893
 .. _1256043: https://bugs.launchpad.net/python-cinderclient/+bug/1256043
