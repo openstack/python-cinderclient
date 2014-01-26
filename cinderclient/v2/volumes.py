@@ -117,10 +117,9 @@ class Volume(base.Resource):
         """Migrate the volume to a new host."""
         self.manager.migrate_volume(self, host, force_host_copy)
 
-#    def migrate_volume_completion(self, old_volume, new_volume, error):
-#        """Complete the migration of the volume."""
-#        self.manager.migrate_volume_completion(self, old_volume,
-#                                               new_volume, error)
+    def retype(self, volume_type, policy):
+        """Change a volume's type."""
+        self.manager.retype(self, volume_type, policy)
 
     def update_all_metadata(self, metadata):
         """Update all metadata of this volume."""
@@ -408,3 +407,15 @@ class VolumeManager(base.ManagerWithFind):
         return self._action('os-update_readonly_flag',
                             base.getid(volume),
                             {'readonly': flag})
+
+    def retype(self, volume, volume_type, policy):
+        """Change a volume's type.
+
+        :param volume: The :class:`Volume` to retype
+        :param volume_type: New volume type
+        :param policy: Policy for migration during the retype
+        """
+        return self._action('os-retype',
+                            volume,
+                            {'new_type': volume_type,
+                             'migration_policy': policy})
