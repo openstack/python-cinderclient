@@ -22,7 +22,6 @@ OpenStack Client interface. Handles the REST calls and responses.
 from __future__ import print_function
 
 import logging
-import os
 
 try:
     import urlparse
@@ -296,10 +295,7 @@ class HTTPClient(object):
         auth_url = self.auth_url
         if self.version == "v2.0":
             while auth_url:
-                if "CINDER_RAX_AUTH" in os.environ:
-                    auth_url = self._rax_auth(auth_url)
-                else:
-                    auth_url = self._v2_auth(auth_url)
+                auth_url = self._v2_auth(auth_url)
 
             # Are we acting on behalf of another user via an
             # existing token? If so, our actual endpoints may
@@ -355,16 +351,6 @@ class HTTPClient(object):
             body['auth']['tenantName'] = self.projectid
         elif self.tenant_id:
             body['auth']['tenantId'] = self.tenant_id
-
-        self._authenticate(url, body)
-
-    def _rax_auth(self, url):
-        """Authenticate against the Rackspace auth service."""
-        body = {"auth": {
-                "RAX-KSKEY:apiKeyCredentials": {
-                    "username": self.user,
-                    "apiKey": self.password,
-                    "tenantName": self.projectid}}}
 
         self._authenticate(url, body)
 
