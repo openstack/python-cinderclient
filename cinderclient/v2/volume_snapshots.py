@@ -132,7 +132,7 @@ class SnapshotManager(base.ManagerWithFind):
     def update(self, snapshot, **kwargs):
         """Update the name or description for a snapshot.
 
-        :param snapshot: The :class:`Snapshot` to delete.
+        :param snapshot: The :class:`Snapshot` to update.
         """
         if not kwargs:
             return

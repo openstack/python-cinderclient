@@ -147,7 +147,7 @@ class SnapshotManager(base.ManagerWithFind):
         """
         Update the display_name or display_description for a snapshot.
 
-        :param snapshot: The :class:`Snapshot` to delete.
+        :param snapshot: The :class:`Snapshot` to update.
         """
         if not kwargs:
             return

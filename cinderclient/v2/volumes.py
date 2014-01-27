@@ -187,7 +187,7 @@ class VolumeManager(base.ManagerWithFind):
     def get(self, volume_id):
         """Get a volume.
 
-        :param volume_id: The ID of the volume to delete.
+        :param volume_id: The ID of the volume to get.
         :rtype: :class:`Volume`
         """
         return self._get("/volumes/%s" % volume_id, "volume")
@@ -225,7 +225,7 @@ class VolumeManager(base.ManagerWithFind):
     def update(self, volume, **kwargs):
         """Update the name or description for a volume.
 
-        :param volume: The :class:`Volume` to delete.
+        :param volume: The :class:`Volume` to update.
         """
         if not kwargs:
             return
