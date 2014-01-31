@@ -29,8 +29,9 @@ See also :doc:`/man/cinder`.
 
 Release Notes
 =============
-MASTER
-------
+
+1.0.8
+-----
 * Add support for reset-state on multiple volumes or snapshots at once
 * Add volume retype command
 
