@@ -149,7 +149,7 @@ class VolumeManager(base.ManagerWithFind):
                project_id=None, availability_zone=None,
                metadata=None, imageRef=None):
         """
-        Create a volume.
+        Creates a volume.
 
         :param size: Size of volume in GB
         :param snapshot_id: ID of the snapshot

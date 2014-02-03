@@ -71,7 +71,7 @@ class VolumeTypeManager(base.ManagerWithFind):
     resource_class = VolumeType
 
     def list(self, search_opts=None):
-        """Get a list of all volume types.
+        """Lists all volume types.
 
         :rtype: list of :class:`VolumeType`.
         """
@@ -86,14 +86,14 @@ class VolumeTypeManager(base.ManagerWithFind):
         return self._get("/types/%s" % base.getid(volume_type), "volume_type")
 
     def delete(self, volume_type):
-        """Delete a specific volume_type.
+        """Deletes a specific volume_type.
 
         :param volume_type: The name or ID of the :class:`VolumeType` to get.
         """
         self._delete("/types/%s" % base.getid(volume_type))
 
     def create(self, name):
-        """Create a volume type.
+        """Creates a volume type.
 
         :param name: Descriptive name of the volume type
         :rtype: :class:`VolumeType`

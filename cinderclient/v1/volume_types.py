@@ -107,7 +107,7 @@ class VolumeTypeManager(base.ManagerWithFind):
 
     def create(self, name):
         """
-        Create a volume type.
+        Creates a volume type.
 
         :param name: Descriptive name of the volume type
         :rtype: :class:`VolumeType`

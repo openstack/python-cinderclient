@@ -31,7 +31,7 @@ class AvailabilityZoneManager(base.ManagerWithFind):
     resource_class = AvailabilityZone
 
     def list(self, detailed=False):
-        """Get a list of all availability zones
+        """Lists all availability zones.
 
         :rtype: list of :class:`AvailabilityZone`
         """

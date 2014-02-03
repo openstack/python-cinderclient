@@ -144,7 +144,7 @@ class VolumeManager(base.ManagerWithFind):
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
                metadata=None, imageRef=None, scheduler_hints=None):
-        """Create a volume.
+        """Creates a volume.
 
         :param size: Size of volume in GB
         :param snapshot_id: ID of the snapshot
@@ -196,7 +196,7 @@ class VolumeManager(base.ManagerWithFind):
         return self._get("/volumes/%s" % volume_id, "volume")
 
     def list(self, detailed=True, search_opts=None):
-        """Get a list of all volumes.
+        """Lists all volumes.
 
         :rtype: list of :class:`Volume`
         """

@@ -61,8 +61,8 @@ class ShellTest(utils.TestCase):
     def test_help(self):
         required = [
             '.*?^usage: ',
-            '.*?(?m)^\s+create\s+Add a new volume.',
-            '.*?(?m)^See "cinder help COMMAND" for help on a specific command',
+            '.*?(?m)^\s+create\s+Creates a volume.',
+            '.*?(?m)^Run "cinder help SUBCOMMAND" for help on a subcommand.',
         ]
         help_text = self.shell('help')
         for r in required:
@@ -72,7 +72,7 @@ class ShellTest(utils.TestCase):
     def test_help_on_subcommand(self):
         required = [
             '.*?^usage: cinder list',
-            '.*?(?m)^List all the volumes.',
+            '.*?(?m)^Lists all volumes.',
         ]
         help_text = self.shell('help list')
         for r in required:

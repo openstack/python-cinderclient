@@ -36,7 +36,7 @@ class VolumeBackupManager(base.ManagerWithFind):
 
     def create(self, volume_id, container=None,
                name=None, description=None):
-        """Create a volume backup.
+        """Creates a volume backup.
 
         :param volume_id: The ID of the volume to backup.
         :param container: The name of the backup service container.

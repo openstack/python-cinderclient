@@ -69,7 +69,7 @@ class SnapshotManager(base.ManagerWithFind):
     def create(self, volume_id, force=False,
                name=None, description=None):
 
-        """Create a snapshot of the given volume.
+        """Creates a snapshot of the given volume.
 
         :param volume_id: The ID of the volume to snapshot.
         :param force: If force is True, create a snapshot even if the volume is
@@ -85,7 +85,7 @@ class SnapshotManager(base.ManagerWithFind):
         return self._create('/snapshots', body, 'snapshot')
 
     def get(self, snapshot_id):
-        """Get a snapshot.
+        """Shows snapshot details.
 
         :param snapshot_id: The ID of the snapshot to get.
         :rtype: :class:`Snapshot`

@@ -65,7 +65,7 @@ class VolumeEncryptionTypeManager(base.ManagerWithFind):
 
     def create(self, volume_type, specs):
         """
-        Create a new encryption type for the specified volume type.
+        Creates encryption type for a volume type. Default: admin only.
 
         :param volume_type: the volume type on which to add an encryption type
         :param specs: the encryption type specifications to add
