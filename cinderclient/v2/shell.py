@@ -869,7 +869,7 @@ def _find_volume_type(cs, vtype):
            default='raw')
 @utils.arg('--disk_format',
            help=argparse.SUPPRESS)
-@utils.arg('image-name',
+@utils.arg('image_name',
            metavar='<image-name>',
            help='Name for created image')
 @utils.arg('--image_name',
