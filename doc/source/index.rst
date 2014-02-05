@@ -30,6 +30,10 @@ See also :doc:`/man/cinder`.
 Release Notes
 =============
 
+MASTER
+------
+.. _1255905: http://bugs.launchpad.net/python-cinderclient/+bug/1255905
+
 1.0.8
 -----
 * Add support for reset-state on multiple volumes or snapshots at once
