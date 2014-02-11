@@ -273,7 +273,7 @@ class ShellTest(utils.TestCase):
         """
         expected = {'encryption': {'cipher': None, 'key_size': None,
                                    'provider': 'TestProvider',
-                                   'control_location': None}}
+                                   'control_location': 'front-end'}}
         self.run_command('encryption-type-create 2 TestProvider')
         self.assert_called('POST', '/types/2/encryption', body=expected)
         self.assert_called_anytime('GET', '/types/2')

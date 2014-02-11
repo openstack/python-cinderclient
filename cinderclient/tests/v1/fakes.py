@@ -467,13 +467,13 @@ class FakeHTTPClient(base_client.HTTPClient):
     def get_types_1_encryption(self, **kw):
         return (200, {}, {'id': 1, 'volume_type_id': 1, 'provider': 'test',
                           'cipher': 'test', 'key_size': 1,
-                          'control_location': 'front'})
+                          'control_location': 'front-end'})
 
     def get_types_2_encryption(self, **kw):
         return (200, {}, {})
 
     def post_types_2_encryption(self, body, **kw):
-        return (200, {}, {'encryption': {}})
+        return (200, {}, {'encryption': body})
 
     def put_types_1_encryption_1(self, body, **kw):
         return (200, {}, {})

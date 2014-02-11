@@ -1240,10 +1240,10 @@ def do_encryption_type_show(cs, args):
            choices=['front-end', 'back-end'],
            type=str,
            required=False,
-           default=None,
+           default='front-end',
            help="Notional service where encryption is performed (e.g., "
-           "front-end=Nova). Values: 'front-end', 'back-end' "
-           "(Optional, Default=None)")
+           "front-end=Nova) Values: 'front-end', 'back-end' "
+           "(Default='front-end')")
 @utils.service_type('volumev2')
 def do_encryption_type_create(cs, args):
     """Create a new encryption type for a volume type (Admin Only)."""
