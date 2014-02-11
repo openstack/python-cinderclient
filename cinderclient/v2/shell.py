@@ -1002,6 +1002,28 @@ def do_backup_restore(cs, args):
     cs.restores.restore(args.backup, volume_id)
 
 
+@utils.arg('backup', metavar='<backup>',
+           help='ID of the backup to export.')
+@utils.service_type('volumev2')
+def do_backup_export(cs, args):
+    """Export backup metadata record."""
+    info = cs.backups.export_record(args.backup)
+    utils.print_dict(info)
+
+
+@utils.arg('backup_service', metavar='<backup_service>',
+           help='Backup service to use for importing the backup.')
+@utils.arg('backup_url', metavar='<backup_url>',
+           help='Backup URL for importing the backup metadata.')
+@utils.service_type('volumev2')
+def do_backup_import(cs, args):
+    """Import backup metadata record."""
+    info = cs.backups.import_record(args.backup_service, args.backup_url)
+    info.pop('links', None)
+
+    utils.print_dict(info)
+
+
 @utils.arg('volume', metavar='<volume>',
            help='Name or ID of the volume to transfer.')
 @utils.arg('--name',

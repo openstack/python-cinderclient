@@ -113,6 +113,16 @@ class ShellTest(utils.TestCase):
         self.run_command('backup-restore 1234')
         self.assert_called('POST', '/backups/1234/restore')
 
+    def test_record_export(self):
+        self.run_command('backup-export 1234')
+        self.assert_called('GET', '/backups/1234/export_record')
+
+    def test_record_import(self):
+        self.run_command('backup-import fake.driver URL_STRING')
+        expected = {'backup-record': {'backup_service': 'fake.driver',
+                                      'backup_url': 'URL_STRING'}}
+        self.assert_called('POST', '/backups/import_record', expected)
+
     def test_snapshot_list_filter_volume_id(self):
         self.run_command('snapshot-list --volume-id=1234')
         self.assert_called('GET', '/snapshots/detail?volume_id=1234')

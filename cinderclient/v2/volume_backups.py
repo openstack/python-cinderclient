@@ -74,3 +74,26 @@ class VolumeBackupManager(base.ManagerWithFind):
         :param backup: The :class:`VolumeBackup` to delete.
         """
         self._delete("/backups/%s" % base.getid(backup))
+
+    def export_record(self, backup_id):
+        """Export volume backup metadata record.
+
+        :param backup_id: The ID of the backup to export.
+        :rtype: :class:`VolumeBackup`
+        """
+        resp, body = \
+            self.api.client.get("/backups/%s/export_record" % backup_id)
+        return body['backup-record']
+
+    def import_record(self, backup_service, backup_url):
+        """Export volume backup metadata record.
+
+        :param backup_service: Backup service to use for importing the backup
+        :param backup_urlBackup URL for importing the backup metadata
+        :rtype: :class:`VolumeBackup`
+        """
+        body = {'backup-record': {'backup_service': backup_service,
+                                  'backup_url': backup_url}}
+        self.run_hooks('modify_body_for_update', body, 'backup-record')
+        resp, body = self.api.client.post("/backups/import_record", body=body)
+        return body['backup']
