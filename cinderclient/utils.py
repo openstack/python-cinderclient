@@ -16,6 +16,7 @@
 from __future__ import print_function
 
 import os
+import pkg_resources
 import re
 import sys
 import uuid
@@ -285,6 +286,15 @@ def import_class(import_str):
     mod_str, _sep, class_str = import_str.rpartition('.')
     __import__(mod_str)
     return getattr(sys.modules[mod_str], class_str)
+
+
+def _load_entry_point(ep_name, name=None):
+    """Try to load the entry point ep_name that matches name."""
+    for ep in pkg_resources.iter_entry_points(ep_name, name=name):
+        try:
+            return ep.load()
+        except (ImportError, pkg_resources.UnknownExtra, AttributeError):
+            continue
 
 _slugify_strip_re = re.compile(r'[^\w\s-]')
 _slugify_hyphenate_re = re.compile(r'[-\s]+')

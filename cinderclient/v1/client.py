@@ -50,8 +50,8 @@ class Client(object):
                  endpoint_type='publicURL', extensions=None,
                  service_type='volume', service_name=None,
                  volume_service_name=None, retries=None,
-                 http_log_debug=False,
-                 cacert=None):
+                 http_log_debug=False, cacert=None,
+                 auth_system='keystone', auth_plugin=None):
         # FIXME(comstud): Rename the api_key argument above when we
         # know it's not being used as keyword argument
         password = api_key
@@ -97,7 +97,9 @@ class Client(object):
             volume_service_name=volume_service_name,
             retries=retries,
             http_log_debug=http_log_debug,
-            cacert=cacert)
+            cacert=cacert,
+            auth_system=auth_system,
+            auth_plugin=auth_plugin)
 
     def authenticate(self):
         """

@@ -54,16 +54,26 @@ class HTTPClient(object):
 
     USER_AGENT = 'python-cinderclient'
 
-    def __init__(self, user, password, projectid, auth_url, insecure=False,
-                 timeout=None, tenant_id=None, proxy_tenant_id=None,
-                 proxy_token=None, region_name=None,
+    def __init__(self, user, password, projectid, auth_url=None,
+                 insecure=False, timeout=None, tenant_id=None,
+                 proxy_tenant_id=None, proxy_token=None, region_name=None,
                  endpoint_type='publicURL', service_type=None,
                  service_name=None, volume_service_name=None, retries=None,
-                 http_log_debug=False, cacert=None):
+                 http_log_debug=False, cacert=None,
+                 auth_system='keystone', auth_plugin=None):
         self.user = user
         self.password = password
         self.projectid = projectid
         self.tenant_id = tenant_id
+
+        if auth_system and auth_system != 'keystone' and not auth_plugin:
+            raise exceptions.AuthSystemNotFound(auth_system)
+
+        if not auth_url and auth_system and auth_system != 'keystone':
+            auth_url = auth_plugin.get_auth_url()
+            if not auth_url:
+                raise exceptions.EndpointNotFound()
+
         self.auth_url = auth_url.rstrip('/')
         self.version = 'v1'
         self.region_name = region_name
@@ -87,6 +97,9 @@ class HTTPClient(object):
                 self.verify_cert = cacert
             else:
                 self.verify_cert = True
+
+        self.auth_system = auth_system
+        self.auth_plugin = auth_plugin
 
         self._logger = logging.getLogger(__name__)
         if self.http_log_debug and not self._logger.handlers:
@@ -295,7 +308,10 @@ class HTTPClient(object):
         auth_url = self.auth_url
         if self.version == "v2.0":
             while auth_url:
-                auth_url = self._v2_auth(auth_url)
+                if not self.auth_system or self.auth_system == 'keystone':
+                    auth_url = self._v2_auth(auth_url)
+                else:
+                    auth_url = self._plugin_auth(auth_url)
 
             # Are we acting on behalf of another user via an
             # existing token? If so, our actual endpoints may
@@ -340,6 +356,9 @@ class HTTPClient(object):
             return resp.headers['location']
         else:
             raise exceptions.from_response(resp, body)
+
+    def _plugin_auth(self, auth_url):
+        return self.auth_plugin.authenticate(self, auth_url)
 
     def _v2_auth(self, url):
         """Authenticate against a v2.0 auth service."""
