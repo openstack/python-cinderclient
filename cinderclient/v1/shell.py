@@ -725,6 +725,15 @@ def do_quota_update(cs, args):
     _quota_update(cs.quotas, args.tenant, args)
 
 
+@utils.arg('tenant', metavar='<tenant_id>',
+           help='UUID of tenant to delete the quotas for.')
+@utils.service_type('volume')
+def do_quota_delete(cs, args):
+    """Delete the quotas for a tenant."""
+
+    cs.quotas.delete(args.tenant)
+
+
 @utils.arg('class_name', metavar='<class>',
            help='Name of quota class to list the quotas for.')
 @utils.service_type('volume')

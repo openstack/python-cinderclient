@@ -412,6 +412,12 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'snapshots': 2,
                           'gigabytes': 1}})
 
+    def delete_os_quota_sets_1234(self, **kw):
+        return (200, {}, {})
+
+    def delete_os_quota_sets_test(self, **kw):
+        return (200, {}, {})
+
     #
     # Quota Classes
     #

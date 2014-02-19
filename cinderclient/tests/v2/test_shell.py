@@ -355,3 +355,7 @@ class ShellTest(utils.TestCase):
     def test_snapshot_delete(self):
         self.run_command('snapshot-delete 1234')
         self.assert_called('DELETE', '/snapshots/1234')
+
+    def test_quota_delete(self):
+        self.run_command('quota-delete 1234')
+        self.assert_called('DELETE', '/os-quota-sets/1234')
