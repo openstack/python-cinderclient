@@ -45,8 +45,9 @@ if not hasattr(urlparse, 'parse_qsl'):
 
 import requests
 
+from keystoneclient import access
+
 from cinderclient import exceptions
-from cinderclient import service_catalog
 from cinderclient import utils
 
 
@@ -223,19 +224,17 @@ class HTTPClient(object):
         if resp.status_code == 200:  # content must always present
             try:
                 self.auth_url = url
-                self.service_catalog = \
-                    service_catalog.ServiceCatalog(body)
+                self.auth_ref = access.AccessInfo.factory(resp, body)
+                self.service_catalog = self.auth_ref.service_catalog
 
                 if extract_token:
-                    self.auth_token = self.service_catalog.get_token()
+                    self.auth_token = self.auth_ref.auth_token
 
                 management_url = self.service_catalog.url_for(
                     attr='region',
                     filter_value=self.region_name,
                     endpoint_type=self.endpoint_type,
-                    service_type=self.service_type,
-                    service_name=self.service_name,
-                    volume_service_name=self.volume_service_name)
+                    service_type=self.service_type)
                 self.management_url = management_url.rstrip('/')
                 return None
             except exceptions.AmbiguousEndpoints:
