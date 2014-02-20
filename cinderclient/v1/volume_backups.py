@@ -58,7 +58,7 @@ class VolumeBackupManager(base.ManagerWithFind):
         """
         return self._get("/backups/%s" % backup_id, "backup")
 
-    def list(self, detailed=True):
+    def list(self, detailed=True, search_opts=None):
         """Get a list of all volume backups.
 
         :rtype: list of :class:`VolumeBackup`
