@@ -482,3 +482,100 @@ class ShellTest(utils.TestCase):
 
         self.run_command('snapshot-delete 5678')
         self.assert_called('DELETE', '/snapshots/5678')
+
+    @httpretty.activate
+    def test_volume_manage(self):
+        self.register_keystone_auth_fixture()
+        self.run_command('manage host1 key1=val1 key2=val2 '
+                         '--name foo --description bar '
+                         '--volume-type baz --availability-zone az '
+                         '--metadata k1=v1 k2=v2')
+        expected = {'volume': {'host': 'host1',
+                               'ref': {'key1': 'val1', 'key2': 'val2'},
+                               'name': 'foo',
+                               'description': 'bar',
+                               'volume_type': 'baz',
+                               'availability_zone': 'az',
+                               'metadata': {'k1': 'v1', 'k2': 'v2'},
+                               'bootable': False}}
+        self.assert_called_anytime('POST', '/os-volume-manage', body=expected)
+
+    @httpretty.activate
+    def test_volume_manage_bootable(self):
+        """
+        Tests the --bootable option
+
+        If this flag is specified, then the resulting POST should contain
+        bootable: True.
+        """
+        self.register_keystone_auth_fixture()
+        self.run_command('manage host1 key1=val1 key2=val2 '
+                         '--name foo --description bar --bootable '
+                         '--volume-type baz --availability-zone az '
+                         '--metadata k1=v1 k2=v2')
+        expected = {'volume': {'host': 'host1',
+                               'ref': {'key1': 'val1', 'key2': 'val2'},
+                               'name': 'foo',
+                               'description': 'bar',
+                               'volume_type': 'baz',
+                               'availability_zone': 'az',
+                               'metadata': {'k1': 'v1', 'k2': 'v2'},
+                               'bootable': True}}
+        self.assert_called_anytime('POST', '/os-volume-manage', body=expected)
+
+    @httpretty.activate
+    def test_volume_manage_source_name(self):
+        """
+        Tests the --source-name option.
+
+        Checks that the --source-name option correctly updates the
+        ref structure that is passed in the HTTP POST
+        """
+        self.register_keystone_auth_fixture()
+        self.run_command('manage host1 key1=val1 key2=val2 '
+                         '--source-name VolName '
+                         '--name foo --description bar '
+                         '--volume-type baz --availability-zone az '
+                         '--metadata k1=v1 k2=v2')
+        expected = {'volume': {'host': 'host1',
+                               'ref': {'source-name': 'VolName',
+                                       'key1': 'val1', 'key2': 'val2'},
+                               'name': 'foo',
+                               'description': 'bar',
+                               'volume_type': 'baz',
+                               'availability_zone': 'az',
+                               'metadata': {'k1': 'v1', 'k2': 'v2'},
+                               'bootable': False}}
+        self.assert_called_anytime('POST', '/os-volume-manage', body=expected)
+
+    @httpretty.activate
+    def test_volume_manage_source_id(self):
+        """
+        Tests the --source-id option.
+
+        Checks that the --source-id option correctly updates the
+        ref structure that is passed in the HTTP POST
+        """
+        self.register_keystone_auth_fixture()
+        self.run_command('manage host1 key1=val1 key2=val2 '
+                         '--source-id 1234 '
+                         '--name foo --description bar '
+                         '--volume-type baz --availability-zone az '
+                         '--metadata k1=v1 k2=v2')
+        expected = {'volume': {'host': 'host1',
+                               'ref': {'source-id': '1234',
+                                       'key1': 'val1', 'key2': 'val2'},
+                               'name': 'foo',
+                               'description': 'bar',
+                               'volume_type': 'baz',
+                               'availability_zone': 'az',
+                               'metadata': {'k1': 'v1', 'k2': 'v2'},
+                               'bootable': False}}
+        self.assert_called_anytime('POST', '/os-volume-manage', body=expected)
+
+    @httpretty.activate
+    def test_volume_unmanage(self):
+        self.register_keystone_auth_fixture()
+        self.run_command('unmanage 1234')
+        self.assert_called('POST', '/volumes/1234/action',
+                           body={'os-unmanage': None})

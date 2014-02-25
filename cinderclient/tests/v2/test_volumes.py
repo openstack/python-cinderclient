@@ -139,3 +139,22 @@ class VolumesTest(utils.TestCase):
         v = cs.volumes.get('1234')
         cs.volumes.set_bootable(v, True)
         cs.assert_called('POST', '/volumes/1234/action')
+
+    def test_volume_manage(self):
+        cs.volumes.manage('host1', {'k': 'v'})
+        expected = {'host': 'host1', 'name': None, 'availability_zone': None,
+                    'description': None, 'metadata': None, 'ref': {'k': 'v'},
+                    'volume_type': None, 'bootable': False}
+        cs.assert_called('POST', '/os-volume-manage', {'volume': expected})
+
+    def test_volume_manage_bootable(self):
+        cs.volumes.manage('host1', {'k': 'v'}, bootable=True)
+        expected = {'host': 'host1', 'name': None, 'availability_zone': None,
+                    'description': None, 'metadata': None, 'ref': {'k': 'v'},
+                    'volume_type': None, 'bootable': True}
+        cs.assert_called('POST', '/os-volume-manage', {'volume': expected})
+
+    def test_volume_unmanage(self):
+        v = cs.volumes.get('1234')
+        cs.volumes.unmanage(v)
+        cs.assert_called('POST', '/volumes/1234/action', {'os-unmanage': None})

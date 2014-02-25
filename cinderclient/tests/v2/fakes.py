@@ -370,6 +370,8 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert 'new_type' in body[action]
         elif action == 'os-set_bootable':
             assert list(body[action]) == ['bootable']
+        elif action == 'os-unmanage':
+            assert body[action] is None
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)
@@ -826,3 +828,8 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def put_snapshots_1234_metadata(self, **kw):
         return (200, {}, {"metadata": {"key1": "val1", "key2": "val2"}})
+
+    def post_os_volume_manage(self, **kw):
+        volume = _stub_volume(id='1234')
+        volume.update(kw['body']['volume'])
+        return (202, {}, {'volume': volume})
