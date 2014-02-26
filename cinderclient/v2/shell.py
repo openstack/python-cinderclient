@@ -668,6 +668,7 @@ def do_type_key(cs, args):
         vtype.unset_keys(list(keypair))
 
 
+@utils.service_type('volumev2')
 def do_endpoints(cs, args):
     """Discover endpoints that get returned from the authenticate services."""
     catalog = cs.client.service_catalog.catalog
@@ -675,6 +676,7 @@ def do_endpoints(cs, args):
         utils.print_dict(e['endpoints'][0], e['name'])
 
 
+@utils.service_type('volumev2')
 def do_credentials(cs, args):
     """Show user credentials returned from auth."""
     catalog = cs.client.service_catalog.catalog
@@ -1373,6 +1375,7 @@ def do_qos_disassociate_all(cs, args):
            nargs='+',
            default=[],
            help='QoS specs to set/unset (only key is necessary on unset)')
+@utils.service_type('volumev2')
 def do_qos_key(cs, args):
     """Set or unset specifications for a qos spec."""
     keypair = _extract_metadata(args)
