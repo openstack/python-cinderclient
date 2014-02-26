@@ -161,4 +161,4 @@ class TestLimitsManager(utils.TestCase):
 
         self.assertIsInstance(lim, limits.Limits)
         for l in lim.absolute:
-            self.assertEqual(l, l1)
+            self.assertEqual(l1, l)

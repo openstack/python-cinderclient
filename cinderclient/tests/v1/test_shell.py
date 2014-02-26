@@ -94,7 +94,7 @@ class ShellTest(utils.TestCase):
 
         for input in inputs:
             args = Arguments(metadata=input[0])
-            self.assertEqual(shell_v1._extract_metadata(args), input[1])
+            self.assertEqual(input[1], shell_v1._extract_metadata(args))
 
     def test_translate_volume_keys(self):
         cs = fakes.FakeClient()
