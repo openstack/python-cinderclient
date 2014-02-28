@@ -73,12 +73,11 @@ class VolumeEncryptionTypesTest(utils.TestCase):
         Verify that one POST request is made for the encryption type creation.
         Verify that encryption type creation returns a VolumeEncryptionType.
         """
-        result = cs.volume_encryption_types.create(2, {'encryption':
-                                                       {'provider': 'Test',
-                                                        'key_size': None,
-                                                        'cipher': None,
-                                                        'control_location':
-                                                        None}})
+        result = cs.volume_encryption_types.create(2, {'provider': 'Test',
+                                                       'key_size': None,
+                                                       'cipher': None,
+                                                       'control_location':
+                                                       None})
         cs.assert_called('POST', '/types/2/encryption')
         self.assertIsInstance(result, VolumeEncryptionType)
 
