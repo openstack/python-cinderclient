@@ -579,11 +579,12 @@ def do_type_create(cs, args):
 
 @utils.arg('id',
            metavar='<id>',
-           help="Unique ID of the volume type to delete")
+           help="Name or ID of the volume type to delete")
 @utils.service_type('volume')
 def do_type_delete(cs, args):
     """Delete a specific volume type."""
-    cs.volume_types.delete(args.id)
+    volume_type = _find_volume_type(cs, args.id)
+    cs.volume_types.delete(volume_type)
 
 
 @utils.arg('vtype',
