@@ -14,7 +14,7 @@
 #    under the License.
 
 from cinderclient import client
-from cinderclient.v1 import availability_zones
+from cinderclient.v2 import availability_zones
 from cinderclient.v2 import limits
 from cinderclient.v2 import qos_specs
 from cinderclient.v2 import quota_classes

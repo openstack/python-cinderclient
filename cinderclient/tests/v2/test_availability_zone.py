@@ -16,10 +16,10 @@
 
 import six
 
-from cinderclient.v1 import availability_zones
-from cinderclient.v1 import shell
+from cinderclient.v2 import availability_zones
+from cinderclient.v2 import shell
 from cinderclient.tests import utils
-from cinderclient.tests.v1 import fakes
+from cinderclient.tests.v2 import fakes
 
 
 cs = fakes.FakeClient()
