@@ -51,3 +51,17 @@ class VolumeBackupsTest(utils.TestCase):
         backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
         cs.restores.restore(backup_id)
         cs.assert_called('POST', '/backups/%s/restore' % backup_id)
+
+    def test_record_export(self):
+        backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
+        cs.backups.export_record(backup_id)
+        cs.assert_called('GET',
+                         '/backups/%s/export_record' % backup_id)
+
+    def test_record_import(self):
+        backup_service = 'fake-backup-service'
+        backup_url = 'fake-backup-url'
+        expected_body = {'backup-record': {'backup_service': backup_service,
+                                           'backup_url': backup_url}}
+        cs.backups.import_record(backup_service, backup_url)
+        cs.assert_called('POST', '/backups/import_record', expected_body)

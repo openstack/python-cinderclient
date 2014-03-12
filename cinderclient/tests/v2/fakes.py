@@ -572,6 +572,27 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (200, {},
                 {'restore': _stub_restore()})
 
+    def get_backups_76a17945_3c6f_435c_975b_b5685db10b62_export_record(self,
+                                                                       **kw):
+        return (200,
+                {},
+                {'backup-record': {'backup_service': 'fake-backup-service',
+                                   'backup_url': 'fake-backup-url'}})
+
+    def get_backups_1234_export_record(self, **kw):
+        return (200,
+                {},
+                {'backup-record': {'backup_service': 'fake-backup-service',
+                                   'backup_url': 'fake-backup-url'}})
+
+    def post_backups_import_record(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        backup1 = '76a17945-3c6f-435c-975b-b5685db10b62'
+        return (200,
+                {},
+                {'backup': _stub_backup(backup1, base_uri, tenant_id)})
+
     #
     # QoSSpecs
     #
