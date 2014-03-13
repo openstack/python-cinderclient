@@ -52,7 +52,7 @@ class ServiceManager(base.ManagerWithFind):
         return self.resource_class(self, result)
 
     def disable(self, host, binary):
-        """Enable the service specified by hostname and binary."""
+        """Disable the service specified by hostname and binary."""
         body = {"host": host, "binary": binary}
         result = self._update("/os-services/disable", body)
         return self.resource_class(self, result)
