@@ -24,7 +24,14 @@ fake_response = utils.TestResponse({
     "status_code": 200,
     "text": '{"hi": "there"}',
 })
+
+fake_response_empty = utils.TestResponse({
+    "status_code": 200,
+    "text": '{"access": {}}'
+})
+
 mock_request = mock.Mock(return_value=(fake_response))
+mock_request_empty = mock.Mock(return_value=(fake_response_empty))
 
 bad_400_response = utils.TestResponse({
     "status_code": 400,
@@ -197,8 +204,20 @@ class ClientTest(utils.TestCase):
         cl = get_client()
 
         # response must not have x-server-management-url header
+        @mock.patch.object(requests, "request", mock_request_empty)
+        def test_auth_call():
+            self.assertRaises(exceptions.AuthorizationFailure,
+                              cl.authenticate)
+
+        test_auth_call()
+
+    def test_auth_not_implemented(self):
+        cl = get_client()
+
+        # response must not have x-server-management-url header
+        # {'hi': 'there'} is neither V2 or V3
         @mock.patch.object(requests, "request", mock_request)
         def test_auth_call():
-            self.assertRaises(exceptions.AuthorizationFailure, cl.authenticate)
+            self.assertRaises(NotImplementedError, cl.authenticate)
 
         test_auth_call()

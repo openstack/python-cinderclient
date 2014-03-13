@@ -267,56 +267,6 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
 
         test_auth_call()
 
-    def test_ambiguous_endpoints(self):
-        cs = client.Client("username", "password", "project_id",
-                           "http://localhost:8776/v2", service_type='volumev2')
-        resp = {
-            "access": {
-                "token": {
-                    "expires": "12345",
-                    "id": "FAKE_ID",
-                },
-                "serviceCatalog": [
-                    {
-                        "adminURL": "http://localhost:8776/v1",
-                        "type": "volumev2",
-                        "name": "Cinder Volume Service",
-                        "endpoints": [
-                            {
-                                "region": "RegionOne",
-                                "internalURL": "http://localhost:8776/v1",
-                                "publicURL": "http://localhost:8776/v1",
-                            },
-                        ],
-                    },
-                    {
-                        "adminURL": "http://localhost:8776/v2",
-                        "type": "volumev2",
-                        "name": "Cinder Volume V2",
-                        "endpoints": [
-                            {
-                                "internalURL": "http://localhost:8776/v2",
-                                "publicURL": "http://localhost:8776/v2",
-                            },
-                        ],
-                    },
-                ],
-            },
-        }
-        auth_response = utils.TestResponse({
-            "status_code": 200,
-            "text": json.dumps(resp),
-        })
-
-        mock_request = mock.Mock(return_value=(auth_response))
-
-        @mock.patch.object(requests, "request", mock_request)
-        def test_auth_call():
-            self.assertRaises(exceptions.AmbiguousEndpoints,
-                              cs.client.authenticate)
-
-        test_auth_call()
-
 
 class AuthenticationTests(utils.TestCase):
     def test_authenticate_success(self):
