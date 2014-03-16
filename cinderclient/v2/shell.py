@@ -1118,6 +1118,10 @@ def do_service_list(cs, args):
     """List all the services. Filter by host & service binary."""
     result = cs.services.list(host=args.host, binary=args.binary)
     columns = ["Binary", "Host", "Zone", "Status", "State", "Updated_at"]
+    # NOTE(jay-lau-513): we check if the response has disabled_reason
+    # so as not to add the column when the extended ext is not enabled.
+    if result and hasattr(result[0], 'disabled_reason'):
+        columns.append("Disabled Reason")
     utils.print_list(result, columns)
 
 
@@ -1133,11 +1137,18 @@ def do_service_enable(cs, args):
 
 @utils.arg('host', metavar='<hostname>', help='Name of host.')
 @utils.arg('binary', metavar='<binary>', help='Service binary.')
+@utils.arg('--reason', metavar='<reason>',
+           help='Reason for disabling service.')
 @utils.service_type('volumev2')
 def do_service_disable(cs, args):
     """Disable the service."""
-    result = cs.services.disable(args.host, args.binary)
     columns = ["Host", "Binary", "Status"]
+    if args.reason:
+        columns.append('Disabled Reason')
+        result = cs.services.disable_log_reason(args.host, args.binary,
+                                                args.reason)
+    else:
+        result = cs.services.disable(args.host, args.binary)
     utils.print_list([result], columns)
 
 

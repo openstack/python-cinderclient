@@ -708,6 +708,11 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (200, {}, {'host': body['host'], 'binary': body['binary'],
                 'status': 'disabled'})
 
+    def put_os_services_disable_log_reason(self, body, **kw):
+        return (200, {}, {'host': body['host'], 'binary': body['binary'],
+                'status': 'disabled',
+                'disabled_reason': body['disabled_reason']})
+
     def get_os_availability_zone(self, **kw):
         return (200, {}, {
             "availabilityZoneInfo": [
