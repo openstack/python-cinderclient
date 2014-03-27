@@ -1,7 +1,7 @@
 pbr>=0.6,<1.0
 argparse
 PrettyTable>=0.7,<0.8
-python-keystoneclient>=0.6.0
+python-keystoneclient>=0.7.0
 requests>=1.1
 simplejson>=2.0.9
 Babel>=1.3
