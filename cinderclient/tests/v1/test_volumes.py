@@ -106,3 +106,8 @@ class VolumesTest(utils.TestCase):
         v = cs.volumes.get('1234')
         cs.volumes.update_readonly_flag(v, True)
         cs.assert_called('POST', '/volumes/1234/action')
+
+    def test_set_bootable(self):
+        v = cs.volumes.get('1234')
+        cs.volumes.set_bootable(v, True)
+        cs.assert_called('POST', '/volumes/1234/action')

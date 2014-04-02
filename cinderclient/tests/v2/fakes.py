@@ -365,6 +365,8 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert list(body[action]) == ['readonly']
         elif action == 'os-retype':
             assert 'new_type' in body[action]
+        elif action == 'os-set_bootable':
+            assert list(body[action]) == ['bootable']
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)
