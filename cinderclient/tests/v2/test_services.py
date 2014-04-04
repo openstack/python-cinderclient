@@ -64,3 +64,12 @@ class ServicesTest(utils.TestCase):
         cs.assert_called('PUT', '/os-services/disable', values)
         self.assertIsInstance(s, services.Service)
         self.assertEqual(s.status, 'disabled')
+
+    def test_services_disable_log_reason(self):
+        s = cs.services.disable_log_reason(
+            'host1', 'cinder-volume', 'disable bad host')
+        values = {"host": "host1", 'binary': 'cinder-volume',
+                  "disabled_reason": "disable bad host"}
+        cs.assert_called('PUT', '/os-services/disable-log-reason', values)
+        self.assertTrue(isinstance(s, services.Service))
+        self.assertEqual(s.status, 'disabled')

@@ -347,6 +347,13 @@ class ShellTest(utils.TestCase):
         self.assert_called('PUT', '/os-services/disable',
                            {"binary": "cinder-volume", "host": "host"})
 
+    def test_services_disable_with_reason(self):
+        cmd = 'service-disable host cinder-volume --reason no_reason'
+        self.run_command(cmd)
+        body = {'host': 'host', 'binary': 'cinder-volume',
+                'disabled_reason': 'no_reason'}
+        self.assert_called('PUT', '/os-services/disable-log-reason', body)
+
     def test_service_enable(self):
         self.run_command('service-enable host cinder-volume')
         self.assert_called('PUT', '/os-services/enable',
