@@ -29,6 +29,8 @@ import os
 import pkgutil
 import sys
 
+import requests
+
 from cinderclient import client
 from cinderclient import exceptions as exc
 from cinderclient import utils
@@ -477,6 +479,13 @@ class OpenStackCinderShell(object):
         streamhandler.setFormatter(logging.Formatter(streamformat))
         logger.setLevel(logging.WARNING)
         logger.addHandler(streamhandler)
+
+        client_logger = logging.getLogger(client.__name__)
+        ch = logging.StreamHandler()
+        client_logger.setLevel(logging.DEBUG)
+        client_logger.addHandler(ch)
+        if hasattr(requests, 'logging'):
+            requests.logging.getLogger(requests.__name__).addHandler(ch)
 
     def main(self, argv):
 

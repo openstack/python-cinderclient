@@ -212,12 +212,6 @@ class HTTPClient(CinderClientMixin):
         self.auth_plugin = auth_plugin
 
         self._logger = logging.getLogger(__name__)
-        if self.http_log_debug and not self._logger.handlers:
-            ch = logging.StreamHandler()
-            self._logger.setLevel(logging.DEBUG)
-            self._logger.addHandler(ch)
-            if hasattr(requests, 'logging'):
-                requests.logging.getLogger(requests.__name__).addHandler(ch)
 
     def http_log_req(self, args, kwargs):
         if not self.http_log_debug:
