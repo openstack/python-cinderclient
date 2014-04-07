@@ -95,7 +95,8 @@ class VolumesTest(utils.TestCase):
                                'project_id': None,
                                'metadata': {},
                                'source_replica': None,
-                               'consistencygroup_id': None},
+                               'consistencygroup_id': None,
+                               'multiattach': False},
                     'OS-SCH-HNT:scheduler_hints': 'uuid'}
         cs.assert_called('POST', '/volumes', body=expected)
 
@@ -111,7 +112,7 @@ class VolumesTest(utils.TestCase):
 
     def test_detach(self):
         v = cs.volumes.get('1234')
-        cs.volumes.detach(v)
+        cs.volumes.detach(v, 'abc123')
         cs.assert_called('POST', '/volumes/1234/action')
 
     def test_reserve(self):

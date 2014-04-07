@@ -234,10 +234,12 @@ def do_list(cs, args):
 
     if all_tenants:
         key_list = ['ID', 'Tenant ID', 'Status', 'Name',
-                    'Size', 'Volume Type', 'Bootable', 'Attached to']
+                    'Size', 'Volume Type', 'Bootable', 'Multiattach',
+                    'Attached to']
     else:
         key_list = ['ID', 'Status', 'Name',
-                    'Size', 'Volume Type', 'Bootable', 'Attached to']
+                    'Size', 'Volume Type', 'Bootable',
+                    'Multiattach', 'Attached to']
     if args.sort_key or args.sort_dir or args.sort:
         sortby_index = None
     else:
@@ -348,6 +350,12 @@ class CheckSizeArgForCreate(argparse.Action):
            action='append',
            default=[],
            help='Scheduler hint, like in nova.')
+@utils.arg('--allow-multiattach',
+           dest='multiattach',
+           action="store_true",
+           help=('Allow volume to be attached more than once.'
+                 ' Default=False'),
+           default=False)
 @utils.service_type('volumev2')
 def do_create(cs, args):
     """Creates a volume."""
@@ -391,7 +399,8 @@ def do_create(cs, args):
                                imageRef=image_ref,
                                metadata=volume_metadata,
                                scheduler_hints=hints,
-                               source_replica=args.source_replica)
+                               source_replica=args.source_replica,
+                               multiattach=args.multiattach)
 
     info = dict()
     volume = cs.volumes.get(volume.id)
