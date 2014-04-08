@@ -376,7 +376,9 @@ class FakeHTTPClient(base_client.HTTPClient):
         return self.post_volumes_1234_action(body, **kw)
 
     def post_volumes(self, **kw):
-        return (202, {}, {'volume': {}})
+        size = kw['body']['volume'].get('size', 1)
+        volume = _stub_volume(id='1234', size=size)
+        return (202, {}, {'volume': volume})
 
     def delete_volumes_1234(self, **kw):
         return (202, {}, None)

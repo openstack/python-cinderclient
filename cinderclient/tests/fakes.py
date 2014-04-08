@@ -34,7 +34,22 @@ def assert_has_keys(dict, required=[], optional=[]):
 
 class FakeClient(object):
 
-    def assert_called(self, method, url, body=None, pos=-1, **kwargs):
+    def _dict_match(self, partial, real):
+
+        result = True
+        try:
+            for key, value in partial.items():
+                if type(value) is dict:
+                    result = self._dict_match(value, real[key])
+                else:
+                    assert real[key] == value
+                    result = True
+        except (AssertionError, KeyError):
+            result = False
+        return result
+
+    def assert_called(self, method, url, body=None,
+                      partial_body=None, pos=-1, **kwargs):
         """
         Assert than an API method was just called.
         """
@@ -50,7 +65,17 @@ class FakeClient(object):
         if body is not None:
             assert self.client.callstack[pos][2] == body
 
-    def assert_called_anytime(self, method, url, body=None):
+        if partial_body is not None:
+            try:
+                assert self._dict_match(partial_body,
+                                        self.client.callstack[pos][2])
+            except AssertionError:
+                print(self.client.callstack[pos][2])
+                print("does not contain")
+                print(partial_body)
+                raise
+
+    def assert_called_anytime(self, method, url, body=None, partial_body=None):
         """
         Assert than an API method was called anytime in the test.
         """
@@ -75,6 +100,15 @@ class FakeClient(object):
                 print(entry[2])
                 print("!=")
                 print(body)
+                raise
+
+        if partial_body is not None:
+            try:
+                assert self._dict_match(partial_body, entry[2])
+            except AssertionError:
+                print(entry[2])
+                print("does not contain")
+                print(partial_body)
                 raise
 
     def clear_callstack(self):
