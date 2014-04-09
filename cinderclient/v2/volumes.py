@@ -180,8 +180,11 @@ class VolumeManager(base.ManagerWithFind):
                            'metadata': volume_metadata,
                            'imageRef': imageRef,
                            'source_volid': source_volid,
-                           'scheduler_hints': scheduler_hints,
                            }}
+
+        if scheduler_hints:
+            body['OS-SCH-HNT:scheduler_hints'] = scheduler_hints
+
         return self._create('/volumes', body, 'volume')
 
     def get(self, volume_id):

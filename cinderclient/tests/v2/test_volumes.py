@@ -36,6 +36,24 @@ class VolumesTest(utils.TestCase):
         cs.volumes.create(1)
         cs.assert_called('POST', '/volumes')
 
+    def test_create_volume_with_hint(self):
+        cs.volumes.create(1, scheduler_hints='uuid')
+        expected = {'volume': {'status': 'creating',
+                               'description': None,
+                               'availability_zone': None,
+                               'source_volid': None,
+                               'snapshot_id': None,
+                               'size': 1,
+                               'user_id': None,
+                               'name': None,
+                               'imageRef': None,
+                               'attach_status': 'detached',
+                               'volume_type': None,
+                               'project_id': None,
+                               'metadata': {}},
+                    'OS-SCH-HNT:scheduler_hints': 'uuid'}
+        cs.assert_called('POST', '/volumes', body=expected)
+
     def test_attach(self):
         v = cs.volumes.get('1234')
         cs.volumes.attach(v, 1, '/dev/vdc', mode='ro')
