@@ -128,6 +128,9 @@ class InstallVenv(object):
                                "install")
         return parser.parse_args(argv[1:])[0]
 
+    def post_process(self, **kwargs):
+        pass
+
 
 class Distro(InstallVenv):
 
