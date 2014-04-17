@@ -531,13 +531,21 @@ def do_snapshot_create(cs, args):
 
 
 @utils.arg('snapshot',
-           metavar='<snapshot>',
-           help='Name or ID of the snapshot to delete.')
+           metavar='<snapshot>', nargs='+',
+           help='Name or ID of the snapshot(s) to delete.')
 @utils.service_type('volumev2')
 def do_snapshot_delete(cs, args):
-    """Remove a snapshot."""
-    snapshot = _find_volume_snapshot(cs, args.snapshot)
-    snapshot.delete()
+    """Remove one or more snapshots."""
+    failure_count = 0
+    for snapshot in args.snapshot:
+        try:
+            _find_volume_snapshot(cs, snapshot).delete()
+        except Exception as e:
+            failure_count += 1
+            print("Delete for snapshot %s failed: %s" % (snapshot, e))
+    if failure_count == len(args.snapshot):
+        raise exceptions.CommandError("Unable to delete any of the specified "
+                                      "snapshots.")
 
 
 @utils.arg('snapshot', metavar='<snapshot>',
