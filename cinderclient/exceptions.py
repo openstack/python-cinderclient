@@ -181,4 +181,5 @@ def from_response(response, body):
         return cls(code=response.status_code, message=message, details=details,
                    request_id=request_id)
     else:
-        return cls(code=response.status_code, request_id=request_id)
+        return cls(code=response.status_code, request_id=request_id,
+                   message=response.reason)
