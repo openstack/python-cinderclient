@@ -31,6 +31,9 @@ Release Notes
 =============
 
 MASTER
+-----
+
+1.0.9
 ------
 .. _1255905: http://bugs.launchpad.net/python-cinderclient/+bug/1255905
 .. _1267168: http://bugs.launchpad.net/python-cinderclient/+bug/1267168
