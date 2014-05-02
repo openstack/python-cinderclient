@@ -42,7 +42,7 @@ class NoUniqueMatch(Exception):
 
 
 class AuthSystemNotFound(Exception):
-    """When the user specify a AuthSystem but not installed."""
+    """When the user specifies an AuthSystem but not installed."""
     def __init__(self, auth_system):
         self.auth_system = auth_system
 
