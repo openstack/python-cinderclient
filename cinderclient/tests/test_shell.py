@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 import re
 import sys
 
@@ -19,7 +20,7 @@ from six import moves
 from testtools import matchers
 
 from cinderclient import exceptions
-import cinderclient.shell
+from cinderclient import shell
 from cinderclient.tests import utils
 
 
@@ -43,7 +44,7 @@ class ShellTest(utils.TestCase):
         orig = sys.stdout
         try:
             sys.stdout = moves.StringIO()
-            _shell = cinderclient.shell.OpenStackCinderShell()
+            _shell = shell.OpenStackCinderShell()
             _shell.main(argstr.split())
         except SystemExit:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -78,3 +79,45 @@ class ShellTest(utils.TestCase):
         for r in required:
             self.assertThat(help_text,
                             matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
+
+
+class CinderClientArgumentParserTest(utils.TestCase):
+    def test_ambiguity_solved_for_one_visible_argument(self):
+        parser = shell.CinderClientArgumentParser(add_help=False)
+        parser.add_argument('--test-parameter',
+                            dest='visible_param',
+                            action='store_true')
+        parser.add_argument('--test_parameter',
+                            dest='hidden_param',
+                            action='store_true',
+                            help=argparse.SUPPRESS)
+
+        opts = parser.parse_args(['--test'])
+
+        #visible argument must be set
+        self.assertTrue(opts.visible_param)
+        self.assertFalse(opts.hidden_param)
+
+    def test_raise_ambiguity_error_two_visible_argument(self):
+        parser = shell.CinderClientArgumentParser(add_help=False)
+        parser.add_argument('--test-parameter',
+                            dest="visible_param1",
+                            action='store_true')
+        parser.add_argument('--test_parameter',
+                            dest="visible_param2",
+                            action='store_true')
+
+        self.assertRaises(SystemExit, parser.parse_args, ['--test'])
+
+    def test_raise_ambiguity_error_two_hidden_argument(self):
+        parser = shell.CinderClientArgumentParser(add_help=False)
+        parser.add_argument('--test-parameter',
+                            dest="hidden_param1",
+                            action='store_true',
+                            help=argparse.SUPPRESS)
+        parser.add_argument('--test_parameter',
+                            dest="hidden_param2",
+                            action='store_true',
+                            help=argparse.SUPPRESS)
+
+        self.assertRaises(SystemExit, parser.parse_args, ['--test'])
