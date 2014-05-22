@@ -202,25 +202,25 @@ def do_show(cs, args):
 @utils.arg('--snapshot-id',
            metavar='<snapshot-id>',
            default=None,
-           help='Creates volume from snapshot ID. OPTIONAL: Default=None.')
+           help='Creates volume from snapshot ID. Default=None.')
 @utils.arg('--snapshot_id',
            help=argparse.SUPPRESS)
 @utils.arg('--source-volid',
            metavar='<source-volid>',
            default=None,
-           help='Creates volume from volume ID. OPTIONAL: Default=None.')
+           help='Creates volume from volume ID. Default=None.')
 @utils.arg('--source_volid',
            help=argparse.SUPPRESS)
 @utils.arg('--image-id',
            metavar='<image-id>',
            default=None,
-           help='Creates volume from image ID. OPTIONAL: Default=None.')
+           help='Creates volume from image ID. Default=None.')
 @utils.arg('--image_id',
            help=argparse.SUPPRESS)
 @utils.arg('--name',
            metavar='<name>',
            default=None,
-           help='Volume name. OPTIONAL: Default=None.')
+           help='Volume name. Default=None.')
 @utils.arg('--display-name',
            help=argparse.SUPPRESS)
 @utils.arg('--display_name',
@@ -228,7 +228,7 @@ def do_show(cs, args):
 @utils.arg('--description',
            metavar='<description>',
            default=None,
-           help='Volume description. OPTIONAL: Default=None.')
+           help='Volume description. Default=None.')
 @utils.arg('--display-description',
            help=argparse.SUPPRESS)
 @utils.arg('--display_description',
@@ -236,20 +236,20 @@ def do_show(cs, args):
 @utils.arg('--volume-type',
            metavar='<volume-type>',
            default=None,
-           help='Volume type. OPTIONAL: Default=None.')
+           help='Volume type. Default=None.')
 @utils.arg('--volume_type',
            help=argparse.SUPPRESS)
 @utils.arg('--availability-zone',
            metavar='<availability-zone>',
            default=None,
-           help='Availability zone for volume. OPTIONAL: Default=None.')
+           help='Availability zone for volume. Default=None.')
 @utils.arg('--availability_zone',
            help=argparse.SUPPRESS)
 @utils.arg('--metadata',
            type=str,
            nargs='*',
            metavar='<key=value>',
-           help='Metadata key and value pairs. OPTIONAL: Default=None.',
+           help='Metadata key and value pairs. Default=None.',
            default=None)
 @utils.arg('--hint',
            metavar='<key=value>',
@@ -347,7 +347,7 @@ def do_force_delete(cs, args):
            help=('The state to assign to the volume. Valid values are '
                  '"available," "error," "creating," "deleting," and '
                  '"error_deleting." '
-                 'OPTIONAL: Default is available.'))
+                 'Default=available.'))
 @utils.service_type('volumev2')
 def do_reset_state(cs, args):
     """Explicitly updates the volume state."""
@@ -378,7 +378,7 @@ def do_reset_state(cs, args):
            metavar='<name>',
            help='New name for volume.')
 @utils.arg('--description', metavar='<description>',
-           help='Volume description. OPTIONAL: Default=None.',
+           help='Volume description. Default=None.',
            default=None)
 @utils.arg('--display-description',
            help=argparse.SUPPRESS)
@@ -446,7 +446,7 @@ def do_metadata(cs, args):
 @utils.arg('--name',
            metavar='<name>',
            default=None,
-           help='Filters results by a name. OPTIONAL: Default=None.')
+           help='Filters results by a name. Default=None.')
 @utils.arg('--display-name',
            help=argparse.SUPPRESS)
 @utils.arg('--display_name',
@@ -454,11 +454,11 @@ def do_metadata(cs, args):
 @utils.arg('--status',
            metavar='<status>',
            default=None,
-           help='Filters results by a status. OPTIONAL: Default=None.')
+           help='Filters results by a status. Default=None.')
 @utils.arg('--volume-id',
            metavar='<volume-id>',
            default=None,
-           help='Filters results by a volume ID. OPTIONAL: Default=None.')
+           help='Filters results by a volume ID. Default=None.')
 @utils.arg('--volume_id',
            help=argparse.SUPPRESS)
 @utils.service_type('volumev2')
@@ -502,12 +502,12 @@ def do_snapshot_show(cs, args):
            'If set to True, ignores the current status of the '
            'volume when attempting to snapshot it rather '
            'than forcing it to be available. '
-           'OPTIONAL: Default=False.',
+           'Default=False.',
            default=False)
 @utils.arg('--name',
            metavar='<name>',
            default=None,
-           help='Snapshot name. OPTIONAL: Default=None.')
+           help='Snapshot name. Default=None.')
 @utils.arg('--display-name',
            help=argparse.SUPPRESS)
 @utils.arg('--display_name',
@@ -515,7 +515,7 @@ def do_snapshot_show(cs, args):
 @utils.arg('--description',
            metavar='<description>',
            default=None,
-           help='Snapshot description. OPTIONAL: Default=None.')
+           help='Snapshot description. Default=None.')
 @utils.arg('--display-description',
            help=argparse.SUPPRESS)
 @utils.arg('--display_description',
@@ -560,7 +560,7 @@ def do_snapshot_delete(cs, args):
 @utils.arg('name', nargs='?', metavar='<name>',
            help='New name for snapshot.')
 @utils.arg('--description', metavar='<description>',
-           help='Snapshot description. OPTIONAL: Default=None.',
+           help='Snapshot description. Default=None.',
            default=None)
 @utils.arg('--display-description',
            help=argparse.SUPPRESS)
@@ -593,7 +593,7 @@ def do_snapshot_rename(cs, args):
            help=('The state to assign to the snapshot. Valid values are '
            '"available," "error," "creating," "deleting," and '
            '"error_deleting." '
-           'OPTIONAL: Default is "available."'))
+           'Default is "available."'))
 @utils.service_type('volumev2')
 def do_snapshot_reset_state(cs, args):
     """Explicitly updates the snapshot state."""
@@ -781,19 +781,19 @@ def do_quota_defaults(cs, args):
 @utils.arg('--volumes',
            metavar='<volumes>',
            type=int, default=None,
-           help='The new "volumes" quota value. OPTIONAL: Default=None.')
+           help='The new "volumes" quota value. Default=None.')
 @utils.arg('--snapshots',
            metavar='<snapshots>',
            type=int, default=None,
-           help='The new "snapshots" quota value. OPTIONAL: Default=None.')
+           help='The new "snapshots" quota value. Default=None.')
 @utils.arg('--gigabytes',
            metavar='<gigabytes>',
            type=int, default=None,
-           help='The new "gigabytes" quota value. OPTIONAL: Default=None.')
+           help='The new "gigabytes" quota value. Default=None.')
 @utils.arg('--volume-type',
            metavar='<volume_type_name>',
            default=None,
-           help='Volume type. OPTIONAL: Default=None.')
+           help='Volume type. Default=None.')
 @utils.service_type('volumev2')
 def do_quota_update(cs, args):
     """Updates quotas for a tenant."""
@@ -826,19 +826,19 @@ def do_quota_class_show(cs, args):
 @utils.arg('--volumes',
            metavar='<volumes>',
            type=int, default=None,
-           help='The new "volumes" quota value. OPTIONAL: Default=None.')
+           help='The new "volumes" quota value. Default=None.')
 @utils.arg('--snapshots',
            metavar='<snapshots>',
            type=int, default=None,
-           help='The new "snapshots" quota value. OPTIONAL: Default=None.')
+           help='The new "snapshots" quota value. Default=None.')
 @utils.arg('--gigabytes',
            metavar='<gigabytes>',
            type=int, default=None,
-           help='The new "gigabytes" quota value. OPTIONAL: Default=None.')
+           help='The new "gigabytes" quota value. Default=None.')
 @utils.arg('--volume-type',
            metavar='<volume_type_name>',
            default=None,
-           help='Volume type. OPTIONAL: Default=None.')
+           help='Volume type. Default=None.')
 @utils.service_type('volumev2')
 def do_quota_class_update(cs, args):
     """Updates quotas for a quota class."""
@@ -881,19 +881,19 @@ def _find_volume_type(cs, vtype):
            metavar='<True|False>',
            help='Enables or disables upload of '
            'a volume that is attached to an instance. '
-           'OPTIONAL: Default=False.',
+           'Default=False.',
            default=False)
 @utils.arg('--container-format',
            metavar='<container-format>',
            help='Container format type. '
-           'OPTIONAL: Default is bare.',
+           'Default is bare.',
            default='bare')
 @utils.arg('--container_format',
            help=argparse.SUPPRESS)
 @utils.arg('--disk-format',
            metavar='<disk-format>',
            help='Disk format type. '
-           'OPTIONAL: Default is raw.',
+           'Default is raw.',
            default='raw')
 @utils.arg('--disk_format',
            help=argparse.SUPPRESS)
@@ -918,7 +918,7 @@ def do_upload_to_image(cs, args):
            choices=['True', 'False'], required=False,
            help='Enables or disables generic host-based '
            'force-migration, which bypasses driver '
-           'optimizations. OPTIONAL: Default=False.',
+           'optimizations. Default=False.',
            default=False)
 @utils.service_type('volumev2')
 def do_migrate(cs, args):
@@ -943,19 +943,19 @@ def do_retype(cs, args):
 @utils.arg('volume', metavar='<volume>',
            help='Name or ID of volume to backup.')
 @utils.arg('--container', metavar='<container>',
-           help='Backup container name. OPTIONAL: Default=None.',
+           help='Backup container name. Default=None.',
            default=None)
 @utils.arg('--display-name',
            help=argparse.SUPPRESS)
 @utils.arg('--name', metavar='<name>',
-           help='Backup name. OPTIONAL: Default=None.',
+           help='Backup name. Default=None.',
            default=None)
 @utils.arg('--display-description',
            help=argparse.SUPPRESS)
 @utils.arg('--description',
            metavar='<description>',
            default=None,
-           help='Backup description. OPTIONAL: Default=None.')
+           help='Backup description. Default=None.')
 @utils.service_type('volumev2')
 def do_backup_create(cs, args):
     """Creates a volume backup."""
@@ -1017,7 +1017,7 @@ def do_backup_delete(cs, args):
            default=None)
 @utils.arg('--volume', metavar='<volume>',
            help='Name or ID of volume to which to restore. '
-           'OPTIONAL: Default=None.',
+           'Default=None.',
            default=None)
 @utils.service_type('volumev2')
 def do_backup_restore(cs, args):
@@ -1057,7 +1057,7 @@ def do_backup_import(cs, args):
 @utils.arg('--name',
            metavar='<name>',
            default=None,
-           help='Transfer name. OPTIONAL: Default=None.')
+           help='Transfer name. Default=None.')
 @utils.arg('--display-name',
            help=argparse.SUPPRESS)
 @utils.service_type('volumev2')
@@ -1135,9 +1135,9 @@ def do_extend(cs, args):
 
 
 @utils.arg('--host', metavar='<hostname>', default=None,
-           help='Host name. OPTIONAL: Default=None.')
+           help='Host name. Default=None.')
 @utils.arg('--binary', metavar='<binary>', default=None,
-           help='Service binary. OPTIONAL: Default=None.')
+           help='Service binary. Default=None.')
 @utils.service_type('volumev2')
 def do_service_list(cs, args):
     """Lists all services. Filter by host and service binary."""
@@ -1289,14 +1289,14 @@ def do_encryption_type_show(cs, args):
            required=False,
            default=None,
            help='The encryption algorithm or mode. '
-           'For example, aes-xts-plain64. OPTIONAL: Default=None.')
+           'For example, aes-xts-plain64. Default=None.')
 @utils.arg('--key_size',
            metavar='<key_size>',
            type=int,
            required=False,
            default=None,
            help='Size of encryption key, in bits. '
-           'For example, 128 or 256. OPTIONAL: Default=None.')
+           'For example, 128 or 256. Default=None.')
 @utils.arg('--control_location',
            metavar='<control_location>',
            choices=['front-end', 'back-end'],
@@ -1305,7 +1305,7 @@ def do_encryption_type_show(cs, args):
            default='front-end',
            help='Notional service where encryption is performed. '
            'Valid values are "front-end" or "back-end." '
-           'For example, front-end=Nova. OPTIONAL: Default is "front-end."')
+           'For example, front-end=Nova. Default is "front-end."')
 @utils.service_type('volumev2')
 def do_encryption_type_create(cs, args):
     """Creates encryption type for a volume type. Admin only."""
@@ -1388,7 +1388,7 @@ def do_qos_show(cs, args):
            metavar='<True|False>',
            default=False,
            help='Enables or disables deletion of in-use '
-                'QoS specifications. OPTIONAL: Default=False.')
+                'QoS specifications. Default=False.')
 @utils.service_type('volumev2')
 def do_qos_delete(cs, args):
     """Deletes a specified qos specs."""
