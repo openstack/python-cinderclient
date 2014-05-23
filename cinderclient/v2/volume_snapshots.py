@@ -67,7 +67,7 @@ class SnapshotManager(base.ManagerWithFind):
     resource_class = Snapshot
 
     def create(self, volume_id, force=False,
-               name=None, description=None):
+               name=None, description=None, metadata=None):
 
         """Creates a snapshot of the given volume.
 
@@ -76,12 +76,20 @@ class SnapshotManager(base.ManagerWithFind):
         attached to an instance. Default is False.
         :param name: Name of the snapshot
         :param description: Description of the snapshot
+        :param metadata: Metadata of the snapshot
         :rtype: :class:`Snapshot`
         """
+
+        if metadata is None:
+            snapshot_metadata = {}
+        else:
+            snapshot_metadata = metadata
+
         body = {'snapshot': {'volume_id': volume_id,
                              'force': force,
                              'name': name,
-                             'description': description}}
+                             'description': description,
+                             'metadata': snapshot_metadata}}
         return self._create('/snapshots', body, 'snapshot')
 
     def get(self, snapshot_id):
