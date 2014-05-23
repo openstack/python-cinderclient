@@ -24,19 +24,26 @@ import argparse
 import glob
 import imp
 import itertools
+import logging
 import os
 import pkgutil
 import sys
-import logging
 
-import cinderclient.auth_plugin
 from cinderclient import client
 from cinderclient import exceptions as exc
+from cinderclient import utils
+import cinderclient.auth_plugin
 import cinderclient.extension
 from cinderclient.openstack.common import strutils
-from cinderclient import utils
+from cinderclient.openstack.common.gettextutils import _
 from cinderclient.v1 import shell as shell_v1
 from cinderclient.v2 import shell as shell_v2
+
+from keystoneclient import discover
+from keystoneclient import session
+from keystoneclient.auth.identity import v2 as v2_auth
+from keystoneclient.auth.identity import v3 as v3_auth
+
 
 DEFAULT_OS_VOLUME_API_VERSION = "1"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
@@ -58,7 +65,7 @@ class CinderClientArgumentParser(argparse.ArgumentParser):
         exits.
         """
         self.print_usage(sys.stderr)
-        #FIXME(lzyeval): if changes occur in argparse.ArgParser._check_value
+        # FIXME(lzyeval): if changes occur in argparse.ArgParser._check_value
         choose_from = ' (choose from'
         progparts = self.prog.partition(' ')
         self.exit(2, "error: %(errmsg)s\nTry '%(mainp)s help %(subp)s'"
@@ -117,6 +124,116 @@ class OpenStackCinderShell(object):
                                               default=False),
                             help="Shows debugging output.")
 
+        parser.add_argument('--os-auth-system',
+                            metavar='<auth-system>',
+                            default=utils.env('OS_AUTH_SYSTEM'),
+                            help='Defaults to env[OS_AUTH_SYSTEM].')
+        parser.add_argument('--os_auth_system',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--service-type',
+                            metavar='<service-type>',
+                            help='Service type. '
+                            'For most actions, default is volume.')
+        parser.add_argument('--service_type',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--service-name',
+                            metavar='<service-name>',
+                            default=utils.env('CINDER_SERVICE_NAME'),
+                            help='Service name. '
+                            'Default=env[CINDER_SERVICE_NAME].')
+        parser.add_argument('--service_name',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--volume-service-name',
+                            metavar='<volume-service-name>',
+                            default=utils.env('CINDER_VOLUME_SERVICE_NAME'),
+                            help='Volume service name. '
+                            'Default=env[CINDER_VOLUME_SERVICE_NAME].')
+        parser.add_argument('--volume_service_name',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--endpoint-type',
+                            metavar='<endpoint-type>',
+                            default=utils.env('CINDER_ENDPOINT_TYPE',
+                                              default=
+                                              DEFAULT_CINDER_ENDPOINT_TYPE),
+                            help='Endpoint type, which is publicURL or '
+                            'internalURL. '
+                            'Default=nova env[CINDER_ENDPOINT_TYPE] or '
+                            + DEFAULT_CINDER_ENDPOINT_TYPE + '.')
+
+        parser.add_argument('--endpoint_type',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-volume-api-version',
+                            metavar='<volume-api-ver>',
+                            default=utils.env('OS_VOLUME_API_VERSION',
+                                              default=None),
+                            help='Block Storage API version. '
+                            'Valid values are 1 or 2. '
+                            'Default=env[OS_VOLUME_API_VERSION].')
+        parser.add_argument('--os_volume_api_version',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--retries',
+                            metavar='<retries>',
+                            type=int,
+                            default=0,
+                            help='Number of retries.')
+
+        self._append_global_identity_args(parser)
+
+        # FIXME(dtroyer): The args below are here for diablo compatibility,
+        #                 remove them in folsum cycle
+
+        # alias for --os-username, left in for backwards compatibility
+        parser.add_argument('--username',
+                            help=argparse.SUPPRESS)
+
+        # alias for --os-region_name, left in for backwards compatibility
+        parser.add_argument('--region_name',
+                            help=argparse.SUPPRESS)
+
+        # alias for --os-password, left in for backwards compatibility
+        parser.add_argument('--apikey', '--password', dest='apikey',
+                            default=utils.env('CINDER_API_KEY'),
+                            help=argparse.SUPPRESS)
+
+        # alias for --os-tenant-name, left in for backward compatibility
+        parser.add_argument('--projectid', '--tenant_name', dest='projectid',
+                            default=utils.env('CINDER_PROJECT_ID'),
+                            help=argparse.SUPPRESS)
+
+        # alias for --os-auth-url, left in for backward compatibility
+        parser.add_argument('--url', '--auth_url', dest='url',
+                            default=utils.env('CINDER_URL'),
+                            help=argparse.SUPPRESS)
+
+        # The auth-system-plugins might require some extra options
+        cinderclient.auth_plugin.discover_auth_systems()
+        cinderclient.auth_plugin.load_auth_system_opts(parser)
+
+        return parser
+
+    def _append_global_identity_args(self, parser):
+        # FIXME(bklei): these are global identity (Keystone) arguments which
+        # should be consistent and shared by all service clients. Therefore,
+        # they should be provided by python-keystoneclient. We will need to
+        # refactor this code once this functionality is available in
+        # python-keystoneclient.
+
+        parser.add_argument(
+            '--os-auth-strategy', metavar='<auth-strategy>',
+            default=utils.env('OS_AUTH_STRATEGY', default='keystone'),
+            help=_('Authentication strategy (Env: OS_AUTH_STRATEGY'
+                   ', default keystone). For now, any other value will'
+                   ' disable the authentication'))
+        parser.add_argument(
+            '--os_auth_strategy',
+            help=argparse.SUPPRESS)
+
         parser.add_argument('--os-username',
                             metavar='<auth-user-name>',
                             default=utils.env('OS_USERNAME',
@@ -162,6 +279,87 @@ class OpenStackCinderShell(object):
         parser.add_argument('--os_auth_url',
                             help=argparse.SUPPRESS)
 
+        parser.add_argument(
+            '--os-user-id', metavar='<auth-user-id>',
+            default=utils.env('OS_USER_ID'),
+            help=_('Authentication user ID (Env: OS_USER_ID)'))
+
+        parser.add_argument(
+            '--os_user_id',
+            help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os-user-domain-id',
+            metavar='<auth-user-domain-id>',
+            default=utils.env('OS_USER_DOMAIN_ID'),
+            help='OpenStack user domain ID. '
+            'Defaults to env[OS_USER_DOMAIN_ID].')
+
+        parser.add_argument(
+            '--os_user_domain_id',
+            help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os-user-domain-name',
+            metavar='<auth-user-domain-name>',
+            default=utils.env('OS_USER_DOMAIN_NAME'),
+            help='OpenStack user domain name. '
+                 'Defaults to env[OS_USER_DOMAIN_NAME].')
+
+        parser.add_argument(
+            '--os_user_domain_name',
+            help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os-project-id',
+            metavar='<auth-project-id>',
+            default=utils.env('OS_PROJECT_ID'),
+            help='Another way to specify tenant ID. '
+            'This option is mutually exclusive with '
+            ' --os-tenant-id. '
+            'Defaults to env[OS_PROJECT_ID].')
+
+        parser.add_argument(
+            '--os_project_id',
+            help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os-project-name',
+            metavar='<auth-project-name>',
+            default=utils.env('OS_PROJECT_NAME'),
+            help='Another way to specify tenant name. '
+                 'This option is mutually exclusive with '
+                 ' --os-tenant-name. '
+                 'Defaults to env[OS_PROJECT_NAME].')
+
+        parser.add_argument(
+            '--os_project_name',
+            help=argparse.SUPPRESS)
+
+        parser.add_argument(
+            '--os-project-domain-id',
+            metavar='<auth-project-domain-id>',
+            default=utils.env('OS_PROJECT_DOMAIN_ID'),
+            help='Defaults to env[OS_PROJECT_DOMAIN_ID].')
+
+        parser.add_argument(
+            '--os-project-domain-name',
+            metavar='<auth-project-domain-name>',
+            default=utils.env('OS_PROJECT_DOMAIN_NAME'),
+            help='Defaults to env[OS_PROJECT_DOMAIN_NAME].')
+
+        parser.add_argument(
+            '--os-cert',
+            metavar='<certificate>',
+            default=utils.env('OS_CERT'),
+            help='Defaults to env[OS_CERT].')
+
+        parser.add_argument(
+            '--os-key',
+            metavar='<key>',
+            default=utils.env('OS_KEY'),
+            help='Defaults to env[OS_KEY].')
+
         parser.add_argument('--os-region-name',
                             metavar='<region-name>',
                             default=utils.env('OS_REGION_NAME',
@@ -171,107 +369,35 @@ class OpenStackCinderShell(object):
         parser.add_argument('--os_region_name',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-auth-system',
-                            metavar='<auth-system>',
-                            default=utils.env('OS_AUTH_SYSTEM'),
-                            help='Defaults to env[OS_AUTH_SYSTEM].')
-        parser.add_argument('--os_auth_system',
-                            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--os-token', metavar='<token>',
+            default=utils.env('OS_TOKEN'),
+            help=_('Defaults to env[OS_TOKEN]'))
+        parser.add_argument(
+            '--os_token',
+            help=argparse.SUPPRESS)
 
-        parser.add_argument('--service-type',
-                            metavar='<service-type>',
-                            help='Service type. '
-                            'For most actions, default is volume.')
-        parser.add_argument('--service_type',
-                            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--os-url', metavar='<url>',
+            default=utils.env('OS_URL'),
+            help=_('Defaults to env[OS_URL]'))
+        parser.add_argument(
+            '--os_url',
+            help=argparse.SUPPRESS)
 
-        parser.add_argument('--service-name',
-                            metavar='<service-name>',
-                            default=utils.env('CINDER_SERVICE_NAME'),
-                            help='Service name. '
-                            'Default=env[CINDER_SERVICE_NAME].')
-        parser.add_argument('--service_name',
-                            help=argparse.SUPPRESS)
-
-        parser.add_argument('--volume-service-name',
-                            metavar='<volume-service-name>',
-                            default=utils.env('CINDER_VOLUME_SERVICE_NAME'),
-                            help='Volume service name. '
-                            'Default=env[CINDER_VOLUME_SERVICE_NAME].')
-        parser.add_argument('--volume_service_name',
-                            help=argparse.SUPPRESS)
-
-        parser.add_argument('--endpoint-type',
-                            metavar='<endpoint-type>',
-                            default=utils.env('CINDER_ENDPOINT_TYPE',
-                            default=DEFAULT_CINDER_ENDPOINT_TYPE),
-                            help='Endpoint type, which is publicURL or '
-                            'internalURL. '
-                            'Default=nova env[CINDER_ENDPOINT_TYPE] or '
-                            + DEFAULT_CINDER_ENDPOINT_TYPE + '.')
-        parser.add_argument('--endpoint_type',
-                            help=argparse.SUPPRESS)
-
-        parser.add_argument('--os-volume-api-version',
-                            metavar='<volume-api-ver>',
-                            default=utils.env('OS_VOLUME_API_VERSION',
-                            default=None),
-                            help='Block Storage API version. '
-                            'Valid values are 1 or 2. '
-                            'Default=env[OS_VOLUME_API_VERSION].')
-        parser.add_argument('--os_volume_api_version',
-                            help=argparse.SUPPRESS)
-
-        parser.add_argument('--os-cacert',
-                            metavar='<ca-certificate>',
-                            default=utils.env('OS_CACERT', default=None),
-                            help='A CA bundle file that is used to '
-                            'verify a TLS (https) server certificate. '
-                            'Default=env[OS_CACERT].')
+        parser.add_argument(
+            '--os-cacert',
+            metavar='<ca-certificate>',
+            default=utils.env('OS_CACERT', default=None),
+            help=_("Specify a CA bundle file to use in "
+                   "verifying a TLS (https) server certificate. "
+                   "Defaults to env[OS_CACERT]"))
 
         parser.add_argument('--insecure',
                             default=utils.env('CINDERCLIENT_INSECURE',
                                               default=False),
                             action='store_true',
                             help=argparse.SUPPRESS)
-
-        parser.add_argument('--retries',
-                            metavar='<retries>',
-                            type=int,
-                            default=0,
-                            help='Number of retries.')
-
-        # FIXME(dtroyer): The args below are here for diablo compatibility,
-        #                 remove them in folsum cycle
-
-        # alias for --os-username, left in for backwards compatibility
-        parser.add_argument('--username',
-                            help=argparse.SUPPRESS)
-
-        # alias for --os-region_name, left in for backwards compatibility
-        parser.add_argument('--region_name',
-                            help=argparse.SUPPRESS)
-
-        # alias for --os-password, left in for backwards compatibility
-        parser.add_argument('--apikey', '--password', dest='apikey',
-                            default=utils.env('CINDER_API_KEY'),
-                            help=argparse.SUPPRESS)
-
-        # alias for --os-tenant-name, left in for backward compatibility
-        parser.add_argument('--projectid', '--tenant_name', dest='projectid',
-                            default=utils.env('CINDER_PROJECT_ID'),
-                            help=argparse.SUPPRESS)
-
-        # alias for --os-auth-url, left in for backward compatibility
-        parser.add_argument('--url', '--auth_url', dest='url',
-                            default=utils.env('CINDER_URL'),
-                            help=argparse.SUPPRESS)
-
-        # The auth-system-plugins might require some extra options
-        cinderclient.auth_plugin.discover_auth_systems()
-        cinderclient.auth_plugin.load_auth_system_opts(parser)
-
-        return parser
 
     def get_subcommand_parser(self, version):
         parser = self.get_base_parser()
@@ -378,11 +504,13 @@ class OpenStackCinderShell(object):
         logger.addHandler(streamhandler)
 
     def main(self, argv):
+
         # Parse args once to find version and debug settings
         parser = self.get_base_parser()
         (options, args) = parser.parse_known_args(argv)
         self.setup_debugging(options.debug)
         api_version_input = True
+        self.options = options
 
         if not options.os_volume_api_version:
             # Environment variable OS_VOLUME_API_VERSION was
@@ -442,7 +570,7 @@ class OpenStackCinderShell(object):
             service_type = DEFAULT_CINDER_SERVICE_TYPE
             service_type = utils.get_service_type(args.func) or service_type
 
-        #FIXME(usrleon): Here should be restrict for project id same as
+        # FIXME(usrleon): Here should be restrict for project id same as
         # for os_username or os_password but for compatibility it is not.
 
         if not utils.isunauthenticated(args.func):
@@ -474,6 +602,28 @@ class OpenStackCinderShell(object):
                 else:
                     os_tenant_name = projectid
 
+            # V3 stuff
+            project_info_provided = self.options.os_tenant_name or \
+                self.options.os_tenant_id or \
+                (self.options.os_project_name and
+                 (self.options.project_domain_name or
+                  self.options.project_domain_id)) or \
+                self.options.os_project_id
+
+            if (not project_info_provided):
+                raise exc.CommandError(
+                    _("You must provide a tenant_name, tenant_id, "
+                      "project_id or project_name (with "
+                      "project_domain_name or project_domain_id) via "
+                      "  --os-tenant-name (env[OS_TENANT_NAME]),"
+                      "  --os-tenant-id (env[OS_TENANT_ID]),"
+                      "  --os-project-id (env[OS_PROJECT_ID])"
+                      "  --os-project-name (env[OS_PROJECT_NAME]),"
+                      "  --os-project-domain-id "
+                      "(env[OS_PROJECT_DOMAIN_ID])"
+                      "  --os-project-domain-name "
+                      "(env[OS_PROJECT_DOMAIN_NAME])"))
+
             if not os_auth_url:
                 if os_auth_system and os_auth_system != 'keystone':
                     os_auth_url = auth_plugin.get_auth_url()
@@ -499,6 +649,8 @@ class OpenStackCinderShell(object):
                 "You must provide an authentication URL "
                 "through --os-auth-url or env[OS_AUTH_URL].")
 
+        auth_session = self._get_keystone_session()
+
         self.cs = client.Client(options.os_volume_api_version, os_username,
                                 os_password, os_tenant_name, os_auth_url,
                                 insecure, region_name=os_region_name,
@@ -511,7 +663,8 @@ class OpenStackCinderShell(object):
                                 retries=options.retries,
                                 http_log_debug=args.debug,
                                 cacert=cacert, auth_system=os_auth_system,
-                                auth_plugin=auth_plugin)
+                                auth_plugin=auth_plugin,
+                                session=auth_session)
 
         try:
             if not utils.isunauthenticated(args.func):
@@ -588,9 +741,101 @@ class OpenStackCinderShell(object):
         else:
             self.parser.print_help()
 
+    def get_v2_auth(self, v2_auth_url):
+
+        username = self.options.os_username
+        password = self.options.os_password
+        tenant_id = self.options.os_tenant_id
+        tenant_name = self.options.os_tenant_name
+
+        return v2_auth.Password(
+            v2_auth_url,
+            username=username,
+            password=password,
+            tenant_id=tenant_id,
+            tenant_name=tenant_name)
+
+    def get_v3_auth(self, v3_auth_url):
+
+        username = self.options.os_username
+        user_id = self.options.os_user_id
+        user_domain_name = self.options.os_user_domain_name
+        user_domain_id = self.options.os_user_domain_id
+        password = self.options.os_password
+        project_id = self.options.os_project_id or self.options.os_tenant_id
+        project_name = (self.options.os_project_name
+                        or self.options.os_tenant_name)
+        project_domain_name = self.options.os_project_domain_name
+        project_domain_id = self.options.os_project_domain_id
+
+        return v3_auth.Password(
+            v3_auth_url,
+            username=username,
+            password=password,
+            user_id=user_id,
+            user_domain_name=user_domain_name,
+            user_domain_id=user_domain_id,
+            project_id=project_id,
+            project_name=project_name,
+            project_domain_name=project_domain_name,
+            project_domain_id=project_domain_id,
+        )
+
+    def _get_keystone_session(self, **kwargs):
+        # first create a Keystone session
+        cacert = self.options.os_cacert or None
+        cert = self.options.os_cert or None
+        insecure = self.options.insecure or False
+
+        if insecure:
+            verify = False
+        else:
+            verify = cacert or True
+        ks_session = session.Session(verify=verify, cert=cert)
+        # discover the supported keystone versions using the given url
+        ks_discover = discover.Discover(session=ks_session,
+                                        auth_url=self.options.os_auth_url)
+
+        # Determine which authentication plugin to use. First inspect the
+        # auth_url to see the supported version. If both v3 and v2 are
+        # supported, then use the highest version if possible.
+        v2_auth_url = ks_discover.url_for('v2.0')
+        v3_auth_url = ks_discover.url_for('v3.0')
+
+        username = self.options.os_username or None
+        user_domain_name = self.options.os_user_domain_name or None
+        user_domain_id = self.options.os_user_domain_id or None
+
+        auth = None
+        if v3_auth_url and v2_auth_url:
+            # support both v2 and v3 auth. Use v3 if possible.
+            if username:
+                if user_domain_name or user_domain_id:
+                    # use v3 auth
+                    auth = self.get_v3_auth(v3_auth_url)
+                else:
+                    # use v2 auth
+                    auth = self.get_v2_auth(v2_auth_url)
+
+        elif v3_auth_url:
+            # support only v3
+            auth = self.get_v3_auth(v3_auth_url)
+        elif v2_auth_url:
+            # support only v2
+            auth = self.get_v2_auth(v2_auth_url)
+        else:
+            raise exc.CommandError('Unable to determine the Keystone version '
+                                   'to authenticate with using the given '
+                                   'auth_url.')
+
+        ks_session.auth = auth
+        return ks_session
 
 # I'm picky about my shell help.
+
+
 class OpenStackHelpFormatter(argparse.HelpFormatter):
+
     def start_section(self, heading):
         # Title-case the headings
         heading = '%s%s' % (heading[0].upper(), heading[1:])
@@ -603,7 +848,7 @@ def main():
             OpenStackCinderShell().main(sys.argv[1:])
         else:
             OpenStackCinderShell().main(map(strutils.safe_decode,
-                                        sys.argv[1:]))
+                                            sys.argv[1:]))
     except KeyboardInterrupt:
         print("... terminating cinder client", file=sys.stderr)
         sys.exit(130)
@@ -614,4 +859,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()

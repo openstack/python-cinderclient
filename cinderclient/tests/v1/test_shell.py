@@ -22,6 +22,8 @@ from cinderclient import shell
 from cinderclient.v1 import shell as shell_v1
 from cinderclient.tests.v1 import fakes
 from cinderclient.tests import utils
+from cinderclient.tests.fixture_data import keystone_client
+import httpretty
 
 
 class ShellTest(utils.TestCase):
@@ -31,7 +33,7 @@ class ShellTest(utils.TestCase):
         'CINDER_PASSWORD': 'password',
         'CINDER_PROJECT_ID': 'project_id',
         'OS_VOLUME_API_VERSION': '1',
-        'CINDER_URL': 'http://no.where',
+        'CINDER_URL': keystone_client.BASE_URL,
     }
 
     # Patch os.environ to avoid required auth info.
@@ -44,7 +46,7 @@ class ShellTest(utils.TestCase):
 
         self.shell = shell.OpenStackCinderShell()
 
-        #HACK(bcwaldon): replace this when we start using stubs
+        # HACK(bcwaldon): replace this when we start using stubs
         self.old_get_client_class = client.get_client_class
         client.get_client_class = lambda *_: fakes.FakeClient
 
@@ -56,7 +58,7 @@ class ShellTest(utils.TestCase):
         if hasattr(self.shell, 'cs'):
             self.shell.cs.clear_callstack()
 
-        #HACK(bcwaldon): replace this when we start using stubs
+        # HACK(bcwaldon): replace this when we start using stubs
         client.get_client_class = self.old_get_client_class
         super(ShellTest, self).tearDown()
 
@@ -69,9 +71,14 @@ class ShellTest(utils.TestCase):
     def assert_called_anytime(self, method, url, body=None):
         return self.shell.cs.assert_called_anytime(method, url, body)
 
+    def register_keystone_auth_fixture(self):
+        httpretty.register_uri(httpretty.GET, keystone_client.BASE_URL,
+                               body=keystone_client.keystone_request_callback)
+
     def test_extract_metadata(self):
         # mimic the result of argparse's parse_args() method
         class Arguments:
+
             def __init__(self, metadata=[]):
                 self.metadata = metadata
 
@@ -88,63 +95,91 @@ class ShellTest(utils.TestCase):
             args = Arguments(metadata=input[0])
             self.assertEqual(shell_v1._extract_metadata(args), input[1])
 
+    @httpretty.activate
     def test_list(self):
+        self.register_keystone_auth_fixture()
         self.run_command('list')
         # NOTE(jdg): we default to detail currently
         self.assert_called('GET', '/volumes/detail')
 
+    @httpretty.activate
     def test_list_filter_status(self):
+        self.register_keystone_auth_fixture()
         self.run_command('list --status=available')
         self.assert_called('GET', '/volumes/detail?status=available')
 
+    @httpretty.activate
     def test_list_filter_display_name(self):
+        self.register_keystone_auth_fixture()
         self.run_command('list --display-name=1234')
         self.assert_called('GET', '/volumes/detail?display_name=1234')
 
+    @httpretty.activate
     def test_list_all_tenants(self):
+        self.register_keystone_auth_fixture()
         self.run_command('list --all-tenants=1')
         self.assert_called('GET', '/volumes/detail?all_tenants=1')
 
+    @httpretty.activate
     def test_list_availability_zone(self):
+        self.register_keystone_auth_fixture()
         self.run_command('availability-zone-list')
         self.assert_called('GET', '/os-availability-zone')
 
+    @httpretty.activate
     def test_show(self):
+        self.register_keystone_auth_fixture()
         self.run_command('show 1234')
         self.assert_called('GET', '/volumes/1234')
 
+    @httpretty.activate
     def test_delete(self):
+        self.register_keystone_auth_fixture()
         self.run_command('delete 1234')
         self.assert_called('DELETE', '/volumes/1234')
 
+    @httpretty.activate
     def test_delete_by_name(self):
+        self.register_keystone_auth_fixture()
         self.run_command('delete sample-volume')
         self.assert_called_anytime('GET', '/volumes/detail?all_tenants=1')
         self.assert_called('DELETE', '/volumes/1234')
 
+    @httpretty.activate
     def test_delete_multiple(self):
+        self.register_keystone_auth_fixture()
         self.run_command('delete 1234 5678')
         self.assert_called_anytime('DELETE', '/volumes/1234')
         self.assert_called('DELETE', '/volumes/5678')
 
+    @httpretty.activate
     def test_backup(self):
+        self.register_keystone_auth_fixture()
         self.run_command('backup-create 1234')
         self.assert_called('POST', '/backups')
 
+    @httpretty.activate
     def test_restore(self):
+        self.register_keystone_auth_fixture()
         self.run_command('backup-restore 1234')
         self.assert_called('POST', '/backups/1234/restore')
 
+    @httpretty.activate
     def test_snapshot_list_filter_volume_id(self):
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-list --volume-id=1234')
         self.assert_called('GET', '/snapshots/detail?volume_id=1234')
 
+    @httpretty.activate
     def test_snapshot_list_filter_status_and_volume_id(self):
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-list --status=available --volume-id=1234')
         self.assert_called('GET', '/snapshots/detail?'
                            'status=available&volume_id=1234')
 
+    @httpretty.activate
     def test_rename(self):
+        self.register_keystone_auth_fixture()
         # basic rename with positional arguments
         self.run_command('rename 1234 new-name')
         expected = {'volume': {'display_name': 'new-name'}}
@@ -165,7 +200,9 @@ class ShellTest(utils.TestCase):
         # Call rename with no arguments
         self.assertRaises(SystemExit, self.run_command, 'rename')
 
+    @httpretty.activate
     def test_rename_snapshot(self):
+        self.register_keystone_auth_fixture()
         # basic rename with positional arguments
         self.run_command('snapshot-rename 1234 new-name')
         expected = {'snapshot': {'display_name': 'new-name'}}
@@ -187,32 +224,44 @@ class ShellTest(utils.TestCase):
         # Call snapshot-rename with no arguments
         self.assertRaises(SystemExit, self.run_command, 'snapshot-rename')
 
+    @httpretty.activate
     def test_set_metadata_set(self):
+        self.register_keystone_auth_fixture()
         self.run_command('metadata 1234 set key1=val1 key2=val2')
         self.assert_called('POST', '/volumes/1234/metadata',
                            {'metadata': {'key1': 'val1', 'key2': 'val2'}})
 
+    @httpretty.activate
     def test_set_metadata_delete_dict(self):
+        self.register_keystone_auth_fixture()
         self.run_command('metadata 1234 unset key1=val1 key2=val2')
         self.assert_called('DELETE', '/volumes/1234/metadata/key1')
         self.assert_called('DELETE', '/volumes/1234/metadata/key2', pos=-2)
 
+    @httpretty.activate
     def test_set_metadata_delete_keys(self):
+        self.register_keystone_auth_fixture()
         self.run_command('metadata 1234 unset key1 key2')
         self.assert_called('DELETE', '/volumes/1234/metadata/key1')
         self.assert_called('DELETE', '/volumes/1234/metadata/key2', pos=-2)
 
+    @httpretty.activate
     def test_reset_state(self):
+        self.register_keystone_auth_fixture()
         self.run_command('reset-state 1234')
         expected = {'os-reset_status': {'status': 'available'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
 
+    @httpretty.activate
     def test_reset_state_with_flag(self):
+        self.register_keystone_auth_fixture()
         self.run_command('reset-state --state error 1234')
         expected = {'os-reset_status': {'status': 'error'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
 
+    @httpretty.activate
     def test_reset_state_multiple(self):
+        self.register_keystone_auth_fixture()
         self.run_command('reset-state 1234 5678 --state error')
         expected = {'os-reset_status': {'status': 'error'}}
         self.assert_called_anytime('POST', '/volumes/1234/action',
@@ -220,17 +269,24 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('POST', '/volumes/5678/action',
                                    body=expected)
 
+    @httpretty.activate
     def test_snapshot_reset_state(self):
+
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-reset-state 1234')
         expected = {'os-reset_status': {'status': 'available'}}
         self.assert_called('POST', '/snapshots/1234/action', body=expected)
 
+    @httpretty.activate
     def test_snapshot_reset_state_with_flag(self):
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-reset-state --state error 1234')
         expected = {'os-reset_status': {'status': 'error'}}
         self.assert_called('POST', '/snapshots/1234/action', body=expected)
 
+    @httpretty.activate
     def test_snapshot_reset_state_multiple(self):
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-reset-state 1234 5678')
         expected = {'os-reset_status': {'status': 'available'}}
         self.assert_called_anytime('POST', '/snapshots/1234/action',
@@ -238,6 +294,7 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('POST', '/snapshots/5678/action',
                                    body=expected)
 
+    @httpretty.activate
     def test_encryption_type_list(self):
         """
         Test encryption-type-list shell command.
@@ -246,11 +303,13 @@ class ShellTest(utils.TestCase):
         - one to get the volume type list information
         - one per volume type to retrieve the encryption type information
         """
+        self.register_keystone_auth_fixture()
         self.run_command('encryption-type-list')
         self.assert_called_anytime('GET', '/types')
         self.assert_called_anytime('GET', '/types/1/encryption')
         self.assert_called_anytime('GET', '/types/2/encryption')
 
+    @httpretty.activate
     def test_encryption_type_show(self):
         """
         Test encryption-type-show shell command.
@@ -259,10 +318,12 @@ class ShellTest(utils.TestCase):
         - one to get the volume type information
         - one to get the encryption type information
         """
+        self.register_keystone_auth_fixture()
         self.run_command('encryption-type-show 1')
         self.assert_called('GET', '/types/1/encryption')
         self.assert_called_anytime('GET', '/types/1')
 
+    @httpretty.activate
     def test_encryption_type_create(self):
         """
         Test encryption-type-create shell command.
@@ -271,6 +332,7 @@ class ShellTest(utils.TestCase):
         - one GET request to retrieve the relevant volume type information
         - one POST request to create the new encryption type
         """
+        self.register_keystone_auth_fixture()
         expected = {'encryption': {'cipher': None, 'key_size': None,
                                    'provider': 'TestProvider',
                                    'control_location': 'front-end'}}
@@ -289,6 +351,7 @@ class ShellTest(utils.TestCase):
         """
         self.skipTest("Not implemented")
 
+    @httpretty.activate
     def test_encryption_type_delete(self):
         """
         Test encryption-type-delete shell command.
@@ -297,43 +360,58 @@ class ShellTest(utils.TestCase):
         - one GET request to retrieve the relevant volume type information
         - one DELETE request to delete the encryption type information
         """
+        self.register_keystone_auth_fixture()
         self.run_command('encryption-type-delete 1')
         self.assert_called('DELETE', '/types/1/encryption/provider')
         self.assert_called_anytime('GET', '/types/1')
 
+    @httpretty.activate
     def test_migrate_volume(self):
+        self.register_keystone_auth_fixture()
         self.run_command('migrate 1234 fakehost --force-host-copy=True')
         expected = {'os-migrate_volume': {'force_host_copy': 'True',
                                           'host': 'fakehost'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
 
+    @httpretty.activate
     def test_snapshot_metadata_set(self):
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-metadata 1234 set key1=val1 key2=val2')
         self.assert_called('POST', '/snapshots/1234/metadata',
                            {'metadata': {'key1': 'val1', 'key2': 'val2'}})
 
+    @httpretty.activate
     def test_snapshot_metadata_unset_dict(self):
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-metadata 1234 unset key1=val1 key2=val2')
         self.assert_called_anytime('DELETE', '/snapshots/1234/metadata/key1')
         self.assert_called_anytime('DELETE', '/snapshots/1234/metadata/key2')
 
+    @httpretty.activate
     def test_snapshot_metadata_unset_keys(self):
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-metadata 1234 unset key1 key2')
         self.assert_called_anytime('DELETE', '/snapshots/1234/metadata/key1')
         self.assert_called_anytime('DELETE', '/snapshots/1234/metadata/key2')
 
+    @httpretty.activate
     def test_volume_metadata_update_all(self):
+        self.register_keystone_auth_fixture()
         self.run_command('metadata-update-all 1234 key1=val1 key2=val2')
         self.assert_called('PUT', '/volumes/1234/metadata',
                            {'metadata': {'key1': 'val1', 'key2': 'val2'}})
 
+    @httpretty.activate
     def test_snapshot_metadata_update_all(self):
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-metadata-update-all\
                          1234 key1=val1 key2=val2')
         self.assert_called('PUT', '/snapshots/1234/metadata',
                            {'metadata': {'key1': 'val1', 'key2': 'val2'}})
 
+    @httpretty.activate
     def test_readonly_mode_update(self):
+        self.register_keystone_auth_fixture()
         self.run_command('readonly-mode-update 1234 True')
         expected = {'os-update_readonly_flag': {'readonly': True}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
@@ -342,31 +420,43 @@ class ShellTest(utils.TestCase):
         expected = {'os-update_readonly_flag': {'readonly': False}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
 
+    @httpretty.activate
     def test_service_disable(self):
+        self.register_keystone_auth_fixture()
         self.run_command('service-disable host cinder-volume')
         self.assert_called('PUT', '/os-services/disable',
                            {"binary": "cinder-volume", "host": "host"})
 
+    @httpretty.activate
     def test_services_disable_with_reason(self):
+        self.register_keystone_auth_fixture()
         cmd = 'service-disable host cinder-volume --reason no_reason'
         self.run_command(cmd)
         body = {'host': 'host', 'binary': 'cinder-volume',
                 'disabled_reason': 'no_reason'}
         self.assert_called('PUT', '/os-services/disable-log-reason', body)
 
+    @httpretty.activate
     def test_service_enable(self):
+        self.register_keystone_auth_fixture()
         self.run_command('service-enable host cinder-volume')
         self.assert_called('PUT', '/os-services/enable',
                            {"binary": "cinder-volume", "host": "host"})
 
+    @httpretty.activate
     def test_snapshot_delete(self):
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-delete 1234')
         self.assert_called('DELETE', '/snapshots/1234')
 
+    @httpretty.activate
     def test_quota_delete(self):
+        self.register_keystone_auth_fixture()
         self.run_command('quota-delete 1234')
         self.assert_called('DELETE', '/os-quota-sets/1234')
 
+    @httpretty.activate
     def test_snapshot_delete_multiple(self):
+        self.register_keystone_auth_fixture()
         self.run_command('snapshot-delete 1234 5678')
         self.assert_called('DELETE', '/snapshots/5678')

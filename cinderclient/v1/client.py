@@ -51,7 +51,7 @@ class Client(object):
                  service_type='volume', service_name=None,
                  volume_service_name=None, retries=None,
                  http_log_debug=False, cacert=None,
-                 auth_system='keystone', auth_plugin=None):
+                 auth_system='keystone', auth_plugin=None, session=None):
         # FIXME(comstud): Rename the api_key argument above when we
         # know it's not being used as keyword argument
         password = api_key
@@ -80,16 +80,16 @@ class Client(object):
                     setattr(self, extension.name,
                             extension.manager_class(self))
 
-        self.client = client.HTTPClient(
-            username,
-            password,
-            project_id,
-            auth_url,
+        self.client = client._construct_http_client(
+            username=username,
+            password=password,
+            project_id=project_id,
+            auth_url=auth_url,
             insecure=insecure,
             timeout=timeout,
             tenant_id=tenant_id,
+            proxy_tenant_id=tenant_id,
             proxy_token=proxy_token,
-            proxy_tenant_id=proxy_tenant_id,
             region_name=region_name,
             endpoint_type=endpoint_type,
             service_type=service_type,
@@ -99,7 +99,8 @@ class Client(object):
             http_log_debug=http_log_debug,
             cacert=cacert,
             auth_system=auth_system,
-            auth_plugin=auth_plugin)
+            auth_plugin=auth_plugin,
+            session=session)
 
     def authenticate(self):
         """
