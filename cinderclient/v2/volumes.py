@@ -24,6 +24,11 @@ except ImportError:
 from cinderclient import base
 
 
+SORT_DIR_VALUES = ('asc', 'desc')
+SORT_KEY_VALUES = ('id', 'status', 'size', 'availability_zone', 'name',
+                   'bootable', 'created_at')
+
+
 class Volume(base.Resource):
     """A volume is an extra block level storage to the OpenStack instances."""
     def __repr__(self):
@@ -208,9 +213,17 @@ class VolumeManager(base.ManagerWithFind):
         """
         return self._get("/volumes/%s" % volume_id, "volume")
 
-    def list(self, detailed=True, search_opts=None):
+    def list(self, detailed=True, search_opts=None, marker=None, limit=None,
+             sort_key=None, sort_dir=None):
         """Lists all volumes.
 
+        :param detailed: Whether to return detailed volume info.
+        :param search_opts: Search options to filter out volumes.
+        :param marker: Begin returning volumes that appear later in the volume
+                       list than that represented by this volume id.
+        :param limit: Maximum number of volumes to return.
+        :param sort_key: Key to be sorted.
+        :param sort_dir: Sort direction, should be 'desc' or 'asc'.
         :rtype: list of :class:`Volume`
         """
         if search_opts is None:
@@ -222,7 +235,33 @@ class VolumeManager(base.ManagerWithFind):
             if val:
                 qparams[opt] = val
 
-        query_string = "?%s" % urlencode(qparams) if qparams else ""
+        if marker:
+            qparams['marker'] = marker
+
+        if limit:
+            qparams['limit'] = limit
+
+        if sort_key is not None:
+            if sort_key in SORT_KEY_VALUES:
+                qparams['sort_key'] = sort_key
+            else:
+                raise ValueError('sort_key must be one of the following: %s.'
+                                 % ', '.join(SORT_KEY_VALUES))
+
+        if sort_dir is not None:
+            if sort_dir in SORT_DIR_VALUES:
+                qparams['sort_dir'] = sort_dir
+            else:
+                raise ValueError('sort_dir must be one of the following: %s.'
+                                 % ', '.join(SORT_DIR_VALUES))
+
+        # Transform the dict to a sequence of two-element tuples in fixed
+        # order, then the encoded string will be consistent in Python 2&3.
+        if qparams:
+            new_qparams = sorted(qparams.items(), key=lambda x: x[0])
+            query_string = "?%s" % urlencode(new_qparams)
+        else:
+            query_string = ""
 
         detail = ""
         if detailed:

@@ -23,6 +23,22 @@ cs = fakes.FakeClient()
 
 class VolumesTest(utils.TestCase):
 
+    def test_list_volumes_with_marker_limit(self):
+        cs.volumes.list(marker=1234, limit=2)
+        cs.assert_called('GET', '/volumes/detail?limit=2&marker=1234')
+
+    def test_list_volumes_with_sort_key_dir(self):
+        cs.volumes.list(sort_key='id', sort_dir='asc')
+        cs.assert_called('GET', '/volumes/detail?sort_dir=asc&sort_key=id')
+
+    def test_list_volumes_with_invalid_sort_key(self):
+        self.assertRaises(ValueError,
+                          cs.volumes.list, sort_key='invalid', sort_dir='asc')
+
+    def test_list_volumes_with_invalid_sort_dir(self):
+        self.assertRaises(ValueError,
+                          cs.volumes.list, sort_key='id', sort_dir='invalid')
+
     def test_delete_volume(self):
         v = cs.volumes.list()[0]
         v.delete()
