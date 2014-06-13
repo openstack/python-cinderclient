@@ -28,7 +28,7 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
         resp = {
             "access": {
                 "token": {
-                    "expires": "12345",
+                    "expires": "2014-11-01T03:32:15-05:00",
                     "id": "FAKE_ID",
                 },
                 "serviceCatalog": [
@@ -95,7 +95,7 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
         resp = {
             "access": {
                 "token": {
-                    "expires": "12345",
+                    "expires": "2014-11-01T03:32:15-05:00",
                     "id": "FAKE_ID",
                     "tenant": {
                         "description": None,
@@ -186,7 +186,7 @@ class AuthenticateAgainstKeystoneTests(utils.TestCase):
         dict_correct_response = {
             "access": {
                 "token": {
-                    "expires": "12345",
+                    "expires": "2014-11-01T03:32:15-05:00",
                     "id": "FAKE_ID",
                 },
                 "serviceCatalog": [
