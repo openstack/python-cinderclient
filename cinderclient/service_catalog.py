@@ -79,7 +79,10 @@ class ServiceCatalog(object):
         if not matching_endpoints:
             raise cinderclient.exceptions.EndpointNotFound()
         elif len(matching_endpoints) > 1:
-            raise cinderclient.exceptions.AmbiguousEndpoints(
-                endpoints=matching_endpoints)
+            try:
+                eplist = [ep[attr] for ep in matching_endpoints]
+            except KeyError:
+                eplist = matching_endpoints
+            raise cinderclient.exceptions.AmbiguousEndpoints(endpoints=eplist)
         else:
             return matching_endpoints[0][endpoint_type]
