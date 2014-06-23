@@ -112,7 +112,7 @@ class Volume(base.Resource):
         :param volume: The UUID of the volume to extend.
         :param new_size: The desired size to extend volume to.
         """
-        self.manager.extend(self, volume, new_size)
+        self.manager.extend(self, new_size)
 
     def migrate_volume(self, host, force_host_copy):
         """Migrate the volume to a new host."""
@@ -134,7 +134,7 @@ class Volume(base.Resource):
         :param read_only: The value to indicate whether to update volume to
             read-only access mode.
         """
-        self.manager.update_readonly_flag(self, volume, read_only)
+        self.manager.update_readonly_flag(self, read_only)
 
 
 class VolumeManager(base.ManagerWithFind):
