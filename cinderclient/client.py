@@ -28,9 +28,11 @@ from keystoneclient.auth.identity import base
 import requests
 
 from cinderclient import exceptions
+from cinderclient.openstack.common import importutils
 from cinderclient.openstack.common import strutils
 from cinderclient import utils
 
+osprofiler_web = importutils.try_import("osprofiler.web")
 
 try:
     import urlparse
@@ -224,6 +226,10 @@ class HTTPClient(object):
         kwargs.setdefault('headers', kwargs.get('headers', {}))
         kwargs['headers']['User-Agent'] = self.USER_AGENT
         kwargs['headers']['Accept'] = 'application/json'
+
+        if osprofiler_web:
+            kwargs['headers'].update(osprofiler_web.get_trace_id_headers())
+
         if 'body' in kwargs:
             kwargs['headers']['Content-Type'] = 'application/json'
             kwargs['data'] = json.dumps(kwargs['body'])

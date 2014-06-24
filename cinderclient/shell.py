@@ -36,6 +36,7 @@ from cinderclient import exceptions as exc
 from cinderclient import utils
 import cinderclient.auth_plugin
 import cinderclient.extension
+from cinderclient.openstack.common import importutils
 from cinderclient.openstack.common import strutils
 from cinderclient.openstack.common.gettextutils import _
 from cinderclient.v1 import shell as shell_v1
@@ -48,6 +49,7 @@ from keystoneclient.auth.identity import v3 as v3_auth
 from keystoneclient.exceptions import DiscoveryFailure
 import six.moves.urllib.parse as urlparse
 
+osprofiler_profiler = importutils.try_import("osprofiler.profiler")
 
 DEFAULT_OS_VOLUME_API_VERSION = "1"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
@@ -185,6 +187,17 @@ class OpenStackCinderShell(object):
                             type=int,
                             default=0,
                             help='Number of retries.')
+
+        if osprofiler_profiler:
+            parser.add_argument('--profile',
+                                metavar='HMAC_KEY',
+                                help='HMAC key to use for encrypting context '
+                                'data for performance profiling of operation. '
+                                'This key needs to match the one configured '
+                                'on the cinder api server. '
+                                'Without key the profiling will not be '
+                                'triggered even if osprofiler is enabled '
+                                'on server side.')
 
         self._append_global_identity_args(parser)
 
@@ -671,7 +684,17 @@ class OpenStackCinderShell(object):
                                "to the default API version: %s" %
                                endpoint_api_version)
 
+        profile = osprofiler_profiler and options.profile
+        if profile:
+            osprofiler_profiler.init(options.profile)
+
         args.func(self.cs, args)
+
+        if profile:
+            trace_id = osprofiler_profiler.get().get_base_id()
+            print("Trace ID: %s" % trace_id)
+            print("To display trace use next command:\n"
+                  "osprofiler trace show --html %s " % trace_id)
 
     def _run_extension_hooks(self, hook_type, *args, **kwargs):
         """Runs hooks for all registered extensions."""
