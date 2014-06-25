@@ -49,6 +49,11 @@ V3_VERSION = {'id': 'v3.0',
               'status': 'stable',
               'updated': UPDATED}
 
+WRONG_VERSION_RESPONSE = {'id': 'v2.0',
+                          'links': [V2_DESCRIBED_BY_HTML, V2_DESCRIBED_BY_PDF],
+                          'status': 'stable',
+                          'updated': UPDATED}
+
 
 def _create_version_list(versions):
     return json.dumps({'versions': {'values': versions}})
@@ -206,7 +211,8 @@ def generate_v3_project_scoped_token(**kwargs):
 
 
 def keystone_request_callback(request, uri, headers):
-    response_headers = {"content-type": "application/json"}
+    response_headers = {"content-type": "application/json",
+                        'server': 'Python/HTTPretty', }
     if uri == BASE_URL:
         return (200, headers, V3_VERSION_LIST)
     elif uri == BASE_URL + "/v2.0":
@@ -216,3 +222,7 @@ def keystone_request_callback(request, uri, headers):
         token_id, token_data = generate_v3_project_scoped_token()
         response_headers["X-Subject-Token"] = token_id
         return (201, response_headers, token_data)
+    elif "WrongDiscoveryResponse.discovery.com" in uri:
+        return (200, response_headers, str(WRONG_VERSION_RESPONSE))
+    else:
+        return (500, response_headers, str(WRONG_VERSION_RESPONSE))

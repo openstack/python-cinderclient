@@ -43,6 +43,8 @@ from keystoneclient import discover
 from keystoneclient import session
 from keystoneclient.auth.identity import v2 as v2_auth
 from keystoneclient.auth.identity import v3 as v3_auth
+from keystoneclient.exceptions import DiscoveryFailure
+import six.moves.urllib.parse as urlparse
 
 
 DEFAULT_OS_VOLUME_API_VERSION = "1"
@@ -157,8 +159,7 @@ class OpenStackCinderShell(object):
         parser.add_argument('--endpoint-type',
                             metavar='<endpoint-type>',
                             default=utils.env('CINDER_ENDPOINT_TYPE',
-                                              default=
-                                              DEFAULT_CINDER_ENDPOINT_TYPE),
+                            default=DEFAULT_CINDER_ENDPOINT_TYPE),
                             help='Endpoint type, which is publicURL or '
                             'internalURL. '
                             'Default=nova env[CINDER_ENDPOINT_TYPE] or '
@@ -737,6 +738,36 @@ class OpenStackCinderShell(object):
             project_domain_id=project_domain_id,
         )
 
+    def _discover_auth_versions(self, session, auth_url):
+        # discover the API versions the server is supporting based on the
+        # given URL
+        v2_auth_url = None
+        v3_auth_url = None
+        try:
+            ks_discover = discover.Discover(session=session, auth_url=auth_url)
+            v2_auth_url = ks_discover.url_for('2.0')
+            v3_auth_url = ks_discover.url_for('3.0')
+        except DiscoveryFailure:
+            # Discovery response mismatch. Raise the error
+            raise
+        except Exception:
+            # Some public clouds throw some other exception or doesn't support
+            # discovery. In that case try to determine version from auth_url
+            # API version from the original URL
+            url_parts = urlparse.urlparse(auth_url)
+            (scheme, netloc, path, params, query, fragment) = url_parts
+            path = path.lower()
+            if path.startswith('/v3'):
+                v3_auth_url = auth_url
+            elif path.startswith('/v2'):
+                v2_auth_url = auth_url
+            else:
+                raise exc.CommandError('Unable to determine the Keystone'
+                                       ' version to authenticate with '
+                                       'using the given auth_url.')
+
+        return (v2_auth_url, v3_auth_url)
+
     def _get_keystone_session(self, **kwargs):
         # first create a Keystone session
         cacert = self.options.os_cacert or None
@@ -747,16 +778,12 @@ class OpenStackCinderShell(object):
             verify = False
         else:
             verify = cacert or True
+
         ks_session = session.Session(verify=verify, cert=cert)
         # discover the supported keystone versions using the given url
-        ks_discover = discover.Discover(session=ks_session,
-                                        auth_url=self.options.os_auth_url)
-
-        # Determine which authentication plugin to use. First inspect the
-        # auth_url to see the supported version. If both v3 and v2 are
-        # supported, then use the highest version if possible.
-        v2_auth_url = ks_discover.url_for('v2.0')
-        v3_auth_url = ks_discover.url_for('v3.0')
+        (v2_auth_url, v3_auth_url) = self._discover_auth_versions(
+            session=ks_session,
+            auth_url=self.options.os_auth_url)
 
         username = self.options.os_username or None
         user_domain_name = self.options.os_user_domain_name or None

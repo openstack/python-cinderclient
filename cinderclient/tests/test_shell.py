@@ -22,6 +22,9 @@ from testtools import matchers
 from cinderclient import exceptions
 from cinderclient import shell
 from cinderclient.tests import utils
+from cinderclient.tests.fixture_data import keystone_client
+from keystoneclient.exceptions import DiscoveryFailure
+import httpretty
 
 
 class ShellTest(utils.TestCase):
@@ -80,8 +83,36 @@ class ShellTest(utils.TestCase):
             self.assertThat(help_text,
                             matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
 
+    def register_keystone_auth_fixture(self, url):
+        httpretty.register_uri(httpretty.GET, url,
+                               body=keystone_client.keystone_request_callback)
+
+    @httpretty.activate
+    def test_version_discovery(self):
+        _shell = shell.OpenStackCinderShell()
+
+        os_auth_url = "https://WrongDiscoveryResponse.discovery.com:35357/v2.0"
+        self.register_keystone_auth_fixture(os_auth_url)
+        self.assertRaises(DiscoveryFailure, _shell._discover_auth_versions,
+                          None, auth_url=os_auth_url)
+
+        os_auth_url = "https://DiscoveryNotSupported.discovery.com:35357/v2.0"
+        self.register_keystone_auth_fixture(os_auth_url)
+        v2_url, v3_url = _shell._discover_auth_versions(
+            None, auth_url=os_auth_url)
+        self.assertEqual(v2_url, os_auth_url, "Expected v2 url")
+        self.assertEqual(v3_url, None, "Expected no v3 url")
+
+        os_auth_url = "https://DiscoveryNotSupported.discovery.com:35357/v3.0"
+        self.register_keystone_auth_fixture(os_auth_url)
+        v2_url, v3_url = _shell._discover_auth_versions(
+            None, auth_url=os_auth_url)
+        self.assertEqual(v3_url, os_auth_url, "Expected v3 url")
+        self.assertEqual(v2_url, None, "Expected no v2 url")
+
 
 class CinderClientArgumentParserTest(utils.TestCase):
+
     def test_ambiguity_solved_for_one_visible_argument(self):
         parser = shell.CinderClientArgumentParser(add_help=False)
         parser.add_argument('--test-parameter',
@@ -94,7 +125,7 @@ class CinderClientArgumentParserTest(utils.TestCase):
 
         opts = parser.parse_args(['--test'])
 
-        #visible argument must be set
+        # visible argument must be set
         self.assertTrue(opts.visible_param)
         self.assertFalse(opts.hidden_param)
 
