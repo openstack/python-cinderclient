@@ -353,8 +353,7 @@ class HTTPClient(CinderClientMixin):
                     self.auth_token = self.auth_ref.auth_token
 
                 management_url = self.service_catalog.url_for(
-                    attr='region',
-                    filter_value=self.region_name,
+                    region_name=self.region_name,
                     endpoint_type=self.endpoint_type,
                     service_type=self.service_type)
                 self.management_url = management_url.rstrip('/')
