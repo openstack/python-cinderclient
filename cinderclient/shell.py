@@ -185,32 +185,6 @@ class OpenStackCinderShell(object):
 
         self._append_global_identity_args(parser)
 
-        # FIXME(dtroyer): The args below are here for diablo compatibility,
-        #                 remove them in folsum cycle
-
-        # alias for --os-username, left in for backwards compatibility
-        parser.add_argument('--username',
-                            help=argparse.SUPPRESS)
-
-        # alias for --os-region_name, left in for backwards compatibility
-        parser.add_argument('--region_name',
-                            help=argparse.SUPPRESS)
-
-        # alias for --os-password, left in for backwards compatibility
-        parser.add_argument('--apikey', '--password', dest='apikey',
-                            default=utils.env('CINDER_API_KEY'),
-                            help=argparse.SUPPRESS)
-
-        # alias for --os-tenant-name, left in for backward compatibility
-        parser.add_argument('--projectid', '--tenant_name', dest='projectid',
-                            default=utils.env('CINDER_PROJECT_ID'),
-                            help=argparse.SUPPRESS)
-
-        # alias for --os-auth-url, left in for backward compatibility
-        parser.add_argument('--url', '--auth_url', dest='url',
-                            default=utils.env('CINDER_URL'),
-                            help=argparse.SUPPRESS)
-
         # The auth-system-plugins might require some extra options
         cinderclient.auth_plugin.discover_auth_systems()
         cinderclient.auth_plugin.load_auth_system_opts(parser)
@@ -546,16 +520,13 @@ class OpenStackCinderShell(object):
         (os_username, os_password, os_tenant_name, os_auth_url,
          os_region_name, os_tenant_id, endpoint_type, insecure,
          service_type, service_name, volume_service_name,
-         username, apikey, projectid, url, region_name, cacert,
-         os_auth_system) = (
+         cacert, os_auth_system) = (
              args.os_username, args.os_password,
              args.os_tenant_name, args.os_auth_url,
              args.os_region_name, args.os_tenant_id,
              args.endpoint_type, args.insecure,
              args.service_type, args.service_name,
-             args.volume_service_name, args.username,
-             args.apikey, args.projectid,
-             args.url, args.region_name, args.os_cacert,
+             args.volume_service_name, args.os_cacert,
              args.os_auth_system)
 
         if os_auth_system and os_auth_system != "keystone":
@@ -579,28 +550,19 @@ class OpenStackCinderShell(object):
 
             if not auth_plugin or not auth_plugin.opts:
                 if not os_username:
-                    if not username:
-                        raise exc.CommandError(
-                            "You must provide a user name "
-                            "through --os-username or env[OS_USERNAME].")
-                    else:
-                        os_username = username
+                    raise exc.CommandError("You must provide a user name "
+                                           "through --os-username or "
+                                           "env[OS_USERNAME].")
 
             if not os_password:
-                if not apikey:
-                    raise exc.CommandError("You must provide a password "
-                                           "through --os-password or "
-                                           "env[OS_PASSWORD].")
-                else:
-                    os_password = apikey
+                raise exc.CommandError("You must provide a password "
+                                       "through --os-password or "
+                                       "env[OS_PASSWORD].")
 
             if not (os_tenant_name or os_tenant_id):
-                if not projectid:
-                    raise exc.CommandError("You must provide a tenant ID "
-                                           "through --os-tenant-id or "
-                                           "env[OS_TENANT_ID].")
-                else:
-                    os_tenant_name = projectid
+                raise exc.CommandError("You must provide a tenant ID "
+                                       "through --os-tenant-id or "
+                                       "env[OS_TENANT_ID].")
 
             # V3 stuff
             project_info_provided = self.options.os_tenant_name or \
@@ -629,15 +591,9 @@ class OpenStackCinderShell(object):
                     os_auth_url = auth_plugin.get_auth_url()
 
             if not os_auth_url:
-                if not url:
-                    raise exc.CommandError(
-                        "You must provide an authentication URL "
-                        "through --os-auth-url or env[OS_AUTH_URL].")
-                else:
-                    os_auth_url = url
-
-            if not os_region_name and region_name:
-                os_region_name = region_name
+                raise exc.CommandError(
+                    "You must provide an authentication URL "
+                    "through --os-auth-url or env[OS_AUTH_URL].")
 
         if not (os_tenant_name or os_tenant_id):
             raise exc.CommandError(
