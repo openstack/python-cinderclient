@@ -154,7 +154,8 @@ def _print(pt, order):
         print(strutils.safe_encode(pt.get_string(sortby=order)))
 
 
-def print_list(objs, fields, formatters={}, order_by=None):
+def print_list(objs, fields, formatters=None, order_by=None):
+    formatters = formatters or {}
     mixed_case_fields = ['serverId']
     pt = prettytable.PrettyTable([f for f in fields], caching=False)
     pt.aligns = ['l' for f in fields]
