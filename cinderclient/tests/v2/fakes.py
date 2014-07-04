@@ -69,6 +69,32 @@ def _stub_snapshot(**kwargs):
     return snapshot
 
 
+def _stub_consistencygroup(**kwargs):
+    consistencygroup = {
+        "created_at": "2012-08-28T16:30:31.000000",
+        "description": None,
+        "name": "cg",
+        "id": "11111111-1111-1111-1111-111111111111",
+        "availability_zone": "myzone",
+        "status": "available",
+    }
+    consistencygroup.update(kwargs)
+    return consistencygroup
+
+
+def _stub_cgsnapshot(**kwargs):
+    cgsnapshot = {
+        "created_at": "2012-08-28T16:30:31.000000",
+        "description": None,
+        "name": None,
+        "id": "11111111-1111-1111-1111-111111111111",
+        "status": "available",
+        "consistencygroup_id": "00000000-0000-0000-0000-000000000000",
+    }
+    cgsnapshot.update(kwargs)
+    return cgsnapshot
+
+
 def _self_href(base_uri, tenant_id, backup_id):
     return '%s/v2/%s/backups/%s' % (base_uri, tenant_id, backup_id)
 
@@ -393,6 +419,43 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def delete_volumes_5678(self, **kw):
         return (202, {}, None)
+
+    #
+    # Consistencygroups
+    #
+
+    def get_consistencygroups_detail(self, **kw):
+        return (200, {}, {"consistencygroups": [
+            _stub_consistencygroup(id='1234'),
+            _stub_consistencygroup(id='4567')]})
+
+    def get_consistencygroups_1234(self, **kw):
+        return (200, {}, {'consistencygroup':
+                          _stub_consistencygroup(id='1234')})
+
+    def post_consistencygroups(self, **kw):
+        return (202, {}, {'consistencygroup': {}})
+
+    def post_consistencygroups_1234_delete(self, **kw):
+        return (202, {}, {})
+
+    #
+    # Cgsnapshots
+    #
+
+    def get_cgsnapshots_detail(self, **kw):
+        return (200, {}, {"cgsnapshots": [
+            _stub_cgsnapshot(id='1234'),
+            _stub_cgsnapshot(id='4567')]})
+
+    def get_cgsnapshots_1234(self, **kw):
+        return (200, {}, {'cgsnapshot': _stub_cgsnapshot(id='1234')})
+
+    def post_cgsnapshots(self, **kw):
+        return (202, {}, {'cgsnapshot': {}})
+
+    def delete_cgsnapshots_1234(self, **kw):
+        return (202, {}, {})
 
     #
     # Quotas
