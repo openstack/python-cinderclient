@@ -14,22 +14,23 @@
 #    under the License.
 
 from cinderclient.tests import utils
-from cinderclient.tests.v1 import fakes
+from cinderclient.tests.fixture_data import client
+from cinderclient.tests.fixture_data import snapshots
 
 
-cs = fakes.FakeClient()
+class SnapshotActionsTest(utils.FixturedTestCase):
 
+    client_fixture_class = client.V1
+    data_fixture_class = snapshots.Fixture
 
-class SnapshotActionsTest(utils.TestCase):
     def test_update_snapshot_status(self):
-        s = cs.volume_snapshots.get('1234')
-        cs.volume_snapshots.update_snapshot_status(s,
-                                                   {'status': 'available'})
-        cs.assert_called('POST', '/snapshots/1234/action')
+        s = self.cs.volume_snapshots.get('1234')
+        stat = {'status': 'available'}
+        self.cs.volume_snapshots.update_snapshot_status(s, stat)
+        self.assert_called('POST', '/snapshots/1234/action')
 
     def test_update_snapshot_status_with_progress(self):
-        s = cs.volume_snapshots.get('1234')
-        cs.volume_snapshots.update_snapshot_status(s,
-                                                   {'status': 'available',
-                                                    'progress': '73%'})
-        cs.assert_called('POST', '/snapshots/1234/action')
+        s = self.cs.volume_snapshots.get('1234')
+        stat = {'status': 'available', 'progress': '73%'}
+        self.cs.volume_snapshots.update_snapshot_status(s, stat)
+        self.assert_called('POST', '/snapshots/1234/action')
