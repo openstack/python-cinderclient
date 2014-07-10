@@ -210,19 +210,21 @@ def generate_v3_project_scoped_token(**kwargs):
     return token_id, o
 
 
-def keystone_request_callback(request, uri, headers):
-    response_headers = {"content-type": "application/json",
-                        'server': 'Python/HTTPretty', }
-    if uri == BASE_URL:
-        return (200, headers, V3_VERSION_LIST)
-    elif uri == BASE_URL + "/v2.0":
+def keystone_request_callback(request, context):
+    context.headers['Content-Type'] = 'application/json'
+
+    if request.url == BASE_URL:
+        return V3_VERSION_LIST
+    elif request.url == BASE_URL + "/v2.0":
         token_id, token_data = generate_v2_project_scoped_token()
-        return (200, response_headers, token_data)
-    elif uri == BASE_URL + "/v3":
+        return token_data
+    elif request.url == BASE_URL + "/v3":
         token_id, token_data = generate_v3_project_scoped_token()
-        response_headers["X-Subject-Token"] = token_id
-        return (201, response_headers, token_data)
-    elif "WrongDiscoveryResponse.discovery.com" in uri:
-        return (200, response_headers, str(WRONG_VERSION_RESPONSE))
+        context.headers["X-Subject-Token"] = token_id
+        context.status_code = 201
+        return token_data
+    elif "WrongDiscoveryResponse.discovery.com" in request.url:
+        return str(WRONG_VERSION_RESPONSE)
     else:
-        return (500, response_headers, str(WRONG_VERSION_RESPONSE))
+        context.status_code = 500
+        return str(WRONG_VERSION_RESPONSE)
