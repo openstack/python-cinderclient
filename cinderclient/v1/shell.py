@@ -332,22 +332,18 @@ def do_force_delete(cs, args):
 @utils.service_type('volume')
 def do_reset_state(cs, args):
     """Explicitly updates the volume state."""
-    failure_count = 0
-
-    single = (len(args.volume) == 1)
+    failure_flag = False
 
     for volume in args.volume:
         try:
             utils.find_volume(cs, volume).reset_state(args.state)
         except Exception as e:
-            failure_count += 1
+            failure_flag = True
             msg = "Reset state for volume %s failed: %s" % (volume, e)
-            if not single:
-                print(msg)
+            print(msg)
 
-    if failure_count == len(args.volume):
-        if not single:
-            msg = "Unable to reset the state for any of the specified volumes."
+    if failure_flag:
+        msg = "Unable to reset the state for the specified volume(s)."
         raise exceptions.CommandError(msg)
 
 

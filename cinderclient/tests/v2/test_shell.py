@@ -17,6 +17,7 @@ import fixtures
 import httpretty
 
 from cinderclient import client
+from cinderclient import exceptions
 from cinderclient import shell
 from cinderclient.tests import utils
 from cinderclient.tests.v2 import fakes
@@ -298,6 +299,21 @@ class ShellTest(utils.TestCase):
                                    body=expected)
         self.assert_called_anytime('POST', '/volumes/5678/action',
                                    body=expected)
+
+    @httpretty.activate
+    def test_reset_state_two_with_one_nonexistent(self):
+        self.register_keystone_auth_fixture()
+        cmd = 'reset-state 1234 123456789'
+        self.assertRaises(exceptions.CommandError, self.run_command, cmd)
+        expected = {'os-reset_status': {'status': 'available'}}
+        self.assert_called_anytime('POST', '/volumes/1234/action',
+                                   body=expected)
+
+    @httpretty.activate
+    def test_reset_state_one_with_one_nonexistent(self):
+        self.register_keystone_auth_fixture()
+        cmd = 'reset-state 123456789'
+        self.assertRaises(exceptions.CommandError, self.run_command, cmd)
 
     @httpretty.activate
     def test_snapshot_reset_state(self):
