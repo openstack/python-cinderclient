@@ -23,6 +23,7 @@ from __future__ import print_function
 import logging
 
 from cinderclient import exceptions
+from cinderclient.openstack.common import strutils
 from cinderclient import utils
 
 from keystoneclient import access
@@ -235,7 +236,11 @@ class HTTPClient(CinderClientMixin):
             string_parts.append(header)
 
         if 'data' in kwargs:
-            string_parts.append(" -d '%s'" % (kwargs['data']))
+            if "password" in kwargs['data']:
+                data = strutils.mask_password(kwargs['data'])
+            else:
+                data = kwargs['data']
+            string_parts.append(" -d '%s'" % (data))
         self._logger.debug("\nREQ: %s\n" % "".join(string_parts))
 
     def http_log_resp(self, resp):
