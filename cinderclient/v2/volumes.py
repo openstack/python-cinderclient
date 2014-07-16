@@ -422,3 +422,8 @@ class VolumeManager(base.ManagerWithFind):
                             volume,
                             {'new_type': volume_type,
                              'migration_policy': policy})
+
+    def set_bootable(self, volume, flag):
+        return self._action('os-set_bootable',
+                            base.getid(volume),
+                            {'bootable': flag})

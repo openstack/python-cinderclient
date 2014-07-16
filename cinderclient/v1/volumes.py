@@ -425,3 +425,8 @@ class VolumeManager(base.ManagerWithFind):
         return self._action('os-update_readonly_flag',
                             base.getid(volume),
                             {'readonly': flag})
+
+    def set_bootable(self, volume, flag):
+        return self._action('os-set_bootable',
+                            base.getid(volume),
+                            {'bootable': flag})

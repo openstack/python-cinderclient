@@ -1547,3 +1547,16 @@ def do_readonly_mode_update(cs, args):
     volume = utils.find_volume(cs, args.volume)
     cs.volumes.update_readonly_flag(volume,
                                     strutils.bool_from_string(args.read_only))
+
+
+@utils.arg('volume', metavar='<volume>', help='ID of the volume to update.')
+@utils.arg('bootable',
+           metavar='<True|true|False|false>',
+           choices=['True', 'true', 'False', 'false'],
+           help='Flag to indicate whether volume is bootable.')
+@utils.service_type('volumev2')
+def do_set_bootable(cs, args):
+    """Update bootable status of a volume."""
+    volume = utils.find_volume(cs, args.volume)
+    cs.volumes.set_bootable(volume,
+                            strutils.bool_from_string(args.bootable))

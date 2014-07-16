@@ -134,3 +134,8 @@ class VolumesTest(utils.TestCase):
         cs.assert_called('POST', '/volumes/1234/action',
                          {'os-retype': {'new_type': 'foo',
                                         'migration_policy': 'on-demand'}})
+
+    def test_set_bootable(self):
+        v = cs.volumes.get('1234')
+        cs.volumes.set_bootable(v, True)
+        cs.assert_called('POST', '/volumes/1234/action')
