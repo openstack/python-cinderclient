@@ -134,6 +134,19 @@ class Volume(base.Resource):
         """
         self.manager.update_readonly_flag(self, read_only)
 
+    def manage(self, host, ref, name=None, description=None,
+               volume_type=None, availability_zone=None, metadata=None,
+               bootable=False):
+        """Manage an existing volume."""
+        self.manager.manage(host=host, ref=ref, name=name,
+                            description=description, volume_type=volume_type,
+                            availability_zone=availability_zone,
+                            metadata=metadata, bootable=bootable)
+
+    def unmanage(self, volume):
+        """Unmanage a volume."""
+        self.manager.unmanage(volume)
+
 
 class VolumeManager(base.ManagerWithFind):
     """Manage :class:`Volume` resources."""
@@ -427,3 +440,22 @@ class VolumeManager(base.ManagerWithFind):
         return self._action('os-set_bootable',
                             base.getid(volume),
                             {'bootable': flag})
+
+    def manage(self, host, ref, name=None, description=None,
+               volume_type=None, availability_zone=None, metadata=None,
+               bootable=False):
+        """Manage an existing volume."""
+        body = {'volume': {'host': host,
+                           'ref': ref,
+                           'name': name,
+                           'description': description,
+                           'volume_type': volume_type,
+                           'availability_zone': availability_zone,
+                           'metadata': metadata,
+                           'bootable': bootable
+                           }}
+        return self._create('/os-volume-manage', body, 'volume')
+
+    def unmanage(self, volume):
+        """Unmanage a volume."""
+        return self._action('os-unmanage', volume, None)
