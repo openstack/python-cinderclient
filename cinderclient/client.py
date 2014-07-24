@@ -315,8 +315,7 @@ class HTTPClient(CinderClientMixin):
                 else:
                     raise
             except requests.exceptions.ConnectionError as e:
-                # Catch a connection refused from requests.request
-                self._logger.debug("Connection refused: %s" % e)
+                self._logger.debug("Connection error: %s" % e)
                 if attempts > self.retries:
                     msg = 'Unable to establish connection: %s' % e
                     raise exceptions.ConnectionError(msg)
