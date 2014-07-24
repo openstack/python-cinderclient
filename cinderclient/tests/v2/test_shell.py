@@ -14,13 +14,13 @@
 #    under the License.
 
 import fixtures
+import httpretty
 
 from cinderclient import client
 from cinderclient import shell
 from cinderclient.tests import utils
 from cinderclient.tests.v2 import fakes
 from cinderclient.tests.fixture_data import keystone_client
-import httpretty
 
 
 class ShellTest(utils.TestCase):
@@ -66,11 +66,15 @@ class ShellTest(utils.TestCase):
     def run_command(self, cmd):
         self.shell.main(cmd.split())
 
-    def assert_called(self, method, url, body=None, **kwargs):
-        return self.shell.cs.assert_called(method, url, body, **kwargs)
+    def assert_called(self, method, url, body=None,
+                      partial_body=None, **kwargs):
+        return self.shell.cs.assert_called(method, url, body,
+                                           partial_body, **kwargs)
 
-    def assert_called_anytime(self, method, url, body=None):
-        return self.shell.cs.assert_called_anytime(method, url, body)
+    def assert_called_anytime(self, method, url, body=None,
+                              partial_body=None):
+        return self.shell.cs.assert_called_anytime(method, url, body,
+                                                   partial_body)
 
     @httpretty.activate
     def test_list(self):
@@ -102,6 +106,41 @@ class ShellTest(utils.TestCase):
         self.register_keystone_auth_fixture()
         self.run_command('availability-zone-list')
         self.assert_called('GET', '/os-availability-zone')
+
+    @httpretty.activate
+    def test_create_volume_from_snapshot(self):
+        self.register_keystone_auth_fixture()
+        expected = {'volume': {'size': None}}
+
+        expected['volume']['snapshot_id'] = '1234'
+        self.run_command('create --snapshot-id=1234')
+        self.assert_called_anytime('POST', '/volumes', partial_body=expected)
+        self.assert_called('GET', '/volumes/1234')
+
+        expected['volume']['size'] = 2
+        self.run_command('create --snapshot-id=1234 2')
+        self.assert_called_anytime('POST', '/volumes', partial_body=expected)
+        self.assert_called('GET', '/volumes/1234')
+
+    @httpretty.activate
+    def test_create_volume_from_volume(self):
+        self.register_keystone_auth_fixture()
+        expected = {'volume': {'size': None}}
+
+        expected['volume']['source_volid'] = '1234'
+        self.run_command('create --source-volid=1234')
+        self.assert_called_anytime('POST', '/volumes', partial_body=expected)
+        self.assert_called('GET', '/volumes/1234')
+
+        expected['volume']['size'] = 2
+        self.run_command('create --source-volid=1234 2')
+        self.assert_called_anytime('POST', '/volumes', partial_body=expected)
+        self.assert_called('GET', '/volumes/1234')
+
+    @httpretty.activate
+    def test_create_size_required_if_not_snapshot_or_clone(self):
+        self.register_keystone_auth_fixture()
+        self.assertRaises(SystemExit, self.run_command, 'create')
 
     @httpretty.activate
     def test_show(self):
