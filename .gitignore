@@ -8,6 +8,7 @@ cover
 *.pyc
 AUTHORS
 ChangeLog
+doc/build
 build
 dist
 cinderclient/versioninfo
