@@ -22,15 +22,35 @@ cs = fakes.FakeClient()
 
 
 class TypesTest(utils.TestCase):
+
     def test_list_types(self):
         tl = cs.volume_types.list()
         cs.assert_called('GET', '/types')
         for t in tl:
             self.assertIsInstance(t, volume_types.VolumeType)
 
+    def test_list_types_not_public(self):
+        cs.volume_types.list(is_public=None)
+        cs.assert_called('GET', '/types?is_public=None')
+
     def test_create(self):
-        t = cs.volume_types.create('test-type-3')
-        cs.assert_called('POST', '/types')
+        t = cs.volume_types.create('test-type-3', 'test-type-3-desc')
+        cs.assert_called('POST', '/types',
+                         {'volume_type': {
+                          'name': 'test-type-3',
+                          'description': 'test-type-3-desc',
+                          'os-volume-type-access:is_public': True
+                          }})
+        self.assertIsInstance(t, volume_types.VolumeType)
+
+    def test_create_non_public(self):
+        t = cs.volume_types.create('test-type-3', 'test-type-3-desc', False)
+        cs.assert_called('POST', '/types',
+                         {'volume_type': {
+                          'name': 'test-type-3',
+                          'description': 'test-type-3-desc',
+                          'os-volume-type-access:is_public': False
+                          }})
         self.assertIsInstance(t, volume_types.VolumeType)
 
     def test_update(self):

@@ -25,6 +25,7 @@ from cinderclient.v2 import services
 from cinderclient.v2 import volumes
 from cinderclient.v2 import volume_snapshots
 from cinderclient.v2 import volume_types
+from cinderclient.v2 import volume_type_access
 from cinderclient.v2 import volume_encryption_types
 from cinderclient.v2 import volume_backups
 from cinderclient.v2 import volume_backups_restore
@@ -61,6 +62,8 @@ class Client(object):
         self.volumes = volumes.VolumeManager(self)
         self.volume_snapshots = volume_snapshots.SnapshotManager(self)
         self.volume_types = volume_types.VolumeTypeManager(self)
+        self.volume_type_access = \
+            volume_type_access.VolumeTypeAccessManager(self)
         self.volume_encryption_types = \
             volume_encryption_types.VolumeEncryptionTypeManager(self)
         self.qos_specs = qos_specs.QoSSpecsManager(self)
