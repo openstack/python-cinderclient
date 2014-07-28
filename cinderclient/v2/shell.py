@@ -226,7 +226,8 @@ def do_show(cs, args):
 
 class CheckSizeArgForCreate(argparse.Action):
     def __call__(self, parser, args, values, option_string=None):
-        if (values or args.snapshot_id or args.source_volid) is None:
+        if (values or args.snapshot_id or args.source_volid
+           or args.source_replica) is None:
             parser.error('Size is a required parameter if snapshot '
                          'or source volume is not specified.')
         setattr(args, self.dest, values)
@@ -251,6 +252,10 @@ class CheckSizeArgForCreate(argparse.Action):
            help='Creates volume from volume ID. Default=None.')
 @utils.arg('--source_volid',
            help=argparse.SUPPRESS)
+@utils.arg('--source-replica',
+           metavar='<source-replica>',
+           default=None,
+           help='Creates volume from replicated volume ID. Default=None.')
 @utils.arg('--image-id',
            metavar='<image-id>',
            default=None,
@@ -335,7 +340,8 @@ def do_create(cs, args):
                                availability_zone=args.availability_zone,
                                imageRef=args.image_id,
                                metadata=volume_metadata,
-                               scheduler_hints=hints)
+                               scheduler_hints=hints,
+                               source_replica=args.source_replica)
 
     info = dict()
     volume = cs.volumes.get(volume.id)
@@ -1672,3 +1678,19 @@ def do_manage(cs, args):
 @utils.service_type('volumev2')
 def do_unmanage(cs, args):
     utils.find_volume(cs, args.volume).unmanage(args.volume)
+
+
+@utils.arg('volume', metavar='<volume>',
+           help='Name or ID of the volume to promote.')
+@utils.service_type('volumev2')
+def do_replication_promote(cs, args):
+    """Promote a secondary volume to primary for a relationship."""
+    utils.find_volume(cs, args.volume).promote(args.volume)
+
+
+@utils.arg('volume', metavar='<volume>',
+           help='Name or ID of the volume to reenable replication.')
+@utils.service_type('volumev2')
+def do_replication_reenable(cs, args):
+    """Sync the secondary volume with primary for a relationship."""
+    utils.find_volume(cs, args.volume).reenable(args.volume)

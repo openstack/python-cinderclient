@@ -137,6 +137,14 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('POST', '/volumes', partial_body=expected)
         self.assert_called('GET', '/volumes/1234')
 
+    def test_create_volume_from_replica(self):
+        expected = {'volume': {'size': None}}
+
+        expected['volume']['source_replica'] = '1234'
+        self.run_command('create --source-replica=1234')
+        self.assert_called_anytime('POST', '/volumes', partial_body=expected)
+        self.assert_called('GET', '/volumes/1234')
+
     def test_create_size_required_if_not_snapshot_or_clone(self):
         self.assertRaises(SystemExit, self.run_command, 'create')
 
@@ -522,3 +530,13 @@ class ShellTest(utils.TestCase):
         self.run_command('unmanage 1234')
         self.assert_called('POST', '/volumes/1234/action',
                            body={'os-unmanage': None})
+
+    def test_replication_promote(self):
+        self.run_command('replication-promote 1234')
+        self.assert_called('POST', '/volumes/1234/action',
+                           body={'os-promote-replica': None})
+
+    def test_replication_reenable(self):
+        self.run_command('replication-reenable 1234')
+        self.assert_called('POST', '/volumes/1234/action',
+                           body={'os-reenable-replica': None})
