@@ -95,6 +95,16 @@ class ShellTest(utils.TestCase):
             args = Arguments(metadata=input[0])
             self.assertEqual(shell_v1._extract_metadata(args), input[1])
 
+    def test_translate_volume_keys(self):
+        cs = fakes.FakeClient()
+        v = cs.volumes.list()[0]
+        setattr(v, 'os-vol-tenant-attr:tenant_id', 'fake_tenant')
+        setattr(v, '_info', {'attachments': [{'server_id': 1234}],
+                'id': 1234, 'name': 'sample-volume',
+                'os-vol-tenant-attr:tenant_id': 'fake_tenant'})
+        shell_v1._translate_volume_keys([v])
+        self.assertEqual(v.tenant_id, 'fake_tenant')
+
     @httpretty.activate
     def test_list(self):
         self.register_keystone_auth_fixture()

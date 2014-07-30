@@ -101,7 +101,8 @@ def _translate_keys(collection, convert):
 
 
 def _translate_volume_keys(collection):
-    convert = [('displayName', 'display_name'), ('volumeType', 'volume_type')]
+    convert = [('displayName', 'display_name'), ('volumeType', 'volume_type'),
+               ('os-vol-tenant-attr:tenant_id', 'tenant_id')]
     _translate_keys(collection, convert)
 
 
@@ -179,8 +180,13 @@ def do_list(cs, args):
     for vol in volumes:
         servers = [s.get('server_id') for s in vol.attachments]
         setattr(vol, 'attached_to', ','.join(map(str, servers)))
-    utils.print_list(volumes, ['ID', 'Status', 'Display Name',
-                     'Size', 'Volume Type', 'Bootable', 'Attached to'])
+    if all_tenants:
+        key_list = ['ID', 'Tenant ID', 'Status', 'Display Name',
+                    'Size', 'Volume Type', 'Bootable', 'Attached to']
+    else:
+        key_list = ['ID', 'Status', 'Display Name',
+                    'Size', 'Volume Type', 'Bootable', 'Attached to']
+    utils.print_list(volumes, key_list)
 
 
 @utils.arg('volume', metavar='<volume>', help='Volume name or ID.')
