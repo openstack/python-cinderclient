@@ -621,11 +621,6 @@ def _print_volume_type_list(vtypes):
     utils.print_list(vtypes, ['ID', 'Name'])
 
 
-def _print_type_and_extra_specs_list(vtypes):
-    formatters = {'extra_specs': _print_type_extra_specs}
-    utils.print_list(vtypes, ['ID', 'Name', 'extra_specs'], formatters)
-
-
 @utils.service_type('volumev2')
 def do_type_list(cs, args):
     """Lists available 'volume types'."""
@@ -635,9 +630,9 @@ def do_type_list(cs, args):
 
 @utils.service_type('volumev2')
 def do_extra_specs_list(cs, args):
-    """Lists current volume types and extra specs. Admin only."""
+    """Lists current volume types and extra specs."""
     vtypes = cs.volume_types.list()
-    _print_type_and_extra_specs_list(vtypes)
+    utils.print_list(vtypes, ['ID', 'Name', 'extra_specs'])
 
 
 @utils.arg('name',
@@ -860,13 +855,6 @@ def do_rate_limits(cs, args):
     limits = cs.limits.get().rate
     columns = ['Verb', 'URI', 'Value', 'Remain', 'Unit', 'Next_Available']
     utils.print_list(limits, columns)
-
-
-def _print_type_extra_specs(vol_type):
-    try:
-        return vol_type.get_keys()
-    except exceptions.NotFound:
-        return "N/A"
 
 
 def _find_volume_type(cs, vtype):
