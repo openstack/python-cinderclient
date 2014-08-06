@@ -77,49 +77,49 @@ class TestLimits(utils.TestCase):
         l2 = limits.RateLimit("verb2", "uri2", "regex2", "value2", "remain2",
                               "unit2", "next2")
         for item in l.rate:
-            self.assertTrue(item in [l1, l2])
+            self.assertIn(item, [l1, l2])
 
 
 class TestRateLimit(utils.TestCase):
     def test_equal(self):
         l1 = _get_default_RateLimit()
         l2 = _get_default_RateLimit()
-        self.assertTrue(l1 == l2)
+        self.assertEqual(l1, l2)
 
     def test_not_equal_verbs(self):
         l1 = _get_default_RateLimit()
         l2 = _get_default_RateLimit(verb="verb2")
-        self.assertFalse(l1 == l2)
+        self.assertNotEqual(l1, l2)
 
     def test_not_equal_uris(self):
         l1 = _get_default_RateLimit()
         l2 = _get_default_RateLimit(uri="uri2")
-        self.assertFalse(l1 == l2)
+        self.assertNotEqual(l1, l2)
 
     def test_not_equal_regexps(self):
         l1 = _get_default_RateLimit()
         l2 = _get_default_RateLimit(regex="regex2")
-        self.assertFalse(l1 == l2)
+        self.assertNotEqual(l1, l2)
 
     def test_not_equal_values(self):
         l1 = _get_default_RateLimit()
         l2 = _get_default_RateLimit(value="value2")
-        self.assertFalse(l1 == l2)
+        self.assertNotEqual(l1, l2)
 
     def test_not_equal_remains(self):
         l1 = _get_default_RateLimit()
         l2 = _get_default_RateLimit(remain="remain2")
-        self.assertFalse(l1 == l2)
+        self.assertNotEqual(l1, l2)
 
     def test_not_equal_units(self):
         l1 = _get_default_RateLimit()
         l2 = _get_default_RateLimit(unit="unit2")
-        self.assertFalse(l1 == l2)
+        self.assertNotEqual(l1, l2)
 
     def test_not_equal_next_available(self):
         l1 = _get_default_RateLimit()
         l2 = _get_default_RateLimit(next_available="next2")
-        self.assertFalse(l1 == l2)
+        self.assertNotEqual(l1, l2)
 
     def test_repr(self):
         l1 = _get_default_RateLimit()
@@ -130,17 +130,17 @@ class TestAbsoluteLimit(utils.TestCase):
     def test_equal(self):
         l1 = limits.AbsoluteLimit("name1", "value1")
         l2 = limits.AbsoluteLimit("name1", "value1")
-        self.assertTrue(l1 == l2)
+        self.assertEqual(l1, l2)
 
     def test_not_equal_values(self):
         l1 = limits.AbsoluteLimit("name1", "value1")
         l2 = limits.AbsoluteLimit("name1", "value2")
-        self.assertFalse(l1 == l2)
+        self.assertNotEqual(l1, l2)
 
     def test_not_equal_names(self):
         l1 = limits.AbsoluteLimit("name1", "value1")
         l2 = limits.AbsoluteLimit("name2", "value1")
-        self.assertFalse(l1 == l2)
+        self.assertNotEqual(l1, l2)
 
     def test_repr(self):
         l1 = limits.AbsoluteLimit("name1", "value1")
