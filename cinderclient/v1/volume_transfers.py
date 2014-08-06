@@ -17,6 +17,11 @@
 Volume transfer interface (1.1 extension).
 """
 
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
+import six
 from cinderclient import base
 
 
@@ -69,10 +74,23 @@ class VolumeTransferManager(base.ManagerWithFind):
 
         :rtype: list of :class:`VolumeTransfer`
         """
-        if detailed is True:
-            return self._list("/os-volume-transfer/detail", "transfers")
-        else:
-            return self._list("/os-volume-transfer", "transfers")
+        if search_opts is None:
+            search_opts = {}
+
+        qparams = {}
+
+        for opt, val in six.iteritems(search_opts):
+            if val:
+                qparams[opt] = val
+
+        query_string = "?%s" % urlencode(qparams) if qparams else ""
+
+        detail = ""
+        if detailed:
+            detail = "/detail"
+
+        return self._list("/os-volume-transfer%s%s" % (detail, query_string),
+                          "transfers")
 
     def delete(self, transfer_id):
         """Delete a volume transfer.

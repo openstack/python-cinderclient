@@ -641,3 +641,11 @@ class ShellTest(utils.TestCase):
     def test_get_pools_detail(self):
         self.run_command('get-pools --detail')
         self.assert_called('GET', '/scheduler-stats/get_pools?detail=True')
+
+    def test_list_transfer(self):
+        self.run_command('transfer-list')
+        self.assert_called('GET', '/os-volume-transfer/detail')
+
+    def test_list_transfer_all_tenants(self):
+        self.run_command('transfer-list --all-tenants=1')
+        self.assert_called('GET', '/os-volume-transfer/detail?all_tenants=1')

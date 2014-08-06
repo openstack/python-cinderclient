@@ -400,3 +400,11 @@ class ShellTest(utils.TestCase):
     def test_snapshot_delete_multiple(self):
         self.run_command('snapshot-delete 1234 5678')
         self.assert_called('DELETE', '/snapshots/5678')
+
+    def test_list_transfer(self):
+        self.run_command('transfer-list')
+        self.assert_called('GET', '/os-volume-transfer/detail')
+
+    def test_list_transfer_all_tenants(self):
+        self.run_command('transfer-list --all-tenants=1')
+        self.assert_called('GET', '/os-volume-transfer/detail?all_tenants=1')

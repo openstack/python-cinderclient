@@ -1270,10 +1270,27 @@ def do_transfer_accept(cs, args):
     utils.print_dict(info)
 
 
+@utils.arg('--all-tenants',
+           dest='all_tenants',
+           metavar='<0|1>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=0,
+           help='Shows details for all tenants. Admin only.')
+@utils.arg('--all_tenants',
+           nargs='?',
+           type=int,
+           const=1,
+           help=argparse.SUPPRESS)
 @utils.service_type('volumev2')
 def do_transfer_list(cs, args):
     """Lists all transfers."""
-    transfers = cs.transfers.list()
+    all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
+    search_opts = {
+        'all_tenants': all_tenants,
+    }
+    transfers = cs.transfers.list(search_opts=search_opts)
     columns = ['ID', 'Volume ID', 'Name']
     utils.print_list(transfers, columns)
 
