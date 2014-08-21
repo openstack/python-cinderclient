@@ -156,6 +156,27 @@ def _extract_metadata(args):
            help='Filters results by a metadata key and value pair. '
            'OPTIONAL: Default=None.',
            default=None)
+@utils.arg('--marker',
+           metavar='<marker>',
+           default=None,
+           help='Begin returning volumes that appear later in the volume '
+           'list than that represented by this volume id. '
+           'OPTIONAL: Default=None.')
+@utils.arg('--limit',
+           metavar='<limit>',
+           default=None,
+           help='Maximum number of volumes to return. OPTIONAL: Default=None.')
+@utils.arg('--sort_key',
+           metavar='<sort_key>',
+           default=None,
+           help='Key to be sorted, should be (`id`, `status`, `size`, '
+           '`availability_zone`, `name`, `bootable`, `created_at`). '
+           'OPTIONAL: Default=None.')
+@utils.arg('--sort_dir',
+           metavar='<sort_dir>',
+           default=None,
+           help='Sort direction, should be `desc` or `asc`. '
+           'OPTIONAL: Default=None.')
 @utils.service_type('volumev2')
 def do_list(cs, args):
     """Lists all volumes."""
@@ -170,7 +191,9 @@ def do_list(cs, args):
         'status': args.status,
         'metadata': _extract_metadata(args) if args.metadata else None,
     }
-    volumes = cs.volumes.list(search_opts=search_opts)
+    volumes = cs.volumes.list(search_opts=search_opts, marker=args.marker,
+                              limit=args.limit, sort_key=args.sort_key,
+                              sort_dir=args.sort_dir)
     _translate_volume_keys(volumes)
 
     # Create a list of servers to which the volume is attached

@@ -103,6 +103,24 @@ class ShellTest(utils.TestCase):
         self.assert_called('GET', '/volumes/detail?all_tenants=1')
 
     @httpretty.activate
+    def test_list_marker(self):
+        self.register_keystone_auth_fixture()
+        self.run_command('list --marker=1234')
+        self.assert_called('GET', '/volumes/detail?marker=1234')
+
+    @httpretty.activate
+    def test_list_limit(self):
+        self.register_keystone_auth_fixture()
+        self.run_command('list --limit=10')
+        self.assert_called('GET', '/volumes/detail?limit=10')
+
+    @httpretty.activate
+    def test_list_sort(self):
+        self.register_keystone_auth_fixture()
+        self.run_command('list --sort_key=name --sort_dir=asc')
+        self.assert_called('GET', '/volumes/detail?sort_dir=asc&sort_key=name')
+
+    @httpretty.activate
     def test_list_availability_zone(self):
         self.register_keystone_auth_fixture()
         self.run_command('availability-zone-list')
