@@ -159,7 +159,7 @@ class HTTPClient(object):
             if not auth_url:
                 raise exceptions.EndpointNotFound()
 
-        self.auth_url = auth_url.rstrip('/')
+        self.auth_url = auth_url.rstrip('/') if auth_url else None
         self.version = 'v1'
         self.region_name = region_name
         self.endpoint_type = endpoint_type

@@ -198,6 +198,10 @@ class ClientTest(utils.TestCase):
         test_get_call()
         self.assertEqual([], self.requests)
 
+    def test_get_no_auth_url(self):
+        client.HTTPClient("username", "password",
+                          "project_id", retries=0)
+
     def test_post(self):
         cl = get_authed_client()
 
