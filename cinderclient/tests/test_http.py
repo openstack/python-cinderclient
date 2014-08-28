@@ -87,7 +87,7 @@ class ClientTest(utils.TestCase):
                 headers=headers,
                 **self.TEST_REQUEST_BASE)
             # Automatic JSON parsing
-            self.assertEqual(body, {"hi": "there"})
+            self.assertEqual({"hi": "there"}, body)
 
         test_get_call()
 
@@ -111,7 +111,7 @@ class ClientTest(utils.TestCase):
             resp, body = cl.get("/hi")
 
         test_get_call()
-        self.assertEqual(self.requests, [])
+        self.assertEqual([], self.requests)
 
     def test_get_retry_500(self):
         cl = get_authed_client(retries=1)
@@ -128,7 +128,7 @@ class ClientTest(utils.TestCase):
             resp, body = cl.get("/hi")
 
         test_get_call()
-        self.assertEqual(self.requests, [])
+        self.assertEqual([], self.requests)
 
     def test_get_retry_connection_error(self):
         cl = get_authed_client(retries=1)
@@ -162,7 +162,7 @@ class ClientTest(utils.TestCase):
             resp, body = cl.get("/hi")
 
         self.assertRaises(exceptions.ClientException, test_get_call)
-        self.assertEqual(self.requests, [mock_request])
+        self.assertEqual([mock_request], self.requests)
 
     def test_get_no_retry_400(self):
         cl = get_authed_client(retries=0)
@@ -179,7 +179,7 @@ class ClientTest(utils.TestCase):
             resp, body = cl.get("/hi")
 
         self.assertRaises(exceptions.BadRequest, test_get_call)
-        self.assertEqual(self.requests, [mock_request])
+        self.assertEqual([mock_request], self.requests)
 
     def test_get_retry_400_socket(self):
         cl = get_authed_client(retries=1)
@@ -196,7 +196,7 @@ class ClientTest(utils.TestCase):
             resp, body = cl.get("/hi")
 
         test_get_call()
-        self.assertEqual(self.requests, [])
+        self.assertEqual([], self.requests)
 
     def test_post(self):
         cl = get_authed_client()

@@ -28,8 +28,8 @@ cs = fakes.FakeClient()
 class AvailabilityZoneTest(utils.TestCase):
 
     def _assertZone(self, zone, name, status):
-        self.assertEqual(zone.zoneName, name)
-        self.assertEqual(zone.zoneState, status)
+        self.assertEqual(name, zone.zoneName)
+        self.assertEqual(status, zone.zoneState)
 
     def test_list_availability_zone(self):
         zones = cs.availability_zones.list(detailed=False)
@@ -47,7 +47,7 @@ class AvailabilityZoneTest(utils.TestCase):
         z0 = shell._treeizeAvailabilityZone(zones[0])
         z1 = shell._treeizeAvailabilityZone(zones[1])
 
-        self.assertEqual((len(z0), len(z1)), (1, 1))
+        self.assertEqual((1, 1), (len(z0), len(z1)))
 
         self._assertZone(z0[0], l0[0], l0[1])
         self._assertZone(z1[0], l1[0], l1[1])
@@ -76,7 +76,7 @@ class AvailabilityZoneTest(utils.TestCase):
         z1 = shell._treeizeAvailabilityZone(zones[1])
         z2 = shell._treeizeAvailabilityZone(zones[2])
 
-        self.assertEqual((len(z0), len(z1), len(z2)), (3, 3, 1))
+        self.assertEqual((3, 3, 1), (len(z0), len(z1), len(z2)))
 
         self._assertZone(z0[0], l0[0], l0[1])
         self._assertZone(z0[1], l1[0], l1[1])

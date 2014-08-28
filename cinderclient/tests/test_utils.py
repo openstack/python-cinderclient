@@ -73,23 +73,23 @@ class FindResourceTestCase(test_utils.TestCase):
 
     def test_find_by_integer_id(self):
         output = utils.find_resource(self.manager, 1234)
-        self.assertEqual(output, self.manager.get('1234'))
+        self.assertEqual(self.manager.get('1234'), output)
 
     def test_find_by_str_id(self):
         output = utils.find_resource(self.manager, '1234')
-        self.assertEqual(output, self.manager.get('1234'))
+        self.assertEqual(self.manager.get('1234'), output)
 
     def test_find_by_uuid(self):
         output = utils.find_resource(self.manager, UUID)
-        self.assertEqual(output, self.manager.get(UUID))
+        self.assertEqual(self.manager.get(UUID), output)
 
     def test_find_by_str_name(self):
         output = utils.find_resource(self.manager, 'entity_one')
-        self.assertEqual(output, self.manager.get('1234'))
+        self.assertEqual(self.manager.get('1234'), output)
 
     def test_find_by_str_displayname(self):
         output = utils.find_resource(self.manager, 'entity_three')
-        self.assertEqual(output, self.manager.get('4242'))
+        self.assertEqual(self.manager.get('4242'), output)
 
 
 class CaptureStdout(object):
@@ -113,14 +113,14 @@ class PrintListTestCase(test_utils.TestCase):
         to_print = [Row(a=1, b=2), Row(a=3, b=4)]
         with CaptureStdout() as cso:
             utils.print_list(to_print, ['a', 'b'])
-        self.assertEqual(cso.read(), """\
+        self.assertEqual("""\
 +---+---+
 | a | b |
 +---+---+
 | 1 | 2 |
 | 3 | 4 |
 +---+---+
-""")
+""", cso.read())
 
     def test_print_list_with_generator(self):
         Row = collections.namedtuple('Row', ['a', 'b'])
@@ -130,11 +130,11 @@ class PrintListTestCase(test_utils.TestCase):
                 yield row
         with CaptureStdout() as cso:
             utils.print_list(gen_rows(), ['a', 'b'])
-        self.assertEqual(cso.read(), """\
+        self.assertEqual("""\
 +---+---+
 | a | b |
 +---+---+
 | 1 | 2 |
 | 3 | 4 |
 +---+---+
-""")
+""", cso.read())
