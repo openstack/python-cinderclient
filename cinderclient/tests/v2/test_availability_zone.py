@@ -18,22 +18,23 @@ import six
 
 from cinderclient.v2 import availability_zones
 from cinderclient.v2 import shell
+from cinderclient.tests.fixture_data import client
+from cinderclient.tests.fixture_data import availability_zones as azfixture
 from cinderclient.tests import utils
-from cinderclient.tests.v2 import fakes
 
 
-cs = fakes.FakeClient()
+class AvailabilityZoneTest(utils.FixturedTestCase):
 
-
-class AvailabilityZoneTest(utils.TestCase):
+    client_fixture_class = client.V2
+    data_fixture_class = azfixture.Fixture
 
     def _assertZone(self, zone, name, status):
         self.assertEqual(name, zone.zoneName)
         self.assertEqual(status, zone.zoneState)
 
     def test_list_availability_zone(self):
-        zones = cs.availability_zones.list(detailed=False)
-        cs.assert_called('GET', '/os-availability-zone')
+        zones = self.cs.availability_zones.list(detailed=False)
+        self.assert_called('GET', '/os-availability-zone')
 
         for zone in zones:
             self.assertIsInstance(zone,
@@ -53,8 +54,8 @@ class AvailabilityZoneTest(utils.TestCase):
         self._assertZone(z1[0], l1[0], l1[1])
 
     def test_detail_availability_zone(self):
-        zones = cs.availability_zones.list(detailed=True)
-        cs.assert_called('GET', '/os-availability-zone/detail')
+        zones = self.cs.availability_zones.list(detailed=True)
+        self.assert_called('GET', '/os-availability-zone/detail')
 
         for zone in zones:
             self.assertIsInstance(zone,
