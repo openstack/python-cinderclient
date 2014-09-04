@@ -30,7 +30,6 @@ import requests
 from cinderclient import exceptions
 from cinderclient.openstack.common import importutils
 from cinderclient.openstack.common import strutils
-from cinderclient import utils
 
 osprofiler_web = importutils.try_import("osprofiler.web")
 
@@ -526,7 +525,7 @@ def get_client_class(version):
             (version, ', '.join(version_map)))
         raise exceptions.UnsupportedVersion(msg)
 
-    return utils.import_class(client_path)
+    return importutils.import_class(client_path)
 
 
 def Client(version, *args, **kwargs):
