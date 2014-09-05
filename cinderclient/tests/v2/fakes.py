@@ -372,6 +372,10 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert list(body[action]) == ['bootable']
         elif action == 'os-unmanage':
             assert body[action] is None
+        elif action == 'os-promote-replica':
+            assert body[action] is None
+        elif action == 'os-reenable-replica':
+            assert body[action] is None
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)
@@ -835,3 +839,9 @@ class FakeHTTPClient(base_client.HTTPClient):
         volume = _stub_volume(id='1234')
         volume.update(kw['body']['volume'])
         return (202, {}, {'volume': volume})
+
+    def post_os_promote_replica_1234(self, **kw):
+        return (202, {}, {})
+
+    def post_os_reenable_replica_1234(self, **kw):
+        return (202, {}, {})

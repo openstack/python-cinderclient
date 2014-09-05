@@ -152,6 +152,14 @@ class Volume(base.Resource):
         """Unmanage a volume."""
         self.manager.unmanage(volume)
 
+    def promote(self, volume):
+        """Promote secondary to be primary in relationship."""
+        self.manager.promote(volume)
+
+    def reenable(self, volume):
+        """Sync the secondary volume with primary for a relationship."""
+        self.manager.reenable(volume)
+
 
 class VolumeManager(base.ManagerWithFind):
     """Manage :class:`Volume` resources."""
@@ -161,7 +169,8 @@ class VolumeManager(base.ManagerWithFind):
                name=None, description=None,
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
-               metadata=None, imageRef=None, scheduler_hints=None):
+               metadata=None, imageRef=None, scheduler_hints=None,
+               source_replica=None):
         """Creates a volume.
 
         :param size: Size of volume in GB
@@ -175,6 +184,7 @@ class VolumeManager(base.ManagerWithFind):
         :param metadata: Optional metadata to set on volume creation
         :param imageRef: reference to an image stored in glance
         :param source_volid: ID of source volume to clone from
+        :param source_replica: ID of source volume to clone replica
         :param scheduler_hints: (optional extension) arbitrary key-value pairs
                             specified by the client to help boot an instance
         :rtype: :class:`Volume`
@@ -198,6 +208,7 @@ class VolumeManager(base.ManagerWithFind):
                            'metadata': volume_metadata,
                            'imageRef': imageRef,
                            'source_volid': source_volid,
+                           'source_replica': source_replica,
                            }}
 
         if scheduler_hints:
@@ -498,3 +509,11 @@ class VolumeManager(base.ManagerWithFind):
     def unmanage(self, volume):
         """Unmanage a volume."""
         return self._action('os-unmanage', volume, None)
+
+    def promote(self, volume):
+        """Promote secondary to be primary in relationship."""
+        return self._action('os-promote-replica', volume, None)
+
+    def reenable(self, volume):
+        """Sync the secondary volume with primary for a relationship."""
+        return self._action('os-reenable-replica', volume, None)
