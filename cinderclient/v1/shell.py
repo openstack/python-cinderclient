@@ -693,7 +693,7 @@ def _quota_update(manager, identifier, args):
             updates[resource] = val
 
     if updates:
-        manager.update(identifier, **updates)
+        _quota_show(manager.update(identifier, **updates))
 
 
 @utils.arg('tenant', metavar='<tenant_id>',
