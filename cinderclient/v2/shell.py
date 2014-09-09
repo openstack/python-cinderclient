@@ -70,6 +70,16 @@ def _find_backup(cs, backup):
     return utils.find_resource(cs.backups, backup)
 
 
+def _find_consistencygroup(cs, consistencygroup):
+    """Gets a consistencygroup by name or ID."""
+    return utils.find_resource(cs.consistencygroups, consistencygroup)
+
+
+def _find_cgsnapshot(cs, cgsnapshot):
+    """Gets a cgsnapshot by name or ID."""
+    return utils.find_resource(cs.cgsnapshots, cgsnapshot)
+
+
 def _find_transfer(cs, transfer):
     """Gets a transfer by name or ID."""
     return utils.find_resource(cs.transfers, transfer)
@@ -240,6 +250,11 @@ class CheckSizeArgForCreate(argparse.Action):
            action=CheckSizeArgForCreate,
            help='Size of volume, in GBs. (Required unless '
                 'snapshot-id/source-volid is specified).')
+@utils.arg('--consisgroup-id',
+           metavar='<consistencygroup-id>',
+           default=None,
+           help='ID of a consistency group where the new volume belongs to. '
+                'Default=None.')
 @utils.arg('--snapshot-id',
            metavar='<snapshot-id>',
            default=None,
@@ -332,6 +347,7 @@ def do_create(cs, args):
     #NOTE(N.S.): end of taken piece
 
     volume = cs.volumes.create(args.size,
+                               args.consisgroup_id,
                                args.snapshot_id,
                                args.source_volid,
                                args.name,
@@ -1694,3 +1710,191 @@ def do_replication_promote(cs, args):
 def do_replication_reenable(cs, args):
     """Sync the secondary volume with primary for a relationship."""
     utils.find_volume(cs, args.volume).reenable(args.volume)
+
+
+@utils.arg('--all-tenants',
+           dest='all_tenants',
+           metavar='<0|1>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=0,
+           help='Shows details for all tenants. Admin only.')
+@utils.service_type('volumev2')
+def do_consisgroup_list(cs, args):
+    """Lists all consistencygroups."""
+    consistencygroups = cs.consistencygroups.list()
+
+    columns = ['ID', 'Status', 'Name']
+    utils.print_list(consistencygroups, columns)
+
+
+@utils.arg('consistencygroup',
+           metavar='<consistencygroup>',
+           help='Name or ID of a consistency group.')
+@utils.service_type('volumev2')
+def do_consisgroup_show(cs, args):
+    """Shows details of a consistency group."""
+    info = dict()
+    consistencygroup = _find_consistencygroup(cs, args.consistencygroup)
+    info.update(consistencygroup._info)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
+@utils.arg('--name',
+           metavar='<name>',
+           help='Name of a consistency group.')
+@utils.arg('--description',
+           metavar='<description>',
+           default=None,
+           help='Description of a consistency group. Default=None.')
+@utils.arg('--volume-types',
+           metavar='<volume-types>',
+           default=None,
+           help='Volume types. If not provided, default_volume_type '
+                'in cinder.conf must be specified. Default=None.')
+@utils.arg('--availability-zone',
+           metavar='<availability-zone>',
+           default=None,
+           help='Availability zone for volume. Default=None.')
+@utils.service_type('volumev2')
+def do_consisgroup_create(cs, args):
+    """Creates a consistency group."""
+
+    consistencygroup = cs.consistencygroups.create(
+        args.name,
+        args.description,
+        args.volume_types,
+        availability_zone=args.availability_zone)
+
+    info = dict()
+    consistencygroup = cs.consistencygroups.get(consistencygroup.id)
+    info.update(consistencygroup._info)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
+@utils.arg('consistencygroup',
+           metavar='<consistencygroup>', nargs='+',
+           help='Name or ID of one or more consistency groups '
+                'to be deleted.')
+@utils.arg('--force',
+           action='store_true',
+           help='Allows or disallows consistency groups '
+                'to be deleted. If the consistency group is empty, '
+                'it can be deleted without the force flag. '
+                'If the consistency group is not empty, the force '
+                'flag is required for it to be deleted.',
+           default=False)
+@utils.service_type('volumev2')
+def do_consisgroup_delete(cs, args):
+    """Removes one or more consistency groups."""
+    failure_count = 0
+    for consistencygroup in args.consistencygroup:
+        try:
+            _find_consistencygroup(cs, consistencygroup).delete(args.force)
+        except Exception as e:
+            failure_count += 1
+            print("Delete for consistency group %s failed: %s" %
+                  (consistencygroup, e))
+    if failure_count == len(args.consistencygroup):
+        raise exceptions.CommandError("Unable to delete any of specified "
+                                      "consistency groups.")
+
+
+@utils.arg('--all-tenants',
+           dest='all_tenants',
+           metavar='<0|1>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=0,
+           help='Shows details for all tenants. Admin only.')
+@utils.arg('--status',
+           metavar='<status>',
+           default=None,
+           help='Filters results by a status. Default=None.')
+@utils.arg('--consistencygroup-id',
+           metavar='<consistencygroup_id>',
+           default=None,
+           help='Filters results by a consistency group ID. Default=None.')
+@utils.service_type('volumev2')
+def do_cgsnapshot_list(cs, args):
+    """Lists all cgsnapshots."""
+    cgsnapshots = cs.cgsnapshots.list()
+
+    all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
+
+    search_opts = {
+        'all_tenants': all_tenants,
+        'status': args.status,
+        'consistencygroup_id': args.consistencygroup_id,
+    }
+
+    cgsnapshots = cs.cgsnapshots.list(search_opts=search_opts)
+
+    columns = ['ID', 'Status', 'Name']
+    utils.print_list(cgsnapshots, columns)
+
+
+@utils.arg('cgsnapshot',
+           metavar='<cgsnapshot>',
+           help='Name or ID of cgsnapshot.')
+@utils.service_type('volumev2')
+def do_cgsnapshot_show(cs, args):
+    """Shows cgsnapshot details."""
+    info = dict()
+    cgsnapshot = _find_cgsnapshot(cs, args.cgsnapshot)
+    info.update(cgsnapshot._info)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
+@utils.arg('consistencygroup',
+           metavar='<consistencygroup>',
+           help='Name or ID of a consistency group.')
+@utils.arg('--name',
+           metavar='<name>',
+           default=None,
+           help='Cgsnapshot name. Default=None.')
+@utils.arg('--description',
+           metavar='<description>',
+           default=None,
+           help='Cgsnapshot description. Default=None.')
+@utils.service_type('volumev2')
+def do_cgsnapshot_create(cs, args):
+    """Creates a cgsnapshot."""
+    consistencygroup = _find_consistencygroup(cs, args.consistencygroup)
+    cgsnapshot = cs.cgsnapshots.create(
+        consistencygroup.id,
+        args.name,
+        args.description)
+
+    info = dict()
+    cgsnapshot = cs.cgsnapshots.get(cgsnapshot.id)
+    info.update(cgsnapshot._info)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
+@utils.arg('cgsnapshot',
+           metavar='<cgsnapshot>', nargs='+',
+           help='Name or ID of one or more cgsnapshots to be deleted.')
+@utils.service_type('volumev2')
+def do_cgsnapshot_delete(cs, args):
+    """Removes one or more cgsnapshots."""
+    failure_count = 0
+    for cgsnapshot in args.cgsnapshot:
+        try:
+            _find_cgsnapshot(cs, cgsnapshot).delete()
+        except Exception as e:
+            failure_count += 1
+            print("Delete for cgsnapshot %s failed: %s" % (cgsnapshot, e))
+    if failure_count == len(args.cgsnapshot):
+        raise exceptions.CommandError("Unable to delete any of specified "
+                                      "cgsnapshots.")

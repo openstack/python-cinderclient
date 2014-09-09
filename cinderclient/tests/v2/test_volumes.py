@@ -67,7 +67,8 @@ class VolumesTest(utils.TestCase):
                                'volume_type': None,
                                'project_id': None,
                                'metadata': {},
-                               'source_replica': None},
+                               'source_replica': None,
+                               'consistencygroup_id': None},
                     'OS-SCH-HNT:scheduler_hints': 'uuid'}
         cs.assert_called('POST', '/volumes', body=expected)
 
