@@ -33,11 +33,11 @@ class ConsistencygroupsTest(utils.TestCase):
         cs.assert_called('POST', '/consistencygroups/1234/delete')
 
     def test_create_consistencygroup(self):
-        cs.consistencygroups.create('cg')
+        cs.consistencygroups.create('type1,type2', 'cg')
         cs.assert_called('POST', '/consistencygroups')
 
     def test_create_consistencygroup_with_volume_types(self):
-        cs.consistencygroups.create('cg', volume_types='type1,type2')
+        cs.consistencygroups.create('type1,type2', 'cg')
         expected = {'consistencygroup': {'status': 'creating',
                                          'description': None,
                                          'availability_zone': None,

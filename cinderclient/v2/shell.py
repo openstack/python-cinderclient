@@ -1743,6 +1743,9 @@ def do_consisgroup_show(cs, args):
     utils.print_dict(info)
 
 
+@utils.arg('volumetypes',
+           metavar='<volume-types>',
+           help='Volume types.')
 @utils.arg('--name',
            metavar='<name>',
            help='Name of a consistency group.')
@@ -1750,11 +1753,6 @@ def do_consisgroup_show(cs, args):
            metavar='<description>',
            default=None,
            help='Description of a consistency group. Default=None.')
-@utils.arg('--volume-types',
-           metavar='<volume-types>',
-           default=None,
-           help='Volume types. If not provided, default_volume_type '
-                'in cinder.conf must be specified. Default=None.')
 @utils.arg('--availability-zone',
            metavar='<availability-zone>',
            default=None,
@@ -1764,9 +1762,9 @@ def do_consisgroup_create(cs, args):
     """Creates a consistency group."""
 
     consistencygroup = cs.consistencygroups.create(
+        args.volumetypes,
         args.name,
         args.description,
-        args.volume_types,
         availability_zone=args.availability_zone)
 
     info = dict()
