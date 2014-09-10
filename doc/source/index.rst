@@ -33,6 +33,29 @@ Release Notes
 MASTER
 -----
 
+1.1.0
+------
+
+* Add support for ConsistencyGroups
+* Use Adapter from keystoneclient
+* Add support for Replication feature
+* Add pagination for Volume List
+
+.. _1325773 http://bugs.launchpad.net/python-cinderclient/+bug/1325773
+.. _1333257 http://bugs.launchpad.net/python-cinderclient/+bug/1333257
+.. _1268480 http://bugs.launchpad.net/python-cinderclient/+bug/1268480
+.. _1275025 http://bugs.launchpad.net/python-cinderclient/+bug/1275025
+.. _1258489 http://bugs.launchpad.net/python-cinderclient/+bug/1258489
+.. _1241682 http://bugs.launchpad.net/python-cinderclient/+bug/1241682
+.. _1203471 http://bugs.launchpad.net/python-cinderclient/+bug/1203471
+.. _1210874 http://bugs.launchpad.net/python-cinderclient/+bug/1210874
+.. _1200214 http://bugs.launchpad.net/python-cinderclient/+bug/1200214
+.. _1130572 http://bugs.launchpad.net/python-cinderclient/+bug/1130572
+.. _1156994 http://bugs.launchpad.net/python-cinderclient/+bug/1156994
+
+** Note Connection refused --> Connection error commit: c9e7818f3f90ce761ad8ccd09181c705880a4266
+** Note Mask Passwords in log output commit: 80582f2b860b2dadef7ae07bdbd8395bf03848b1
+
 1.0.9
 ------
 .. _1255905: http://bugs.launchpad.net/python-cinderclient/+bug/1255905
