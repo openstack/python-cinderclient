@@ -42,8 +42,8 @@ class ConsistencygroupManager(base.ManagerWithFind):
     """Manage :class:`Consistencygroup` resources."""
     resource_class = Consistencygroup
 
-    def create(self, name=None, description=None,
-               volume_types=None, user_id=None,
+    def create(self, volume_types, name=None,
+               description=None, user_id=None,
                project_id=None, availability_zone=None):
         """Creates a consistencygroup.
 
