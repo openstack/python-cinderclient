@@ -486,6 +486,9 @@ class OpenStackCinderShell(object):
         client_logger.addHandler(ch)
         if hasattr(requests, 'logging'):
             requests.logging.getLogger(requests.__name__).addHandler(ch)
+        # required for logging when using a keystone session
+        ks_logger = logging.getLogger("keystoneclient")
+        ks_logger.setLevel(logging.DEBUG)
 
     def main(self, argv):
 
