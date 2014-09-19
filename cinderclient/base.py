@@ -33,14 +33,6 @@ from cinderclient import utils
 Resource = common_base.Resource
 
 
-# Python 2.4 compat
-try:
-    all
-except NameError:
-    def all(iterable):
-        return True not in (not x for x in iterable)
-
-
 def getid(obj):
     """
     Abstracts the common pattern of allowing both an object or an object's ID
