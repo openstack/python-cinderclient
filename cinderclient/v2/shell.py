@@ -1693,6 +1693,7 @@ def do_manage(cs, args):
            help='Name or ID of the volume to unmanage.')
 @utils.service_type('volumev2')
 def do_unmanage(cs, args):
+    """Stop managing a volume."""
     utils.find_volume(cs, args.volume).unmanage(args.volume)
 
 
