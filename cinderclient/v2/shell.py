@@ -578,6 +578,12 @@ def do_snapshot_show(cs, args):
            help=argparse.SUPPRESS)
 @utils.arg('--display_description',
            help=argparse.SUPPRESS)
+@utils.arg('--metadata',
+           type=str,
+           nargs='*',
+           metavar='<key=value>',
+           help='Snapshot metadata key and value pairs. Default=None.',
+           default=None)
 @utils.service_type('volumev2')
 def do_snapshot_create(cs, args):
     """Creates a snapshot."""
@@ -587,11 +593,16 @@ def do_snapshot_create(cs, args):
     if args.display_description is not None:
         args.description = args.display_description
 
+    snapshot_metadata = None
+    if args.metadata is not None:
+        snapshot_metadata = _extract_metadata(args)
+
     volume = utils.find_volume(cs, args.volume)
     snapshot = cs.volume_snapshots.create(volume.id,
                                           args.force,
                                           args.name,
-                                          args.description)
+                                          args.description,
+                                          metadata=snapshot_metadata)
     _print_volume_snapshot(snapshot)
 
 

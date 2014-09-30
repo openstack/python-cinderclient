@@ -296,6 +296,13 @@ class FakeHTTPClient(base_client.HTTPClient):
     def get_snapshots_5678(self, **kw):
         return (200, {}, {'snapshot': _stub_snapshot(id='5678')})
 
+    def post_snapshots(self, **kw):
+        metadata = kw['body']['snapshot'].get('metadata', None)
+        snapshot = _stub_snapshot(id='1234', volume_id='1234')
+        if snapshot is not None:
+            snapshot.update({'metadata': metadata})
+        return (202, {}, {'snapshot': snapshot})
+
     def put_snapshots_1234(self, **kw):
         snapshot = _stub_snapshot(id='1234')
         snapshot.update(kw['body']['snapshot'])

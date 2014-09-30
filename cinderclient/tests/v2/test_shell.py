@@ -540,3 +540,16 @@ class ShellTest(utils.TestCase):
         self.run_command('replication-reenable 1234')
         self.assert_called('POST', '/volumes/1234/action',
                            body={'os-reenable-replica': None})
+
+    def test_create_snapshot_from_volume_with_metadata(self):
+        """
+        Tests create snapshot with --metadata parameter.
+
+        Checks metadata params are set during create snapshot
+        when metadata is passed
+        """
+        expected = {'snapshot': {'volume_id': 1234,
+                                 'metadata': {'k1': 'v1',
+                                              'k2': 'v2'}}}
+        self.run_command('snapshot-create 1234 --metadata k1=v1 k2=v2')
+        self.assert_called_anytime('POST', '/snapshots', partial_body=expected)
