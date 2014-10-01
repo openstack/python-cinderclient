@@ -445,12 +445,12 @@ class ShellTest(utils.TestCase):
         self.assert_called('DELETE', '/snapshots/5678')
 
     def test_volume_manage(self):
-        self.run_command('manage host1 key1=val1 key2=val2 '
+        self.run_command('manage host1 some_fake_name '
                          '--name foo --description bar '
                          '--volume-type baz --availability-zone az '
                          '--metadata k1=v1 k2=v2')
         expected = {'volume': {'host': 'host1',
-                               'ref': {'key1': 'val1', 'key2': 'val2'},
+                               'ref': {'source-name': 'some_fake_name'},
                                'name': 'foo',
                                'description': 'bar',
                                'volume_type': 'baz',
@@ -466,12 +466,12 @@ class ShellTest(utils.TestCase):
         If this flag is specified, then the resulting POST should contain
         bootable: True.
         """
-        self.run_command('manage host1 key1=val1 key2=val2 '
+        self.run_command('manage host1 some_fake_name '
                          '--name foo --description bar --bootable '
                          '--volume-type baz --availability-zone az '
                          '--metadata k1=v1 k2=v2')
         expected = {'volume': {'host': 'host1',
-                               'ref': {'key1': 'val1', 'key2': 'val2'},
+                               'ref': {'source-name': 'some_fake_name'},
                                'name': 'foo',
                                'description': 'bar',
                                'volume_type': 'baz',
@@ -487,14 +487,12 @@ class ShellTest(utils.TestCase):
         Checks that the --source-name option correctly updates the
         ref structure that is passed in the HTTP POST
         """
-        self.run_command('manage host1 key1=val1 key2=val2 '
-                         '--source-name VolName '
+        self.run_command('manage host1 VolName '
                          '--name foo --description bar '
                          '--volume-type baz --availability-zone az '
                          '--metadata k1=v1 k2=v2')
         expected = {'volume': {'host': 'host1',
-                               'ref': {'source-name': 'VolName',
-                                       'key1': 'val1', 'key2': 'val2'},
+                               'ref': {'source-name': 'VolName'},
                                'name': 'foo',
                                'description': 'bar',
                                'volume_type': 'baz',
@@ -510,14 +508,13 @@ class ShellTest(utils.TestCase):
         Checks that the --source-id option correctly updates the
         ref structure that is passed in the HTTP POST
         """
-        self.run_command('manage host1 key1=val1 key2=val2 '
-                         '--source-id 1234 '
+        self.run_command('manage host1 1234 '
+                         '--id-type source-id '
                          '--name foo --description bar '
                          '--volume-type baz --availability-zone az '
                          '--metadata k1=v1 k2=v2')
         expected = {'volume': {'host': 'host1',
-                               'ref': {'source-id': '1234',
-                                       'key1': 'val1', 'key2': 'val2'},
+                               'ref': {'source-id': '1234'},
                                'name': 'foo',
                                'description': 'bar',
                                'volume_type': 'baz',

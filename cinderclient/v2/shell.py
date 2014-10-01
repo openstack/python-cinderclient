@@ -1621,36 +1621,33 @@ def do_set_bootable(cs, args):
 
 @utils.arg('host',
            metavar='<host>',
-           help='Cinder host on which the existing volume resides')
-@utils.arg('ref',
-           type=str,
-           nargs='*',
-           metavar='<key=value>',
-           help='Driver-specific reference to the existing volume as '
-                'key=value pairs')
-@utils.arg('--source-name',
-           metavar='<source-name>',
-           help='Name of the volume to manage (Optional)')
-@utils.arg('--source-id',
-           metavar='<source-id>',
-           help='ID of the volume to manage (Optional)')
+           help='Cinder host on which the existing volume resides; '
+                'takes the form: host@backend-name#pool')
+@utils.arg('identifier',
+           metavar='<identifier>',
+           help='Name or other Identifier for existing volume')
+@utils.arg('--id-type',
+           metavar='<id-type>',
+           default='source-name',
+           help='Type of backend device identifier provided, '
+                'typically source-name or source-id (Default=source-name)')
 @utils.arg('--name',
            metavar='<name>',
-           help='Volume name (Optional, Default=None)')
+           help='Volume name (Default=None)')
 @utils.arg('--description',
            metavar='<description>',
-           help='Volume description (Optional, Default=None)')
+           help='Volume description (Default=None)')
 @utils.arg('--volume-type',
            metavar='<volume-type>',
-           help='Volume type (Optional, Default=None)')
+           help='Volume type (Default=None)')
 @utils.arg('--availability-zone',
            metavar='<availability-zone>',
-           help='Availability zone for volume (Optional, Default=None)')
+           help='Availability zone for volume (Default=None)')
 @utils.arg('--metadata',
            type=str,
            nargs='*',
            metavar='<key=value>',
-           help='Metadata key=value pairs (Optional, Default=None)')
+           help='Metadata key=value pairs (Default=None)')
 @utils.arg('--bootable',
            action='store_true',
            help='Specifies that the newly created volume should be'
@@ -1664,9 +1661,7 @@ def do_manage(cs, args):
 
     # Build a dictionary of key/value pairs to pass to the API.
     ref_dict = {}
-    for pair in args.ref:
-        (k, v) = pair.split('=', 1)
-        ref_dict[k] = v
+    ref_dict[args.id_type] = args.identifier
 
     # The recommended way to specify an existing volume is by ID or name, and
     # have the Cinder driver look for 'source-name' or 'source-id' elements in
@@ -1677,6 +1672,7 @@ def do_manage(cs, args):
     # Note how argparse converts hyphens to underscores.  We use hyphens in the
     # dictionary so that it is consistent with what the user specified on the
     # CLI.
+
     if hasattr(args, 'source_name') and \
        args.source_name is not None:
         ref_dict['source-name'] = args.source_name
