@@ -1705,7 +1705,8 @@ def do_manage(cs, args):
 @utils.service_type('volumev2')
 def do_unmanage(cs, args):
     """Stop managing a volume."""
-    utils.find_volume(cs, args.volume).unmanage(args.volume)
+    volume = utils.find_volume(cs, args.volume)
+    cs.volumes.unmanage(volume.id)
 
 
 @utils.arg('volume', metavar='<volume>',
@@ -1713,7 +1714,8 @@ def do_unmanage(cs, args):
 @utils.service_type('volumev2')
 def do_replication_promote(cs, args):
     """Promote a secondary volume to primary for a relationship."""
-    utils.find_volume(cs, args.volume).promote(args.volume)
+    volume = utils.find_volume(cs, args.volume)
+    cs.volumes.promote(volume.id)
 
 
 @utils.arg('volume', metavar='<volume>',
@@ -1721,7 +1723,8 @@ def do_replication_promote(cs, args):
 @utils.service_type('volumev2')
 def do_replication_reenable(cs, args):
     """Sync the secondary volume with primary for a relationship."""
-    utils.find_volume(cs, args.volume).reenable(args.volume)
+    volume = utils.find_volume(cs, args.volume)
+    cs.volumes.reenable(volume.id)
 
 
 @utils.arg('--all-tenants',
