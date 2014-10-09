@@ -1,8 +1,6 @@
-.coverage
-.venv
+/.*
+!.gitignore
 .*.sw?
-.tox
-.testrepository
 subunit.log
 *,cover
 cover
@@ -14,7 +12,3 @@ build
 dist
 cinderclient/versioninfo
 python_cinderclient.egg-info
-
-# Development environment files
-.project
-.pydevproject
