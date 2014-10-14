@@ -176,3 +176,15 @@ class VolumesTest(utils.TestCase):
         v = cs.volumes.get('1234')
         cs.volumes.unmanage(v)
         cs.assert_called('POST', '/volumes/1234/action', {'os-unmanage': None})
+
+    def test_replication_promote(self):
+        v = cs.volumes.get('1234')
+        cs.volumes.promote(v)
+        cs.assert_called('POST', '/volumes/1234/action',
+                         {'os-promote-replica': None})
+
+    def test_replication_reenable(self):
+        v = cs.volumes.get('1234')
+        cs.volumes.reenable(v)
+        cs.assert_called('POST', '/volumes/1234/action',
+                         {'os-reenable-replica': None})
