@@ -298,6 +298,10 @@ class HTTPClient(object):
                 if attempts > self.retries:
                     msg = 'Unable to establish connection: %s' % e
                     raise exceptions.ConnectionError(msg)
+            except requests.exceptions.Timeout as e:
+                self._logger.debug("Timeout error: %s" % e)
+                if attempts > self.retries:
+                    raise
             self._logger.debug(
                 "Failed attempt(%s of %s), retrying in %s seconds" %
                 (attempts, self.retries, backoff))

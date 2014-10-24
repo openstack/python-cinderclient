@@ -54,6 +54,9 @@ bad_500_request = mock.Mock(return_value=(bad_500_response))
 connection_error_request = mock.Mock(
     side_effect=requests.exceptions.ConnectionError)
 
+timeout_error_request = mock.Mock(
+    side_effect=requests.exceptions.Timeout)
+
 
 def get_client(retries=0):
     cl = client.HTTPClient("username", "password",
@@ -241,3 +244,20 @@ class ClientTest(utils.TestCase):
             self.assertRaises(NotImplementedError, cl.authenticate)
 
         test_auth_call()
+
+    def test_get_retry_timeout_error(self):
+        cl = get_authed_client(retries=1)
+
+        self.requests = [timeout_error_request, mock_request]
+
+        def request(*args, **kwargs):
+            next_request = self.requests.pop(0)
+            return next_request(*args, **kwargs)
+
+        @mock.patch.object(requests, "request", request)
+        @mock.patch('time.time', mock.Mock(return_value=1234))
+        def test_get_call():
+            resp, body = cl.get("/hi")
+
+        test_get_call()
+        self.assertEqual(self.requests, [])
