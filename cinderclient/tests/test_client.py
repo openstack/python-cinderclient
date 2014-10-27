@@ -61,3 +61,16 @@ class ClientTest(utils.TestCase):
 
         self.assertNotIn("fakePassword", output[1])
         self.assertIn("fakeUser", output[1])
+
+    def test_versions(self):
+        v1_url = 'http://fakeurl/v1/tenants'
+        v2_url = 'http://fakeurl/v2/tenants'
+        unknown_url = 'http://fakeurl/v9/tenants'
+
+        self.assertEqual('1',
+                         cinderclient.client.get_volume_api_from_url(v1_url))
+        self.assertEqual('2',
+                         cinderclient.client.get_volume_api_from_url(v2_url))
+        self.assertRaises(cinderclient.exceptions.UnsupportedVersion,
+                          cinderclient.client.get_volume_api_from_url,
+                          unknown_url)

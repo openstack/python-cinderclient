@@ -66,7 +66,7 @@ def get_volume_api_from_url(url):
             return version[1:]
 
     msg = "Invalid client version '%s'. must be one of: %s" % (
-        (version, ', '.join(valid_versions)))
+        (version, ', '.join(_VALID_VERSIONS)))
     raise exceptions.UnsupportedVersion(msg)
 
 
