@@ -578,9 +578,13 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'name': 'test-type-2',
                           'extra_specs': {}}})
 
+    def get_types_default(self, **kw):
+        return self.get_types_1()
+
     def post_types(self, body, **kw):
         return (202, {}, {'volume_type': {'id': 3,
                           'name': 'test-type-3',
+                          'description': 'test_type-3-desc',
                           'extra_specs': {}}})
 
     def post_types_1_extra_specs(self, body, **kw):
@@ -592,6 +596,9 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def delete_types_1(self, **kw):
         return (202, {}, None)
+
+    def put_types_1(self, **kw):
+        return self.get_types_1()
 
     #
     # VolumeEncryptionTypes

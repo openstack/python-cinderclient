@@ -33,6 +33,21 @@ class TypesTest(utils.TestCase):
         cs.assert_called('POST', '/types')
         self.assertIsInstance(t, volume_types.VolumeType)
 
+    def test_update(self):
+        t = cs.volume_types.update('1', 'test_desc_1')
+        cs.assert_called('PUT', '/types/1')
+        self.assertIsInstance(t, volume_types.VolumeType)
+
+    def test_get(self):
+        t = cs.volume_types.get('1')
+        cs.assert_called('GET', '/types/1')
+        self.assertIsInstance(t, volume_types.VolumeType)
+
+    def test_default(self):
+        t = cs.volume_types.default()
+        cs.assert_called('GET', '/types/default')
+        self.assertIsInstance(t, volume_types.VolumeType)
+
     def test_set_key(self):
         t = cs.volume_types.get(1)
         t.set_keys({'k': 'v'})

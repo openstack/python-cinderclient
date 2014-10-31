@@ -85,6 +85,13 @@ class VolumeTypeManager(base.ManagerWithFind):
         """
         return self._get("/types/%s" % base.getid(volume_type), "volume_type")
 
+    def default(self):
+        """Get the default volume type.
+
+        :rtype: :class:`VolumeType`
+        """
+        return self._get("/types/default", "volume_type")
+
     def delete(self, volume_type):
         """Deletes a specific volume_type.
 
@@ -92,17 +99,36 @@ class VolumeTypeManager(base.ManagerWithFind):
         """
         self._delete("/types/%s" % base.getid(volume_type))
 
-    def create(self, name):
+    def create(self, name, description=None):
         """Creates a volume type.
 
         :param name: Descriptive name of the volume type
+        :param description: Description of the the volume type
         :rtype: :class:`VolumeType`
         """
 
         body = {
             "volume_type": {
                 "name": name,
+                "description": description
             }
         }
 
         return self._create("/types", body, "volume_type")
+
+    def update(self, volume_type, description):
+        """Update the description for a volume type.
+
+        :param volume_type: The ID of the :class:`VolumeType` to update.
+        :param description: Description of the the volume type.
+        :rtype: :class:`VolumeType`
+        """
+
+        body = {
+            "volume_type": {
+                "description": description
+            }
+        }
+
+        return self._update("/types/%s" % base.getid(volume_type),
+                            body, response_key="volume_type")

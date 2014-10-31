@@ -696,7 +696,7 @@ def do_snapshot_reset_state(cs, args):
 
 
 def _print_volume_type_list(vtypes):
-    utils.print_list(vtypes, ['ID', 'Name'])
+    utils.print_list(vtypes, ['ID', 'Name', 'Description'])
 
 
 @utils.service_type('volumev2')
@@ -704,6 +704,26 @@ def do_type_list(cs, args):
     """Lists available 'volume types'."""
     vtypes = cs.volume_types.list()
     _print_volume_type_list(vtypes)
+
+
+@utils.service_type('volumev2')
+def do_type_default(cs, args):
+    """List the default volume type."""
+    vtype = cs.volume_types.default()
+    _print_volume_type_list([vtype])
+
+
+@utils.arg('id',
+           metavar='<id>',
+           help="ID of the volume type.")
+@utils.arg('description',
+           metavar='<description>',
+           help="Description of the volume type.")
+@utils.service_type('volumev2')
+def do_type_update(cs, args):
+    """Updates volume type description."""
+    vtype = cs.volume_types.update(args.id, args.description)
+    _print_volume_type_list([vtype])
 
 
 @utils.service_type('volumev2')
@@ -716,10 +736,13 @@ def do_extra_specs_list(cs, args):
 @utils.arg('name',
            metavar='<name>',
            help="Name of new volume type.")
+@utils.arg('--description',
+           metavar='<description>',
+           help="Description of new volume type.")
 @utils.service_type('volumev2')
 def do_type_create(cs, args):
     """Creates a volume type."""
-    vtype = cs.volume_types.create(args.name)
+    vtype = cs.volume_types.create(args.name, args.description)
     _print_volume_type_list([vtype])
 
 
