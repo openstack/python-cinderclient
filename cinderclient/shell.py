@@ -183,6 +183,16 @@ class OpenStackCinderShell(object):
         parser.add_argument('--os_volume_api_version',
                             help=argparse.SUPPRESS)
 
+        parser.add_argument('--bypass-url',
+                            metavar='<bypass-url>',
+                            dest='bypass_url',
+                            default=utils.env('CINDERCLIENT_BYPASS_URL'),
+                            help="Use this API endpoint instead of the "
+                            "Service Catalog. Defaults to "
+                            "env[CINDERCLIENT_BYPASS_URL]")
+        parser.add_argument('--bypass_url',
+                            help=argparse.SUPPRESS)
+
         parser.add_argument('--retries',
                             metavar='<retries>',
                             type=int,
@@ -545,14 +555,15 @@ class OpenStackCinderShell(object):
 
         (os_username, os_password, os_tenant_name, os_auth_url,
          os_region_name, os_tenant_id, endpoint_type, insecure,
-         service_type, service_name, volume_service_name,
+         service_type, service_name, volume_service_name, bypass_url,
          cacert, os_auth_system) = (
              args.os_username, args.os_password,
              args.os_tenant_name, args.os_auth_url,
              args.os_region_name, args.os_tenant_id,
              args.endpoint_type, args.insecure,
              args.service_type, args.service_name,
-             args.volume_service_name, args.os_cacert,
+             args.volume_service_name,
+             args.bypass_url, args.os_cacert,
              args.os_auth_system)
         if os_auth_system and os_auth_system != "keystone":
             auth_plugin = cinderclient.auth_plugin.load_plugin(os_auth_system)
@@ -652,6 +663,7 @@ class OpenStackCinderShell(object):
                                 service_type=service_type,
                                 service_name=service_name,
                                 volume_service_name=volume_service_name,
+                                bypass_url=bypass_url,
                                 retries=options.retries,
                                 http_log_debug=args.debug,
                                 cacert=cacert, auth_system=os_auth_system,
