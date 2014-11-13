@@ -54,8 +54,11 @@ class Manager(utils.HookableMixin):
     def __init__(self, api):
         self.api = api
 
-    def _list(self, url, response_key, obj_class=None, body=None):
+    def _list(self, url, response_key, obj_class=None, body=None,
+              limit=None, items=None):
         resp = None
+        if items is None:
+            items = []
         if body:
             resp, body = self.api.client.post(url, body=body)
         else:
@@ -75,8 +78,37 @@ class Manager(utils.HookableMixin):
 
         with self.completion_cache('human_id', obj_class, mode="w"):
             with self.completion_cache('uuid', obj_class, mode="w"):
-                return [obj_class(self, res, loaded=True)
-                        for res in data if res]
+                items_new = [obj_class(self, res, loaded=True)
+                             for res in data if res]
+        if limit:
+            limit = int(limit)
+            margin = limit - len(items)
+            if margin <= len(items_new):
+                # If the limit is reached, return the items.
+                items = items + items_new[:margin]
+                return items
+            else:
+                items = items + items_new
+        else:
+            items = items + items_new
+
+        # It is possible that the length of the list we request is longer
+        # than osapi_max_limit, so we have to retrieve multiple times to
+        # get the complete list.
+        next = None
+        if 'volumes_links' in body:
+            volumes_links = body['volumes_links']
+            if volumes_links:
+                for volumes_link in volumes_links:
+                    if 'rel' in volumes_link and 'next' == volumes_link['rel']:
+                        next = volumes_link['href']
+                        break
+            if next:
+                # As long as the 'next' link is not empty, keep requesting it
+                # till there is no more items.
+                items = self._list(next, response_key, obj_class, None,
+                                   limit, items)
+        return items
 
     @contextlib.contextmanager
     def completion_cache(self, cache_type, obj_class, mode):

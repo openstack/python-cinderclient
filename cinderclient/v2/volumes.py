@@ -281,7 +281,7 @@ class VolumeManager(base.ManagerWithFind):
             detail = "/detail"
 
         return self._list("/volumes%s%s" % (detail, query_string),
-                          "volumes")
+                          "volumes", limit=limit)
 
     def delete(self, volume):
         """Delete a volume.
