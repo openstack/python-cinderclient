@@ -16,6 +16,7 @@ import re
 import sys
 
 import fixtures
+import mock
 import requests_mock
 from six import moves
 from testtools import matchers
@@ -24,6 +25,7 @@ from cinderclient import exceptions
 from cinderclient import shell
 from cinderclient.tests import utils
 from cinderclient.tests.fixture_data import keystone_client
+import keystoneclient.exceptions as ks_exc
 from keystoneclient.exceptions import DiscoveryFailure
 
 
@@ -33,10 +35,14 @@ class ShellTest(utils.TestCase):
         'OS_USERNAME': 'username',
         'OS_PASSWORD': 'password',
         'OS_TENANT_NAME': 'tenant_name',
-        'OS_AUTH_URL': 'http://no.where',
+        'OS_AUTH_URL': 'http://no.where/v2.0',
     }
 
     # Patch os.environ to avoid required auth info.
+    def make_env(self, exclude=None):
+        env = dict((k, v) for k, v in self.FAKE_ENV.items() if k != exclude)
+        self.useFixture(fixtures.MonkeyPatch('os.environ', env))
+
     def setUp(self):
         super(ShellTest, self).setUp()
         for var in self.FAKE_ENV:
@@ -109,6 +115,15 @@ class ShellTest(utils.TestCase):
             None, auth_url=os_auth_url)
         self.assertEqual(v3_url, os_auth_url, "Expected v3 url")
         self.assertEqual(v2_url, None, "Expected no v2 url")
+
+    @mock.patch('sys.stdin', side_effect=mock.MagicMock)
+    @mock.patch('getpass.getpass', return_value='password')
+    def test_password_prompted(self, mock_getpass, mock_stdin):
+        self.make_env(exclude='OS_PASSWORD')
+        # We should get a Connection Refused because there is no keystone.
+        self.assertRaises(ks_exc.ConnectionRefused, self.shell, 'list')
+        # Make sure we are actually prompted.
+        mock_getpass.assert_called_with('OS Password: ')
 
 
 class CinderClientArgumentParserTest(utils.TestCase):

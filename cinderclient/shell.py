@@ -21,6 +21,7 @@ Command-line interface to the OpenStack Cinder API.
 from __future__ import print_function
 
 import argparse
+import getpass
 import glob
 import imp
 import itertools
@@ -504,7 +505,6 @@ class OpenStackCinderShell(object):
         ks_logger.setLevel(logging.DEBUG)
 
     def main(self, argv):
-
         # Parse args once to find version and debug settings
         parser = self.get_base_parser()
         (options, args) = parser.parse_known_args(argv)
@@ -554,7 +554,6 @@ class OpenStackCinderShell(object):
              args.service_type, args.service_name,
              args.volume_service_name, args.os_cacert,
              args.os_auth_system)
-
         if os_auth_system and os_auth_system != "keystone":
             auth_plugin = cinderclient.auth_plugin.load_plugin(os_auth_system)
         else:
@@ -581,9 +580,20 @@ class OpenStackCinderShell(object):
                                            "env[OS_USERNAME].")
 
             if not os_password:
-                raise exc.CommandError("You must provide a password "
-                                       "through --os-password or "
-                                       "env[OS_PASSWORD].")
+                # No password, If we've got a tty, try prompting for it
+                if hasattr(sys.stdin, 'isatty') and sys.stdin.isatty():
+                    # Check for Ctl-D
+                    try:
+                        os_password = getpass.getpass('OS Password: ')
+                    except EOFError:
+                        pass
+                # No password because we didn't have a tty or the
+                # user Ctl-D when prompted.
+                if not os_password:
+                    raise exc.CommandError("You must provide a password "
+                                           "through --os-password, "
+                                           "env[OS_PASSWORD] "
+                                           "or, prompted response.")
 
             if not (os_tenant_name or os_tenant_id):
                 raise exc.CommandError("You must provide a tenant ID "
