@@ -1,7 +1,7 @@
 [run]
 branch = True
 source = cinderclient
-omit = cinderclient/openstack/*
+omit = cinderclient/openstack/*,cinderclient/tests/*
 
 [report]
 ignore-errors = True
