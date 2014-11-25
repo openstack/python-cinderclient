@@ -566,7 +566,7 @@ def do_snapshot_reset_state(cs, args):
 
     if failure_count == len(args.snapshot):
         if not single:
-            msg = ("Unable to reset the state for any of the the specified "
+            msg = ("Unable to reset the state for any of the specified "
                    "snapshots.")
         raise exceptions.CommandError(msg)
 
