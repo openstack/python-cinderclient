@@ -36,6 +36,7 @@ class QuotaSetsTest(utils.TestCase):
         q = cs.quotas.get('test')
         q.update(volumes=2)
         q.update(snapshots=2)
+        q.update(backups=2)
         cs.assert_called('PUT', '/os-quota-sets/test')
 
     def test_refresh_quota(self):
@@ -43,13 +44,17 @@ class QuotaSetsTest(utils.TestCase):
         q2 = cs.quotas.get('test')
         self.assertEqual(q.volumes, q2.volumes)
         self.assertEqual(q.snapshots, q2.snapshots)
+        self.assertEqual(q.backups, q2.backups)
         q2.volumes = 0
         self.assertNotEqual(q.volumes, q2.volumes)
         q2.snapshots = 0
         self.assertNotEqual(q.snapshots, q2.snapshots)
+        q2.backups = 0
+        self.assertNotEqual(q.backups, q2.backups)
         q2.get()
         self.assertEqual(q.volumes, q2.volumes)
         self.assertEqual(q.snapshots, q2.snapshots)
+        self.assertEqual(q.backups, q2.backups)
 
     def test_delete_quota(self):
         tenant_id = 'test'
