@@ -145,7 +145,8 @@ class HTTPClient(object):
                  insecure=False, timeout=None, tenant_id=None,
                  proxy_tenant_id=None, proxy_token=None, region_name=None,
                  endpoint_type='publicURL', service_type=None,
-                 service_name=None, volume_service_name=None, retries=None,
+                 service_name=None, volume_service_name=None,
+                 bypass_url=None, retries=None,
                  http_log_debug=False, cacert=None,
                  auth_system='keystone', auth_plugin=None):
         self.user = user
@@ -168,10 +169,11 @@ class HTTPClient(object):
         self.service_type = service_type
         self.service_name = service_name
         self.volume_service_name = volume_service_name
+        self.bypass_url = bypass_url.rstrip('/') if bypass_url else bypass_url
         self.retries = int(retries or 0)
         self.http_log_debug = http_log_debug
 
-        self.management_url = None
+        self.management_url = self.bypass_url or None
         self.auth_token = None
         self.proxy_token = proxy_token
         self.proxy_tenant_id = proxy_tenant_id
@@ -410,7 +412,10 @@ class HTTPClient(object):
             # existing token? If so, our actual endpoints may
             # be different than that of the admin token.
             if self.proxy_token:
-                self._fetch_endpoints_from_auth(admin_url)
+                if self.bypass_url:
+                    self.set_management_url(self.bypass_url)
+                else:
+                    self._fetch_endpoints_from_auth(admin_url)
                 # Since keystone no longer returns the user token
                 # with the endpoints any more, we need to replace
                 # our service account token with the user token.
@@ -426,6 +431,11 @@ class HTTPClient(object):
                 if auth_url.find('v2.0') < 0:
                     auth_url = auth_url + '/v2.0'
                 self._v2_auth(auth_url)
+
+        if self.bypass_url:
+            self.set_management_url(self.bypass_url)
+        elif not self.management_url:
+            raise exceptions.Unauthorized('Cinder Client')
 
     def _v1_auth(self, url):
         if self.proxy_token:
@@ -486,7 +496,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                            region_name=None, endpoint_type='publicURL',
                            service_type='volume',
                            service_name=None, volume_service_name=None,
-                           retries=None,
+                           bypass_url=None, retries=None,
                            http_log_debug=False,
                            auth_system='keystone', auth_plugin=None,
                            cacert=None, tenant_id=None,
@@ -519,6 +529,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                           service_type=service_type,
                           service_name=service_name,
                           volume_service_name=volume_service_name,
+                          bypass_url=bypass_url,
                           retries=retries,
                           http_log_debug=http_log_debug,
                           cacert=cacert,

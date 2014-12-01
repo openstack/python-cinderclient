@@ -71,6 +71,14 @@ def get_authed_client(retries=0):
     return cl
 
 
+def get_authed_bypass_url(retries=0):
+    cl = client.HTTPClient("username", "password",
+                           "project_id", "auth_test",
+                           bypass_url="volume/v100/", retries=retries)
+    cl.auth_token = "token"
+    return cl
+
+
 class ClientTest(utils.TestCase):
 
     def test_get(self):
@@ -222,6 +230,11 @@ class ClientTest(utils.TestCase):
                 **self.TEST_REQUEST_BASE)
 
         test_post_call()
+
+    def test_bypass_url(self):
+        cl = get_authed_bypass_url()
+        self.assertEqual("volume/v100", cl.bypass_url)
+        self.assertEqual("volume/v100", cl.management_url)
 
     def test_auth_failure(self):
         cl = get_client()
