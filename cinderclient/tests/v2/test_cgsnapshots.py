@@ -46,9 +46,34 @@ class cgsnapshotsTest(utils.TestCase):
                                    'project_id': None}}
         cs.assert_called('POST', '/cgsnapshots', body=expected)
 
+    def test_update_cgsnapshot(self):
+        v = cs.cgsnapshots.list()[0]
+        expected = {'cgsnapshot': {'name': 'cgs2'}}
+        v.update(name='cgs2')
+        cs.assert_called('PUT', '/cgsnapshots/1234', body=expected)
+        cs.cgsnapshots.update('1234', name='cgs2')
+        cs.assert_called('PUT', '/cgsnapshots/1234', body=expected)
+        cs.cgsnapshots.update(v, name='cgs2')
+        cs.assert_called('PUT', '/cgsnapshots/1234', body=expected)
+
+    def test_update_cgsnapshot_no_props(self):
+        cs.cgsnapshots.update('1234')
+
     def test_list_cgsnapshot(self):
         cs.cgsnapshots.list()
         cs.assert_called('GET', '/cgsnapshots/detail')
+
+    def test_list_cgsnapshot_detailed_false(self):
+        cs.cgsnapshots.list(detailed=False)
+        cs.assert_called('GET', '/cgsnapshots')
+
+    def test_list_cgsnapshot_with_search_opts(self):
+        cs.cgsnapshots.list(search_opts={'foo': 'bar'})
+        cs.assert_called('GET', '/cgsnapshots/detail?foo=bar')
+
+    def test_list_cgsnapshot_with_empty_search_opt(self):
+        cs.cgsnapshots.list(search_opts={'foo': 'bar', '123': None})
+        cs.assert_called('GET', '/cgsnapshots/detail?foo=bar')
 
     def test_get_cgsnapshot(self):
         cgsnapshot_id = '1234'

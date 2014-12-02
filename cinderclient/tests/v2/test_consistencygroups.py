@@ -47,6 +47,36 @@ class ConsistencygroupsTest(utils.TestCase):
                                          'project_id': None}}
         cs.assert_called('POST', '/consistencygroups', body=expected)
 
+    def test_update_consistencygroup(self):
+        v = cs.consistencygroups.list()[0]
+        expected = {'consistencygroup': {'name': 'cg2'}}
+        v.update(name='cg2')
+        cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
+        cs.consistencygroups.update('1234', name='cg2')
+        cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
+        cs.consistencygroups.update(v, name='cg2')
+        cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
+
+    def test_update_consistencygroup_no_props(self):
+        cs.consistencygroups.update('1234')
+
     def test_list_consistencygroup(self):
         cs.consistencygroups.list()
         cs.assert_called('GET', '/consistencygroups/detail')
+
+    def test_list_consistencygroup_detailed_false(self):
+        cs.consistencygroups.list(detailed=False)
+        cs.assert_called('GET', '/consistencygroups')
+
+    def test_list_consistencygroup_with_search_opts(self):
+        cs.consistencygroups.list(search_opts={'foo': 'bar'})
+        cs.assert_called('GET', '/consistencygroups/detail?foo=bar')
+
+    def test_list_consistencygroup_with_empty_search_opt(self):
+        cs.consistencygroups.list(search_opts={'foo': 'bar', 'abc': None})
+        cs.assert_called('GET', '/consistencygroups/detail?foo=bar')
+
+    def test_get_consistencygroup(self):
+        consistencygroup_id = '1234'
+        cs.consistencygroups.get(consistencygroup_id)
+        cs.assert_called('GET', '/consistencygroups/%s' % consistencygroup_id)

@@ -69,28 +69,38 @@ def _stub_snapshot(**kwargs):
     return snapshot
 
 
-def _stub_consistencygroup(**kwargs):
+def _stub_consistencygroup(detailed=True, **kwargs):
     consistencygroup = {
-        "created_at": "2012-08-28T16:30:31.000000",
-        "description": None,
         "name": "cg",
         "id": "11111111-1111-1111-1111-111111111111",
-        "availability_zone": "myzone",
-        "status": "available",
     }
+    if detailed:
+        details = {
+            "created_at": "2012-08-28T16:30:31.000000",
+            "description": None,
+            "availability_zone": "myzone",
+            "status": "available",
+        }
+        consistencygroup.update(details)
     consistencygroup.update(kwargs)
     return consistencygroup
 
 
-def _stub_cgsnapshot(**kwargs):
+def _stub_cgsnapshot(detailed=True, **kwargs):
     cgsnapshot = {
-        "created_at": "2012-08-28T16:30:31.000000",
-        "description": None,
         "name": None,
         "id": "11111111-1111-1111-1111-111111111111",
-        "status": "available",
-        "consistencygroup_id": "00000000-0000-0000-0000-000000000000",
     }
+    if detailed:
+        details = {
+            "created_at": "2012-08-28T16:30:31.000000",
+            "description": None,
+            "name": None,
+            "id": "11111111-1111-1111-1111-111111111111",
+            "status": "available",
+            "consistencygroup_id": "00000000-0000-0000-0000-000000000000",
+        }
+        cgsnapshot.update(details)
     cgsnapshot.update(kwargs)
     return cgsnapshot
 
@@ -458,12 +468,20 @@ class FakeHTTPClient(base_client.HTTPClient):
             _stub_consistencygroup(id='1234'),
             _stub_consistencygroup(id='4567')]})
 
+    def get_consistencygroups(self, **kw):
+        return (200, {}, {"consistencygroups": [
+            _stub_consistencygroup(detailed=False, id='1234'),
+            _stub_consistencygroup(detailed=False, id='4567')]})
+
     def get_consistencygroups_1234(self, **kw):
         return (200, {}, {'consistencygroup':
                           _stub_consistencygroup(id='1234')})
 
     def post_consistencygroups(self, **kw):
         return (202, {}, {'consistencygroup': {}})
+
+    def put_consistencygroups_1234(self, **kw):
+        return (200, {}, {'consistencygroup': {}})
 
     def post_consistencygroups_1234_delete(self, **kw):
         return (202, {}, {})
@@ -477,11 +495,19 @@ class FakeHTTPClient(base_client.HTTPClient):
             _stub_cgsnapshot(id='1234'),
             _stub_cgsnapshot(id='4567')]})
 
+    def get_cgsnapshots(self, **kw):
+        return (200, {}, {"cgsnapshots": [
+            _stub_cgsnapshot(detailed=False, id='1234'),
+            _stub_cgsnapshot(detailed=False, id='4567')]})
+
     def get_cgsnapshots_1234(self, **kw):
         return (200, {}, {'cgsnapshot': _stub_cgsnapshot(id='1234')})
 
     def post_cgsnapshots(self, **kw):
         return (202, {}, {'cgsnapshot': {}})
+
+    def put_cgsnapshots_1234(self, **kw):
+        return (200, {}, {'cgsnapshot': {}})
 
     def delete_cgsnapshots_1234(self, **kw):
         return (202, {}, {})
