@@ -72,11 +72,6 @@ def get_volume_api_from_url(url):
 
 class SessionClient(adapter.LegacyJsonAdapter):
 
-    def __init__(self, **kwargs):
-        kwargs.setdefault('user_agent', 'python-cinderclient')
-        kwargs.setdefault('service_type', 'volume')
-        super(SessionClient, self).__init__(**kwargs)
-
     def request(self, *args, **kwargs):
         kwargs.setdefault('authenticated', False)
         return super(SessionClient, self).request(*args, **kwargs)
@@ -98,32 +93,12 @@ class SessionClient(adapter.LegacyJsonAdapter):
     def delete(self, url, **kwargs):
         return self._cs_request(url, 'DELETE', **kwargs)
 
-    def _invalidate(self, auth=None):
-        # NOTE(jamielennox): This is being implemented in keystoneclient
-        return self.session.invalidate(auth or self.auth)
-
-    def _get_token(self, auth=None):
-        # NOTE(jamielennox): This is being implemented in keystoneclient
-        return self.session.get_token(auth or self.auth)
-
-    def _get_endpoint(self, auth=None, **kwargs):
-        # NOTE(jamielennox): This is being implemented in keystoneclient
-        if self.service_type:
-            kwargs.setdefault('service_type', self.service_type)
-        if self.service_name:
-            kwargs.setdefault('service_name', self.service_name)
-        if self.interface:
-            kwargs.setdefault('interface', self.interface)
-        if self.region_name:
-            kwargs.setdefault('region_name', self.region_name)
-        return self.session.get_endpoint(auth or self.auth, **kwargs)
-
     def get_volume_api_version_from_endpoint(self):
-        return get_volume_api_from_url(self._get_endpoint())
+        return get_volume_api_from_url(self.get_endpoint())
 
     def authenticate(self, auth=None):
-        self._invalidate(auth)
-        return self._get_token(auth)
+        self.invalidate(auth)
+        return self.get_token(auth)
 
     @property
     def service_catalog(self):
@@ -505,6 +480,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                            **kwargs):
 
     if session:
+        kwargs.setdefault('user_agent', 'python-cinderclient')
         kwargs.setdefault('interface', endpoint_type)
         return SessionClient(session=session,
                              auth=auth,
