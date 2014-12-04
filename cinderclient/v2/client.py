@@ -18,6 +18,7 @@ from cinderclient.v2 import availability_zones
 from cinderclient.v2 import cgsnapshots
 from cinderclient.v2 import consistencygroups
 from cinderclient.v2 import limits
+from cinderclient.v2 import pools
 from cinderclient.v2 import qos_specs
 from cinderclient.v2 import quota_classes
 from cinderclient.v2 import quotas
@@ -75,6 +76,7 @@ class Client(object):
         self.cgsnapshots = cgsnapshots.CgsnapshotManager(self)
         self.availability_zones = \
             availability_zones.AvailabilityZoneManager(self)
+        self.pools = pools.PoolManager(self)
 
         # Add in any extensions...
         if extensions:
