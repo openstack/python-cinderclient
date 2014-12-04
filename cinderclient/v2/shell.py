@@ -277,6 +277,12 @@ class CheckSizeArgForCreate(argparse.Action):
            help='Creates volume from image ID. Default=None.')
 @utils.arg('--image_id',
            help=argparse.SUPPRESS)
+@utils.arg('--image',
+           metavar='<image>',
+           default=None,
+           help='Creates a volume from image (ID or name). Default=None.')
+@utils.arg('--image_ref',
+           help=argparse.SUPPRESS)
 @utils.arg('--name',
            metavar='<name>',
            default=None,
@@ -346,6 +352,9 @@ def do_create(cs, args):
                 hints[key] = value
     #NOTE(N.S.): end of taken piece
 
+    # Keep backward compatibility with image_id, favoring explicit ID
+    image_ref = args.image_id or args.image_ref
+
     volume = cs.volumes.create(args.size,
                                args.consisgroup_id,
                                args.snapshot_id,
@@ -354,7 +363,7 @@ def do_create(cs, args):
                                args.description,
                                args.volume_type,
                                availability_zone=args.availability_zone,
-                               imageRef=args.image_id,
+                               imageRef=image_ref,
                                metadata=volume_metadata,
                                scheduler_hints=hints,
                                source_replica=args.source_replica)
