@@ -18,7 +18,7 @@ pull requests.
 
 .. _Github: https://github.com/openstack/python-cinderclient
 .. _Launchpad: https://launchpad.net/python-cinderclient
-.. _Gerrit: http://wiki.openstack.org/GerritWorkflow
+.. _Gerrit: http://docs.openstack.org/infra/manual/developers.html#development-workflow
 
 This code a fork of `Jacobian's python-cloudservers`__ If you need API support
 for the Rackspace API solely or the BSD license, you should use that repository.
