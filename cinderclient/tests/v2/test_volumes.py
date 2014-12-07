@@ -16,7 +16,7 @@
 
 from cinderclient.tests import utils
 from cinderclient.tests.v2 import fakes
-
+from cinderclient.v2.volumes import Volume
 
 cs = fakes.FakeClient()
 
@@ -38,6 +38,33 @@ class VolumesTest(utils.TestCase):
     def test_list_volumes_with_invalid_sort_dir(self):
         self.assertRaises(ValueError,
                           cs.volumes.list, sort_key='id', sort_dir='invalid')
+
+    def test__list(self):
+        # There only 2 volumes available for our tests, so we set limit to 2.
+        limit = 2
+        url = "/volumes?limit=%s" % limit
+        response_key = "volumes"
+        fake_volume1234 = Volume(self, {'id': 1234,
+                                        'name': 'sample-volume'},
+                                 loaded=True)
+        fake_volume5678 = Volume(self, {'id': 5678,
+                                        'name': 'sample-volume2'},
+                                 loaded=True)
+        fake_volumes = [fake_volume1234, fake_volume5678]
+        # osapi_max_limit is 1000 by default. If limit is less than
+        # osapi_max_limit, we can get 2 volumes back.
+        volumes = cs.volumes._list(url, response_key, limit=limit)
+        cs.assert_called('GET', url)
+        self.assertEqual(fake_volumes, volumes)
+
+        # When we change the osapi_max_limit to 1, the next link should be
+        # generated. If limit equals 2 and id passed as an argument, we can
+        # still get 2 volumes back, because the method _list will fetch the
+        # volume from the next link.
+        cs.client.osapi_max_limit = 1
+        volumes = cs.volumes._list(url, response_key, limit=limit)
+        self.assertEqual(fake_volumes, volumes)
+        cs.client.osapi_max_limit = 1000
 
     def test_delete_volume(self):
         v = cs.volumes.list()[0]

@@ -239,6 +239,8 @@ class FakeHTTPClient(base_client.HTTPClient):
         self.auth_url = 'auth_url'
         self.callstack = []
         self.management_url = 'http://10.0.2.15:8776/v2/fake'
+        self.osapi_max_limit = 1000
+        self.marker = None
 
     def _cs_request(self, url, method, **kwargs):
         # Check that certain things are called correctly
@@ -250,7 +252,16 @@ class FakeHTTPClient(base_client.HTTPClient):
         # Call the method
         args = urlparse.parse_qsl(urlparse.urlparse(url)[4])
         kwargs.update(args)
-        munged_url = url.rsplit('?', 1)[0]
+        url_split = url.rsplit('?', 1)
+        munged_url = url_split[0]
+        if len(url_split) > 1:
+            parameters = url_split[1]
+            if 'marker' in parameters:
+                self.marker = int(parameters.rsplit('marker=', 1)[1])
+            else:
+                self.marker = None
+        else:
+            self.marker = None
         munged_url = munged_url.strip('/').replace('/', '_').replace('.', '_')
         munged_url = munged_url.replace('-', '_')
 
@@ -340,10 +351,21 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (200, {}, {'volume': volume})
 
     def get_volumes(self, **kw):
-        return (200, {}, {"volumes": [
-            {'id': 1234, 'name': 'sample-volume'},
-            {'id': 5678, 'name': 'sample-volume2'}
-        ]})
+        if self.marker == 1234:
+            return (200, {}, {"volumes": [
+                {'id': 5678, 'name': 'sample-volume2'}
+            ]})
+        elif self.osapi_max_limit == 1:
+            return (200, {}, {"volumes": [
+                {'id': 1234, 'name': 'sample-volume'}
+            ], "volumes_links": [
+                {'href': "/volumes?limit=1&marker=1234", 'rel': 'next'}
+            ]})
+        else:
+            return (200, {}, {"volumes": [
+                {'id': 1234, 'name': 'sample-volume'},
+                {'id': 5678, 'name': 'sample-volume2'}
+            ]})
 
     # TODO(jdg): This will need to change
     # at the very least it's not complete
