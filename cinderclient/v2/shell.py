@@ -752,13 +752,16 @@ def do_type_default(cs, args):
 @utils.arg('id',
            metavar='<id>',
            help="ID of the volume type.")
-@utils.arg('description',
+@utils.arg('--name',
+           metavar='<name>',
+           help="Name of the volume type.")
+@utils.arg('--description',
            metavar='<description>',
            help="Description of the volume type.")
 @utils.service_type('volumev2')
 def do_type_update(cs, args):
-    """Updates volume type description."""
-    vtype = cs.volume_types.update(args.id, args.description)
+    """Updates volume type name and/or description."""
+    vtype = cs.volume_types.update(args.id, args.name, args.description)
     _print_volume_type_list([vtype])
 
 

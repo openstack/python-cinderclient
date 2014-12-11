@@ -128,16 +128,18 @@ class VolumeTypeManager(base.ManagerWithFind):
 
         return self._create("/types", body, "volume_type")
 
-    def update(self, volume_type, description):
-        """Update the description for a volume type.
+    def update(self, volume_type, name=None, description=None):
+        """Update the name and/or description for a volume type.
 
         :param volume_type: The ID of the :class:`VolumeType` to update.
+        :param name: Descriptive name of the volume type.
         :param description: Description of the the volume type.
         :rtype: :class:`VolumeType`
         """
 
         body = {
             "volume_type": {
+                "name": name,
                 "description": description
             }
         }
