@@ -54,9 +54,9 @@ class ShellTest(utils.TestCase):
             text=keystone_client.keystone_request_callback)
 
     def tearDown(self):
-        # For some method like test_image_meta_bad_action we are
+        # For some methods like test_image_meta_bad_action we are
         # testing a SystemExit to be thrown and object self.shell has
-        # no time to get instantatiated which is OK in this case, so
+        # no time to get instantiated, which is OK in this case, so
         # we make sure the method is there before launching it.
         if hasattr(self.shell, 'cs'):
             self.shell.cs.clear_callstack()
