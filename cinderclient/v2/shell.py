@@ -217,7 +217,11 @@ def do_list(cs, args):
     else:
         key_list = ['ID', 'Status', 'Name',
                     'Size', 'Volume Type', 'Bootable', 'Attached to']
-    utils.print_list(volumes, key_list)
+    if args.sort_key or args.sort_dir:
+        sortby_index = None
+    else:
+        sortby_index = 0
+    utils.print_list(volumes, key_list, sortby_index=sortby_index)
 
 
 @utils.arg('volume',

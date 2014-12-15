@@ -14,6 +14,7 @@
 #    under the License.
 
 import fixtures
+import mock
 from requests_mock.contrib import fixture as requests_mock_fixture
 
 from cinderclient import client
@@ -106,6 +107,24 @@ class ShellTest(utils.TestCase):
     def test_list_sort(self):
         self.run_command('list --sort_key=name --sort_dir=asc')
         self.assert_called('GET', '/volumes/detail?sort_dir=asc&sort_key=name')
+
+    def test_list_reorder_with_sort(self):
+        # sortby_index is None if there is sort information
+        for cmd in ['list --sort_key=name',
+                    'list --sort_dir=asc',
+                    'list --sort_key=name --sort_dir=asc']:
+            with mock.patch('cinderclient.utils.print_list') as mock_print:
+                self.run_command(cmd)
+                mock_print.assert_called_once_with(
+                    mock.ANY, mock.ANY, sortby_index=None)
+
+    def test_list_reorder_without_sort(self):
+        # sortby_index is 0 without sort information
+        for cmd in ['list', 'list --all-tenants']:
+            with mock.patch('cinderclient.utils.print_list') as mock_print:
+                self.run_command(cmd)
+                mock_print.assert_called_once_with(
+                    mock.ANY, mock.ANY, sortby_index=0)
 
     def test_list_availability_zone(self):
         self.run_command('availability-zone-list')
