@@ -81,8 +81,8 @@ class ShellTest(utils.TestCase):
         # mimic the result of argparse's parse_args() method
         class Arguments:
 
-            def __init__(self, metadata=[]):
-                self.metadata = metadata
+            def __init__(self, metadata=None):
+                self.metadata = metadata or []
 
         inputs = [
             ([], {}),

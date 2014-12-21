@@ -22,7 +22,10 @@ places where actual behavior differs from the spec.
 from __future__ import print_function
 
 
-def assert_has_keys(dict, required=[], optional=[]):
+def assert_has_keys(dict, required=None, optional=None):
+    required = required or []
+    optional = optional or []
+
     for k in required:
         try:
             assert k in dict
