@@ -801,3 +801,21 @@ class ShellTest(utils.TestCase):
     def test_list_transfer_all_tenants(self):
         self.run_command('transfer-list --all-tenants=1')
         self.assert_called('GET', '/os-volume-transfer/detail?all_tenants=1')
+
+    def test_consistencygroup_update(self):
+        self.run_command('consisgroup-update '
+                         '--name cg2 --description desc2 '
+                         '--add-volumes uuid1,uuid2 '
+                         '--remove-volumes uuid3,uuid4 '
+                         '1234')
+        expected = {'consistencygroup': {'name': 'cg2',
+                                         'description': 'desc2',
+                                         'add_volumes': 'uuid1,uuid2',
+                                         'remove_volumes': 'uuid3,uuid4'}}
+        self.assert_called('PUT', '/consistencygroups/1234',
+                           body=expected)
+
+    def test_consistencygroup_update_bad_request(self):
+        self.assertRaises(exceptions.BadRequest,
+                          self.run_command,
+                          'consisgroup-update 1234')
