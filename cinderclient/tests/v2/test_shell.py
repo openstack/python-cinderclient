@@ -550,3 +550,11 @@ class ShellTest(utils.TestCase):
                                               'k2': 'v2'}}}
         self.run_command('snapshot-create 1234 --metadata k1=v1 k2=v2')
         self.assert_called_anytime('POST', '/snapshots', partial_body=expected)
+
+    def test_get_pools(self):
+        self.run_command('get-pools')
+        self.assert_called('GET', '/scheduler-stats/get_pools')
+
+    def test_get_pools_detail(self):
+        self.run_command('get-pools --detail')
+        self.assert_called('GET', '/scheduler-stats/get_pools?detail=True')

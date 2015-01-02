@@ -954,3 +954,13 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def post_os_reenable_replica_1234(self, **kw):
         return (202, {}, {})
+
+    def get_scheduler_stats_get_pools(self, **kw):
+        return (200, {}, {
+            "pools": [
+                {"name": "test1@backend1#pool",
+                 "capabilities": {
+                     "pool_name": "pool",
+                     "volume_backend_name": "backend",
+                     "storage_protocol": "iSCSI"}}]
+        })

@@ -160,6 +160,10 @@ class Volume(base.Resource):
         """Sync the secondary volume with primary for a relationship."""
         self.manager.reenable(volume)
 
+    def get_pools(self, detail):
+        """Show pool information for backends."""
+        self.manager.get_pools(detail)
+
 
 class VolumeManager(base.ManagerWithFind):
     """Manage :class:`Volume` resources."""
@@ -519,3 +523,11 @@ class VolumeManager(base.ManagerWithFind):
     def reenable(self, volume):
         """Sync the secondary volume with primary for a relationship."""
         return self._action('os-reenable-replica', volume, None)
+
+    def get_pools(self, detail):
+        """Show pool information for backends."""
+        query_string = ""
+        if detail:
+            query_string = "?detail=True"
+
+        return self._get('/scheduler-stats/get_pools%s' % query_string, None)
