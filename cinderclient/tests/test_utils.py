@@ -110,15 +110,46 @@ class PrintListTestCase(test_utils.TestCase):
 
     def test_print_list_with_list(self):
         Row = collections.namedtuple('Row', ['a', 'b'])
-        to_print = [Row(a=1, b=2), Row(a=3, b=4)]
+        to_print = [Row(a=3, b=4), Row(a=1, b=2)]
         with CaptureStdout() as cso:
             utils.print_list(to_print, ['a', 'b'])
+        # Output should be sorted by the first key (a)
         self.assertEqual("""\
 +---+---+
 | a | b |
 +---+---+
 | 1 | 2 |
 | 3 | 4 |
++---+---+
+""", cso.read())
+
+    def test_print_list_with_list_sortby(self):
+        Row = collections.namedtuple('Row', ['a', 'b'])
+        to_print = [Row(a=4, b=3), Row(a=2, b=1)]
+        with CaptureStdout() as cso:
+            utils.print_list(to_print, ['a', 'b'], sortby_index=1)
+        # Output should be sorted by the second key (b)
+        self.assertEqual("""\
++---+---+
+| a | b |
++---+---+
+| 2 | 1 |
+| 4 | 3 |
++---+---+
+""", cso.read())
+
+    def test_print_list_with_list_no_sort(self):
+        Row = collections.namedtuple('Row', ['a', 'b'])
+        to_print = [Row(a=3, b=4), Row(a=1, b=2)]
+        with CaptureStdout() as cso:
+            utils.print_list(to_print, ['a', 'b'], sortby_index=None)
+        # Output should be in the order given
+        self.assertEqual("""\
++---+---+
+| a | b |
++---+---+
+| 3 | 4 |
+| 1 | 2 |
 +---+---+
 """, cso.read())
 

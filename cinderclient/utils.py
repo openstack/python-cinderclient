@@ -110,7 +110,16 @@ def _print(pt, order):
         print(strutils.safe_encode(pt.get_string(sortby=order)))
 
 
-def print_list(objs, fields, formatters=None, order_by=None):
+def print_list(objs, fields, formatters=None, sortby_index=0):
+    '''Prints a list of objects.
+
+    @param objs: Objects to print
+    @param fields: Fields on each object to be printed
+    @param formatters: Custom field formatters
+    @param sortby_index: Results sorted against the key in the fields list at
+                         this index; if None then the object order is not
+                         altered
+    '''
     formatters = formatters or {}
     mixed_case_fields = ['serverId']
     pt = prettytable.PrettyTable([f for f in fields], caching=False)
@@ -133,8 +142,10 @@ def print_list(objs, fields, formatters=None, order_by=None):
                 row.append(data)
         pt.add_row(row)
 
-    if order_by is None:
-        order_by = fields[0]
+    if sortby_index is None:
+        order_by = None
+    else:
+        order_by = fields[sortby_index]
     _print(pt, order_by)
 
 
