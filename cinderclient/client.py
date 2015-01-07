@@ -28,6 +28,7 @@ from keystoneclient.auth.identity import base
 import requests
 
 from cinderclient import exceptions
+from cinderclient.openstack.common.gettextutils import _
 from cinderclient.openstack.common import importutils
 from cinderclient.openstack.common import strutils
 
@@ -71,12 +72,25 @@ def get_volume_api_from_url(url):
 
 class SessionClient(adapter.LegacyJsonAdapter):
 
-    def request(self, *args, **kwargs):
+    def request(self, url, method, **kwargs):
         kwargs.setdefault('authenticated', False)
+
+        # NOTE(thingee): v1 and v2 require the project id in the url. Prepend
+        # it if we're doing discovery. We figure out if we're doing discovery
+        # if there is no project id already specified in the path. parts is
+        # a list where index 1 is the version discovered and index 2 might be
+        # an empty string or a project id.
+        endpoint = self.get_endpoint()
+        parts = urlparse.urlsplit(endpoint).path.split('/')
+        project_id = self.get_project_id()
+        if (parts[1] in ['v1', 'v2'] and parts[2] == ''
+                and project_id is not None):
+            url = '{0}{1}{2}'.format(endpoint, project_id, url)
+
         # Note(tpatil): The standard call raises errors from
         # keystoneclient, here we need to raise the cinderclient errors.
         raise_exc = kwargs.pop('raise_exc', True)
-        resp, body = super(SessionClient, self).request(*args,
+        resp, body = super(SessionClient, self).request(url, method,
                                                         raise_exc=False,
                                                         **kwargs)
         if raise_exc and resp.status_code >= 400:
@@ -102,7 +116,14 @@ class SessionClient(adapter.LegacyJsonAdapter):
         return self._cs_request(url, 'DELETE', **kwargs)
 
     def get_volume_api_version_from_endpoint(self):
-        return get_volume_api_from_url(self.get_endpoint())
+        endpoint = self.get_endpoint()
+        if not endpoint:
+            msg = _('The Cinder server does not support %s. Check your '
+                    'providers supported versions and try again with '
+                    'setting --os-volume-api-version or the environment '
+                    'variable OS_VOLUME_API_VERSION.') % self.version
+            raise exceptions.InvalidAPIVersion(msg)
+        return get_volume_api_from_url(endpoint)
 
     def authenticate(self, auth=None):
         self.invalidate(auth)
@@ -540,4 +561,4 @@ def get_client_class(version):
 
 def Client(version, *args, **kwargs):
     client_class = get_client_class(version)
-    return client_class(*args, **kwargs)
+    return client_class(*args, version=version, **kwargs)
