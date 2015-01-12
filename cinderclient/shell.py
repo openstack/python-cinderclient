@@ -52,7 +52,7 @@ import six.moves.urllib.parse as urlparse
 
 osprofiler_profiler = importutils.try_import("osprofiler.profiler")
 
-DEFAULT_OS_VOLUME_API_VERSION = "1"
+DEFAULT_OS_VOLUME_API_VERSION = "2"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
 DEFAULT_CINDER_SERVICE_TYPE = 'volume'
 
