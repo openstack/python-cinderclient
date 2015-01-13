@@ -1952,3 +1952,21 @@ def do_cgsnapshot_delete(cs, args):
     if failure_count == len(args.cgsnapshot):
         raise exceptions.CommandError("Unable to delete any of specified "
                                       "cgsnapshots.")
+
+
+@utils.arg('--detail',
+           action='store_true',
+           help='Show detailed information about pools.')
+@utils.service_type('volumev2')
+def do_get_pools(cs, args):
+    """Show pool information for backends. Admin only."""
+    pools = cs.volumes.get_pools(args.detail)
+    infos = dict()
+    infos.update(pools._info)
+
+    for info in infos['pools']:
+        backend = dict()
+        backend['name'] = info['name']
+        if args.detail:
+            backend.update(info['capabilities'])
+        utils.print_dict(backend)

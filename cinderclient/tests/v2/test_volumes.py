@@ -215,3 +215,11 @@ class VolumesTest(utils.TestCase):
         cs.volumes.reenable(v)
         cs.assert_called('POST', '/volumes/1234/action',
                          {'os-reenable-replica': None})
+
+    def test_get_pools(self):
+        cs.volumes.get_pools('')
+        cs.assert_called('GET', '/scheduler-stats/get_pools')
+
+    def test_get_pools_detail(self):
+        cs.volumes.get_pools('--detail')
+        cs.assert_called('GET', '/scheduler-stats/get_pools?detail=True')
