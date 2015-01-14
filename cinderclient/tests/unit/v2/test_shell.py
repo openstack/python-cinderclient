@@ -935,3 +935,15 @@ class ShellTest(utils.TestCase):
                           self.run_command,
                           'consisgroup-create-from-src '
                           '--name cg')
+
+    def test_set_image_metadata(self):
+        self.run_command('image-metadata 1234 set key1=val1')
+        expected = {"os-set_image_metadata": {"metadata": {"key1": "val1"}}}
+        self.assert_called('POST', '/volumes/1234/action',
+                           body=expected)
+
+    def test_unset_image_metadata(self):
+        self.run_command('image-metadata 1234 unset key1')
+        expected = {"os-unset_image_metadata": {"key": "key1"}}
+        self.assert_called('POST', '/volumes/1234/action',
+                           body=expected)

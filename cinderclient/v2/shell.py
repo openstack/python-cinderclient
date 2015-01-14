@@ -540,6 +540,32 @@ def do_metadata(cs, args):
                                    reverse=True))
 
 
+@utils.arg('volume',
+           metavar='<volume>',
+           help='Name or ID of volume for which to update metadata.')
+@utils.arg('action',
+           metavar='<action>',
+           choices=['set', 'unset'],
+           help="The action. Valid values are 'set' or 'unset.'")
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           default=[],
+           help='Metadata key and value pair to set or unset. '
+           'For unset, specify only the key.')
+@utils.service_type('volumev2')
+def do_image_metadata(cs, args):
+    """Sets or deletes volume image metadata."""
+    volume = utils.find_volume(cs, args.volume)
+    metadata = _extract_metadata(args)
+
+    if args.action == 'set':
+        cs.volumes.set_image_metadata(volume, metadata)
+    elif args.action == 'unset':
+        cs.volumes.delete_image_metadata(volume, sorted(metadata.keys(),
+                                         reverse=True))
+
+
 @utils.arg('--all-tenants',
            dest='all_tenants',
            metavar='<0|1>',

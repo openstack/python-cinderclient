@@ -98,6 +98,22 @@ class Volume(base.Resource):
         """
         return self.manager.set_metadata(self, metadata)
 
+    def set_image_metadata(self, volume, metadata):
+        """Set a volume's image metadata.
+
+        :param volume : The :class: `Volume` to set metadata on
+        :param metadata: A dict of key/value pairs to set
+        """
+        return self.manager.set_image_metadata(self, volume, metadata)
+
+    def delete_image_metadata(self, volume, keys):
+        """Delete specified keys from volume's image metadata.
+
+        :param volume: The :class:`Volume`.
+        :param keys: A list of keys to be removed.
+        """
+        return self.manager.delete_image_metadata(self, volume, keys)
+
     def upload_to_image(self, force, image_name, container_format,
                         disk_format):
         """Upload a volume to image service as an image."""
@@ -474,6 +490,26 @@ class VolumeManager(base.ManagerWithFind):
         """
         for k in keys:
             self._delete("/volumes/%s/metadata/%s" % (base.getid(volume), k))
+
+    def set_image_metadata(self, volume, metadata):
+        """Set a volume's image metadata.
+
+        :param volume: The :class:`Volume`.
+        :param metadata: keys and the values to be set with.
+        :type metadata: dict
+        """
+        return self._action("os-set_image_metadata", volume,
+                            {'metadata': metadata})
+
+    def delete_image_metadata(self, volume, keys):
+        """Delete specified keys from volume's image metadata.
+
+        :param volume: The :class:`Volume`.
+        :param keys: A list of keys to be removed.
+        """
+        for key in keys:
+            self._action("os-unset_image_metadata", volume,
+                         {'key': key})
 
     def upload_to_image(self, volume, force, image_name, container_format,
                         disk_format):
