@@ -394,7 +394,7 @@ def do_delete(cs, args):
             failure_count += 1
             print("Delete for volume %s failed: %s" % (volume, e))
     if failure_count == len(args.volume):
-        raise exceptions.CommandError("Unable to delete any of specified "
+        raise exceptions.CommandError("Unable to delete any of the specified "
                                       "volumes.")
 
 
@@ -412,7 +412,7 @@ def do_force_delete(cs, args):
             failure_count += 1
             print("Delete for volume %s failed: %s" % (volume, e))
     if failure_count == len(args.volume):
-        raise exceptions.CommandError("Unable to force delete any of "
+        raise exceptions.CommandError("Unable to force delete any of the "
                                       "specified volumes.")
 
 
@@ -1855,7 +1855,7 @@ def do_consisgroup_delete(cs, args):
             print("Delete for consistency group %s failed: %s" %
                   (consistencygroup, e))
     if failure_count == len(args.consistencygroup):
-        raise exceptions.CommandError("Unable to delete any of specified "
+        raise exceptions.CommandError("Unable to delete any of the specified "
                                       "consistency groups.")
 
 
@@ -1950,7 +1950,7 @@ def do_cgsnapshot_delete(cs, args):
             failure_count += 1
             print("Delete for cgsnapshot %s failed: %s" % (cgsnapshot, e))
     if failure_count == len(args.cgsnapshot):
-        raise exceptions.CommandError("Unable to delete any of specified "
+        raise exceptions.CommandError("Unable to delete any of the specified "
                                       "cgsnapshots.")
 
 
