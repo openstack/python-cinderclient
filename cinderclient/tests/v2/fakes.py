@@ -498,7 +498,8 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'snapshots': 1,
                           'gigabytes': 1,
                           'backups': 1,
-                          'backup_gigabytes': 1}})
+                          'backup_gigabytes': 1,
+                          'consistencygroups': 1}})
 
     def get_os_quota_sets_test_defaults(self):
         return (200, {}, {'quota_set': {
@@ -508,7 +509,8 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'snapshots': 1,
                           'gigabytes': 1,
                           'backups': 1,
-                          'backup_gigabytes': 1}})
+                          'backup_gigabytes': 1,
+                          'consistencygroups': 1}})
 
     def put_os_quota_sets_test(self, body, **kw):
         assert list(body) == ['quota_set']
@@ -521,7 +523,8 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'snapshots': 2,
                           'gigabytes': 1,
                           'backups': 1,
-                          'backup_gigabytes': 1}})
+                          'backup_gigabytes': 1,
+                          'consistencygroups': 2}})
 
     def delete_os_quota_sets_1234(self, **kw):
         return (200, {}, {})
@@ -541,7 +544,8 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'snapshots': 1,
                           'gigabytes': 1,
                           'backups': 1,
-                          'backup_gigabytes': 1}})
+                          'backup_gigabytes': 1,
+                          'consistencygroups': 1}})
 
     def put_os_quota_class_sets_test(self, body, **kw):
         assert list(body) == ['quota_class_set']
@@ -554,7 +558,8 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'snapshots': 2,
                           'gigabytes': 1,
                           'backups': 1,
-                          'backup_gigabytes': 1}})
+                          'backup_gigabytes': 1,
+                          'consistencygroups': 2}})
 
     #
     # VolumeTypes

@@ -801,7 +801,8 @@ def do_credentials(cs, args):
 
 
 _quota_resources = ['volumes', 'snapshots', 'gigabytes',
-                    'backups', 'backup_gigabytes']
+                    'backups', 'backup_gigabytes',
+                    'consistencygroups']
 _quota_infos = ['Type', 'In_use', 'Reserved', 'Limit']
 
 
@@ -899,6 +900,10 @@ def do_quota_defaults(cs, args):
            metavar='<backup_gigabytes>',
            type=int, default=None,
            help='The new "backup_gigabytes" quota value. Default=None.')
+@utils.arg('--consistencygroups',
+           metavar='<consistencygroups>',
+           type=int, default=None,
+           help='The new "consistencygroups" quota value. Default=None.')
 @utils.arg('--volume-type',
            metavar='<volume_type_name>',
            default=None,
