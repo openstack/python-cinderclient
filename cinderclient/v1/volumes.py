@@ -118,11 +118,6 @@ class Volume(base.Resource):
         """Migrate the volume to a new host."""
         self.manager.migrate_volume(self, host, force_host_copy)
 
-#    def migrate_volume_completion(self, old_volume, new_volume, error):
-#        """Complete the migration of the volume."""
-#        self.manager.migrate_volume_completion(self, old_volume,
-#                                               new_volume, error)
-
     def update_all_metadata(self, metadata):
         """Update all metadata of this volume."""
         return self.manager.update_all_metadata(self, metadata)
