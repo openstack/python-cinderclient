@@ -67,6 +67,32 @@ class ConsistencygroupManager(base.ManagerWithFind):
 
         return self._create('/consistencygroups', body, 'consistencygroup')
 
+    def create_from_src(self, cgsnapshot_id, name=None,
+                        description=None, user_id=None,
+                        project_id=None):
+        """Creates a consistencygroup from a cgsnapshot.
+
+        :param cgsnapshot_id: UUID of a CGSnapshot
+        :param name: Name of the ConsistencyGroup
+        :param description: Description of the ConsistencyGroup
+        :param user_id: User id derived from context
+        :param project_id: Project id derived from context
+        :rtype: :class:`Consistencygroup`
+        """
+        body = {'consistencygroup-from-src': {'name': name,
+                                              'description': description,
+                                              'cgsnapshot_id': cgsnapshot_id,
+                                              'user_id': user_id,
+                                              'project_id': project_id,
+                                              'status': "creating",
+                                              }}
+
+        self.run_hooks('modify_body_for_update', body,
+                       'consistencygroup-from-src')
+        resp, body = self.api.client.post(
+            "/consistencygroups/create_from_src", body=body)
+        return body['consistencygroup']
+
     def get(self, group_id):
         """Get a consistencygroup.
 

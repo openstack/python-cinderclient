@@ -1945,6 +1945,32 @@ def do_consisgroup_create(cs, args):
     utils.print_dict(info)
 
 
+@utils.arg('--cgsnapshot',
+           metavar='<cgsnapshot>',
+           help='Name or ID of a cgsnapshot. Default=None.')
+@utils.arg('--name',
+           metavar='<name>',
+           help='Name of a consistency group. Default=None.')
+@utils.arg('--description',
+           metavar='<description>',
+           help='Description of a consistency group. Default=None.')
+@utils.service_type('volumev2')
+def do_consisgroup_create_from_src(cs, args):
+    """Creates a consistency group from a cgsnapshot."""
+    if not args.cgsnapshot:
+        msg = ('Cannot create consistency group because the source '
+               'cgsnapshot is not provided.')
+        raise exceptions.BadRequest(code=400, message=msg)
+    cgsnapshot = _find_cgsnapshot(cs, args.cgsnapshot)
+    info = cs.consistencygroups.create_from_src(
+        cgsnapshot.id,
+        args.name,
+        args.description)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
 @utils.arg('consistencygroup',
            metavar='<consistencygroup>', nargs='+',
            help='Name or ID of one or more consistency groups '
