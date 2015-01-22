@@ -249,13 +249,6 @@ def safe_issubclass(*args):
     return False
 
 
-def import_class(import_str):
-    """Returns a class from a string including module and class."""
-    mod_str, _sep, class_str = import_str.rpartition('.')
-    __import__(mod_str)
-    return getattr(sys.modules[mod_str], class_str)
-
-
 def _load_entry_point(ep_name, name=None):
     """Try to load the entry point ep_name that matches name."""
     for ep in pkg_resources.iter_entry_points(ep_name, name=name):
