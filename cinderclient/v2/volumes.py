@@ -24,9 +24,12 @@ except ImportError:
 from cinderclient import base
 
 
+# Valid sort directions and client sort keys
 SORT_DIR_VALUES = ('asc', 'desc')
 SORT_KEY_VALUES = ('id', 'status', 'size', 'availability_zone', 'name',
                    'bootable', 'created_at')
+# Mapping of client keys to actual sort keys
+SORT_KEY_MAPPINGS = {'name': 'display_name'}
 
 
 class Volume(base.Resource):
@@ -260,7 +263,7 @@ class VolumeManager(base.ManagerWithFind):
 
         if sort_key is not None:
             if sort_key in SORT_KEY_VALUES:
-                qparams['sort_key'] = sort_key
+                qparams['sort_key'] = SORT_KEY_MAPPINGS.get(sort_key, sort_key)
             else:
                 raise ValueError('sort_key must be one of the following: %s.'
                                  % ', '.join(SORT_KEY_VALUES))
