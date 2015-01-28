@@ -421,7 +421,9 @@ def do_force_delete(cs, args):
 @utils.arg('--state', metavar='<state>', default='available',
            help=('The state to assign to the volume. Valid values are '
                  '"available," "error," "creating," "deleting," and '
-                 '"error_deleting." '
+                 '"error_deleting." NOTE: This command simply changes '
+                 'the state of the Volume in the DataBase with no regard '
+                 'to actual status, exercise caution when using. '
                  'Default=available.'))
 @utils.service_type('volumev2')
 def do_reset_state(cs, args):
@@ -674,8 +676,10 @@ def do_snapshot_rename(cs, args):
            default='available',
            help=('The state to assign to the snapshot. Valid values are '
            '"available," "error," "creating," "deleting," and '
-           '"error_deleting." '
-           'Default is "available."'))
+           '"error_deleting." NOTE: This command simply changes '
+           'the state of the Snapshot in the DataBase with no regard '
+           'to actual status, exercise caution when using. '
+           'Default=available.'))
 @utils.service_type('volumev2')
 def do_snapshot_reset_state(cs, args):
     """Explicitly updates the snapshot state."""
