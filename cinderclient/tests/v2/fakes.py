@@ -987,11 +987,22 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (202, {}, {})
 
     def get_scheduler_stats_get_pools(self, **kw):
-        return (200, {}, {
-            "pools": [
-                {"name": "test1@backend1#pool",
-                 "capabilities": {
-                     "pool_name": "pool",
-                     "volume_backend_name": "backend",
-                     "storage_protocol": "iSCSI"}}]
-        })
+        stats = [
+            {
+                "name": "ubuntu@lvm#backend_name",
+                "capabilities": {
+                    "pool_name": "backend_name",
+                    "QoS_support": False,
+                    "timestamp": "2014-11-21T18:15:28.141161",
+                    "allocated_capacity_gb": 0,
+                    "volume_backend_name": "backend_name",
+                    "free_capacity_gb": 7.01,
+                    "driver_version": "2.0.0",
+                    "total_capacity_gb": 10.01,
+                    "reserved_percentage": 0,
+                    "vendor_name": "Open Source",
+                    "storage_protocol": "iSCSI",
+                }
+            },
+        ]
+        return (200, {}, {"pools": stats})
