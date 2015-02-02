@@ -425,7 +425,14 @@ def do_force_delete(cs, args):
                  'Default=available.'))
 @utils.service_type('volumev2')
 def do_reset_state(cs, args):
-    """Explicitly updates the volume state."""
+    """Explicitly updates the volume state in the Cinder database.
+
+    Note that this does not affect whether the volume is actually attached to
+    the Nova compute host or instance and can result in an unusable volume.
+    Being a database change only, this has no impact on the true state of the
+    volume and may not match the actual state. This can render a volume
+    unusable in the case of change to the 'available' state.
+    """
     failure_flag = False
 
     for volume in args.volume:
