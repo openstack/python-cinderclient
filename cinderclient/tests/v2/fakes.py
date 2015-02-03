@@ -105,6 +105,13 @@ def _stub_cgsnapshot(detailed=True, **kwargs):
     return cgsnapshot
 
 
+def _stub_type_access(**kwargs):
+    access = {'volume_type_id': '11111111-1111-1111-1111-111111111111',
+              'project_id': '00000000-0000-0000-0000-000000000000'}
+    access.update(kwargs)
+    return access
+
+
 def _self_href(base_uri, tenant_id, backup_id):
     return '%s/v2/%s/backups/%s' % (base_uri, tenant_id, backup_id)
 
@@ -590,24 +597,36 @@ class FakeHTTPClient(base_client.HTTPClient):
     #
     # VolumeTypes
     #
+
     def get_types(self, **kw):
         return (200, {}, {
             'volume_types': [{'id': 1,
                               'name': 'test-type-1',
+                              'description': 'test_type-1-desc',
                               'extra_specs': {}},
                              {'id': 2,
                               'name': 'test-type-2',
+                              'description': 'test_type-2-desc',
                               'extra_specs': {}}]})
 
     def get_types_1(self, **kw):
         return (200, {}, {'volume_type': {'id': 1,
                           'name': 'test-type-1',
+                          'description': 'test_type-1-desc',
                           'extra_specs': {}}})
 
     def get_types_2(self, **kw):
         return (200, {}, {'volume_type': {'id': 2,
                           'name': 'test-type-2',
+                          'description': 'test_type-2-desc',
                           'extra_specs': {}}})
+
+    def get_types_3(self, **kw):
+        return (200, {}, {'volume_type': {'id': 3,
+                          'name': 'test-type-3',
+                          'description': 'test_type-3-desc',
+                          'extra_specs': {},
+                          'os-volume-type-access:is_public': False}})
 
     def get_types_default(self, **kw):
         return self.get_types_1()
@@ -617,6 +636,19 @@ class FakeHTTPClient(base_client.HTTPClient):
                           'name': 'test-type-3',
                           'description': 'test_type-3-desc',
                           'extra_specs': {}}})
+
+    def post_types_3_action(self, body, **kw):
+        _body = None
+        resp = 202
+        assert len(list(body)) == 1
+        action = list(body)[0]
+        if action == 'addProjectAccess':
+            assert 'project' in body['addProjectAccess']
+        elif action == 'removeProjectAccess':
+            assert 'project' in body['removeProjectAccess']
+        else:
+            raise AssertionError('Unexpected action: %s' % action)
+        return (resp, {}, _body)
 
     def post_types_1_extra_specs(self, body, **kw):
         assert list(body) == ['extra_specs']
@@ -630,6 +662,15 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def put_types_1(self, **kw):
         return self.get_types_1()
+
+    #
+    # VolumeAccess
+    #
+
+    def get_types_3_os_volume_type_access(self, **kw):
+        return (200, {}, {'volume_type_access': [
+            _stub_type_access()
+        ]})
 
     #
     # VolumeEncryptionTypes

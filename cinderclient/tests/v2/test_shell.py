@@ -332,6 +332,55 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('POST', '/snapshots/5678/action',
                                    body=expected)
 
+    def test_type_list(self):
+        self.run_command('type-list')
+        self.assert_called_anytime('GET', '/types')
+
+    def test_type_list_all(self):
+        self.run_command('type-list --all')
+        self.assert_called_anytime('GET', '/types?is_public=None')
+
+    def test_type_create(self):
+        self.run_command('type-create test-type-1')
+        self.assert_called('POST', '/types')
+
+    def test_type_create_public(self):
+        expected = {'volume_type': {'name': 'test-type-1',
+                                    'description': 'test_type-1-desc',
+                                    'os-volume-type-access:is_public': True}}
+        self.run_command('type-create test-type-1 '
+                         '--description=test_type-1-desc '
+                         '--is-public=True')
+        self.assert_called('POST', '/types', body=expected)
+
+    def test_type_create_private(self):
+        expected = {'volume_type': {'name': 'test-type-3',
+                                    'description': 'test_type-3-desc',
+                                    'os-volume-type-access:is_public': False}}
+        self.run_command('type-create test-type-3 '
+                         '--description=test_type-3-desc '
+                         '--is-public=False')
+        self.assert_called('POST', '/types', body=expected)
+
+    def test_type_access_list(self):
+        self.run_command('type-access-list --volume-type 3')
+        self.assert_called('GET', '/types/3/os-volume-type-access')
+
+    def test_type_access_add_project(self):
+        expected = {'addProjectAccess': {'project': '101'}}
+        self.run_command('type-access-add --volume-type 3 --project-id 101')
+        self.assert_called_anytime('GET', '/types/3')
+        self.assert_called('POST', '/types/3/action',
+                           body=expected)
+
+    def test_type_access_remove_project(self):
+        expected = {'removeProjectAccess': {'project': '101'}}
+        self.run_command('type-access-remove '
+                         '--volume-type 3 --project-id 101')
+        self.assert_called_anytime('GET', '/types/3')
+        self.assert_called('POST', '/types/3/action',
+                           body=expected)
+
     def test_encryption_type_list(self):
         """
         Test encryption-type-list shell command.

@@ -700,13 +700,21 @@ def do_snapshot_reset_state(cs, args):
 
 
 def _print_volume_type_list(vtypes):
-    utils.print_list(vtypes, ['ID', 'Name', 'Description'])
+    utils.print_list(vtypes, ['ID', 'Name', 'Description', 'Is_Public'])
 
 
 @utils.service_type('volumev2')
+@utils.arg('--all',
+           dest='all',
+           action='store_true',
+           default=False,
+           help='Display all volume types (Admin only).')
 def do_type_list(cs, args):
     """Lists available 'volume types'."""
-    vtypes = cs.volume_types.list()
+    if args.all:
+        vtypes = cs.volume_types.list(is_public=None)
+    else:
+        vtypes = cs.volume_types.list()
     _print_volume_type_list(vtypes)
 
 
@@ -743,10 +751,15 @@ def do_extra_specs_list(cs, args):
 @utils.arg('--description',
            metavar='<description>',
            help="Description of new volume type.")
+@utils.arg('--is-public',
+           metavar='<is-public>',
+           help="Make type accessible to the public (default true).",
+           default=True)
 @utils.service_type('volumev2')
 def do_type_create(cs, args):
     """Creates a volume type."""
-    vtype = cs.volume_types.create(args.name, args.description)
+    is_public = strutils.bool_from_string(args.is_public)
+    vtype = cs.volume_types.create(args.name, args.description, is_public)
     _print_volume_type_list([vtype])
 
 
@@ -782,6 +795,45 @@ def do_type_key(cs, args):
         vtype.set_keys(keypair)
     elif args.action == 'unset':
         vtype.unset_keys(list(keypair))
+
+
+@utils.arg('--volume-type', metavar='<volume_type>', required=True,
+           help="Filter results by volume type name or ID.")
+@utils.service_type('volumev2')
+def do_type_access_list(cs, args):
+    """Print access information about the given volume type."""
+    volume_type = _find_volume_type(cs, args.volume_type)
+    if volume_type.is_public:
+        raise exceptions.CommandError("Failed to get access list "
+                                      "for public volume type.")
+    access_list = cs.volume_type_access.list(volume_type)
+
+    columns = ['Volume_type_ID', 'Project_ID']
+    utils.print_list(access_list, columns)
+
+
+@utils.arg('--volume-type', metavar='<volume_type>', required=True,
+           help="Volume type name or ID to add access for the given project.")
+@utils.arg('--project-id', metavar='<project_id>', required=True,
+           help='Project ID to add volume type access for.')
+@utils.service_type('volumev2')
+def do_type_access_add(cs, args):
+    """Adds volume type access for the given project."""
+    vtype = _find_volume_type(cs, args.volume_type)
+    cs.volume_type_access.add_project_access(vtype, args.project_id)
+
+
+@utils.arg('--volume-type', metavar='<volume_type>', required=True,
+           help=('Volume type name or ID to remove access '
+                 'for the given project.'))
+@utils.arg('--project-id', metavar='<project_id>', required=True,
+           help='Project ID to remove volume type access for.')
+@utils.service_type('volumev2')
+def do_type_access_remove(cs, args):
+    """Removes volume type access for the given project."""
+    vtype = _find_volume_type(cs, args.volume_type)
+    cs.volume_type_access.remove_project_access(
+        vtype, args.project_id)
 
 
 @utils.service_type('volumev2')
