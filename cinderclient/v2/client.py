@@ -30,7 +30,7 @@ from cinderclient.v2 import volume_type_access
 from cinderclient.v2 import volume_encryption_types
 from cinderclient.v2 import volume_backups
 from cinderclient.v2 import volume_backups_restore
-from cinderclient.v1 import volume_transfers
+from cinderclient.v2 import volume_transfers
 
 
 class Client(object):
