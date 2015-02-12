@@ -680,8 +680,11 @@ class OpenStackCinderShell(object):
                 "You must provide an authentication URL "
                 "through --os-auth-url or env[OS_AUTH_URL].")
 
-        auth_session = self._get_keystone_session()
-        if not service_type_input or not api_version_input:
+        auth_session = None
+        if not auth_plugin:
+            auth_session = self._get_keystone_session()
+
+        if auth_session and (not service_type_input or not api_version_input):
             # NOTE(thingee): Unfortunately the v2 shell is tied to volumev2
             # service_type. If the service_catalog just contains service_type
             # volume with x.x.x.x:8776 for discovery, and the user sets version
