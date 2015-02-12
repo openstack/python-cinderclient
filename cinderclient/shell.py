@@ -125,7 +125,7 @@ class OpenStackCinderShell(object):
                             action='version',
                             version=cinderclient.__version__)
 
-        parser.add_argument('--debug',
+        parser.add_argument('-d', '--debug',
                             action='store_true',
                             default=utils.env('CINDERCLIENT_DEBUG',
                                               default=False),
