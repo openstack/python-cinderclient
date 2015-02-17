@@ -112,6 +112,75 @@ class ShellTest(utils.TestCase):
         # NOTE(jdg): we default to detail currently
         self.assert_called('GET', '/volumes/detail')
 
+    def test_metadata_args_with_limiter(self):
+        self.run_command('create --metadata key1="--test1" 1')
+        expected = {'volume': {'snapshot_id': None,
+                               'display_description': None,
+                               'source_volid': None,
+                               'status': 'creating',
+                               'size': 1,
+                               'volume_type': None,
+                               'imageRef': None,
+                               'availability_zone': None,
+                               'attach_status': 'detached',
+                               'user_id': None,
+                               'project_id': None,
+                               'metadata': {'key1': '"--test1"'},
+                               'display_name': None}}
+        self.assert_called_anytime('POST', '/volumes', expected)
+
+    def test_metadata_args_limiter_display_name(self):
+        self.run_command('create --metadata key1="--t1" --display-name="t" 1')
+        expected = {'volume': {'snapshot_id': None,
+                               'display_description': None,
+                               'source_volid': None,
+                               'status': 'creating',
+                               'size': 1,
+                               'volume_type': None,
+                               'imageRef': None,
+                               'availability_zone': None,
+                               'attach_status': 'detached',
+                               'user_id': None,
+                               'project_id': None,
+                               'metadata': {'key1': '"--t1"'},
+                               'display_name': '"t"'}}
+        self.assert_called_anytime('POST', '/volumes', expected)
+
+    def test_delimit_metadata_args(self):
+        self.run_command('create --metadata key1="test1" key2="test2" 1')
+        expected = {'volume': {'snapshot_id': None,
+                               'display_description': None,
+                               'source_volid': None,
+                               'status': 'creating',
+                               'size': 1,
+                               'volume_type': None,
+                               'imageRef': None,
+                               'availability_zone': None,
+                               'attach_status': 'detached',
+                               'user_id': None,
+                               'project_id': None,
+                               'metadata': {'key1': '"test1"',
+                                            'key2': '"test2"'},
+                               'display_name': None}}
+        self.assert_called_anytime('POST', '/volumes', expected)
+
+    def test_delimit_metadata_args_display_name(self):
+        self.run_command('create --metadata key1="t1" --display-name="t" 1')
+        expected = {'volume': {'snapshot_id': None,
+                               'display_description': None,
+                               'source_volid': None,
+                               'status': 'creating',
+                               'size': 1,
+                               'volume_type': None,
+                               'imageRef': None,
+                               'availability_zone': None,
+                               'attach_status': 'detached',
+                               'user_id': None,
+                               'project_id': None,
+                               'metadata': {'key1': '"t1"'},
+                               'display_name': '"t"'}}
+        self.assert_called_anytime('POST', '/volumes', expected)
+
     def test_list_filter_status(self):
         self.run_command('list --status=available')
         self.assert_called('GET', '/volumes/detail?status=available')
