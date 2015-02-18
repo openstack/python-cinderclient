@@ -110,7 +110,7 @@ You'll find complete documentation on the shell by running
         list-extensions     List all the os-api extensions that are available.
 
     Optional arguments:
-      --debug               Print debugging output
+      -d, --debug               Print debugging output
       --os-username <auth-user-name>
                             Defaults to env[OS_USERNAME].
       --os-password <auth-password>
