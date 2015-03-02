@@ -997,8 +997,8 @@ def do_quota_class_show(cs, args):
     _quota_show(cs.quota_classes.get(args.class_name))
 
 
-@utils.arg('class-name',
-           metavar='<class-name>',
+@utils.arg('class_name',
+           metavar='<class_name>',
            help='Name of quota class for which to set quotas.')
 @utils.arg('--volumes',
            metavar='<volumes>',

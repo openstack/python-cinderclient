@@ -26,7 +26,7 @@ class QuotaClassSet(base.Resource):
         return self.class_name
 
     def update(self, *args, **kwargs):
-        self.manager.update(self.class_name, *args, **kwargs)
+        return self.manager.update(self.class_name, *args, **kwargs)
 
 
 class QuotaClassSetManager(base.Manager):
@@ -42,4 +42,6 @@ class QuotaClassSetManager(base.Manager):
         for update in updates:
             body['quota_class_set'][update] = updates[update]
 
-        self._update('/os-quota-class-sets/%s' % (class_name), body)
+        result = self._update('/os-quota-class-sets/%s' % (class_name), body)
+        return self.resource_class(self,
+                                   result['quota_class_set'], loaded=True)
