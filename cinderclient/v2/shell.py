@@ -1702,7 +1702,7 @@ def do_metadata_update_all(cs, args):
     volume = utils.find_volume(cs, args.volume)
     metadata = _extract_metadata(args)
     metadata = volume.update_all_metadata(metadata)
-    utils.print_dict(metadata)
+    utils.print_dict(metadata['metadata'], 'Metadata-property')
 
 
 @utils.arg('snapshot',
