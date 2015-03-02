@@ -28,6 +28,7 @@ from cinderclient import exceptions
 from cinderclient import utils
 from cinderclient.openstack.common import strutils
 from cinderclient.v2 import availability_zones
+from cinderclient.v2 import volumes
 
 
 def _poll_for_status(poll_fn, obj_id, action, final_ok_states,
@@ -179,14 +180,18 @@ def _extract_metadata(args):
 @utils.arg('--sort_key',
            metavar='<sort_key>',
            default=None,
-           help='Key to be sorted, should be (`id`, `status`, `size`, '
-           '`availability_zone`, `name`, `bootable`, `created_at`). '
-           'OPTIONAL: Default=None.')
+           help=argparse.SUPPRESS)
 @utils.arg('--sort_dir',
            metavar='<sort_dir>',
            default=None,
-           help='Sort direction, should be `desc` or `asc`. '
-           'OPTIONAL: Default=None.')
+           help=argparse.SUPPRESS)
+@utils.arg('--sort',
+           metavar='<key>[:<direction>]',
+           default=None,
+           help=(('Comma-separated list of sort keys and directions in the '
+           'form of <key>[:<asc|desc>]. '
+           'Valid keys: %s. '
+           'OPTIONAL: Default=None.') % ', '.join(volumes.SORT_KEY_VALUES)))
 @utils.service_type('volumev2')
 def do_list(cs, args):
     """Lists all volumes."""
@@ -201,9 +206,17 @@ def do_list(cs, args):
         'status': args.status,
         'metadata': _extract_metadata(args) if args.metadata else None,
     }
+
+    # --sort_key and --sort_dir deprecated in kilo and is not supported
+    # with --sort
+    if args.sort and (args.sort_key or args.sort_dir):
+        raise exceptions.CommandError(
+            'The --sort_key and --sort_dir arguments are deprecated and are '
+            'not supported with --sort.')
+
     volumes = cs.volumes.list(search_opts=search_opts, marker=args.marker,
                               limit=args.limit, sort_key=args.sort_key,
-                              sort_dir=args.sort_dir)
+                              sort_dir=args.sort_dir, sort=args.sort)
     _translate_volume_keys(volumes)
 
     # Create a list of servers to which the volume is attached
@@ -217,7 +230,7 @@ def do_list(cs, args):
     else:
         key_list = ['ID', 'Status', 'Name',
                     'Size', 'Volume Type', 'Bootable', 'Attached to']
-    if args.sort_key or args.sort_dir:
+    if args.sort_key or args.sort_dir or args.sort:
         sortby_index = None
     else:
         sortby_index = 0
