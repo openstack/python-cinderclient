@@ -9,8 +9,8 @@ See the `OpenStack CLI guide`_ for information on how to use the ``cinder``
 command-line tool. You may also want to look at the
 `OpenStack API documentation`_.
 
-.. _OpenStack CLI Guide: http://docs.openstack.org/cli/quick-start/content/
-.. _OpenStack API documentation: http://docs.openstack.org/api/
+.. _OpenStack CLI Guide: http://docs.openstack.org/user-guide/content/ch_cli.html
+.. _OpenStack API documentation: http://developer.openstack.org/api-ref.html
 
 The project is hosted on `Launchpad`_, where bugs can be filed. The code is
 hosted on `Github`_. Patches must be submitted using `Gerrit`_, *not* Github
@@ -20,11 +20,11 @@ pull requests.
 .. _Launchpad: https://launchpad.net/python-cinderclient
 .. _Gerrit: http://docs.openstack.org/infra/manual/developers.html#development-workflow
 
-This code a fork of `Jacobian's python-cloudservers`__ If you need API support
+This code is a fork of `Jacobian's python-cloudservers`__. If you need API support
 for the Rackspace API solely or the BSD license, you should use that repository.
 python-cinderclient is licensed under the Apache License like the rest of OpenStack.
 
-__ http://github.com/jacobian/python-cloudservers
+__ https://github.com/jacobian-archive/python-cloudservers
 
 .. contents:: Contents:
    :local:
@@ -110,7 +110,7 @@ You'll find complete documentation on the shell by running
         list-extensions     List all the os-api extensions that are available.
 
     Optional arguments:
-      -d, --debug               Print debugging output
+      -d, --debug           Print debugging output
       --os-username <auth-user-name>
                             Defaults to env[OS_USERNAME].
       --os-password <auth-password>
