@@ -226,6 +226,11 @@ class ShellTest(utils.TestCase):
         expected = {'os-reset_status': {'status': 'available'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
 
+    def test_reset_state_attach(self):
+        self.run_command('reset-state --state in-use 1234')
+        expected = {'os-reset_status': {'status': 'in-use'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
     def test_reset_state_with_flag(self):
         self.run_command('reset-state --state error 1234')
         expected = {'os-reset_status': {'status': 'error'}}

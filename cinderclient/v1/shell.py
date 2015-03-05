@@ -332,11 +332,11 @@ def do_force_delete(cs, args):
            'Separate multiple volumes with a space.')
 @utils.arg('--state', metavar='<state>', default='available',
            help=('The state to assign to the volume. Valid values are '
-           '"available," "error," "creating," "deleting," and '
-           '"error_deleting." NOTE: This command simply changes '
-           'the state of the Volume in the DataBase with no regard '
-           'to actual status, exercise caution when using. '
-           'Default=available.'))
+                 '"available," "error," "creating," "deleting," "in-use," '
+                 '"attaching," "detaching" and "error_deleting." '
+                 'NOTE: This command simply changes the state of the '
+                 'Volume in the DataBase with no regard to actual status, '
+                 'exercise caution when using. Default=available.'))
 @utils.service_type('volume')
 def do_reset_state(cs, args):
     """Explicitly updates the volume state."""
@@ -546,11 +546,11 @@ def do_snapshot_rename(cs, args):
            help='Name or ID of snapshot to modify.')
 @utils.arg('--state', metavar='<state>', default='available',
            help=('The state to assign to the snapshot. Valid values are '
-           '"available," "error," "creating," "deleting," and '
-           '"error_deleting." NOTE: This command simply changes '
-           'the state of the Snapshot in the DataBase with no regard '
-           'to actual status, exercise caution when using. '
-           'Default=available.'))
+                 '"available," "error," "creating," "deleting," and '
+                 '"error_deleting." NOTE: This command simply changes '
+                 'the state of the Snapshot in the DataBase with no regard '
+                 'to actual status, exercise caution when using. '
+                 'Default=available.'))
 @utils.service_type('volume')
 def do_snapshot_reset_state(cs, args):
     """Explicitly updates the snapshot state."""

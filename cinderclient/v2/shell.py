@@ -354,7 +354,7 @@ def do_create(cs, args):
     if args.metadata is not None:
         volume_metadata = _extract_metadata(args)
 
-    #NOTE(N.S.): take this piece from novaclient
+    # NOTE(N.S.): take this piece from novaclient
     hints = {}
     if args.scheduler_hints:
         for hint in args.scheduler_hints:
@@ -367,7 +367,7 @@ def do_create(cs, args):
                 hints[key] += [value]
             else:
                 hints[key] = value
-    #NOTE(N.S.): end of taken piece
+    # NOTE(N.S.): end of taken piece
 
     # Keep backward compatibility with image_id, favoring explicit ID
     image_ref = args.image_id or args.image_ref
@@ -433,11 +433,11 @@ def do_force_delete(cs, args):
            help='Name or ID of volume to modify.')
 @utils.arg('--state', metavar='<state>', default='available',
            help=('The state to assign to the volume. Valid values are '
-                 '"available," "error," "creating," "deleting," and '
-                 '"error_deleting." NOTE: This command simply changes '
-                 'the state of the Volume in the DataBase with no regard '
-                 'to actual status, exercise caution when using. '
-                 'Default=available.'))
+                 '"available," "error," "creating," "deleting," "in-use," '
+                 '"attaching," "detaching" and "error_deleting." '
+                 'NOTE: This command simply changes the state of the '
+                 'Volume in the DataBase with no regard to actual status, '
+                 'exercise caution when using. Default=available.'))
 @utils.service_type('volumev2')
 def do_reset_state(cs, args):
     """Explicitly updates the volume state in the Cinder database.
@@ -695,11 +695,11 @@ def do_snapshot_rename(cs, args):
 @utils.arg('--state', metavar='<state>',
            default='available',
            help=('The state to assign to the snapshot. Valid values are '
-           '"available," "error," "creating," "deleting," and '
-           '"error_deleting." NOTE: This command simply changes '
-           'the state of the Snapshot in the DataBase with no regard '
-           'to actual status, exercise caution when using. '
-           'Default=available.'))
+                 '"available," "error," "creating," "deleting," and '
+                 '"error_deleting." NOTE: This command simply changes '
+                 'the state of the Snapshot in the DataBase with no regard '
+                 'to actual status, exercise caution when using. '
+                 'Default=available.'))
 @utils.service_type('volumev2')
 def do_snapshot_reset_state(cs, args):
     """Explicitly updates the snapshot state."""
