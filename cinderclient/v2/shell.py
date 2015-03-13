@@ -455,6 +455,16 @@ def do_force_delete(cs, args):
                  'NOTE: This command simply changes the state of the '
                  'Volume in the DataBase with no regard to actual status, '
                  'exercise caution when using. Default=available.'))
+@utils.arg('--attach-status', metavar='<attach-status>', default=None,
+           help=('The attach status to assign to the volume in the DataBase, '
+                 'with no regard to the actual status. Valid values are '
+                 '"attached" and "detached". Default=None, that means the '
+                 'status is unchanged.'))
+@utils.arg('--reset-migration-status',
+           action='store_true',
+           help=('Clears the migration status of the volume in the DataBase '
+                 'that indicates the volume is source or destination of '
+                 'volume migration, with no regard to the actual status.'))
 @utils.service_type('volumev2')
 def do_reset_state(cs, args):
     """Explicitly updates the volume state in the Cinder database.
@@ -466,10 +476,13 @@ def do_reset_state(cs, args):
     unusable in the case of change to the 'available' state.
     """
     failure_flag = False
+    migration_status = 'none' if args.reset_migration_status else None
 
     for volume in args.volume:
         try:
-            utils.find_volume(cs, volume).reset_state(args.state)
+            utils.find_volume(cs, volume).reset_state(args.state,
+                                                      args.attach_status,
+                                                      migration_status)
         except Exception as e:
             failure_flag = True
             msg = "Reset state for volume %s failed: %s" % (volume, e)

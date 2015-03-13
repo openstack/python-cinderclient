@@ -111,9 +111,16 @@ class Volume(base.Resource):
         """
         self.manager.force_delete(self)
 
-    def reset_state(self, state):
-        """Update the volume with the provided state."""
-        self.manager.reset_state(self, state)
+    def reset_state(self, state, attach_status=None, migration_status=None):
+        """Update the volume with the provided state.
+
+        :param state: The state of the volume to set.
+        :param attach_status: The attach_status of the volume to be set,
+                              or None to keep the current status.
+        :param migration_status: The migration_status of the volume to be set,
+                                 or None to keep the current status.
+        """
+        self.manager.reset_state(self, state, attach_status, migration_status)
 
     def extend(self, volume, new_size):
         """Extend the size of the specified volume.
@@ -495,9 +502,23 @@ class VolumeManager(base.ManagerWithFind):
         """
         return self._action('os-force_delete', base.getid(volume))
 
-    def reset_state(self, volume, state):
-        """Update the provided volume with the provided state."""
-        return self._action('os-reset_status', volume, {'status': state})
+    def reset_state(self, volume, state, attach_status=None,
+                    migration_status=None):
+        """Update the provided volume with the provided state.
+
+        :param volume: The :class:`Volume` to set the state.
+        :param state: The state of the volume to be set.
+        :param attach_status: The attach_status of the volume to be set,
+                              or None to keep the current status.
+        :param migration_status: The migration_status of the volume to be set,
+                                 or None to keep the current status.
+        """
+        body = {'status': state}
+        if attach_status:
+            body.update({'attach_status': attach_status})
+        if migration_status:
+            body.update({'migration_status': migration_status})
+        return self._action('os-reset_status', volume, body)
 
     def extend(self, volume, new_size):
         """Extend the size of the specified volume.
