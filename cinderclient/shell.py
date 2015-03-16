@@ -514,6 +514,28 @@ class OpenStackCinderShell(object):
         ks_logger = logging.getLogger("keystoneclient")
         ks_logger.setLevel(logging.DEBUG)
 
+    def _delimit_metadata_args(self, argv):
+        """This function adds -- separator at the appropriate spot
+        """
+        word = '--metadata'
+        tmp = []
+        # flag is true in between metadata option and next option
+        metadata_options = False
+        if word in argv:
+            for arg in argv:
+                if arg == word:
+                    metadata_options = True
+                elif metadata_options:
+                    if arg.startswith('--'):
+                        metadata_options = False
+                    elif '=' not in arg:
+                        tmp.append(u'--')
+                        metadata_options = False
+                tmp.append(arg)
+            return tmp
+        else:
+            return argv
+
     def main(self, argv):
         # Parse args once to find version and debug settings
         parser = self.get_base_parser()
@@ -542,6 +564,7 @@ class OpenStackCinderShell(object):
             subcommand_parser.print_help()
             return 0
 
+        argv = self._delimit_metadata_args(argv)
         args = subcommand_parser.parse_args(argv)
         self._run_extension_hooks('__post_parse_args__', args)
 
