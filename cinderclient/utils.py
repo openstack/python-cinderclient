@@ -139,6 +139,8 @@ def print_list(objs, fields, formatters=None, sortby_index=0):
                     data = o[field]
                 else:
                     data = getattr(o, field_name, '')
+                if data is None:
+                    data = '-'
                 row.append(data)
         pt.add_row(row)
 
