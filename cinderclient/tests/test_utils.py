@@ -123,6 +123,21 @@ class PrintListTestCase(test_utils.TestCase):
 +---+---+
 """, cso.read())
 
+    def test_print_list_with_None_data(self):
+        Row = collections.namedtuple('Row', ['a', 'b'])
+        to_print = [Row(a=3, b=None), Row(a=1, b=2)]
+        with CaptureStdout() as cso:
+            utils.print_list(to_print, ['a', 'b'])
+        # Output should be sorted by the first key (a)
+        self.assertEqual("""\
++---+---+
+| a | b |
++---+---+
+| 1 | 2 |
+| 3 | - |
++---+---+
+""", cso.read())
+
     def test_print_list_with_list_sortby(self):
         Row = collections.namedtuple('Row', ['a', 'b'])
         to_print = [Row(a=4, b=3), Row(a=2, b=1)]
