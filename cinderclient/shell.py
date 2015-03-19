@@ -361,18 +361,6 @@ class OpenStackCinderShell(object):
             default=utils.env('OS_PROJECT_DOMAIN_NAME'),
             help='Defaults to env[OS_PROJECT_DOMAIN_NAME].')
 
-        parser.add_argument(
-            '--os-cert',
-            metavar='<certificate>',
-            default=utils.env('OS_CERT'),
-            help='Defaults to env[OS_CERT].')
-
-        parser.add_argument(
-            '--os-key',
-            metavar='<key>',
-            default=utils.env('OS_KEY'),
-            help='Defaults to env[OS_KEY].')
-
         parser.add_argument('--os-region-name',
                             metavar='<region-name>',
                             default=utils.env('OS_REGION_NAME',
@@ -398,19 +386,10 @@ class OpenStackCinderShell(object):
             '--os_url',
             help=argparse.SUPPRESS)
 
-        parser.add_argument(
-            '--os-cacert',
-            metavar='<ca-certificate>',
-            default=utils.env('OS_CACERT', default=None),
-            help=_("Specify a CA bundle file to use in "
-                   "verifying a TLS (https) server certificate. "
-                   "Defaults to env[OS_CACERT]"))
-
-        parser.add_argument('--insecure',
-                            default=utils.env('CINDERCLIENT_INSECURE',
-                                              default=False),
-                            action='store_true',
-                            help=argparse.SUPPRESS)
+        # Register the CLI arguments that have moved to the session object.
+        session.Session.register_cli_options(parser)
+        parser.set_defaults(insecure=utils.env('CINDERCLIENT_INSECURE',
+                                               default=False))
 
     def get_subcommand_parser(self, version):
         parser = self.get_base_parser()
