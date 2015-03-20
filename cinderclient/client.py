@@ -73,7 +73,16 @@ class SessionClient(adapter.LegacyJsonAdapter):
 
     def request(self, *args, **kwargs):
         kwargs.setdefault('authenticated', False)
-        return super(SessionClient, self).request(*args, **kwargs)
+        # Note(tpatil): The standard call raises errors from
+        # keystoneclient, here we need to raise the cinderclient errors.
+        raise_exc = kwargs.pop('raise_exc', True)
+        resp, body = super(SessionClient, self).request(*args,
+                                                        raise_exc=False,
+                                                        **kwargs)
+        if raise_exc and resp.status_code >= 400:
+            raise exceptions.from_response(resp, body)
+
+        return resp, body
 
     def _cs_request(self, url, method, **kwargs):
         # this function is mostly redundant but makes compatibility easier

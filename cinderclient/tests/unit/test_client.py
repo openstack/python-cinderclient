@@ -12,13 +12,18 @@
 # limitations under the License.
 
 import logging
+import json
 
 import fixtures
+import mock
 
 import cinderclient.client
 import cinderclient.v1.client
 import cinderclient.v2.client
+from cinderclient import exceptions
 from cinderclient.tests.unit import utils
+from keystoneclient import adapter
+from keystoneclient import exceptions as keystone_exception
 
 
 class ClientTest(utils.TestCase):
@@ -74,3 +79,111 @@ class ClientTest(utils.TestCase):
         self.assertRaises(cinderclient.exceptions.UnsupportedVersion,
                           cinderclient.client.get_volume_api_from_url,
                           unknown_url)
+
+    @mock.patch.object(adapter.Adapter, 'request')
+    @mock.patch.object(exceptions, 'from_response')
+    def test_sessionclient_request_method(
+            self, mock_from_resp, mock_request):
+        kwargs = {
+            "body": {
+                "volume": {
+                    "status": "creating",
+                    "imageRef": "username",
+                    "attach_status": "detached"
+                },
+                "authenticated": "True"
+            }
+        }
+
+        resp = {
+            "text": {
+                "volume": {
+                    "status": "creating",
+                    "id": "431253c0-e203-4da2-88df-60c756942aaf",
+                    "size": 1
+                }
+            },
+            "code": 202
+        }
+
+        mock_response = utils.TestResponse({
+            "status_code": 202,
+            "text": json.dumps(resp),
+        })
+
+        # 'request' method of Adaptor will return 202 response
+        mock_request.return_value = mock_response
+        session_client = cinderclient.client.SessionClient(session=mock.Mock())
+        response, body = session_client.request(mock.sentinel.url,
+                                                'POST', **kwargs)
+
+        # In this case, from_response method will not get called
+        # because response status_code is < 400
+        self.assertEqual(202, response.status_code)
+        self.assertFalse(mock_from_resp.called)
+
+    @mock.patch.object(adapter.Adapter, 'request')
+    def test_sessionclient_request_method_raises_badrequest(
+            self, mock_request):
+        kwargs = {
+            "body": {
+                "volume": {
+                    "status": "creating",
+                    "imageRef": "username",
+                    "attach_status": "detached"
+                },
+                "authenticated": "True"
+            }
+        }
+
+        resp = {
+            "badRequest": {
+                "message": "Invalid image identifier or unable to access "
+                           "requested image.",
+                "code": 400
+            }
+        }
+
+        mock_response = utils.TestResponse({
+            "status_code": 400,
+            "text": json.dumps(resp),
+        })
+
+        # 'request' method of Adaptor will return 400 response
+        mock_request.return_value = mock_response
+        session_client = cinderclient.client.SessionClient(
+            session=mock.Mock())
+
+        # 'from_response' method will raise BadRequest because
+        # resp.status_code is 400
+        self.assertRaises(exceptions.BadRequest, session_client.request,
+                          mock.sentinel.url, 'POST', **kwargs)
+
+    @mock.patch.object(exceptions, 'from_response')
+    def test_keystone_request_raises_auth_failure_exception(
+            self, mock_from_resp):
+
+        kwargs = {
+            "body": {
+                "volume": {
+                    "status": "creating",
+                    "imageRef": "username",
+                    "attach_status": "detached"
+                },
+                "authenticated": "True"
+            }
+        }
+
+        with mock.patch.object(adapter.Adapter, 'request',
+                               side_effect=
+                               keystone_exception.AuthorizationFailure()):
+            session_client = cinderclient.client.SessionClient(
+                session=mock.Mock())
+            self.assertRaises(keystone_exception.AuthorizationFailure,
+                              session_client.request,
+                              mock.sentinel.url, 'POST', **kwargs)
+
+        # As keystonesession.request method will raise
+        # AuthorizationFailure exception, check exceptions.from_response
+        # is not getting called.
+        self.assertFalse(mock_from_resp.called)
