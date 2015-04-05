@@ -598,13 +598,15 @@ def do_snapshot_show(cs, args):
            help='Name or ID of volume to snapshot.')
 @utils.arg('--force',
            metavar='<True|False>',
+           const=True,
+           nargs='?',
            default=False,
            help='Allows or disallows snapshot of '
-                'a volume when the volume is attached to an instance. '
-                'If set to True, ignores the current status of the '
-                'volume when attempting to snapshot it rather '
-                'than forcing it to be available. '
-                'Default=False.')
+           'a volume when the volume is attached to an instance. '
+           'If set to True, ignores the current status of the '
+           'volume when attempting to snapshot it rather '
+           'than forcing it to be available. '
+           'Default=False.')
 @utils.arg('--name',
            metavar='<name>',
            default=None,
@@ -1073,10 +1075,12 @@ def _find_volume_type(cs, vtype):
            help='Name or ID of volume to snapshot.')
 @utils.arg('--force',
            metavar='<True|False>',
+           const=True,
+           nargs='?',
            default=False,
            help='Enables or disables upload of '
-                'a volume that is attached to an instance. '
-                'Default=False.')
+           'a volume that is attached to an instance. '
+           'Default=False.')
 @utils.arg('--container-format',
            metavar='<container-format>',
            default='bare',
@@ -1109,11 +1113,14 @@ def do_upload_to_image(cs, args):
 @utils.arg('volume', metavar='<volume>', help='ID of volume to migrate.')
 @utils.arg('host', metavar='<host>', help='Destination host.')
 @utils.arg('--force-host-copy', metavar='<True|False>',
-           choices=['True', 'False'], required=False,
+           choices=['True', 'False'],
+           required=False,
+           const=True,
+           nargs='?',
            default=False,
            help='Enables or disables generic host-based '
-                'force-migration, which bypasses driver '
-                'optimizations. Default=False.')
+           'force-migration, which bypasses driver '
+           'optimizations. Default=False.')
 @utils.service_type('volumev2')
 def do_migrate(cs, args):
     """Migrates volume to a new host."""
@@ -1602,6 +1609,8 @@ def do_qos_show(cs, args):
            help='ID of QoS specifications to delete.')
 @utils.arg('--force',
            metavar='<True|False>',
+           const=True,
+           nargs='?',
            default=False,
            help='Enables or disables deletion of in-use '
                 'QoS specifications. Default=False.')
