@@ -112,6 +112,16 @@ class ShellTest(utils.TestCase):
         # NOTE(jdg): we default to detail currently
         self.assert_called('GET', '/volumes/detail')
 
+    def test_list_filter_tenant_with_all_tenants(self):
+        self.run_command('list --tenant=123 --all-tenants 1')
+        self.assert_called('GET',
+                           '/volumes/detail?all_tenants=1&project_id=123')
+
+    def test_list_filter_tenant_without_all_tenants(self):
+        self.run_command('list --tenant=123')
+        self.assert_called('GET',
+                           '/volumes/detail?all_tenants=1&project_id=123')
+
     def test_metadata_args_with_limiter(self):
         self.run_command('create --metadata key1="--test1" 1')
         expected = {'volume': {'snapshot_id': None,
