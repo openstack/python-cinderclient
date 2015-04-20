@@ -62,8 +62,6 @@ class ClientTest(utils.TestCase):
 
         output = self.logger.output.split('\n')
 
-        print("JSBRYANT: output is", output)
-
         self.assertNotIn("fakePassword", output[1])
         self.assertIn("fakeUser", output[1])
 
