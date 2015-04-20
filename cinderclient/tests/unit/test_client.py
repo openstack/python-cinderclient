@@ -21,6 +21,7 @@ import cinderclient.client
 import cinderclient.v1.client
 import cinderclient.v2.client
 from cinderclient import exceptions
+from cinderclient.tests.unit.fixture_data import base as fixture_base
 from cinderclient.tests.unit import utils
 from keystoneclient import adapter
 from keystoneclient import exceptions as keystone_exception
@@ -66,8 +67,8 @@ class ClientTest(utils.TestCase):
         self.assertIn("fakeUser", output[1])
 
     def test_versions(self):
-        v1_url = 'http://fakeurl/v1/tenants'
-        v2_url = 'http://fakeurl/v2/tenants'
+        v1_url = fixture_base.VOLUME_V1_URL
+        v2_url = fixture_base.VOLUME_V2_URL
         unknown_url = 'http://fakeurl/v9/tenants'
 
         self.assertEqual('1',
@@ -111,8 +112,11 @@ class ClientTest(utils.TestCase):
 
         # 'request' method of Adaptor will return 202 response
         mock_request.return_value = mock_response
-        session_client = cinderclient.client.SessionClient(session=mock.Mock())
-        response, body = session_client.request(mock.sentinel.url,
+        mock_session = mock.Mock()
+        mock_session.get_endpoint.return_value = fixture_base.VOLUME_V1_URL
+        session_client = cinderclient.client.SessionClient(
+            session=mock_session)
+        response, body = session_client.request(fixture_base.VOLUME_V1_URL,
                                                 'POST', **kwargs)
 
         # In this case, from_response method will not get called
@@ -149,13 +153,15 @@ class ClientTest(utils.TestCase):
 
         # 'request' method of Adaptor will return 400 response
         mock_request.return_value = mock_response
+        mock_session = mock.Mock()
+        mock_session.get_endpoint.return_value = fixture_base.VOLUME_V1_URL
         session_client = cinderclient.client.SessionClient(
-            session=mock.Mock())
+            session=mock_session)
 
         # 'from_response' method will raise BadRequest because
         # resp.status_code is 400
         self.assertRaises(exceptions.BadRequest, session_client.request,
-                          mock.sentinel.url, 'POST', **kwargs)
+                          fixture_base.VOLUME_V1_URL, 'POST', **kwargs)
 
     @mock.patch.object(exceptions, 'from_response')
     def test_keystone_request_raises_auth_failure_exception(
@@ -175,11 +181,13 @@ class ClientTest(utils.TestCase):
         with mock.patch.object(adapter.Adapter, 'request',
                                side_effect=
                                keystone_exception.AuthorizationFailure()):
+            mock_session = mock.Mock()
+            mock_session.get_endpoint.return_value = fixture_base.VOLUME_V1_URL
             session_client = cinderclient.client.SessionClient(
-                session=mock.Mock())
+                session=mock_session)
             self.assertRaises(keystone_exception.AuthorizationFailure,
                               session_client.request,
-                              mock.sentinel.url, 'POST', **kwargs)
+                              fixture_base.VOLUME_V1_URL, 'POST', **kwargs)
 
         # As keystonesession.request method will raise
         # AuthorizationFailure exception, check exceptions.from_response
