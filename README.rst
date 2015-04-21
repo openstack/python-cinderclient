@@ -150,3 +150,8 @@ Quick-start using keystone::
     [...]
 
 See release notes and more at `<http://docs.openstack.org/developer/python-cinderclient/>`_.
+
+* License: Apache License, Version 2.0
+* Documentation: http://docs.openstack.org/developer/python-cinderclient
+* Source: http://git.openstack.org/cgit/openstack/python-cinderclient
+* Bugs: http://bugs.launchpad.net/python-cinderclient
