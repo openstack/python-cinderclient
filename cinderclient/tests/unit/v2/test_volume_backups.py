@@ -26,6 +26,16 @@ class VolumeBackupsTest(utils.TestCase):
         cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4')
         cs.assert_called('POST', '/backups')
 
+    def test_create_full(self):
+        cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4',
+                          None, None, False)
+        cs.assert_called('POST', '/backups')
+
+    def test_create_incremental(self):
+        cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4',
+                          None, None, True)
+        cs.assert_called('POST', '/backups')
+
     def test_get(self):
         backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
         cs.backups.get(backup_id)

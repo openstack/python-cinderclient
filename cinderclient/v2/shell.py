@@ -1150,6 +1150,10 @@ def do_retype(cs, args):
            metavar='<description>',
            default=None,
            help='Backup description. Default=None.')
+@utils.arg('--incremental',
+           action='store_true',
+           help='Incremental backup. Default=False.',
+           default=False)
 @utils.service_type('volumev2')
 def do_backup_create(cs, args):
     """Creates a volume backup."""
@@ -1163,7 +1167,8 @@ def do_backup_create(cs, args):
     backup = cs.backups.create(volume.id,
                                args.container,
                                args.name,
-                               args.description)
+                               args.description,
+                               args.incremental)
 
     info = {"volume_id": volume.id}
     info.update(backup._info)
