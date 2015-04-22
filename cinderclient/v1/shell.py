@@ -170,6 +170,11 @@ def _extract_metadata(args):
     nargs='?',
     metavar='<tenant>',
     help='Display information from single tenant (Admin only).')
+@utils.arg(
+    '--limit',
+    metavar='<limit>',
+    default=None,
+    help='Maximum number of volumes to return. OPTIONAL: Default=None.')
 @utils.service_type('volume')
 def do_list(cs, args):
     """Lists all volumes."""
@@ -182,7 +187,7 @@ def do_list(cs, args):
         'status': args.status,
         'metadata': _extract_metadata(args) if args.metadata else None,
     }
-    volumes = cs.volumes.list(search_opts=search_opts)
+    volumes = cs.volumes.list(search_opts=search_opts, limit=args.limit)
     _translate_volume_keys(volumes)
 
     # Create a list of servers to which the volume is attached

@@ -220,6 +220,10 @@ class ShellTest(utils.TestCase):
         self.run_command('availability-zone-list')
         self.assert_called('GET', '/os-availability-zone')
 
+    def test_list_limit(self):
+        self.run_command('list --limit=10')
+        self.assert_called('GET', '/volumes/detail?limit=10')
+
     def test_show(self):
         self.run_command('show 1234')
         self.assert_called('GET', '/volumes/1234')
