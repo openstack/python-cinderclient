@@ -378,7 +378,7 @@ def do_create(cs, args):
     # NOTE(N.S.): end of taken piece
 
     # Keep backward compatibility with image_id, favoring explicit ID
-    image_ref = args.image_id or args.image_ref
+    image_ref = args.image_id or args.image or args.image_ref
 
     volume = cs.volumes.create(args.size,
                                args.consisgroup_id,

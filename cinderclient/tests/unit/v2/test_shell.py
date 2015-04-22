@@ -322,6 +322,15 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('POST', '/volumes', partial_body=expected)
         self.assert_called('GET', '/volumes/1234')
 
+    def test_create_volume_from_image(self):
+        expected = {'volume': {'status': 'creating',
+                               'size': 1,
+                               'imageRef': '1234',
+                               'attach_status': 'detached'}}
+        self.run_command('create --image=1234 1')
+        self.assert_called_anytime('POST', '/volumes', partial_body=expected)
+        self.assert_called('GET', '/volumes/1234')
+
     def test_create_size_required_if_not_snapshot_or_clone(self):
         self.assertRaises(SystemExit, self.run_command, 'create')
 
