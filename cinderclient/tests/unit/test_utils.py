@@ -14,6 +14,7 @@
 import collections
 import sys
 
+import mock
 from six import moves
 
 from cinderclient import exceptions
@@ -66,10 +67,12 @@ class FindResourceTestCase(test_utils.TestCase):
         self.manager = FakeManager(None)
 
     def test_find_none(self):
+        self.manager.find = mock.Mock(side_effect=self.manager.find)
         self.assertRaises(exceptions.CommandError,
                           utils.find_resource,
                           self.manager,
                           'asdf')
+        self.assertEqual(3, self.manager.find.call_count)
 
     def test_find_by_integer_id(self):
         output = utils.find_resource(self.manager, 1234)

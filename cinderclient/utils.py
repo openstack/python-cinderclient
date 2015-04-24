@@ -166,16 +166,16 @@ def find_resource(manager, name_or_id):
             return manager.get(int(name_or_id))
     except exceptions.NotFound:
         pass
+    else:
+        # now try to get entity as uuid
+        try:
+            uuid.UUID(name_or_id)
+            return manager.get(name_or_id)
+        except (ValueError, exceptions.NotFound):
+            pass
 
     if sys.version_info <= (3, 0):
         name_or_id = strutils.safe_decode(name_or_id)
-
-    # now try to get entity as uuid
-    try:
-        uuid.UUID(name_or_id)
-        return manager.get(name_or_id)
-    except (ValueError, exceptions.NotFound):
-        pass
 
     try:
         try:
@@ -187,16 +187,15 @@ def find_resource(manager, name_or_id):
         try:
             return manager.find(name=name_or_id)
         except exceptions.NotFound:
-            try:
-                return manager.find(display_name=name_or_id)
-            except (UnicodeDecodeError, exceptions.NotFound):
-                try:
-                    # Volumes does not have name, but display_name
-                    return manager.find(display_name=name_or_id)
-                except exceptions.NotFound:
-                    msg = "No %s with a name or ID of '%s' exists." % \
-                        (manager.resource_class.__name__.lower(), name_or_id)
-                    raise exceptions.CommandError(msg)
+            pass
+
+        # Volumes don't have name, but display_name
+        try:
+            return manager.find(display_name=name_or_id)
+        except (UnicodeDecodeError, exceptions.NotFound):
+            msg = "No %s with a name or ID of '%s' exists." % \
+                (manager.resource_class.__name__.lower(), name_or_id)
+            raise exceptions.CommandError(msg)
     except exceptions.NoUniqueMatch:
         msg = ("Multiple %s matches found for '%s', use an ID to be more"
                " specific." % (manager.resource_class.__name__.lower(),
