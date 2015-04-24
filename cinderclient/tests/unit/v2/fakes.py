@@ -493,6 +493,12 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_consistencygroups_1234_delete(self, **kw):
         return (202, {}, {})
 
+    def post_consistencygroups_create_from_src(self, **kw):
+        return (200,
+                {},
+                {'consistencygroup': _stub_consistencygroup(
+                    id='1234', cgsnapshot_id='1234')})
+
     #
     # Cgsnapshots
     #

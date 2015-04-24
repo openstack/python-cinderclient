@@ -819,3 +819,26 @@ class ShellTest(utils.TestCase):
         self.assertRaises(exceptions.BadRequest,
                           self.run_command,
                           'consisgroup-update 1234')
+
+    def test_consistencygroup_create_from_src(self):
+        self.run_command('consisgroup-create-from-src '
+                         '--name cg '
+                         '--cgsnapshot 1234')
+        expected = {
+            'consistencygroup-from-src': {
+                'name': 'cg',
+                'cgsnapshot_id': '1234',
+                'description': None,
+                'user_id': None,
+                'project_id': None,
+                'status': 'creating'
+            }
+        }
+        self.assert_called('POST', '/consistencygroups/create_from_src',
+                           expected)
+
+    def test_consistencygroup_create_from_src_bad_request(self):
+        self.assertRaises(exceptions.BadRequest,
+                          self.run_command,
+                          'consisgroup-create-from-src '
+                          '--name cg')
