@@ -127,7 +127,7 @@ class ShellTest(utils.TestCase):
         in the tenant_id for mocking purposes.
         """
         token = keystone_client_fixture.V2Token()
-        cinder_url = 'http://127.0.0.1:8776/v1/%s' % fixture_base.TENANT_ID
+        cinder_url = 'http://127.0.0.1:8776/'
 
         volume_service = token.add_service('volume', 'Cinder v1')
         volume_service.add_endpoint(public=cinder_url, region='RegionOne')
@@ -153,7 +153,7 @@ class ShellTest(utils.TestCase):
         in the tenant_id for mocking purposes.
         """
         token = keystone_client_fixture.V2Token()
-        cinder_url = 'http://127.0.0.1:8776/v1/%s' % fixture_base.TENANT_ID
+        cinder_url = 'http://127.0.0.1:8776/'
 
         volume_service = token.add_service('volume', 'Cinder v1')
         volume_service.add_endpoint(
@@ -182,7 +182,7 @@ class ShellTest(utils.TestCase):
         in the tenant_id for mocking purposes.
         """
         token = keystone_client_fixture.V2Token()
-        cinder_url = 'http://127.0.0.1:8776/v2/%s' % fixture_base.TENANT_ID
+        cinder_url = 'http://127.0.0.1:8776/'
 
         volumev2_service = token.add_service('volumev2', 'Cinder v2')
         volumev2_service.add_endpoint(

@@ -21,10 +21,12 @@ OpenStack Client interface. Handles the REST calls and responses.
 from __future__ import print_function
 
 import logging
+import re
 
 from keystoneclient import access
 from keystoneclient import adapter
 from keystoneclient.auth.identity import base
+from keystoneclient import discover
 import requests
 
 from cinderclient import exceptions
@@ -55,6 +57,12 @@ if not hasattr(urlparse, 'parse_qsl'):
     urlparse.parse_qsl = cgi.parse_qsl
 
 _VALID_VERSIONS = ['v1', 'v2']
+
+
+# tell keystoneclient that we can ignore the /v1|v2/{project_id} component of
+# the service catalog when doing discovery lookups
+for svc in ('volume', 'volumev2'):
+    discover.add_catalog_discover_hack(svc, re.compile('/v[12]/\w+/?$'), '/')
 
 
 def get_volume_api_from_url(url):
