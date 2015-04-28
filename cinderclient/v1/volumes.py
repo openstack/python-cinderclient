@@ -190,7 +190,7 @@ class VolumeManager(base.ManagerWithFind):
         """
         return self._get("/volumes/%s" % volume_id, "volume")
 
-    def list(self, detailed=True, search_opts=None):
+    def list(self, detailed=True, search_opts=None, limit=None):
         """
         Get a list of all volumes.
 
@@ -204,6 +204,9 @@ class VolumeManager(base.ManagerWithFind):
         for opt, val in six.iteritems(search_opts):
             if val:
                 qparams[opt] = val
+
+        if limit:
+            qparams['limit'] = limit
 
         # Transform the dict to a sequence of two-element tuples in fixed
         # order, then the encoded string will be consistent in Python 2&3.
