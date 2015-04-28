@@ -115,7 +115,7 @@ class ShellTest(utils.TestCase):
         v = cs.volumes.list()[0]
         setattr(v, 'os-vol-tenant-attr:tenant_id', 'fake_tenant')
         setattr(v, '_info', {'attachments': [{'server_id': 1234}],
-                'id': 1234, 'name': 'sample-volume',
+                'id': 1234, 'display_name': 'sample-volume',
                 'os-vol-tenant-attr:tenant_id': 'fake_tenant'})
         shell_v1._translate_volume_keys([v])
         self.assertEqual(v.tenant_id, 'fake_tenant')

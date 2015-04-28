@@ -26,15 +26,12 @@ UUID = '8e8ec658-c7b0-4243-bdf8-6f7f2952c0d0'
 
 
 class FakeResource(object):
+    NAME_ATTR = 'name'
 
     def __init__(self, _id, properties):
         self.id = _id
         try:
             self.name = properties['name']
-        except KeyError:
-            pass
-        try:
-            self.display_name = properties['display_name']
         except KeyError:
             pass
 
@@ -46,7 +43,6 @@ class FakeManager(base.ManagerWithFind):
     resources = [
         FakeResource('1234', {'name': 'entity_one'}),
         FakeResource(UUID, {'name': 'entity_two'}),
-        FakeResource('4242', {'display_name': 'entity_three'}),
         FakeResource('5678', {'name': '9876'})
     ]
 
@@ -58,6 +54,26 @@ class FakeManager(base.ManagerWithFind):
 
     def list(self, search_opts):
         return self.resources
+
+
+class FakeDisplayResource(object):
+    NAME_ATTR = 'display_name'
+
+    def __init__(self, _id, properties):
+        self.id = _id
+        try:
+            self.display_name = properties['display_name']
+        except KeyError:
+            pass
+
+
+class FakeDisplayManager(FakeManager):
+
+    resource_class = FakeDisplayResource
+
+    resources = [
+        FakeDisplayResource('4242', {'display_name': 'entity_three'}),
+    ]
 
 
 class FindResourceTestCase(test_utils.TestCase):
@@ -72,7 +88,7 @@ class FindResourceTestCase(test_utils.TestCase):
                           utils.find_resource,
                           self.manager,
                           'asdf')
-        self.assertEqual(3, self.manager.find.call_count)
+        self.assertEqual(2, self.manager.find.call_count)
 
     def test_find_by_integer_id(self):
         output = utils.find_resource(self.manager, 1234)
@@ -91,8 +107,9 @@ class FindResourceTestCase(test_utils.TestCase):
         self.assertEqual(self.manager.get('1234'), output)
 
     def test_find_by_str_displayname(self):
-        output = utils.find_resource(self.manager, 'entity_three')
-        self.assertEqual(self.manager.get('4242'), output)
+        display_manager = FakeDisplayManager(None)
+        output = utils.find_resource(display_manager, 'entity_three')
+        self.assertEqual(display_manager.get('4242'), output)
 
 
 class CaptureStdout(object):

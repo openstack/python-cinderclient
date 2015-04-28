@@ -22,6 +22,8 @@ from cinderclient import base
 
 class VolumeBackup(base.Resource):
     """A volume backup is a block level backup of a volume."""
+    NAME_ATTR = "display_name"
+
     def __repr__(self):
         return "<VolumeBackup: %s>" % self.id
 
