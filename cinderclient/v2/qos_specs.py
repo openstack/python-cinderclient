@@ -43,7 +43,7 @@ class QoSSpecsManager(base.ManagerWithFind):
     """
     resource_class = QoSSpecs
 
-    def list(self):
+    def list(self, search_opts=None):
         """Get a list of all qos specs.
 
         :rtype: list of :class:`QoSSpecs`.
