@@ -157,14 +157,14 @@ _code_map = dict((c.http_status, c) for c in [BadRequest, Unauthorized,
 
 def from_response(response, body):
     """
-    Return an instance of an ClientException or subclass
-    based on an requests response.
+    Return an instance of a ClientException or subclass
+    based on a requests response.
 
     Usage::
 
         resp, body = requests.request(...)
         if resp.status_code != 200:
-            raise exception_from_response(resp, rest.text)
+            raise exceptions.from_response(resp, resp.text)
     """
     cls = _code_map.get(response.status_code, ClientException)
     if response.headers:
