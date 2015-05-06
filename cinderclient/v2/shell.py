@@ -153,30 +153,30 @@ def _extract_metadata(args):
 @utils.arg('--name',
            metavar='<name>',
            default=None,
-           help='Filters results by a name. OPTIONAL: Default=None.')
+           help='Filters results by a name. Default=None.')
 @utils.arg('--display-name',
            help=argparse.SUPPRESS)
 @utils.arg('--status',
            metavar='<status>',
            default=None,
-           help='Filters results by a status. OPTIONAL: Default=None.')
+           help='Filters results by a status. Default=None.')
 @utils.arg('--metadata',
            type=str,
            nargs='*',
            metavar='<key=value>',
            default=None,
            help='Filters results by a metadata key and value pair. '
-                'OPTIONAL: Default=None.')
+                'Default=None.')
 @utils.arg('--marker',
            metavar='<marker>',
            default=None,
            help='Begin returning volumes that appear later in the volume '
                 'list than that represented by this volume id. '
-                'OPTIONAL: Default=None.')
+                'Default=None.')
 @utils.arg('--limit',
            metavar='<limit>',
            default=None,
-           help='Maximum number of volumes to return. OPTIONAL: Default=None.')
+           help='Maximum number of volumes to return. Default=None.')
 @utils.arg('--sort_key',
            metavar='<sort_key>',
            default=None,
@@ -190,7 +190,7 @@ def _extract_metadata(args):
            default=None,
            help=(('Comma-separated list of sort keys and directions in the '
                   'form of <key>[:<asc|desc>]. '
-                  'Valid keys: %s. OPTIONAL: '
+                  'Valid keys: %s. '
                   'Default=None.') % ', '.join(volumes.SORT_KEY_VALUES)))
 @utils.arg('--tenant',
            type=str,
