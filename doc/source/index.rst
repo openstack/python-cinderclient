@@ -33,6 +33,86 @@ Release Notes
 MASTER
 -----
 
+1.2.1
+-----
+
+* Remove warnings about Keystone unable to contact endpoint for discovery.
+* backup-create subcommand allows specifying --incremental to do an incremental
+  backup.
+* Modify consistency groups using the consisgroup-update subcommand. Change the
+  name, description, add volumes, or remove volumes.
+* Create consistency group from consistency group snapshot using the
+  consisgroup-create-from-src subcommand.
+* --force no longer needs a boolean to be specified.
+
+.. _1341411 http://bugs.launchpad.net/python-cinderclient/+bug/1341411
+.. _1429102 http://bugs.launchpad.net/python-cinderclient/+bug/1429102
+.. _1447589 http://bugs.launchpad.net/python-cinderclient/+bug/1447589
+.. _1447162 http://bugs.launchpad.net/python-cinderclient/+bug/1447162
+.. _1448244 http://bugs.launchpad.net/python-cinderclient/+bug/1448244
+.. _1244453 http://bugs.launchpad.net/python-cinderclient/+bug/1244453
+
+1.2.0
+-----
+
+* Add metadata during snapshot create.
+* Add TTY password entry when no password is environment vars or --os-password.
+* Ability to set backup quota in quota-update subcommand.
+* Force the client to use a particular Cinder API endpoint with --bypass-url.
+* Create a volume from an image by image name.
+* New type-default subcommand will display the default volume type.
+* New type-update subcommand allows updating a volume type's description.
+* type-list subcommand displays volume type description.
+* type-create subcommand allows setting the description.
+* Show pools to a backend when doing a service-list subcommand.
+* List and update consistency group quotas.
+* Create volume types that are non-public and have particular project access.
+* -d is available as a shorter option to --debug.
+* transfer-list subcommand has an option for --all-tenants.
+* --sort option available instead of --sort-key and --sort-dir. E.q. --sort
+  <key>[:<direction>].
+* Volume type name can now be updated via subcommand type-update.
+* bash compeletion gives subcommands when using 'cinder help'.
+* Version discovery is now available. You no longer need a volumev2 service
+  type in your keystone catalog.
+* Filter by tenant in list subcommand.
+
+.. _1373662 http://bugs.launchpad.net/python-cinderclient/+bug/1373662
+.. _1376311 http://bugs.launchpad.net/python-cinderclient/+bug/1376311
+.. _1368910 http://bugs.launchpad.net/python-cinderclient/+bug/1368910
+.. _1374211 http://bugs.launchpad.net/python-cinderclient/+bug/1374211
+.. _1379505 http://bugs.launchpad.net/python-cinderclient/+bug/1379505
+.. _1282324 http://bugs.launchpad.net/python-cinderclient/+bug/1282324
+.. _1358926 http://bugs.launchpad.net/python-cinderclient/+bug/1358926
+.. _1342192 http://bugs.launchpad.net/python-cinderclient/+bug/1342192
+.. _1386232 http://bugs.launchpad.net/python-cinderclient/+bug/1386232
+.. _1402846 http://bugs.launchpad.net/python-cinderclient/+bug/1402846
+.. _1373766 http://bugs.launchpad.net/python-cinderclient/+bug/1373766
+.. _1403902 http://bugs.launchpad.net/python-cinderclient/+bug/1403902
+.. _1377823 http://bugs.launchpad.net/python-cinderclient/+bug/1377823
+.. _1350702 http://bugs.launchpad.net/python-cinderclient/+bug/1350702
+.. _1357559 http://bugs.launchpad.net/python-cinderclient/+bug/1357559
+.. _1341424 http://bugs.launchpad.net/python-cinderclient/+bug/1341424
+.. _1365273 http://bugs.launchpad.net/python-cinderclient/+bug/1365273
+.. _1404020 http://bugs.launchpad.net/python-cinderclient/+bug/1404020
+.. _1380729 http://bugs.launchpad.net/python-cinderclient/+bug/1380729
+.. _1417273 http://bugs.launchpad.net/python-cinderclient/+bug/1417273
+.. _1420238 http://bugs.launchpad.net/python-cinderclient/+bug/1420238
+.. _1421210 http://bugs.launchpad.net/python-cinderclient/+bug/1421210
+.. _1351084 http://bugs.launchpad.net/python-cinderclient/+bug/1351084
+.. _1366289 http://bugs.launchpad.net/python-cinderclient/+bug/1366289
+.. _1309086 http://bugs.launchpad.net/python-cinderclient/+bug/1309086
+.. _1379486 http://bugs.launchpad.net/python-cinderclient/+bug/1379486
+.. _1422244 http://bugs.launchpad.net/python-cinderclient/+bug/1422244
+.. _1399747 http://bugs.launchpad.net/python-cinderclient/+bug/1399747
+.. _1431693 http://bugs.launchpad.net/python-cinderclient/+bug/1431693
+.. _1428764 http://bugs.launchpad.net/python-cinderclient/+bug/1428764
+
+** Python 2.4 support removed.
+** --sort-key and --sort-dir are deprecated. Use --sort instead.
+** A dash will be displayed of None when there is no data to display under
+   a column.
+
 1.1.1
 ------
 .. _1370152 http://bugs.launchpad.net/python-cinderclient/+bug/1370152
