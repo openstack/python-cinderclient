@@ -164,14 +164,24 @@ class OpenStackCinderShell(object):
 
         parser.add_argument('--endpoint-type',
                             metavar='<endpoint-type>',
+                            dest='os_endpoint_type',
                             default=utils.env('CINDER_ENDPOINT_TYPE',
                             default=DEFAULT_CINDER_ENDPOINT_TYPE),
+                            help='DEPRECATED! Use --os-endpoint-type.')
+        parser.add_argument('--endpoint_type',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-endpoint-type',
+                            metavar='<os-endpoint-type>',
+                            default=utils.env('OS_ENDPOINT_TYPE',
+                            default=utils.env('CINDER_ENDPOINT_TYPE',
+                            default=DEFAULT_CINDER_ENDPOINT_TYPE)),
                             help='Endpoint type, which is publicURL or '
                             'internalURL. '
-                            'Default=nova env[CINDER_ENDPOINT_TYPE] or '
+                            'Default=env[OS_ENDPOINT_TYPE] or '
+                            'nova env[CINDER_ENDPOINT_TYPE] or '
                             + DEFAULT_CINDER_ENDPOINT_TYPE + '.')
-
-        parser.add_argument('--endpoint_type',
+        parser.add_argument('--os_endpoint_type',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-volume-api-version',
@@ -587,7 +597,7 @@ class OpenStackCinderShell(object):
              args.os_username, args.os_password,
              args.os_tenant_name, args.os_auth_url,
              args.os_region_name, args.os_tenant_id,
-             args.endpoint_type, args.insecure,
+             args.os_endpoint_type, args.insecure,
              args.service_type, args.service_name,
              args.volume_service_name,
              args.bypass_url, args.os_cacert,
@@ -596,9 +606,6 @@ class OpenStackCinderShell(object):
             auth_plugin = cinderclient.auth_plugin.load_plugin(os_auth_system)
         else:
             auth_plugin = None
-
-        if not endpoint_type:
-            endpoint_type = DEFAULT_CINDER_ENDPOINT_TYPE
 
         if not service_type:
             service_type = DEFAULT_CINDER_SERVICE_TYPE
