@@ -112,10 +112,10 @@ class Volume(base.Resource):
 
     def extend(self, volume, new_size):
         """Extend the size of the specified volume.
+
         :param volume: The UUID of the volume to extend
         :param new_size: The desired size to extend volume to.
         """
-
         self.manager.extend(self, new_size)
 
     def migrate_volume(self, host, force_host_copy):
@@ -193,8 +193,7 @@ class VolumeManager(base.ManagerWithFind):
         :param scheduler_hints: (optional extension) arbitrary key-value pairs
                             specified by the client to help boot an instance
         :rtype: :class:`Volume`
-       """
-
+        """
         if metadata is None:
             volume_metadata = {}
         else:
@@ -420,6 +419,10 @@ class VolumeManager(base.ManagerWithFind):
                             'disk_format': disk_format})
 
     def force_delete(self, volume):
+        """Delete the specified volume ignoring its current state.
+
+        :param volume: The :class:`Volume` to force-delete.
+        """
         return self._action('os-force_delete', base.getid(volume))
 
     def reset_state(self, volume, state):
@@ -427,6 +430,11 @@ class VolumeManager(base.ManagerWithFind):
         return self._action('os-reset_status', volume, {'status': state})
 
     def extend(self, volume, new_size):
+        """Extend the size of the specified volume.
+
+        :param volume: The UUID of the volume to extend.
+        :param new_size: The requested size to extend volume to.
+        """
         return self._action('os-extend',
                             base.getid(volume),
                             {'new_size': new_size})
@@ -447,7 +455,6 @@ class VolumeManager(base.ManagerWithFind):
         :param host: The destination host
         :param force_host_copy: Skip driver optimizations
         """
-
         return self._action('os-migrate_volume',
                             volume,
                             {'host': host, 'force_host_copy': force_host_copy})
@@ -459,7 +466,6 @@ class VolumeManager(base.ManagerWithFind):
         :param new_volume: The new temporary :class:`Volume` in the migration
         :param error: Inform of an error to cause migration cleanup
         """
-
         new_volume_id = base.getid(new_volume)
         return self._action('os-migrate_volume_completion',
                             old_volume,

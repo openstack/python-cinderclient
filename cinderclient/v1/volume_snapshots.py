@@ -54,7 +54,7 @@ class Snapshot(base.Resource):
         return self._info.get('os-extended-snapshot-attributes:project_id')
 
     def reset_state(self, state):
-        """Update the snapshot with the privided state."""
+        """Update the snapshot with the provided state."""
         self.manager.reset_state(self, state)
 
     def set_metadata(self, metadata):

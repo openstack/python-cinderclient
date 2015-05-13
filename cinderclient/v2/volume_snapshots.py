@@ -105,7 +105,6 @@ class SnapshotManager(base.ManagerWithFind):
 
         :rtype: list of :class:`Snapshot`
         """
-
         if search_opts is None:
             search_opts = {}
 
