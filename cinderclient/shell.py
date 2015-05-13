@@ -701,7 +701,7 @@ class OpenStackCinderShell(object):
                 endpoint = keystone_adapter.get_endpoint(
                     service_type=service_type,
                     version=version,
-                    interface='public')
+                    interface=endpoint_type)
 
                 # Service was found, but wrong version. Lets try a different
                 # version, if the user did not specify one.
@@ -713,7 +713,7 @@ class OpenStackCinderShell(object):
 
                     endpoint = keystone_adapter.get_endpoint(
                         service_type=service_type, version=version,
-                        interface='public')
+                        interface=endpoint_type)
 
             except keystoneclient_exc.EndpointNotFound as e:
                 # No endpoint found with that service_type, lets fall back to
@@ -727,7 +727,7 @@ class OpenStackCinderShell(object):
                 try:
                     endpoint = keystone_adapter.get_endpoint(
                         version=version,
-                        service_type=service_type, interface='public')
+                        service_type=service_type, interface=endpoint_type)
 
                     # Service was found, but wrong version. Lets try
                     # a different version, if the user did not specify one.
@@ -739,7 +739,7 @@ class OpenStackCinderShell(object):
 
                         endpoint = keystone_adapter.get_endpoint(
                             service_type=service_type, version=version,
-                            interface='public')
+                            interface=endpoint_type)
 
                 except keystoneclient_exc.EndpointNotFound:
                     raise e
