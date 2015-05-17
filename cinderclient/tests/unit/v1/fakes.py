@@ -299,8 +299,8 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def get_volumes(self, **kw):
         return (200, {}, {"volumes": [
-            {'id': 1234, 'name': 'sample-volume'},
-            {'id': 5678, 'name': 'sample-volume2'}
+            {'id': 1234, 'display_name': 'sample-volume'},
+            {'id': 5678, 'display_name': 'sample-volume2'}
         ]})
 
     # TODO(jdg): This will need to change
@@ -308,7 +308,7 @@ class FakeHTTPClient(base_client.HTTPClient):
     def get_volumes_detail(self, **kw):
         return (200, {}, {"volumes": [
             {'id': kw.get('id', 1234),
-             'name': 'sample-volume',
+             'display_name': 'sample-volume',
              'attachments': [{'server_id': 1234}]},
         ]})
 
