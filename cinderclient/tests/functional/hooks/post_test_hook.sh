@@ -31,14 +31,27 @@ function generate_testr_results {
 
 export CINDERCLIENT_DIR="$BASE/python-cinderclient"
 
+sudo chown -R jenkins:stack $CINDERCLIENT_DIR
+
 # Get admin credentials
 cd $STACK_DIR
 source openrc admin admin
 
+# Store these credentials into the config file
+CREDS_FILE=$CINDERCLIENT_DIR/functional_creds.conf
+cat <<EOF > $CREDS_FILE
+# Credentials for functional testing
+[auth]
+uri = $OS_AUTH_URL
+
+[admin]
+user = $OS_USERNAME
+tenant = $OS_TENANT_NAME
+pass = $OS_PASSWORD
+EOF
+
 # Go to the cinderclient dir
 cd $CINDERCLIENT_DIR
-
-sudo chown -R jenkins:stack $CINDERCLIENT_DIR
 
 # Run tests
 echo "Running cinderclient functional test suite"
