@@ -41,6 +41,17 @@ class ClientTestBase(base.ClientTestBase):
         return self.clients.cinder(*args,
                                    **kwargs)
 
+    def assertTableHeaders(self, output_lines, field_names):
+        """Verify that output table has headers item listed in field_names.
+
+        :param output_lines: output table from cmd
+        :param field_names: field names from the output table of the cmd
+        """
+        table = self.parser.table(output_lines)
+        headers = table['headers']
+        for field in field_names:
+            self.assertIn(field, headers)
+
     def assertTableStruct(self, items, field_names):
         """Verify that all items has keys listed in field_names.
 
