@@ -591,13 +591,13 @@ class OpenStackCinderShell(object):
             return 0
 
         (os_username, os_password, os_tenant_name, os_auth_url,
-         os_region_name, os_tenant_id, endpoint_type, insecure,
+         os_region_name, os_tenant_id, endpoint_type,
          service_type, service_name, volume_service_name, bypass_url,
          cacert, os_auth_system) = (
              args.os_username, args.os_password,
              args.os_tenant_name, args.os_auth_url,
              args.os_region_name, args.os_tenant_id,
-             args.os_endpoint_type, args.insecure,
+             args.os_endpoint_type,
              args.service_type, args.service_name,
              args.volume_service_name,
              args.bypass_url, args.os_cacert,

@@ -92,7 +92,7 @@ class ShellTest(utils.TestCase):
 
     def test_extract_metadata(self):
         # mimic the result of argparse's parse_args() method
-        class Arguments:
+        class Arguments(object):
 
             def __init__(self, metadata=None):
                 self.metadata = metadata or []
