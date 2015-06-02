@@ -18,12 +18,17 @@ import sys
 import fixtures
 from keystoneclient import fixture as keystone_client_fixture
 import mock
+import pkg_resources
 import requests_mock
+import requests
 from six import moves
 from testtools import matchers
 
 from cinderclient import exceptions
+from cinderclient import auth_plugin
 from cinderclient import shell
+from cinderclient.tests.unit.test_auth_plugins import mock_http_request
+from cinderclient.tests.unit.test_auth_plugins import requested_headers
 from cinderclient.tests.unit.fixture_data import base as fixture_base
 from cinderclient.tests.unit.fixture_data import keystone_client
 from cinderclient.tests.unit import utils
@@ -41,8 +46,9 @@ class ShellTest(utils.TestCase):
     }
 
     # Patch os.environ to avoid required auth info.
-    def make_env(self, exclude=None):
+    def make_env(self, exclude=None, include=None):
         env = dict((k, v) for k, v in self.FAKE_ENV.items() if k != exclude)
+        env.update(include or {})
         self.useFixture(fixtures.MonkeyPatch('os.environ', env))
 
     def setUp(self):
@@ -323,6 +329,50 @@ class ShellTest(utils.TestCase):
         self.assertRaises(ks_exc.ConnectionRefused, self.shell, 'list')
         # Make sure we are actually prompted.
         mock_getpass.assert_called_with('OS Password: ')
+
+    @mock.patch.object(requests, "request")
+    @mock.patch.object(pkg_resources, "iter_entry_points")
+    def test_auth_system_not_keystone(self, mock_iter_entry_points,
+                                      mock_request):
+        """Test that we can authenticate using the auth plugin system."""
+        non_keystone_auth_url = "http://non-keystone-url.com/v2.0"
+
+        class MockEntrypoint(pkg_resources.EntryPoint):
+            def load(self):
+                return FakePlugin
+
+        class FakePlugin(auth_plugin.BaseAuthPlugin):
+            def authenticate(self, cls, auth_url):
+                cls._authenticate(auth_url, {"fake": "me"})
+
+            def get_auth_url(self):
+                return non_keystone_auth_url
+
+        mock_iter_entry_points.side_effect = lambda _t: [
+            MockEntrypoint("fake", "fake", ["FakePlugin"])]
+
+        mock_request.side_effect = mock_http_request()
+
+        # Tell the shell we wish to use our 'fake' auth instead of keystone
+        # and the auth plugin will provide the auth url
+        self.make_env(exclude="OS_AUTH_URL",
+                      include={'OS_AUTH_SYSTEM': 'fake'})
+        # This should fail as we have not setup a mock response for 'list',
+        # however auth should have been called
+        _shell = shell.OpenStackCinderShell()
+        self.assertRaises(KeyError, _shell.main, ['list'])
+
+        headers = requested_headers(_shell.cs)
+        token_url = _shell.cs.client.auth_url + "/tokens"
+        self.assertEqual(non_keystone_auth_url + "/tokens", token_url)
+
+        mock_request.assert_any_called(
+            "POST",
+            token_url,
+            headers=headers,
+            data='{"fake": "me"}',
+            allow_redirects=True,
+            **self.TEST_REQUEST_BASE)
 
 
 class CinderClientArgumentParserTest(utils.TestCase):

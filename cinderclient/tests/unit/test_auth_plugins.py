@@ -47,9 +47,9 @@ def mock_http_request(resp=None):
                         "endpoints": [
                             {
                                 "region": "RegionOne",
-                                "adminURL": "http://localhost:8774/v1.1",
-                                "internalURL": "http://localhost:8774/v1.1",
-                                "publicURL": "http://localhost:8774/v1.1/",
+                                "adminURL": "http://localhost:8774/v1",
+                                "internalURL": "http://localhost:8774/v1",
+                                "publicURL": "http://localhost:8774/v1/",
                             },
                         ],
                     },
