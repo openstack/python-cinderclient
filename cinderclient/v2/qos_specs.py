@@ -86,7 +86,7 @@ class QoSSpecsManager(base.ManagerWithFind):
         return self._create("/qos-specs", body, "qos_specs")
 
     def set_keys(self, qos_specs, specs):
-        """Update a qos specs with new specifications.
+        """Add/Update keys in qos specs.
 
         :param qos_specs: The ID of qos specs
         :param specs: A dict of key/value pairs to be set
@@ -101,7 +101,7 @@ class QoSSpecsManager(base.ManagerWithFind):
         return self._update("/qos-specs/%s" % qos_specs, body)
 
     def unset_keys(self, qos_specs, specs):
-        """Update a qos specs with new specifications.
+        """Remove keys from a qos specs.
 
         :param qos_specs: The ID of qos specs
         :param specs: A list of key to be unset
