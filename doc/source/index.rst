@@ -33,6 +33,11 @@ Release Notes
 MASTER
 -----
 
+1.2.2
+-----
+
+* Update requirements to resolve conflicts with other OpenStack projects
+
 1.2.1
 -----
 
