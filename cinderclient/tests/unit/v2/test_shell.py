@@ -344,7 +344,8 @@ class ShellTest(utils.TestCase):
 
     def test_delete_by_name(self):
         self.run_command('delete sample-volume')
-        self.assert_called_anytime('GET', '/volumes/detail?all_tenants=1')
+        self.assert_called_anytime('GET', '/volumes/detail?all_tenants=1&'
+                                          'name=sample-volume')
         self.assert_called('DELETE', '/volumes/1234')
 
     def test_delete_multiple(self):

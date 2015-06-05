@@ -210,8 +210,8 @@ class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):
         """
         Find a single item with attributes matching ``**kwargs``.
 
-        This isn't very efficient: it loads the entire list then filters on
-        the Python side.
+        This isn't very efficient for search options which require the
+        Python side filtering(e.g. 'human_id')
         """
         matches = self.findall(**kwargs)
         num_matches = len(matches)
@@ -227,16 +227,29 @@ class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):
         """
         Find all items with attributes matching ``**kwargs``.
 
-        This isn't very efficient: it loads the entire list then filters on
-        the Python side.
+        This isn't very efficient for search options which require the
+        Python side filtering(e.g. 'human_id')
         """
-        found = []
-        searches = list(kwargs.items())
 
         # Want to search for all tenants here so that when attempting to delete
         # that a user like admin doesn't get a failure when trying to delete
         # another tenant's volume by name.
-        for obj in self.list(search_opts={'all_tenants': 1}):
+        search_opts = {'all_tenants': 1}
+
+        # Pass 'name' or 'display_name' search_opts to server filtering to
+        # increase search performance.
+        if 'name' in kwargs:
+            search_opts['name'] = kwargs['name']
+        elif 'display_name' in kwargs:
+            search_opts['display_name'] = kwargs['display_name']
+
+        found = []
+        searches = kwargs.items()
+
+        # Not all resources attributes support filters on server side
+        # (e.g. 'human_id' doesn't), so when doing findall some client
+        # side filtering is still needed.
+        for obj in self.list(search_opts=search_opts):
             try:
                 if all(getattr(obj, attr) == value
                        for (attr, value) in searches):
