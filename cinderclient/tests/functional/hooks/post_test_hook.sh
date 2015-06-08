@@ -29,7 +29,7 @@ function generate_testr_results {
     fi
 }
 
-export CINDERCLIENT_DIR="$BASE/python-cinderclient"
+export CINDERCLIENT_DIR="$BASE/new/python-cinderclient"
 
 sudo chown -R jenkins:stack $CINDERCLIENT_DIR
 
