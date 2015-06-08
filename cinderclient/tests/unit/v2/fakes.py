@@ -686,8 +686,12 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_types_2_encryption(self, body, **kw):
         return (200, {}, {'encryption': body})
 
-    def put_types_1_encryption_1(self, body, **kw):
-        return (200, {}, {})
+    def put_types_1_encryption_provider(self, body, **kw):
+        get_body = self.get_types_1_encryption()[2]
+        for k, v in body.items():
+            if k in get_body.keys():
+                get_body.update([(k, v)])
+        return (200, {}, get_body)
 
     def delete_types_1_encryption_provider(self, **kw):
         return (202, {}, None)

@@ -555,8 +555,67 @@ class ShellTest(utils.TestCase):
         - one GET request to retrieve the relevant volume type information
         - one GET request to retrieve the relevant encryption type information
         - one PUT request to update the encryption type information
+        Verify that the PUT request correctly parses encryption-type-update
+        parameters from sys.argv
         """
-        self.skipTest("Not implemented")
+        parameters = {'--provider': 'EncryptionProvider', '--cipher': 'des',
+                      '--key-size': 1024, '--control-location': 'back-end'}
+
+        # Construct the argument string for the update call and the
+        # expected encryption-type body that should be produced by it
+        args = ' '.join(['%s %s' % (k, v) for k, v in parameters.items()])
+        expected = {'encryption': {'provider': 'EncryptionProvider',
+                                   'cipher': 'des',
+                                   'key_size': 1024,
+                                   'control_location': 'back-end'}}
+
+        self.run_command('encryption-type-update 1 %s' % args)
+        self.assert_called('GET', '/types/1/encryption')
+        self.assert_called_anytime('GET', '/types/1')
+        self.assert_called_anytime('PUT', '/types/1/encryption/provider',
+                                   body=expected)
+
+    def test_encryption_type_update_no_attributes(self):
+        """
+        Test encryption-type-update shell command.
+
+        Verify two GETs/one PUT requests are made per command invocation:
+        - one GET request to retrieve the relevant volume type information
+        - one GET request to retrieve the relevant encryption type information
+        - one PUT request to update the encryption type information
+        """
+        expected = {'encryption': {}}
+        self.run_command('encryption-type-update 1')
+        self.assert_called('GET', '/types/1/encryption')
+        self.assert_called_anytime('GET', '/types/1')
+        self.assert_called_anytime('PUT', '/types/1/encryption/provider',
+                                   body=expected)
+
+    def test_encryption_type_update_default_attributes(self):
+        """
+        Test encryption-type-update shell command.
+
+        Verify two GETs/one PUT requests are made per command invocation:
+        - one GET request to retrieve the relevant volume type information
+        - one GET request to retrieve the relevant encryption type information
+        - one PUT request to update the encryption type information
+        Verify that the encryption-type body produced contains default None
+        values for all specified parameters.
+        """
+        parameters = ['--cipher', '--key-size']
+
+        # Construct the argument string for the update call and the
+        # expected encryption-type body that should be produced by it
+        args = ' '.join(['%s' % (p) for p in parameters])
+        expected_pairs = [(k.strip('-').replace('-', '_'), None) for k in
+                          parameters]
+        expected = {'encryption': dict(expected_pairs)}
+
+        self.run_command('encryption-type-update 1 %s' % args)
+        self.assert_called('GET', '/types/1/encryption')
+        self.assert_called_anytime('GET', '/types/1')
+        self.assert_called_anytime('PUT', '/types/1/encryption/provider',
+                                   body=expected)
 
     def test_encryption_type_delete(self):
         """
