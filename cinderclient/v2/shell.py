@@ -160,6 +160,11 @@ def _extract_metadata(args):
            metavar='<status>',
            default=None,
            help='Filters results by a status. Default=None.')
+@utils.arg('--migration_status',
+           metavar='<migration_status>',
+           default=None,
+           help='Filters results by a migration status. Default=None. '
+                'Admin only.')
 @utils.arg('--metadata',
            type=str,
            nargs='*',
@@ -212,6 +217,7 @@ def do_list(cs, args):
         'project_id': args.tenant,
         'name': args.name,
         'status': args.status,
+        'migration_status': args.migration_status,
         'metadata': _extract_metadata(args) if args.metadata else None,
     }
 
@@ -233,18 +239,19 @@ def do_list(cs, args):
         setattr(vol, 'attached_to', ','.join(map(str, servers)))
 
     if all_tenants:
-        key_list = ['ID', 'Tenant ID', 'Status', 'Name',
+        key_list = ['ID', 'Tenant ID', 'Status', 'Migration Status', 'Name',
                     'Size', 'Volume Type', 'Bootable', 'Multiattach',
                     'Attached to']
     else:
-        key_list = ['ID', 'Status', 'Name',
+        key_list = ['ID', 'Status', 'Migration Status', 'Name',
                     'Size', 'Volume Type', 'Bootable',
                     'Multiattach', 'Attached to']
     if args.sort_key or args.sort_dir or args.sort:
         sortby_index = None
     else:
         sortby_index = 0
-    utils.print_list(volumes, key_list, sortby_index=sortby_index)
+    utils.print_list(volumes, key_list, exclude_unavailable=True,
+                     sortby_index=sortby_index)
 
 
 @utils.arg('volume',
@@ -452,7 +459,8 @@ def do_force_delete(cs, args):
 @utils.arg('--state', metavar='<state>', default='available',
            help=('The state to assign to the volume. Valid values are '
                  '"available", "error", "creating", "deleting", "in-use", '
-                 '"attaching", "detaching" and "error_deleting". '
+                 '"attaching", "detaching", "error_deleting" and '
+                 '"maintenance". '
                  'NOTE: This command simply changes the state of the '
                  'Volume in the DataBase with no regard to actual status, '
                  'exercise caution when using. Default=available.'))
@@ -1153,11 +1161,31 @@ def do_upload_to_image(cs, args):
            help='Enables or disables generic host-based '
            'force-migration, which bypasses driver '
            'optimizations. Default=False.')
+@utils.arg('--lock-volume', metavar='<True|False>',
+           choices=['True', 'False'],
+           required=False,
+           const=True,
+           nargs='?',
+           default=False,
+           help='Enables or disables the termination of volume migration '
+           'caused by other commands. This option applies to the '
+           'available volume. True means it locks the volume '
+           'state and does not allow the migration to be aborted. The '
+           'volume status will be in maintenance during the '
+           'migration. False means it allows the volume migration '
+           'to be aborted. The volume status is still in the original '
+           'status. Default=False.')
 @utils.service_type('volumev2')
 def do_migrate(cs, args):
     """Migrates volume to a new host."""
     volume = utils.find_volume(cs, args.volume)
-    volume.migrate_volume(args.host, args.force_host_copy)
+    try:
+        volume.migrate_volume(args.host, args.force_host_copy,
+                              args.lock_volume)
+        print("Request to migrate volume %s has been accepted." % (volume))
+    except Exception as e:
+        print("Migration for volume %s failed: %s." % (volume,
+                                                       six.text_type(e)))
 
 
 @utils.arg('volume', metavar='<volume>',

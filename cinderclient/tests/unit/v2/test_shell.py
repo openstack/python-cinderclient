@@ -276,7 +276,8 @@ class ShellTest(utils.TestCase):
             with mock.patch('cinderclient.utils.print_list') as mock_print:
                 self.run_command(cmd)
                 mock_print.assert_called_once_with(
-                    mock.ANY, mock.ANY, sortby_index=None)
+                    mock.ANY, mock.ANY, exclude_unavailable=True,
+                    sortby_index=None)
 
     def test_list_reorder_without_sort(self):
         # sortby_index is 0 without sort information
@@ -284,7 +285,8 @@ class ShellTest(utils.TestCase):
             with mock.patch('cinderclient.utils.print_list') as mock_print:
                 self.run_command(cmd)
                 mock_print.assert_called_once_with(
-                    mock.ANY, mock.ANY, sortby_index=0)
+                    mock.ANY, mock.ANY, exclude_unavailable=True,
+                    sortby_index=0)
 
     def test_list_availability_zone(self):
         self.run_command('availability-zone-list')
@@ -710,16 +712,37 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('GET', '/types/1')
 
     def test_migrate_volume(self):
-        self.run_command('migrate 1234 fakehost --force-host-copy=True')
+        self.run_command('migrate 1234 fakehost --force-host-copy=True '
+                         '--lock-volume=True')
         expected = {'os-migrate_volume': {'force_host_copy': 'True',
+                                          'lock_volume': 'True',
                                           'host': 'fakehost'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
 
     def test_migrate_volume_bool_force(self):
-        self.run_command('migrate 1234 fakehost --force-host-copy')
+        self.run_command('migrate 1234 fakehost --force-host-copy '
+                         '--lock-volume')
         expected = {'os-migrate_volume': {'force_host_copy': True,
+                                          'lock_volume': True,
                                           'host': 'fakehost'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_migrate_volume_bool_force_false(self):
+        # Set both --force-host-copy and --lock-volume to False.
+        self.run_command('migrate 1234 fakehost --force-host-copy=False '
+                         '--lock-volume=False')
+        expected = {'os-migrate_volume': {'force_host_copy': 'False',
+                                          'lock_volume': 'False',
+                                          'host': 'fakehost'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+        # Do not set the values to --force-host-copy and --lock-volume.
+        self.run_command('migrate 1234 fakehost')
+        expected = {'os-migrate_volume': {'force_host_copy': False,
+                                          'lock_volume': False,
+                                          'host': 'fakehost'}}
+        self.assert_called('POST', '/volumes/1234/action',
+                           body=expected)
 
     def test_snapshot_metadata_set(self):
         self.run_command('snapshot-metadata 1234 set key1=val1 key2=val2')
