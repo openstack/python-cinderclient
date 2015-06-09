@@ -38,6 +38,11 @@ class VolumesTest(utils.TestCase):
         cs.volumes.attach(v, 1, '/dev/vdc', mode='rw')
         cs.assert_called('POST', '/volumes/1234/action')
 
+    def test_attach_to_host(self):
+        v = cs.volumes.get('1234')
+        cs.volumes.attach(v, None, None, host_name='test', mode='rw')
+        cs.assert_called('POST', '/volumes/1234/action')
+
     def test_detach(self):
         v = cs.volumes.get('1234')
         cs.volumes.detach(v)

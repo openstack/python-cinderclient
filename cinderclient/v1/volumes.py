@@ -40,14 +40,17 @@ class Volume(base.Resource):
         """Update the display_name or display_description for this volume."""
         self.manager.update(self, **kwargs)
 
-    def attach(self, instance_uuid, mountpoint, mode='rw'):
+    def attach(self, instance_uuid, mountpoint, mode='rw',
+               host_name=None):
         """Set attachment metadata.
 
         :param instance_uuid: uuid of the attaching instance.
-        :param mountpoint: mountpoint on the attaching instance.
+        :param mountpoint: mountpoint on the attaching instance or host.
         :param mode: the access mode
+        :param host_name: name of the attaching host.
         """
-        return self.manager.attach(self, instance_uuid, mountpoint, mode)
+        return self.manager.attach(self, instance_uuid, mountpoint, mode,
+                                   host_name)
 
     def detach(self):
         """Clear attachment metadata."""
@@ -255,21 +258,24 @@ class VolumeManager(base.ManagerWithFind):
         url = '/volumes/%s/action' % base.getid(volume)
         return self.api.client.post(url, body=body)
 
-    def attach(self, volume, instance_uuid, mountpoint, mode='rw'):
+    def attach(self, volume, instance_uuid, mountpoint, mode='rw',
+               host_name=None):
         """
         Set attachment metadata.
 
         :param volume: The :class:`Volume` (or its ID)
                        you would like to attach.
-        :param instance_uuid: uuid of the attaching instance.
+        :param instance_uuid: uuid of the attaching instance or host.
         :param mountpoint: mountpoint on the attaching instance.
         :param mode: the access mode.
+        :param host_name: name of the attaching host.
         """
-        return self._action('os-attach',
-                            volume,
-                            {'instance_uuid': instance_uuid,
-                             'mountpoint': mountpoint,
-                             'mode': mode})
+        body = {'mountpoint': mountpoint, 'mode': mode}
+        if instance_uuid is not None:
+            body.update({'instance_uuid': instance_uuid})
+        if host_name is not None:
+            body.update({'host_name': host_name})
+        return self._action('os-attach', volume, body)
 
     def detach(self, volume):
         """
