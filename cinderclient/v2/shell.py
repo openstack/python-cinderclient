@@ -261,8 +261,8 @@ def do_show(cs, args):
 
 class CheckSizeArgForCreate(argparse.Action):
     def __call__(self, parser, args, values, option_string=None):
-        if (values or args.snapshot_id or args.source_volid
-           or args.source_replica) is None:
+        if ((args.snapshot_id or args.source_volid or args.source_replica)
+                is None and values is None):
             parser.error('Size is a required parameter if snapshot '
                          'or source volume is not specified.')
         setattr(args, self.dest, values)

@@ -334,6 +334,13 @@ class ShellTest(utils.TestCase):
     def test_create_size_required_if_not_snapshot_or_clone(self):
         self.assertRaises(SystemExit, self.run_command, 'create')
 
+    def test_create_size_zero_if_not_snapshot_or_clone(self):
+        expected = {'volume': {'status': 'creating',
+                               'size': 0}}
+        self.run_command('create 0')
+        self.assert_called_anytime('POST', '/volumes', partial_body=expected)
+        self.assert_called('GET', '/volumes/1234')
+
     def test_show(self):
         self.run_command('show 1234')
         self.assert_called('GET', '/volumes/1234')
