@@ -36,7 +36,7 @@ class VolumeEncryptionTypesTest(utils.TestCase):
         Verify that all returned information is :class: VolumeEncryptionType
         """
         encryption_types = cs.volume_encryption_types.list()
-        cs.assert_called_anytime('GET', '/types')
+        cs.assert_called_anytime('GET', '/types?is_public=None')
         cs.assert_called_anytime('GET', '/types/2/encryption')
         cs.assert_called_anytime('GET', '/types/1/encryption')
         for encryption_type in encryption_types:

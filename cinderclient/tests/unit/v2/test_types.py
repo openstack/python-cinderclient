@@ -25,7 +25,7 @@ class TypesTest(utils.TestCase):
 
     def test_list_types(self):
         tl = cs.volume_types.list()
-        cs.assert_called('GET', '/types')
+        cs.assert_called('GET', '/types?is_public=None')
         for t in tl:
             self.assertIsInstance(t, volume_types.VolumeType)
 

@@ -738,17 +738,9 @@ def _print_volume_type_list(vtypes):
 
 
 @utils.service_type('volumev2')
-@utils.arg('--all',
-           dest='all',
-           action='store_true',
-           default=False,
-           help='Display all volume types (Admin only).')
 def do_type_list(cs, args):
-    """Lists available 'volume types'."""
-    if args.all:
-        vtypes = cs.volume_types.list(is_public=None)
-    else:
-        vtypes = cs.volume_types.list()
+    """Lists available 'volume types'. (Admin only will see private types)"""
+    vtypes = cs.volume_types.list()
     _print_volume_type_list(vtypes)
 
 

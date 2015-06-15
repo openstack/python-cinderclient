@@ -496,10 +496,6 @@ class ShellTest(utils.TestCase):
 
     def test_type_list(self):
         self.run_command('type-list')
-        self.assert_called_anytime('GET', '/types')
-
-    def test_type_list_all(self):
-        self.run_command('type-list --all')
         self.assert_called_anytime('GET', '/types?is_public=None')
 
     def test_type_create(self):
@@ -535,6 +531,16 @@ class ShellTest(utils.TestCase):
         self.assert_called('POST', '/types/3/action',
                            body=expected)
 
+    def test_type_access_add_project_by_name(self):
+        expected = {'addProjectAccess': {'project': '101'}}
+        with mock.patch('cinderclient.utils.find_resource') as mock_find:
+            mock_find.return_value = '3'
+            self.run_command('type-access-add --volume-type type_name \
+                              --project-id 101')
+            mock_find.assert_called_once_with(mock.ANY, 'type_name')
+        self.assert_called('POST', '/types/3/action',
+                           body=expected)
+
     def test_type_access_remove_project(self):
         expected = {'removeProjectAccess': {'project': '101'}}
         self.run_command('type-access-remove '
@@ -552,7 +558,7 @@ class ShellTest(utils.TestCase):
         - one per volume type to retrieve the encryption type information
         """
         self.run_command('encryption-type-list')
-        self.assert_called_anytime('GET', '/types')
+        self.assert_called_anytime('GET', '/types?is_public=None')
         self.assert_called_anytime('GET', '/types/1/encryption')
         self.assert_called_anytime('GET', '/types/2/encryption')
 
