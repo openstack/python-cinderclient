@@ -169,6 +169,7 @@ class OpenStackCinderShell(object):
                             default=DEFAULT_CINDER_ENDPOINT_TYPE),
                             help='DEPRECATED! Use --os-endpoint-type.')
         parser.add_argument('--endpoint_type',
+                            dest='os_endpoint_type',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-endpoint-type',
