@@ -179,8 +179,8 @@ class VolumeManager(base.ManagerWithFind):
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
                metadata=None, imageRef=None, scheduler_hints=None,
-               source_replica=None):
-        """Creates a volume.
+               source_replica=None, multiattach=False):
+        """Create a volume.
 
         :param size: Size of volume in GB
         :param consistencygroup_id: ID of the consistencygroup
@@ -197,6 +197,8 @@ class VolumeManager(base.ManagerWithFind):
         :param source_replica: ID of source volume to clone replica
         :param scheduler_hints: (optional extension) arbitrary key-value pairs
                             specified by the client to help boot an instance
+        :param multiattach: Allow the volume to be attached to more than
+                            one instance
         :rtype: :class:`Volume`
         """
         if metadata is None:
@@ -219,6 +221,7 @@ class VolumeManager(base.ManagerWithFind):
                            'imageRef': imageRef,
                            'source_volid': source_volid,
                            'source_replica': source_replica,
+                           'multiattach': multiattach,
                            }}
 
         if scheduler_hints:
@@ -393,13 +396,15 @@ class VolumeManager(base.ManagerWithFind):
             body.update({'host_name': host_name})
         return self._action('os-attach', volume, body)
 
-    def detach(self, volume):
+    def detach(self, volume, attachment_uuid=None):
         """Clear attachment metadata.
 
         :param volume: The :class:`Volume` (or its ID)
                        you would like to detach.
+        :param attachment_uuid: The uuid of the volume attachment.
         """
-        return self._action('os-detach', volume)
+        return self._action('os-detach', volume,
+                            {'attachment_id': attachment_uuid})
 
     def reserve(self, volume):
         """Reserve this volume.
