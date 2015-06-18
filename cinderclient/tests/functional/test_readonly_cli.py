@@ -38,14 +38,14 @@ class CinderClientReadOnlyTests(base.ClientTestBase):
     def test_backup_list(self):
         backup_list = self.cinder('backup-list')
         self.assertTableHeaders(backup_list, ['ID', 'Volume ID', 'Status',
-                                             'Name', 'Size', 'Object Count',
-                                             'Container'])
+                                              'Name', 'Size', 'Object Count',
+                                              'Container'])
 
     def test_encryption_type_list(self):
         encrypt_list = self.cinder('encryption-type-list')
         self.assertTableHeaders(encrypt_list, ['Volume Type ID', 'Provider',
-                                              'Cipher', 'Key Size',
-                                              'Control Location'])
+                                               'Cipher', 'Key Size',
+                                               'Control Location'])
 
     def test_endpoints(self):
         out = self.cinder('endpoints')
@@ -55,11 +55,16 @@ class CinderClientReadOnlyTests(base.ClientTestBase):
             self.assertTrue(2 >= len(headers))
             self.assertEqual('Value', headers[1])
 
+    def test_extra_specs_list(self):
+        extra_specs_list = self.cinder('extra-specs-list')
+        self.assertTableHeaders(extra_specs_list, ['ID', 'Name',
+                                                   'extra_specs'])
+
     def test_list(self):
         list = self.cinder('list')
         self.assertTableHeaders(list, ['ID', 'Status', 'Name', 'Size',
-                                      'Volume Type', 'Bootable',
-                                      'Attached to'])
+                                       'Volume Type', 'Bootable',
+                                       'Attached to'])
 
     def test_qos_list(self):
         qos_list = self.cinder('qos-list')
@@ -68,17 +73,18 @@ class CinderClientReadOnlyTests(base.ClientTestBase):
     def test_rate_limits(self):
         rate_limits = self.cinder('rate-limits')
         self.assertTableHeaders(rate_limits, ['Verb', 'URI', 'Value', 'Remain',
-                                             'Unit', 'Next_Available'])
+                                              'Unit', 'Next_Available'])
 
     def test_service_list(self):
         service_list = self.cinder('service-list')
         self.assertTableHeaders(service_list, ['Binary', 'Host', 'Zone',
-                                              'Status', 'State', 'Updated_at'])
+                                               'Status', 'State',
+                                               'Updated_at'])
 
     def test_snapshot_list(self):
         snapshot_list = self.cinder('snapshot-list')
         self.assertTableHeaders(snapshot_list, ['ID', 'Volume ID', 'Status',
-                                               'Name', 'Size'])
+                                                'Name', 'Size'])
 
     def test_transfer_list(self):
         transfer_list = self.cinder('transfer-list')
@@ -87,3 +93,8 @@ class CinderClientReadOnlyTests(base.ClientTestBase):
     def test_type_list(self):
         type_list = self.cinder('type-list')
         self.assertTableHeaders(type_list, ['ID', 'Name'])
+
+    def test_list_extensions(self):
+        list_extensions = self.cinder('list-extensions')
+        self.assertTableHeaders(list_extensions, ['Name', 'Summary', 'Alias',
+                                                  'Updated'])
