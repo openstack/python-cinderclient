@@ -892,7 +892,7 @@ def do_credentials(cs, args):
 
 _quota_resources = ['volumes', 'snapshots', 'gigabytes',
                     'backups', 'backup_gigabytes',
-                    'consistencygroups']
+                    'consistencygroups', 'per_volume_gigabytes']
 _quota_infos = ['Type', 'In_use', 'Reserved', 'Limit']
 
 
@@ -998,6 +998,10 @@ def do_quota_defaults(cs, args):
            metavar='<volume_type_name>',
            default=None,
            help='Volume type. Default=None.')
+@utils.arg('--per-volume-gigabytes',
+           metavar='<per_volume_gigabytes>',
+           type=int, default=None,
+           help='Set max volume size limit. Default=None.')
 @utils.service_type('volumev2')
 def do_quota_update(cs, args):
     """Updates quotas for a tenant."""
