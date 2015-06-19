@@ -84,7 +84,9 @@ class VolumeEncryptionTypeManager(base.ManagerWithFind):
         :param specs: the encryption type specifications to update
         :return: an instance of :class: VolumeEncryptionType
         """
-        raise NotImplementedError()
+        body = {'encryption': specs}
+        return self._update("/types/%s/encryption/provider" %
+                            base.getid(volume_type), body)
 
     def delete(self, volume_type):
         """

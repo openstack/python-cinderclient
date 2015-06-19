@@ -1546,6 +1546,63 @@ def do_encryption_type_create(cs, args):
 
 
 @utils.arg('volume_type',
+           metavar='<volume-type>',
+           type=str,
+           help="Name or ID of the volume type")
+@utils.arg('--provider',
+           metavar='<provider>',
+           type=str,
+           required=False,
+           default=argparse.SUPPRESS,
+           help="Class providing encryption support (e.g. LuksEncryptor) "
+           "(Optional)")
+@utils.arg('--cipher',
+           metavar='<cipher>',
+           type=str,
+           nargs='?',
+           required=False,
+           default=argparse.SUPPRESS,
+           const=None,
+           help="Encryption algorithm/mode to use (e.g., aes-xts-plain64). "
+           "Provide parameter without value to set to provider default. "
+           "(Optional)")
+@utils.arg('--key-size',
+           dest='key_size',
+           metavar='<key-size>',
+           type=int,
+           nargs='?',
+           required=False,
+           default=argparse.SUPPRESS,
+           const=None,
+           help="Size of the encryption key, in bits (e.g., 128, 256). "
+           "Provide parameter without value to set to provider default. "
+           "(Optional)")
+@utils.arg('--control-location',
+           dest='control_location',
+           metavar='<control-location>',
+           choices=['front-end', 'back-end'],
+           type=str,
+           required=False,
+           default=argparse.SUPPRESS,
+           help="Notional service where encryption is performed (e.g., "
+           "front-end=Nova). Values: 'front-end', 'back-end' (Optional)")
+@utils.service_type('volumev2')
+def do_encryption_type_update(cs, args):
+    """Update encryption type information for a volume type (Admin Only)."""
+    volume_type = _find_volume_type(cs, args.volume_type)
+
+    # An argument should only be pulled if the user specified the parameter.
+    body = {}
+    for attr in ['provider', 'cipher', 'key_size', 'control_location']:
+        if hasattr(args, attr):
+            body[attr] = getattr(args, attr)
+
+    cs.volume_encryption_types.update(volume_type, body)
+    result = cs.volume_encryption_types.get(volume_type)
+    _print_volume_encryption_type_list([result])
+
+
+@utils.arg('volume_type',
            metavar='<volume_type>',
            type=str,
            help='Name or ID of volume type.')
