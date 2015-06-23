@@ -16,7 +16,6 @@ import re
 import sys
 
 import fixtures
-from keystoneclient import fixture as keystone_client_fixture
 import mock
 import pkg_resources
 import requests_mock
@@ -29,7 +28,6 @@ from cinderclient import auth_plugin
 from cinderclient import shell
 from cinderclient.tests.unit.test_auth_plugins import mock_http_request
 from cinderclient.tests.unit.test_auth_plugins import requested_headers
-from cinderclient.tests.unit.fixture_data import base as fixture_base
 from cinderclient.tests.unit.fixture_data import keystone_client
 from cinderclient.tests.unit import utils
 import keystoneclient.exceptions as ks_exc
@@ -42,7 +40,7 @@ class ShellTest(utils.TestCase):
         'OS_USERNAME': 'username',
         'OS_PASSWORD': 'password',
         'OS_TENANT_NAME': 'tenant_name',
-        'OS_AUTH_URL': '%s/v2.0' % keystone_client.BASE_HOST,
+        'OS_AUTH_URL': 'http://no.where/v2.0',
     }
 
     # Patch os.environ to avoid required auth info.
@@ -123,203 +121,6 @@ class ShellTest(utils.TestCase):
             None, auth_url=os_auth_url)
         self.assertEqual(v3_url, os_auth_url, "Expected v3 url")
         self.assertEqual(v2_url, None, "Expected no v2 url")
-
-    @requests_mock.Mocker()
-    def test_cinder_version_legacy_endpoint_v1_and_v2(self, mocker):
-        """Verify that legacy endpoint settings still work.
-
-        Legacy endpoints that are not using version discovery is
-        <hostname>:<port>/<version>/(tenant_id)s. For this unit test, we fill
-        in the tenant_id for mocking purposes.
-        """
-        token = keystone_client_fixture.V2Token()
-        cinder_url = 'http://127.0.0.1:8776/'
-
-        volume_service = token.add_service('volume', 'Cinder v1')
-        volume_service.add_endpoint(public=cinder_url, region='RegionOne')
-
-        volumev2_service = token.add_service('volumev2', 'Cinder v2')
-        volumev2_service.add_endpoint(public=cinder_url, region='RegionOne')
-
-        mocker.post(keystone_client.BASE_HOST + '/v2.0/tokens',
-                    json=token)
-        mocker.get(cinder_url, json=fixture_base.generate_version_output())
-        volume_request = mocker.get('http://127.0.0.1:8776/v1/volumes/detail',
-                                    json={'volumes': {}})
-
-        self.shell('list')
-        self.assertTrue(volume_request.called)
-
-    @requests_mock.Mocker()
-    def test_cinder_version_legacy_endpoint_only_v1(self, mocker):
-        """Verify that v1 legacy endpoint settings still work.
-
-        Legacy endpoints that are not using version discovery is
-        <hostname>:<port>/<version>/(tenant_id)s. For this unit test, we fill
-        in the tenant_id for mocking purposes.
-        """
-        token = keystone_client_fixture.V2Token()
-        cinder_url = 'http://127.0.0.1:8776/'
-
-        volume_service = token.add_service('volume', 'Cinder v1')
-        volume_service.add_endpoint(
-            public=cinder_url,
-            region='RegionOne'
-        )
-
-        mocker.get(
-            cinder_url,
-            json=fixture_base.generate_version_output(v1=True, v2=False)
-        )
-        mocker.post(keystone_client.BASE_HOST + '/v2.0/tokens',
-                    json=token)
-        volume_request = mocker.get('http://127.0.0.1:8776/v1/volumes/detail',
-                                    json={'volumes': {}})
-
-        self.shell('list')
-        self.assertTrue(volume_request.called)
-
-    @requests_mock.Mocker()
-    def test_cinder_version_legacy_endpoint_only_v2(self, mocker):
-        """Verify that v2 legacy endpoint settings still work.
-
-        Legacy endpoints that are not using version discovery is
-        <hostname>:<port>/<version>/(tenant_id)s. For this unit test, we fill
-        in the tenant_id for mocking purposes.
-        """
-        token = keystone_client_fixture.V2Token()
-        cinder_url = 'http://127.0.0.1:8776/'
-
-        volumev2_service = token.add_service('volumev2', 'Cinder v2')
-        volumev2_service.add_endpoint(
-            public=cinder_url,
-            region='RegionOne'
-        )
-
-        mocker.post(keystone_client.BASE_HOST + '/v2.0/tokens',
-                    json=token)
-
-        mocker.get(
-            cinder_url,
-            json=fixture_base.generate_version_output(v1=False, v2=True)
-        )
-        volume_request = mocker.get('http://127.0.0.1:8776/v2/volumes/detail',
-                                    json={'volumes': {}})
-
-        self.shell('list')
-        self.assertTrue(volume_request.called)
-
-    @requests_mock.Mocker()
-    def test_cinder_version_discovery(self, mocker):
-        """Verify client works two endpoints enabled under one service."""
-        token = keystone_client_fixture.V2Token()
-
-        volume_service = token.add_service('volume', 'Cinder')
-        volume_service.add_endpoint(public='http://127.0.0.1:8776',
-                                    region='RegionOne')
-
-        mocker.post(keystone_client.BASE_HOST + '/v2.0/tokens',
-                    json=token)
-        mocker.get(
-            'http://127.0.0.1:8776/',
-            json=fixture_base.generate_version_output(v1=True, v2=True)
-        )
-
-        v1_request = mocker.get('http://127.0.0.1:8776/v1/volumes/detail',
-                                json={'volumes': {}})
-        v2_request = mocker.get('http://127.0.0.1:8776/v2/volumes/detail',
-                                json={'volumes': {}})
-
-        self.shell('list')
-        self.assertTrue(v1_request.called)
-
-        self.shell('--os-volume-api-version 2 list')
-        self.assertTrue(v2_request.called)
-
-    @requests_mock.Mocker()
-    def test_cinder_version_discovery_only_v1(self, mocker):
-        """Verify when v1 is only enabled, the client discovers it."""
-        token = keystone_client_fixture.V2Token()
-
-        volume_service = token.add_service('volume', 'Cinder')
-        volume_service.add_endpoint(public='http://127.0.0.1:8776',
-                                    region='RegionOne')
-
-        mocker.post(keystone_client.BASE_HOST + '/v2.0/tokens',
-                    json=token)
-        mocker.get(
-            'http://127.0.0.1:8776/',
-            json=fixture_base.generate_version_output(v1=True, v2=True)
-        )
-        volume_request = mocker.get('http://127.0.0.1:8776/v1/volumes/detail',
-                                    json={'volumes': {}})
-
-        self.shell('list')
-        self.assertTrue(volume_request.called)
-
-    @requests_mock.Mocker()
-    def test_cinder_version_discovery_only_v2(self, mocker):
-        """Verify when v2 is enabled, the client discovers it."""
-        token = keystone_client_fixture.V2Token()
-
-        volumev2_service = token.add_service('volume', 'Cinder')
-        volumev2_service.add_endpoint(public='http://127.0.0.1:8776',
-                                      region='RegionOne')
-
-        mocker.post(keystone_client.BASE_HOST + '/v2.0/tokens',
-                    json=token)
-
-        mocker.get(
-            'http://127.0.0.1:8776/',
-            json=fixture_base.generate_version_output(v1=False, v2=True)
-        )
-        volume_request = mocker.get('http://127.0.0.1:8776/v2/volumes/detail',
-                                    json={'volumes': {}})
-
-        self.shell('list')
-        self.assertTrue(volume_request.called)
-
-    @requests_mock.Mocker()
-    def test_cinder_version_discovery_fallback(self, mocker):
-        """Client defaults to v1, but v2 is only available, fallback to v2."""
-        token = keystone_client_fixture.V2Token()
-
-        volumev2_service = token.add_service('volumev2', 'Cinder v2')
-        volumev2_service.add_endpoint(public='http://127.0.0.1:8776',
-                                      region='RegionOne')
-
-        mocker.post(keystone_client.BASE_HOST + '/v2.0/tokens',
-                    json=token)
-
-        mocker.get(
-            'http://127.0.0.1:8776/',
-            json=fixture_base.generate_version_output(v1=False, v2=True)
-        )
-        volume_request = mocker.get('http://127.0.0.1:8776/v2/volumes/detail',
-                                    json={'volumes': {}})
-
-        self.shell('list')
-        self.assertTrue(volume_request.called)
-
-    @requests_mock.Mocker()
-    def test_cinder_version_discovery_unsupported_version(self, mocker):
-        """Try a version from the client that's not enabled in Cinder."""
-        token = keystone_client_fixture.V2Token()
-
-        volume_service = token.add_service('volume', 'Cinder')
-        volume_service.add_endpoint(public='http://127.0.0.1:8776',
-                                    region='RegionOne')
-
-        mocker.post(keystone_client.BASE_HOST + '/v2.0/tokens',
-                    json=token)
-
-        mocker.get(
-            'http://127.0.0.1:8776/',
-            json=fixture_base.generate_version_output(v1=False, v2=True)
-        )
-
-        self.assertRaises(exceptions.InvalidAPIVersion,
-                          self.shell, '--os-volume-api-version 1 list')
 
     @mock.patch('sys.stdin', side_effect=mock.MagicMock)
     @mock.patch('getpass.getpass', return_value='password')
