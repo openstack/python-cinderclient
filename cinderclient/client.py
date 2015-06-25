@@ -394,6 +394,9 @@ class HTTPClient(object):
         return self._extract_service_catalog(url, resp, body,
                                              extract_token=False)
 
+    def set_management_url(self, url):
+        self.management_url = url
+
     def authenticate(self):
         magic_tuple = urlparse.urlsplit(self.auth_url)
         scheme, netloc, path, query, frag = magic_tuple

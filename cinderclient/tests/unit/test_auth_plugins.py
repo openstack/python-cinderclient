@@ -199,8 +199,9 @@ class DeprecatedAuthPluginTest(utils.TestCase):
 class AuthPluginTest(utils.TestCase):
     @mock.patch.object(requests, "request")
     @mock.patch.object(pkg_resources, "iter_entry_points")
-    def test_auth_system_success(self, mock_iter_entry_points, mock_request):
-        """Test that we can authenticate using the auth system."""
+    def _test_auth_success(self, mock_iter_entry_points, mock_request,
+                           **client_kwargs):
+        """Generic test that we can authenticate using the auth system."""
         class MockEntrypoint(pkg_resources.EntryPoint):
             def load(self):
                 return FakePlugin
@@ -218,7 +219,7 @@ class AuthPluginTest(utils.TestCase):
         plugin = auth_plugin.load_plugin("fake")
         cs = client.Client("username", "password", "project_id",
                            "auth_url/v2.0", auth_system="fake",
-                           auth_plugin=plugin)
+                           auth_plugin=plugin, **client_kwargs)
         cs.client.authenticate()
 
         headers = requested_headers(cs)
@@ -231,6 +232,29 @@ class AuthPluginTest(utils.TestCase):
             data='{"fake": "me"}',
             allow_redirects=True,
             **self.TEST_REQUEST_BASE)
+
+        return cs.client
+
+    def test_auth_system_success(self):
+        """Test that we can authenticate using the auth system."""
+        c = self._test_auth_success()
+        self.assertIsNone(c.bypass_url)
+        self.assertIsNone(c.proxy_token)
+
+    def test_auth_bypass_url(self):
+        """Test that we can authenticate with bypass URL."""
+        c = self._test_auth_success(bypass_url='auth_url2/v2.0')
+        self.assertEqual('auth_url2/v2.0', c.bypass_url)
+        self.assertEqual('auth_url2/v2.0', c.management_url)
+        self.assertIsNone(c.proxy_token)
+
+    def test_auth_bypass_url_proxy_token(self):
+        """Test that we can authenticate with bypass URL and proxy token."""
+        c = self._test_auth_success(proxy_token='abc',
+                                    bypass_url='auth_url2/v2.0')
+        self.assertEqual('auth_url2/v2.0', c.bypass_url)
+        self.assertEqual('auth_url2/v2.0', c.management_url)
+        self.assertEqual('abc', c.proxy_token)
 
     @mock.patch.object(pkg_resources, "iter_entry_points")
     def test_discover_auth_system_options(self, mock_iter_entry_points):
