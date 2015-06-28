@@ -6,6 +6,7 @@
 subunit.log
 *,cover
 cover
+covhtml
 *.pyc
 AUTHORS
 ChangeLog
