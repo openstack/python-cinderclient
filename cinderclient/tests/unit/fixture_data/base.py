@@ -14,42 +14,6 @@ import fixtures
 
 IDENTITY_URL = 'http://identityserver:5000/v2.0'
 VOLUME_URL = 'http://volume.host'
-TENANT_ID = 'b363706f891f48019483f8bd6503c54b'
-
-VOLUME_V1_URL = '%(volume_url)s/v1/%(tenant_id)s' % {'volume_url': VOLUME_URL,
-                                                     'tenant_id': TENANT_ID}
-VOLUME_V2_URL = '%(volume_url)s/v2/%(tenant_id)s' % {'volume_url': VOLUME_URL,
-                                                     'tenant_id': TENANT_ID}
-
-
-def generate_version_output(v1=True, v2=True):
-    v1_dict = {
-        "status": "SUPPORTED",
-        "updated": "2014-06-28T12:20:21Z",
-        "id": "v1.0",
-        "links": [{
-            "href": "http://127.0.0.1:8776/v1/",
-            "rel": "self"
-        }]
-    }
-
-    v2_dict = {
-        "status": "CURRENT",
-        "updated": "2012-11-21T11:33:21Z",
-        "id": "v2.0", "links": [{
-            "href": "http://127.0.0.1:8776/v2/",
-            "rel": "self"
-        }]
-    }
-
-    versions = []
-    if v1:
-        versions.append(v1_dict)
-
-    if v2:
-        versions.append(v2_dict)
-
-    return {"versions": versions}
 
 
 class Fixture(fixtures.Fixture):
