@@ -33,6 +33,23 @@ Release Notes
 MASTER
 -----
 
+1.3.0
+-----
+
+* Revert version discovery support due to this breaking deployments using
+  proxies. We will revisit this once the Kilo config option 'public_endpoint'
+  has been available longer to allow these deployments to work again with
+  version discovery available from the Cinder client.
+* Add volume multi-attach support.
+* Add encryption-type-update to update volume encryption types.
+
+.. _1454276 http://bugs.launchpad.net/python-cinderclient/+bug/1454276
+.. _1462104 http://bugs.launchpad.net/python-cinderclient/+bug/1462104
+.. _1418580 http://bugs.launchpad.net/python-cinderclient/+bug/1418580
+.. _1464160 http://bugs.launchpad.net/python-cinderclient/+bug/1464160
+
+
+
 1.2.2
 -----
 
