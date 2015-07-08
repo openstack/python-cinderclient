@@ -1903,11 +1903,9 @@ def do_manage(cs, args):
     # dictionary so that it is consistent with what the user specified on the
     # CLI.
 
-    if hasattr(args, 'source_name') and \
-       args.source_name is not None:
+    if hasattr(args, 'source_name') and args.source_name is not None:
         ref_dict['source-name'] = args.source_name
-    if hasattr(args, 'source_id') and \
-       args.source_id is not None:
+    if hasattr(args, 'source_id') and args.source_id is not None:
         ref_dict['source-id'] = args.source_id
 
     volume = cs.volumes.manage(host=args.host,

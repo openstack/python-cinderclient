@@ -94,7 +94,7 @@ class VolumeBackupManager(base.ManagerWithFind):
         """Export volume backup metadata record.
 
         :param backup_service: Backup service to use for importing the backup
-        :param backup_urlBackup URL for importing the backup metadata
+        :param backup_url: Backup URL for importing the backup metadata
         :rtype: :class:`VolumeBackup`
         """
         body = {'backup-record': {'backup_service': backup_service,
