@@ -1238,7 +1238,15 @@ def do_backup_restore(cs, args):
         volume_id = utils.find_volume(cs, vol).id
     else:
         volume_id = None
-    cs.restores.restore(args.backup, volume_id)
+
+    restore = cs.restores.restore(args.backup, volume_id)
+
+    info = {"backup_id": args.backup}
+    info.update(restore._info)
+
+    info.pop('links', None)
+
+    utils.print_dict(info)
 
 
 @utils.arg('backup', metavar='<backup>',
