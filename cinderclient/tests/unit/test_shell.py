@@ -167,7 +167,7 @@ class ShellTest(utils.TestCase):
         token_url = _shell.cs.client.auth_url + "/tokens"
         self.assertEqual(non_keystone_auth_url + "/tokens", token_url)
 
-        mock_request.assert_any_called(
+        mock_request.assert_any_call(
             "POST",
             token_url,
             headers=headers,
