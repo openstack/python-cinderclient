@@ -590,6 +590,14 @@ class OpenStackCinderShell(object):
         # FIXME(usrleon): Here should be restrict for project id same as
         # for os_username or os_password but for compatibility it is not.
 
+        # V3 stuff
+        project_info_provided = ((self.options.os_tenant_name or
+                                  self.options.os_tenant_id) or
+                                 (self.options.os_project_name and
+                                  (self.options.os_project_domain_name or
+                                   self.options.os_project_domain_id)) or
+                                 self.options.os_project_id)
+
         if not utils.isunauthenticated(args.func):
             if auth_plugin:
                 auth_plugin.parse_opts(args)
@@ -616,32 +624,20 @@ class OpenStackCinderShell(object):
                                            "env[OS_PASSWORD] "
                                            "or, prompted response.")
 
-            if not (os_tenant_name or os_tenant_id):
-                raise exc.CommandError("You must provide a tenant ID "
-                                       "through --os-tenant-id or "
-                                       "env[OS_TENANT_ID].")
-
-            # V3 stuff
-            project_info_provided = self.options.os_tenant_name or \
-                self.options.os_tenant_id or \
-                (self.options.os_project_name and
-                 (self.options.project_domain_name or
-                  self.options.project_domain_id)) or \
-                self.options.os_project_id
-
-            if (not project_info_provided):
-                raise exc.CommandError(
-                    _("You must provide a tenant_name, tenant_id, "
-                      "project_id or project_name (with "
-                      "project_domain_name or project_domain_id) via "
-                      "  --os-tenant-name (env[OS_TENANT_NAME]),"
-                      "  --os-tenant-id (env[OS_TENANT_ID]),"
-                      "  --os-project-id (env[OS_PROJECT_ID])"
-                      "  --os-project-name (env[OS_PROJECT_NAME]),"
-                      "  --os-project-domain-id "
-                      "(env[OS_PROJECT_DOMAIN_ID])"
-                      "  --os-project-domain-name "
-                      "(env[OS_PROJECT_DOMAIN_NAME])"))
+            if not project_info_provided:
+                raise exc.CommandError(_(
+                    "You must provide a tenant_name, tenant_id, "
+                    "project_id or project_name (with "
+                    "project_domain_name or project_domain_id) via "
+                    "  --os-tenant-name (env[OS_TENANT_NAME]),"
+                    "  --os-tenant-id (env[OS_TENANT_ID]),"
+                    "  --os-project-id (env[OS_PROJECT_ID])"
+                    "  --os-project-name (env[OS_PROJECT_NAME]),"
+                    "  --os-project-domain-id "
+                    "(env[OS_PROJECT_DOMAIN_ID])"
+                    "  --os-project-domain-name "
+                    "(env[OS_PROJECT_DOMAIN_NAME])"
+                ))
 
             if not os_auth_url:
                 if os_auth_system and os_auth_system != 'keystone':
@@ -652,10 +648,20 @@ class OpenStackCinderShell(object):
                     "You must provide an authentication URL "
                     "through --os-auth-url or env[OS_AUTH_URL].")
 
-        if not (os_tenant_name or os_tenant_id):
-            raise exc.CommandError(
-                "You must provide a tenant ID "
-                "through --os-tenant-id or env[OS_TENANT_ID].")
+        if not project_info_provided:
+            raise exc.CommandError(_(
+                "You must provide a tenant_name, tenant_id, "
+                "project_id or project_name (with "
+                "project_domain_name or project_domain_id) via "
+                "  --os-tenant-name (env[OS_TENANT_NAME]),"
+                "  --os-tenant-id (env[OS_TENANT_ID]),"
+                "  --os-project-id (env[OS_PROJECT_ID])"
+                "  --os-project-name (env[OS_PROJECT_NAME]),"
+                "  --os-project-domain-id "
+                "(env[OS_PROJECT_DOMAIN_ID])"
+                "  --os-project-domain-name "
+                "(env[OS_PROJECT_DOMAIN_NAME])"
+            ))
 
         if not os_auth_url:
             raise exc.CommandError(
