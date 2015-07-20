@@ -530,19 +530,22 @@ class FakeHTTPClient(base_client.HTTPClient):
                               'extra_specs': {}}]})
 
     def get_types_1(self, **kw):
-        return (200, {}, {'volume_type': {'id': 1,
-                          'name': 'test-type-1',
-                          'extra_specs': {}}})
+        return (200, {}, {
+            'volume_type': {'id': 1,
+                            'name': 'test-type-1',
+                            'extra_specs': {}}})
 
     def get_types_2(self, **kw):
-        return (200, {}, {'volume_type': {'id': 2,
-                          'name': 'test-type-2',
-                          'extra_specs': {}}})
+        return (200, {}, {
+            'volume_type': {'id': 2,
+                            'name': 'test-type-2',
+                            'extra_specs': {}}})
 
     def post_types(self, body, **kw):
-        return (202, {}, {'volume_type': {'id': 3,
-                          'name': 'test-type-3',
-                          'extra_specs': {}}})
+        return (202, {}, {
+            'volume_type': {'id': 3,
+                            'name': 'test-type-3',
+                            'extra_specs': {}}})
 
     def post_types_1_extra_specs(self, body, **kw):
         assert list(body) == ['extra_specs']
@@ -825,8 +828,8 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def put_os_services_disable_log_reason(self, body, **kw):
         return (200, {}, {'host': body['host'], 'binary': body['binary'],
-                'status': 'disabled',
-                'disabled_reason': body['disabled_reason']})
+                          'status': 'disabled',
+                          'disabled_reason': body['disabled_reason']})
 
     def get_os_availability_zone(self, **kw):
         return (200, {}, {
@@ -841,7 +844,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                     "zoneState": {"available": False},
                     "hosts": None,
                 },
-                ]
+            ]
         })
 
     def get_os_availability_zone_detail(self, **kw):
@@ -880,7 +883,7 @@ class FakeHTTPClient(base_client.HTTPClient):
                     "zoneState": {"available": False},
                     "hosts": None,
                 },
-                ]
+            ]
         })
 
     def post_snapshots_1234_metadata(self, **kw):

@@ -361,9 +361,9 @@ class VolumeManager(base.ManagerWithFind):
         return self._action('os-volume_upload_image',
                             volume,
                             {'force': force,
-                            'image_name': image_name,
-                            'container_format': container_format,
-                            'disk_format': disk_format})
+                             'image_name': image_name,
+                             'container_format': container_format,
+                             'disk_format': disk_format})
 
     def force_delete(self, volume):
         return self._action('os-force_delete', base.getid(volume))

@@ -331,7 +331,7 @@ def do_create(cs, args):
     if args.metadata is not None:
         volume_metadata = _extract_metadata(args)
 
-    #NOTE(N.S.): take this piece from novaclient
+    # NOTE(N.S.): take this piece from novaclient
     hints = {}
     if args.scheduler_hints:
         for hint in args.scheduler_hints:
@@ -344,7 +344,7 @@ def do_create(cs, args):
                 hints[key] += [value]
             else:
                 hints[key] = value
-    #NOTE(N.S.): end of taken piece
+    # NOTE(N.S.): end of taken piece
 
     volume = cs.volumes.create(args.size,
                                args.consisgroup_id,
@@ -649,9 +649,8 @@ def do_snapshot_rename(cs, args):
 @utils.arg('--state', metavar='<state>',
            default='available',
            help=('The state to assign to the snapshot. Valid values are '
-           '"available," "error," "creating," "deleting," and '
-           '"error_deleting." '
-           'Default is "available."'))
+                 '"available," "error," "creating," "deleting," and '
+                 '"error_deleting." Default is "available."'))
 @utils.service_type('volumev2')
 def do_snapshot_reset_state(cs, args):
     """Explicitly updates the snapshot state."""

@@ -160,8 +160,9 @@ class OpenStackCinderShell(object):
 
         parser.add_argument('--endpoint-type',
                             metavar='<endpoint-type>',
-                            default=utils.env('CINDER_ENDPOINT_TYPE',
-                            default=DEFAULT_CINDER_ENDPOINT_TYPE),
+                            default=utils.env(
+                                'CINDER_ENDPOINT_TYPE',
+                                default=DEFAULT_CINDER_ENDPOINT_TYPE),
                             help='Endpoint type, which is publicURL or '
                             'internalURL. '
                             'Default=nova env[CINDER_ENDPOINT_TYPE] or '

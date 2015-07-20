@@ -68,8 +68,7 @@ class VolumeType(base.Resource):
         resp = None
         for k in keys:
             resp = self.manager._delete(
-                "/types/%s/extra_specs/%s" % (
-                base.getid(self), k))
+                "/types/%s/extra_specs/%s" % (base.getid(self), k))
             if resp is not None:
                 return resp
 
