@@ -141,6 +141,8 @@ def print_list(objs, fields, formatters=None, sortby_index=0):
                     data = getattr(o, field_name, '')
                 if data is None:
                     data = '-'
+                if isinstance(data, six.string_types) and "\r" in data:
+                    data = data.replace("\r", " ")
                 row.append(data)
         pt.add_row(row)
 
@@ -154,7 +156,11 @@ def print_list(objs, fields, formatters=None, sortby_index=0):
 def print_dict(d, property="Property"):
     pt = prettytable.PrettyTable([property, 'Value'], caching=False)
     pt.aligns = ['l', 'l']
-    [pt.add_row(list(r)) for r in six.iteritems(d)]
+    for r in six.iteritems(d):
+        r = list(r)
+        if isinstance(r[1], six.string_types) and "\r" in r[1]:
+            r[1] = r[1].replace("\r", " ")
+        pt.add_row(r)
     _print(pt, property)
 
 

@@ -204,3 +204,37 @@ class PrintListTestCase(test_utils.TestCase):
 | 3 | 4 |
 +---+---+
 """, cso.read())
+
+    def test_print_list_with_return(self):
+        Row = collections.namedtuple('Row', ['a', 'b'])
+        to_print = [Row(a=3, b='a\r'), Row(a=1, b='c\rd')]
+        with CaptureStdout() as cso:
+            utils.print_list(to_print, ['a', 'b'])
+        # Output should be sorted by the first key (a)
+        self.assertEqual("""\
++---+-----+
+| a |  b  |
++---+-----+
+| 1 | c d |
+| 3 |  a  |
++---+-----+
+""", cso.read())
+
+
+class PrintDictTestCase(test_utils.TestCase):
+
+    def test_print_dict_with_return(self):
+        d = {'a': 'A', 'b': 'B', 'c': 'C', 'd': 'test\rcarriage\n\rreturn'}
+        with CaptureStdout() as cso:
+            utils.print_dict(d)
+        self.assertEqual("""\
++----------+---------------+
+| Property |     Value     |
++----------+---------------+
+|    a     |       A       |
+|    b     |       B       |
+|    c     |       C       |
+|    d     | test carriage |
+|          |     return    |
++----------+---------------+
+""", cso.read())
