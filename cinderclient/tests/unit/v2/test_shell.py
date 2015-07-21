@@ -359,6 +359,10 @@ class ShellTest(utils.TestCase):
         self.run_command('backup-create 1234 --incremental')
         self.assert_called('POST', '/backups')
 
+    def test_backup_force(self):
+        self.run_command('backup-create 1234 --force')
+        self.assert_called('POST', '/backups')
+
     def test_restore(self):
         self.run_command('backup-restore 1234')
         self.assert_called('POST', '/backups/1234/restore')
