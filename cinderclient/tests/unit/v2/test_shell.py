@@ -913,7 +913,7 @@ class ShellTest(utils.TestCase):
                           self.run_command,
                           'consisgroup-update 1234')
 
-    def test_consistencygroup_create_from_src(self):
+    def test_consistencygroup_create_from_src_snap(self):
         self.run_command('consisgroup-create-from-src '
                          '--name cg '
                          '--cgsnapshot 1234')
@@ -924,17 +924,44 @@ class ShellTest(utils.TestCase):
                 'description': None,
                 'user_id': None,
                 'project_id': None,
-                'status': 'creating'
+                'status': 'creating',
+                'source_cgid': None
             }
         }
         self.assert_called('POST', '/consistencygroups/create_from_src',
                            expected)
 
-    def test_consistencygroup_create_from_src_bad_request(self):
+    def test_consistencygroup_create_from_src_cg(self):
+        self.run_command('consisgroup-create-from-src '
+                         '--name cg '
+                         '--source-cg 1234')
+        expected = {
+            'consistencygroup-from-src': {
+                'name': 'cg',
+                'cgsnapshot_id': None,
+                'description': None,
+                'user_id': None,
+                'project_id': None,
+                'status': 'creating',
+                'source_cgid': '1234'
+            }
+        }
+        self.assert_called('POST', '/consistencygroups/create_from_src',
+                           expected)
+
+    def test_consistencygroup_create_from_src_fail_no_snap_cg(self):
         self.assertRaises(exceptions.BadRequest,
                           self.run_command,
                           'consisgroup-create-from-src '
                           '--name cg')
+
+    def test_consistencygroup_create_from_src_fail_both_snap_cg(self):
+        self.assertRaises(exceptions.BadRequest,
+                          self.run_command,
+                          'consisgroup-create-from-src '
+                          '--name cg '
+                          '--cgsnapshot 1234 '
+                          '--source-cg 5678')
 
     def test_set_image_metadata(self):
         self.run_command('image-metadata 1234 set key1=val1')

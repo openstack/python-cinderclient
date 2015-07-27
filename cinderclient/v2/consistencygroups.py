@@ -67,12 +67,13 @@ class ConsistencygroupManager(base.ManagerWithFind):
 
         return self._create('/consistencygroups', body, 'consistencygroup')
 
-    def create_from_src(self, cgsnapshot_id, name=None,
+    def create_from_src(self, cgsnapshot_id, source_cgid, name=None,
                         description=None, user_id=None,
                         project_id=None):
-        """Creates a consistencygroup from a cgsnapshot.
+        """Creates a consistencygroup from a cgsnapshot or a source CG.
 
         :param cgsnapshot_id: UUID of a CGSnapshot
+        :param source_cgid: UUID of a source CG
         :param name: Name of the ConsistencyGroup
         :param description: Description of the ConsistencyGroup
         :param user_id: User id derived from context
@@ -82,6 +83,7 @@ class ConsistencygroupManager(base.ManagerWithFind):
         body = {'consistencygroup-from-src': {'name': name,
                                               'description': description,
                                               'cgsnapshot_id': cgsnapshot_id,
+                                              'source_cgid': source_cgid,
                                               'user_id': user_id,
                                               'project_id': project_id,
                                               'status': "creating",
