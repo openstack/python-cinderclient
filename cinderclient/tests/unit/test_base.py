@@ -59,3 +59,7 @@ class BaseTest(utils.TestCase):
         self.assertRaises(exceptions.NotFound,
                           cs.volumes.find,
                           vegetable='carrot')
+
+    def test_to_dict(self):
+        r1 = base.Resource(None, {'id': 1, 'name': 'hi'})
+        self.assertEqual({'id': 1, 'name': 'hi'}, r1.to_dict())
