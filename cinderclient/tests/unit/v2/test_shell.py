@@ -947,3 +947,35 @@ class ShellTest(utils.TestCase):
         expected = {"os-unset_image_metadata": {"key": "key1"}}
         self.assert_called('POST', '/volumes/1234/action',
                            body=expected)
+
+    def _get_params_from_stack(self, pos=-1):
+        method, url = self.shell.cs.client.callstack[pos][0:2]
+        path, query = parse.splitquery(url)
+        params = parse.parse_qs(query)
+        return path, params
+
+    def test_backup_list_all_tenants(self):
+        self.run_command('backup-list --all-tenants=1 --name=bc '
+                         '--status=available --volume-id=1234')
+        expected = {
+            'all_tenants': ['1'],
+            'name': ['bc'],
+            'status': ['available'],
+            'volume_id': ['1234'],
+        }
+
+        path, params = self._get_params_from_stack()
+
+        self.assertEqual('/backups/detail', path)
+        self.assertEqual(4, len(params))
+
+        for k in params.keys():
+            self.assertEqual(expected[k], params[k])
+
+    def test_backup_list_volume_id(self):
+        self.run_command('backup-list --volume-id=1234')
+        self.assert_called('GET', '/backups/detail?volume_id=1234')
+
+    def test_backup_list(self):
+        self.run_command('backup-list')
+        self.assert_called('GET', '/backups/detail')

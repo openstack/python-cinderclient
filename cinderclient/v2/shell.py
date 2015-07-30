@@ -1229,10 +1229,45 @@ def do_backup_show(cs, args):
     utils.print_dict(info)
 
 
+@utils.arg('--all-tenants',
+           metavar='<all_tenants>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=0,
+           help='Shows details for all tenants. Admin only.')
+@utils.arg('--all_tenants',
+           nargs='?',
+           type=int,
+           const=1,
+           help=argparse.SUPPRESS)
+@utils.arg('--name',
+           metavar='<name>',
+           default=None,
+           help='Filters results by a name. Default=None.')
+@utils.arg('--status',
+           metavar='<status>',
+           default=None,
+           help='Filters results by a status. Default=None.')
+@utils.arg('--volume-id',
+           metavar='<volume-id>',
+           default=None,
+           help='Filters results by a volume ID. Default=None.')
+@utils.arg('--volume_id',
+           help=argparse.SUPPRESS)
 @utils.service_type('volumev2')
 def do_backup_list(cs, args):
     """Lists all backups."""
-    backups = cs.backups.list()
+
+    search_opts = {
+        'all_tenants': args.all_tenants,
+        'name': args.name,
+        'status': args.status,
+        'volume_id': args.volume_id,
+    }
+
+    backups = cs.backups.list(search_opts=search_opts)
+    _translate_volume_snapshot_keys(backups)
     columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'Object Count',
                'Container']
     utils.print_list(backups, columns)

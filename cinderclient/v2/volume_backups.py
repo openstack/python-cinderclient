@@ -16,7 +16,7 @@
 """
 Volume Backups interface (1.1 extension).
 """
-
+from six.moves.urllib.parse import urlencode
 from cinderclient import base
 
 
@@ -68,10 +68,16 @@ class VolumeBackupManager(base.ManagerWithFind):
 
         :rtype: list of :class:`VolumeBackup`
         """
-        if detailed is True:
-            return self._list("/backups/detail", "backups")
-        else:
-            return self._list("/backups", "backups")
+        search_opts = search_opts or {}
+
+        qparams = dict((key, val) for key, val in search_opts.items() if val)
+
+        query_string = ("?%s" % urlencode(qparams)) if qparams else ""
+
+        detail = '/detail' if detailed else ''
+
+        return self._list("/backups%s%s" % (detail, query_string),
+                          "backups")
 
     def delete(self, backup):
         """Delete a volume backup.
