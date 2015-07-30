@@ -315,6 +315,7 @@ def do_delete(cs, args):
     for volume in args.volume:
         try:
             utils.find_volume(cs, volume).delete()
+            print("Request to delete volume %s has been accepted." % (volume))
         except Exception as e:
             failure_count += 1
             print("Delete for volume %s failed: %s" % (volume, e))
