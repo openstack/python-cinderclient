@@ -82,7 +82,9 @@ class ClientException(Exception):
     """
     def __init__(self, code, message=None, details=None, request_id=None):
         self.code = code
-        self.message = message or self.__class__.message
+        # NOTE(mriedem): Use getattr on self.__class__.message since
+        # BaseException.message was dropped in python 3, see PEP 0352.
+        self.message = message or getattr(self.__class__, 'message', None)
         self.details = details
         self.request_id = request_id
 
@@ -176,8 +178,8 @@ def from_response(response, body):
         details = "n/a"
         if hasattr(body, 'keys'):
             error = body[list(body)[0]]
-            message = error.get('message', None)
-            details = error.get('details', None)
+            message = error.get('message', message)
+            details = error.get('details', details)
         return cls(code=response.status_code, message=message, details=details,
                    request_id=request_id)
     else:
