@@ -451,8 +451,8 @@ def do_force_delete(cs, args):
            help='Name or ID of volume to modify.')
 @utils.arg('--state', metavar='<state>', default='available',
            help=('The state to assign to the volume. Valid values are '
-                 '"available," "error," "creating," "deleting," "in-use," '
-                 '"attaching," "detaching" and "error_deleting." '
+                 '"available", "error", "creating", "deleting", "in-use", '
+                 '"attaching", "detaching" and "error_deleting". '
                  'NOTE: This command simply changes the state of the '
                  'Volume in the DataBase with no regard to actual status, '
                  'exercise caution when using. Default=available.'))
@@ -741,8 +741,8 @@ def do_snapshot_rename(cs, args):
 @utils.arg('--state', metavar='<state>',
            default='available',
            help=('The state to assign to the snapshot. Valid values are '
-                 '"available," "error," "creating," "deleting," and '
-                 '"error_deleting." NOTE: This command simply changes '
+                 '"available", "error", "creating", "deleting", and '
+                 '"error_deleting". NOTE: This command simply changes '
                  'the state of the Snapshot in the DataBase with no regard '
                  'to actual status, exercise caution when using. '
                  'Default=available.'))
