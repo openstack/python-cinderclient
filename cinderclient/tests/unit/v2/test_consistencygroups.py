@@ -89,7 +89,7 @@ class ConsistencygroupsTest(utils.TestCase):
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
 
     def test_update_consistencygroup_none(self):
-        self.assertEqual(None, cs.consistencygroups.update('1234'))
+        self.assertIsNone(cs.consistencygroups.update('1234'))
 
     def test_update_consistencygroup_no_props(self):
         cs.consistencygroups.update('1234')
