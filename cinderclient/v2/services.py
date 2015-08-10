@@ -22,7 +22,7 @@ from cinderclient import base
 class Service(base.Resource):
 
     def __repr__(self):
-        return "<Service: %s>" % self.service
+        return "<Service: %s>" % self.binary
 
 
 class ServiceManager(base.ManagerWithFind):
