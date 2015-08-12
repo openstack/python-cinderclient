@@ -2317,3 +2317,20 @@ def do_get_pools(cs, args):
         if args.detail:
             backend.update(info['capabilities'])
         utils.print_dict(backend)
+
+
+@utils.arg('host',
+           metavar='<host>',
+           help='Cinder host to show backend volume stats and properties; '
+                'takes the form: host@backend-name')
+@utils.service_type('volumev2')
+def do_get_capabilities(cs, args):
+    """Show backend volume stats and properties. Admin only."""
+
+    capabilities = cs.capabilities.get(args.host)
+    infos = dict()
+    infos.update(capabilities._info)
+
+    prop = infos.pop('properties', None)
+    utils.print_dict(infos, "Volume stats")
+    utils.print_dict(prop, "Backend properties")

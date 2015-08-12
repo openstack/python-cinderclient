@@ -1067,3 +1067,20 @@ class FakeHTTPClient(base_client.HTTPClient):
             },
         ]
         return (200, {}, {"pools": stats})
+
+    def get_capabilities_host(self, **kw):
+        return (200, {},
+            {
+                'namespace': 'OS::Storage::Capabilities::fake',
+                'vendor_name': 'OpenStack',
+                'volume_backend_name': 'lvm',
+                'pool_name': 'pool',
+                'storage_protocol': 'iSCSI',
+                'properties': {
+                    'compression': {
+                        'title': 'Compression',
+                        'description': 'Enables compression.',
+                        'type': 'boolean'},
+                }
+            }
+        )

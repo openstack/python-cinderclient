@@ -1045,3 +1045,7 @@ class ShellTest(utils.TestCase):
     def test_backup_list(self):
         self.run_command('backup-list')
         self.assert_called('GET', '/backups/detail')
+
+    def test_get_capabilities(self):
+        self.run_command('get-capabilities host')
+        self.assert_called('GET', '/capabilities/host')
