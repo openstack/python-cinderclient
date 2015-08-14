@@ -238,14 +238,12 @@ class HTTPClient(object):
             **kwargs)
         self.http_log_resp(resp)
 
+        body = None
         if resp.text:
             try:
                 body = json.loads(resp.text)
-            except ValueError:
-                pass
-                body = None
-        else:
-            body = None
+            except ValueError as e:
+                self._logger.debug("Load http response text error: %s", e)
 
         if resp.status_code >= 400:
             raise exceptions.from_response(resp, body)
