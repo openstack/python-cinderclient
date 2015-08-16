@@ -113,14 +113,14 @@ class ShellTest(utils.TestCase):
         v2_url, v3_url = _shell._discover_auth_versions(
             None, auth_url=os_auth_url)
         self.assertEqual(v2_url, os_auth_url, "Expected v2 url")
-        self.assertEqual(v3_url, None, "Expected no v3 url")
+        self.assertIsNone(v3_url, "Expected no v3 url")
 
         os_auth_url = "https://DiscoveryNotSupported.discovery.com:35357/v3.0"
         self.register_keystone_auth_fixture(mocker, os_auth_url)
         v2_url, v3_url = _shell._discover_auth_versions(
             None, auth_url=os_auth_url)
         self.assertEqual(v3_url, os_auth_url, "Expected v3 url")
-        self.assertEqual(v2_url, None, "Expected no v2 url")
+        self.assertIsNone(v2_url, "Expected no v2 url")
 
     @mock.patch('sys.stdin', side_effect=mock.MagicMock)
     @mock.patch('getpass.getpass', return_value='password')

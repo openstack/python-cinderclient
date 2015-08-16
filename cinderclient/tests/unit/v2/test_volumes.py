@@ -235,7 +235,7 @@ class FormatSortParamTestCase(utils.TestCase):
 
     def test_format_sort_empty_input(self):
         for s in [None, '', []]:
-            self.assertEqual(None, cs.volumes._format_sort_param(s))
+            self.assertIsNone(cs.volumes._format_sort_param(s))
 
     def test_format_sort_string_single_key(self):
         s = 'id'
