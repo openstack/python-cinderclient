@@ -122,13 +122,17 @@ class ShellTest(utils.TestCase):
         self.assertEqual(v3_url, os_auth_url, "Expected v3 url")
         self.assertIsNone(v2_url, "Expected no v2 url")
 
+    @mock.patch('keystoneclient.adapter.Adapter.get_token',
+                side_effect=ks_exc.ConnectionRefused())
+    @mock.patch('keystoneclient.discover.Discover',
+                side_effect=ks_exc.ConnectionRefused())
     @mock.patch('sys.stdin', side_effect=mock.MagicMock)
     @mock.patch('getpass.getpass', return_value='password')
-    def test_password_prompted(self, mock_getpass, mock_stdin):
+    def test_password_prompted(self, mock_getpass, mock_stdin, mock_discover,
+                               mock_token):
         self.make_env(exclude='OS_PASSWORD')
-        # We should get a Connection Refused because there is no keystone.
-        self.assertRaises(ks_exc.ConnectionRefused, self.shell, 'list')
-        # Make sure we are actually prompted.
+        _shell = shell.OpenStackCinderShell()
+        self.assertRaises(ks_exc.ConnectionRefused, _shell.main, ['list'])
         mock_getpass.assert_called_with('OS Password: ')
 
     @mock.patch.object(requests, "request")
