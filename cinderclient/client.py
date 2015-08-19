@@ -332,7 +332,8 @@ class HTTPClient(object):
                 management_url = self.service_catalog.url_for(
                     region_name=self.region_name,
                     endpoint_type=self.endpoint_type,
-                    service_type=self.service_type)
+                    service_type=self.service_type,
+                    service_name=self.service_name)
                 self.management_url = management_url.rstrip('/')
                 return None
             except exceptions.AmbiguousEndpoints:

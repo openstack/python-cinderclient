@@ -115,28 +115,49 @@ def generate_v2_project_scoped_token(**kwargs):
                              }
                     }}
 
-    # we only care about Neutron and Keystone endpoints
+    # Add endpoint Keystone
     o['access']['serviceCatalog'] = [
-        {'endpoints': [
-            {'publicURL': 'public_' + ref.get('cinder_url'),
-             'internalURL': 'internal_' + ref.get('cinder_url'),
-             'adminURL': 'admin_' + (ref.get('auth_url') or ""),
-             'id': uuid.uuid4().hex,
-             'region': 'RegionOne'
-             }],
-         'endpoints_links': [],
-         'name': 'Neutron',
-         'type': 'network'},
-        {'endpoints': [
-            {'publicURL': ref.get('auth_url'),
-             'adminURL': ref.get('auth_url'),
-             'internalURL': ref.get('auth_url'),
-             'id': uuid.uuid4().hex,
-             'region': 'RegionOne'
-             }],
-         'endpoint_links': [],
-         'name': 'keystone',
-         'type': 'identity'}]
+        {
+            'endpoints': [
+            {
+                'publicURL': ref.get('auth_url'),
+                'adminURL': ref.get('auth_url'),
+                'internalURL': ref.get('auth_url'),
+                'id': uuid.uuid4().hex,
+                'region': 'RegionOne'
+            }],
+            'endpoint_links': [],
+            'name': 'keystone',
+            'type': 'identity'
+        }
+    ]
+
+    cinder_endpoint = {
+        'endpoints': [
+            {
+                'publicURL': 'public_' + ref.get('cinder_url'),
+                'internalURL': 'internal_' + ref.get('cinder_url'),
+                'adminURL': 'admin_' + (ref.get('auth_url') or ""),
+                'id': uuid.uuid4().hex,
+                'region': 'RegionOne'
+            }
+        ],
+        'endpoints_links': [],
+        'name': None,
+        'type': 'volumev2'
+    }
+
+    # Add multiple Cinder endpoints
+    for count in range(1, 4):
+        # Copy the endpoint and create a service name
+        endpoint_copy = copy.deepcopy(cinder_endpoint)
+        name = "cinder%i" % count
+        # Assign the service name and a unique endpoint
+        endpoint_copy['endpoints'][0]['publicURL'] = \
+            'http://%s.api.com/v2' % name
+        endpoint_copy['name'] = name
+
+        o['access']['serviceCatalog'].append(endpoint_copy)
 
     return token, o
 
@@ -218,6 +239,9 @@ def keystone_request_callback(request, context):
     elif request.url == BASE_URL + "/v2.0":
         token_id, token_data = generate_v2_project_scoped_token()
         return token_data
+    elif request.url.startswith("http://multiple.service.names"):
+        token_id, token_data = generate_v2_project_scoped_token()
+        return json.dumps(token_data)
     elif request.url == BASE_URL + "/v3":
         token_id, token_data = generate_v3_project_scoped_token()
         context.headers["X-Subject-Token"] = token_id
