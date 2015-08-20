@@ -94,8 +94,8 @@ class ConsistencygroupsTest(utils.TestCase):
     def test_update_consistencygroup_no_props(self):
         cs.consistencygroups.update('1234')
 
-    def test_create_consistencygroup_from_src(self):
-        cs.consistencygroups.create_from_src('5678', name='cg')
+    def test_create_consistencygroup_from_src_snap(self):
+        cs.consistencygroups.create_from_src('5678', None, name='cg')
         expected = {
             'consistencygroup-from-src': {
                 'status': 'creating',
@@ -103,7 +103,24 @@ class ConsistencygroupsTest(utils.TestCase):
                 'user_id': None,
                 'name': 'cg',
                 'cgsnapshot_id': '5678',
-                'project_id': None
+                'project_id': None,
+                'source_cgid': None
+            }
+        }
+        cs.assert_called('POST', '/consistencygroups/create_from_src',
+                         body=expected)
+
+    def test_create_consistencygroup_from_src_cg(self):
+        cs.consistencygroups.create_from_src(None, '5678', name='cg')
+        expected = {
+            'consistencygroup-from-src': {
+                'status': 'creating',
+                'description': None,
+                'user_id': None,
+                'name': 'cg',
+                'source_cgid': '5678',
+                'project_id': None,
+                'cgsnapshot_id': None
             }
         }
         cs.assert_called('POST', '/consistencygroups/create_from_src',

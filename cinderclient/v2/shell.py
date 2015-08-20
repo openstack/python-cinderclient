@@ -2082,6 +2082,9 @@ def do_consisgroup_create(cs, args):
 @utils.arg('--cgsnapshot',
            metavar='<cgsnapshot>',
            help='Name or ID of a cgsnapshot. Default=None.')
+@utils.arg('--source-cg',
+           metavar='<source-cg>',
+           help='Name or ID of a source CG. Default=None.')
 @utils.arg('--name',
            metavar='<name>',
            help='Name of a consistency group. Default=None.')
@@ -2090,14 +2093,24 @@ def do_consisgroup_create(cs, args):
            help='Description of a consistency group. Default=None.')
 @utils.service_type('volumev2')
 def do_consisgroup_create_from_src(cs, args):
-    """Creates a consistency group from a cgsnapshot."""
-    if not args.cgsnapshot:
-        msg = ('Cannot create consistency group because the source '
-               'cgsnapshot is not provided.')
+    """Creates a consistency group from a cgsnapshot or a source CG."""
+    if not args.cgsnapshot and not args.source_cg:
+        msg = ('Cannot create consistency group because neither '
+               'cgsnapshot nor source CG is provided.')
         raise exceptions.BadRequest(code=400, message=msg)
-    cgsnapshot = _find_cgsnapshot(cs, args.cgsnapshot)
+    if args.cgsnapshot and args.source_cg:
+        msg = ('Cannot create consistency group because both '
+               'cgsnapshot and source CG are provided.')
+        raise exceptions.BadRequest(code=400, message=msg)
+    cgsnapshot = None
+    if args.cgsnapshot:
+        cgsnapshot = _find_cgsnapshot(cs, args.cgsnapshot)
+    source_cg = None
+    if args.source_cg:
+        source_cg = _find_consistencygroup(cs, args.source_cg)
     info = cs.consistencygroups.create_from_src(
-        cgsnapshot.id,
+        cgsnapshot.id if cgsnapshot else None,
+        source_cg.id if source_cg else None,
         args.name,
         args.description)
 
