@@ -15,6 +15,7 @@
 
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v2 import fakes
+from cinderclient.v2 import volume_backups_restore
 
 
 cs = fakes.FakeClient()
@@ -59,8 +60,10 @@ class VolumeBackupsTest(utils.TestCase):
 
     def test_restore(self):
         backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
-        cs.restores.restore(backup_id)
+        info = cs.restores.restore(backup_id)
         cs.assert_called('POST', '/backups/%s/restore' % backup_id)
+        self.assertIsInstance(info,
+                              volume_backups_restore.VolumeBackupsRestore)
 
     def test_record_export(self):
         backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'

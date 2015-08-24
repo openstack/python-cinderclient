@@ -21,6 +21,8 @@ from six.moves.urllib import parse
 from cinderclient import client
 from cinderclient import exceptions
 from cinderclient import shell
+from cinderclient.v2 import volumes
+from cinderclient.v2 import shell as test_shell
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v2 import fakes
 from cinderclient.tests.unit.fixture_data import keystone_client
@@ -54,6 +56,15 @@ class ShellTest(utils.TestCase):
         self.requests.register_uri(
             'GET', keystone_client.BASE_URL,
             text=keystone_client.keystone_request_callback)
+
+        self.cs = mock.Mock()
+
+    def _make_args(self, args):
+        class Args(object):
+            def __init__(self, entries):
+                self.__dict__.update(entries)
+
+        return Args(args)
 
     def tearDown(self):
         # For some methods like test_image_meta_bad_action we are
@@ -362,6 +373,30 @@ class ShellTest(utils.TestCase):
     def test_restore(self):
         self.run_command('backup-restore 1234')
         self.assert_called('POST', '/backups/1234/restore')
+
+    @mock.patch('cinderclient.utils.print_dict')
+    @mock.patch('cinderclient.utils.find_volume')
+    def test_do_backup_restore(self,
+                               mock_find_volume,
+                               mock_print_dict):
+        backup_id = '1234'
+        volume_id = '5678'
+        input = {
+            'backup': backup_id,
+            'volume': volume_id
+        }
+
+        args = self._make_args(input)
+        with mock.patch.object(self.cs.restores,
+                               'restore') as mocked_restore:
+            mock_find_volume.return_value = volumes.Volume(self,
+                                                           {'id': volume_id},
+                                                           loaded = True)
+            test_shell.do_backup_restore(self.cs, args)
+            mocked_restore.assert_called_once_with(
+                input['backup'],
+                volume_id)
+            self.assertTrue(mock_print_dict.called)
 
     def test_record_export(self):
         self.run_command('backup-export 1234')
