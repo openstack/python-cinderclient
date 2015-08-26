@@ -22,7 +22,7 @@ class CinderClientTests(base.ClientTestBase):
     def test_volume_create_delete_id(self):
         """Create and delete a volume by ID."""
         volume = self.volume_create(params='1')
-        self.assert_volume_details_rows(volume.keys())
+        self.assert_volume_details(volume.keys())
         self.volume_delete(volume['id'])
         self.check_volume_deleted(volume['id'])
 
@@ -39,7 +39,7 @@ class CinderClientTests(base.ClientTestBase):
         output = self.cinder('show', params='TestVolumeShow')
         volume = self._get_property_from_output(output)
         self.assertEqual('TestVolumeShow', volume['name'])
-        self.assert_volume_details_rows(volume.keys())
+        self.assert_volume_details(volume.keys())
 
         self.volume_delete(volume['id'])
         self.check_volume_deleted(volume['id'])
@@ -53,5 +53,15 @@ class CinderClientTests(base.ClientTestBase):
         volume = self._get_property_from_output(output)
         self.assertEqual('2', volume['size'])
 
+        self.volume_delete(volume['id'])
+        self.check_volume_deleted(volume['id'])
+
+    def test_snapshot_create_and_delete(self):
+        """Create a volume snapshot and then delete."""
+        volume = self.volume_create(params='1')
+        snapshot = self.snapshot_create(volume['id'])
+        self.assert_snapshot_details(snapshot.keys())
+        self.snapshot_delete(snapshot['id'])
+        self.check_snapshot_deleted(snapshot['id'])
         self.volume_delete(volume['id'])
         self.check_volume_deleted(volume['id'])
