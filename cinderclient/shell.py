@@ -200,7 +200,7 @@ class OpenStackCinderShell(object):
                             default=utils.env('CINDERCLIENT_BYPASS_URL'),
                             help="Use this API endpoint instead of the "
                             "Service Catalog. Defaults to "
-                            "env[CINDERCLIENT_BYPASS_URL]")
+                            "env[CINDERCLIENT_BYPASS_URL].")
         parser.add_argument('--bypass_url',
                             help=argparse.SUPPRESS)
 
@@ -241,7 +241,7 @@ class OpenStackCinderShell(object):
             default=utils.env('OS_AUTH_STRATEGY', default='keystone'),
             help=_('Authentication strategy (Env: OS_AUTH_STRATEGY'
                    ', default keystone). For now, any other value will'
-                   ' disable the authentication'))
+                   ' disable the authentication.'))
         parser.add_argument(
             '--os_auth_strategy',
             help=argparse.SUPPRESS)
@@ -294,7 +294,7 @@ class OpenStackCinderShell(object):
         parser.add_argument(
             '--os-user-id', metavar='<auth-user-id>',
             default=utils.env('OS_USER_ID'),
-            help=_('Authentication user ID (Env: OS_USER_ID)'))
+            help=_('Authentication user ID (Env: OS_USER_ID).'))
 
         parser.add_argument(
             '--os_user_id',
@@ -372,7 +372,7 @@ class OpenStackCinderShell(object):
         parser.add_argument(
             '--os-token', metavar='<token>',
             default=utils.env('OS_TOKEN'),
-            help=_('Defaults to env[OS_TOKEN]'))
+            help=_('Defaults to env[OS_TOKEN].'))
         parser.add_argument(
             '--os_token',
             help=argparse.SUPPRESS)
@@ -380,7 +380,7 @@ class OpenStackCinderShell(object):
         parser.add_argument(
             '--os-url', metavar='<url>',
             default=utils.env('OS_URL'),
-            help=_('Defaults to env[OS_URL]'))
+            help=_('Defaults to env[OS_URL].'))
         parser.add_argument(
             '--os_url',
             help=argparse.SUPPRESS)
