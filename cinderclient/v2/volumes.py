@@ -139,9 +139,9 @@ class Volume(base.Resource):
         """
         self.manager.extend(self, new_size)
 
-    def migrate_volume(self, host, force_host_copy):
+    def migrate_volume(self, host, force_host_copy, lock_volume):
         """Migrate the volume to a new host."""
-        self.manager.migrate_volume(self, host, force_host_copy)
+        self.manager.migrate_volume(self, host, force_host_copy, lock_volume)
 
     def retype(self, volume_type, policy):
         """Change a volume's type."""
@@ -554,16 +554,19 @@ class VolumeManager(base.ManagerWithFind):
         """
         return self._get("/volumes/%s/encryption" % volume_id)._info
 
-    def migrate_volume(self, volume, host, force_host_copy):
+    def migrate_volume(self, volume, host, force_host_copy, lock_volume):
         """Migrate volume to new host.
 
         :param volume: The :class:`Volume` to migrate
         :param host: The destination host
         :param force_host_copy: Skip driver optimizations
+        :param lock_volume: Lock the volume and guarantee the migration
+                            to finish
         """
         return self._action('os-migrate_volume',
                             volume,
-                            {'host': host, 'force_host_copy': force_host_copy})
+                            {'host': host, 'force_host_copy': force_host_copy,
+                             'lock_volume': lock_volume})
 
     def migrate_volume_completion(self, old_volume, new_volume, error):
         """Complete the migration from the old volume to the temp new one.
