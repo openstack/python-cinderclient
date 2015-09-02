@@ -97,76 +97,14 @@ class ClientTestBase(base.ClientTestBase):
             for field in field_names:
                 self.assertIn(field, item)
 
-    def assert_volume_details(self, items):
-        """Check presence of common volume properties.
+    def assert_object_details(self, expected, items):
+        """Check presence of common object properties.
 
-        :param items: volume properties
+        :param expected: expected object properties
+        :param items: object properties
         """
-        values = ('attachments', 'availability_zone', 'bootable', 'created_at',
-                  'description', 'encrypted', 'id', 'metadata', 'name', 'size',
-                  'status', 'user_id', 'volume_type')
-
-        for value in values:
+        for value in expected:
             self.assertIn(value, items)
-
-    def wait_for_volume_status(self, volume_id, status, timeout=60):
-        """Wait until volume reaches given status.
-
-        :param volume_id: uuid4 id of given volume
-        :param status: expected status of volume
-        :param timeout: timeout in seconds
-        """
-        start_time = time.time()
-        while time.time() - start_time < timeout:
-            if status in self.cinder('show', params=volume_id):
-                break
-        else:
-            self.fail("Volume %s did not reach status %s after %d seconds."
-                      % (volume_id, status, timeout))
-
-    def check_volume_not_deleted(self, volume_id):
-        """Check that volume exists.
-
-        :param volume_id: uuid4 id of given volume
-        """
-        self.assertTrue(self.cinder('show', params=volume_id))
-
-    def check_volume_deleted(self, volume_id, timeout=60):
-        """Check that volume deleted successfully.
-
-        :param volume_id: uuid4 id of given volume
-        :param timeout: timeout in seconds
-        """
-        try:
-            start_time = time.time()
-            while time.time() - start_time < timeout:
-                if volume_id not in self.cinder('show', params=volume_id):
-                    break
-        except exceptions.CommandFailed:
-            pass
-        else:
-            self.fail("Volume %s not deleted after %d seconds."
-                      % (volume_id, timeout))
-
-    def volume_create(self, params):
-        """Create volume.
-
-        :param params: parameters to cinder command
-        :return: volume dictionary
-        """
-        output = self.cinder('create', params=params)
-        volume = self._get_property_from_output(output)
-        self.addCleanup(self.volume_delete, volume['id'])
-        self.wait_for_volume_status(volume['id'], 'available')
-        return volume
-
-    def volume_delete(self, volume_id):
-        """Delete specified volume by ID.
-
-        :param volume_id: uuid4 id of given volume
-        """
-        if volume_id in self.cinder('list'):
-            self.cinder('delete', params=volume_id)
 
     def _get_property_from_output(self, output):
         """Create a dictionary from an output
@@ -179,65 +117,67 @@ class ClientTestBase(base.ClientTestBase):
             obj[item['Property']] = six.text_type(item['Value'])
         return obj
 
-    def wait_for_snapshot_status(self, snapshot_id, status, timeout=60):
-        """Wait until snapshot reaches given status.
+    def object_cmd(self, object_name, cmd):
+        return (object_name + '-' + cmd if object_name != 'volume' else cmd)
 
-        :param snapshot_id: uuid4 id of given volume
-        :param status: expected snapshot's status
+    def wait_for_object_status(self, object_name, object_id, status,
+                               timeout=60):
+        """Wait until object reaches given status.
+
+        :param object_name: object name
+        :param object_id: uuid4 id of an object
+        :param status: expected status of an object
         :param timeout: timeout in seconds
         """
+        cmd = self.object_cmd(object_name, 'show')
         start_time = time.time()
         while time.time() - start_time < timeout:
-            if status in self.cinder('snapshot-show', params=snapshot_id):
+            if status in self.cinder(cmd, params=object_id):
                 break
         else:
-            self.fail("Snapshot %s did not reach status %s after %d seconds."
-                      % (snapshot_id, status, timeout))
+            self.fail("%s %s did not reach status %s after %d seconds."
+                      % (object_name, object_id, status, timeout))
 
-    def check_snapshot_deleted(self, snapshot_id, timeout=60):
-        """Check that snapshot deleted successfully.
+    def check_object_deleted(self, object_name, object_id, timeout=60):
+        """Check that volume deleted successfully.
 
-        :param snapshot_id: the given snapshot id
+        :param object_name: object name
+        :param object_id: uuid4 id of an object
         :param timeout: timeout in seconds
         """
+        cmd = self.object_cmd(object_name, 'show')
         try:
             start_time = time.time()
             while time.time() - start_time < timeout:
-                if snapshot_id not in self.cinder('snapshot-show',
-                                                  params=snapshot_id):
+                if object_id not in self.cinder(cmd, params=object_id):
                     break
         except exceptions.CommandFailed:
             pass
         else:
-            self.fail("Snapshot %s has not deleted after %d seconds."
-                      % (snapshot_id, timeout))
+            self.fail("%s %s not deleted after %d seconds."
+                      % (object_name, object_id, timeout))
 
-    def assert_snapshot_details(self, items):
-        """Check presence of common volume snapshot properties.
+    def object_create(self, object_name, params):
+        """Create an object.
 
-        :param items: volume snapshot properties
+        :param object_name: object name
+        :param params: parameters to cinder command
+        :return: object dictionary
         """
-        values = ('created_at', 'description', 'id', 'metadata', 'name',
-                  'size', 'status', 'volume_id')
+        cmd = self.object_cmd(object_name, 'create')
+        output = self.cinder(cmd, params=params)
+        object = self._get_property_from_output(output)
+        self.addCleanup(self.object_delete, object_name, object['id'])
+        self.wait_for_object_status(object_name, object['id'], 'available')
+        return object
 
-        for value in values:
-            self.assertIn(value, items)
+    def object_delete(self, object_name, object_id):
+        """Delete specified object by ID.
 
-    def snapshot_create(self, volume_id):
-        """Create a volume snapshot from the volume id.
-
-        :param volume_id: the given volume id to create a snapshot
+        :param object_name: object name
+        :param object_id: uuid4 id of an object
         """
-        output = self.cinder('snapshot-create', params=volume_id)
-        snapshot = self._get_property_from_output(output)
-        self.addCleanup(self.snapshot_delete, snapshot['id'])
-        self.wait_for_snapshot_status(snapshot['id'], 'available')
-        return snapshot
-
-    def snapshot_delete(self, snapshot_id):
-        """Delete specified snapshot by ID.
-
-        :param snapshot_id: the given snapshot id
-        """
-        if snapshot_id in self.cinder('snapshot-list'):
-            self.cinder('snapshot-delete', params=snapshot_id)
+        cmd = self.object_cmd(object_name, 'list')
+        cmd_delete = self.object_cmd(object_name, 'delete')
+        if object_id in self.cinder(cmd):
+            self.cinder(cmd_delete, params=object_id)
