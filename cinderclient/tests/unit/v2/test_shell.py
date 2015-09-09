@@ -559,6 +559,15 @@ class ShellTest(utils.TestCase):
                          '--is-public=False')
         self.assert_called('POST', '/types', body=expected)
 
+    def test_type_update(self):
+        expected = {'volume_type': {'name': 'test-type-1',
+                                    'description': 'test_type-1-desc',
+                                    'is_public': False}}
+        self.run_command('type-update --name test-type-1 '
+                         '--description=test_type-1-desc '
+                         '--is-public=False 1')
+        self.assert_called('PUT', '/types/1', body=expected)
+
     def test_type_access_list(self):
         self.run_command('type-access-list --volume-type 3')
         self.assert_called('GET', '/types/3/os-volume-type-access')

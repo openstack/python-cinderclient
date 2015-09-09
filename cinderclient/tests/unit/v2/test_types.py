@@ -54,11 +54,12 @@ class TypesTest(utils.TestCase):
         self.assertIsInstance(t, volume_types.VolumeType)
 
     def test_update(self):
-        t = cs.volume_types.update('1', 'test_type_1', 'test_desc_1')
+        t = cs.volume_types.update('1', 'test_type_1', 'test_desc_1', False)
         cs.assert_called('PUT',
                          '/types/1',
                          {'volume_type': {'name': 'test_type_1',
-                                          'description': 'test_desc_1'}})
+                                          'description': 'test_desc_1',
+                                          'is_public': False}})
         self.assertIsInstance(t, volume_types.VolumeType)
 
     def test_get(self):
