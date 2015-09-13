@@ -22,6 +22,7 @@ from __future__ import print_function
 
 import logging
 import re
+import six
 
 from keystoneclient import access
 from keystoneclient import adapter
@@ -32,6 +33,7 @@ import requests
 from cinderclient import exceptions
 from cinderclient.openstack.common import importutils
 from cinderclient.openstack.common import strutils
+from cinderclient.openstack.common.gettextutils import _
 
 osprofiler_web = importutils.try_import("osprofiler.web")
 
@@ -72,8 +74,8 @@ def get_volume_api_from_url(url):
         if version in components:
             return version[1:]
 
-    msg = "Invalid client version '%s'. must be one of: %s" % (
-        (version, ', '.join(_VALID_VERSIONS)))
+    msg = (_("Invalid url: '%(url)s'. It must include one of: %(version)s.")
+        % {'url': url, 'version': ', '.join(_VALID_VERSIONS)})
     raise exceptions.UnsupportedVersion(msg)
 
 
@@ -110,7 +112,14 @@ class SessionClient(adapter.LegacyJsonAdapter):
         return self._cs_request(url, 'DELETE', **kwargs)
 
     def get_volume_api_version_from_endpoint(self):
-        return get_volume_api_from_url(self.get_endpoint())
+        try:
+            version = get_volume_api_from_url(self.get_endpoint())
+        except exceptions.UnsupportedVersion as e:
+            msg = (_("Service catalog returned invalid url.\n"
+                     "%s") % six.text_type(e.message))
+            raise exceptions.UnsupportedVersion(msg)
+
+        return version
 
     def authenticate(self, auth=None):
         self.invalidate(auth)
@@ -312,7 +321,20 @@ class HTTPClient(object):
         return self._cs_request(url, 'DELETE', **kwargs)
 
     def get_volume_api_version_from_endpoint(self):
-        return get_volume_api_from_url(self.management_url)
+        try:
+            version = get_volume_api_from_url(self.management_url)
+        except exceptions.UnsupportedVersion as e:
+            if self.management_url == self.bypass_url:
+                msg = (_("Invalid url was specified in --bypass-url or "
+                         "environment variable CINDERCLIENT_BYPASS_URL.\n"
+                         "%s") % six.text_type(e.message))
+            else:
+                msg = (_("Service catalog returned invalid url.\n"
+                         "%s") % six.text_type(e.message))
+
+            raise exceptions.UnsupportedVersion(msg)
+
+        return version
 
     def _extract_service_catalog(self, url, resp, body, extract_token=True):
         """See what the auth service told us and process the response.
