@@ -24,11 +24,19 @@ import hashlib
 import os
 
 import six
+from six.moves.urllib import parse
 
 from cinderclient import exceptions
 from cinderclient.openstack.common.apiclient import base as common_base
 from cinderclient import utils
 
+
+# Valid sort directions and client sort keys
+SORT_DIR_VALUES = ('asc', 'desc')
+SORT_KEY_VALUES = ('id', 'status', 'size', 'availability_zone', 'name',
+                   'bootable', 'created_at')
+# Mapping of client keys to actual sort keys
+SORT_KEY_MAPPINGS = {'name': 'display_name'}
 
 Resource = common_base.Resource
 
@@ -109,6 +117,116 @@ class Manager(utils.HookableMixin):
                 items = self._list(next, response_key, obj_class, None,
                                    limit, items)
         return items
+
+    def _build_list_url(self, resource_type, detailed=True, search_opts=None,
+                        marker=None, limit=None, sort_key=None, sort_dir=None,
+                        sort=None):
+
+        if search_opts is None:
+            search_opts = {}
+
+        query_params = {}
+        for key, val in search_opts.items():
+            if val:
+                query_params[key] = val
+
+        if marker:
+            query_params['marker'] = marker
+
+        if limit:
+            query_params['limit'] = limit
+
+        if sort:
+            query_params['sort'] = self._format_sort_param(sort)
+        else:
+            # sort_key and sort_dir deprecated in kilo, prefer sort
+            if sort_key:
+                query_params['sort_key'] = self._format_sort_key_param(
+                    sort_key)
+
+            if sort_dir:
+                query_params['sort_dir'] = self._format_sort_dir_param(
+                    sort_dir)
+
+        # Transform the dict to a sequence of two-element tuples in fixed
+        # order, then the encoded string will be consistent in Python 2&3.
+        query_string = ""
+        if query_params:
+            params = sorted(query_params.items(), key=lambda x: x[0])
+            query_string = "?%s" % parse.urlencode(params)
+
+        detail = ""
+        if detailed:
+            detail = "/detail"
+
+        return ("/%(resource_type)s%(detail)s%(query_string)s" %
+                {"resource_type": resource_type, "detail": detail,
+                 "query_string": query_string})
+
+    def _format_sort_param(self, sort):
+        '''Formats the sort information into the sort query string parameter.
+
+        The input sort information can be any of the following:
+        - Comma-separated string in the form of <key[:dir]>
+        - List of strings in the form of <key[:dir]>
+        - List of either string keys, or tuples of (key, dir)
+
+        For example, the following import sort values are valid:
+        - 'key1:dir1,key2,key3:dir3'
+        - ['key1:dir1', 'key2', 'key3:dir3']
+        - [('key1', 'dir1'), 'key2', ('key3', dir3')]
+
+        :param sort: Input sort information
+        :returns: Formatted query string parameter or None
+        :raise ValueError: If an invalid sort direction or invalid sort key is
+                           given
+        '''
+        if not sort:
+            return None
+
+        if isinstance(sort, six.string_types):
+            # Convert the string into a list for consistent validation
+            sort = [s for s in sort.split(',') if s]
+
+        sort_array = []
+        for sort_item in sort:
+            if isinstance(sort_item, tuple):
+                sort_key = sort_item[0]
+                sort_dir = sort_item[1]
+            else:
+                sort_key, _sep, sort_dir = sort_item.partition(':')
+            sort_key = sort_key.strip()
+            if sort_key in SORT_KEY_VALUES:
+                sort_key = SORT_KEY_MAPPINGS.get(sort_key, sort_key)
+            else:
+                raise ValueError('sort_key must be one of the following: %s.'
+                                 % ', '.join(SORT_KEY_VALUES))
+            if sort_dir:
+                sort_dir = sort_dir.strip()
+                if sort_dir not in SORT_DIR_VALUES:
+                    msg = ('sort_dir must be one of the following: %s.'
+                           % ', '.join(SORT_DIR_VALUES))
+                    raise ValueError(msg)
+                sort_array.append('%s:%s' % (sort_key, sort_dir))
+            else:
+                sort_array.append(sort_key)
+        return ','.join(sort_array)
+
+    def _format_sort_key_param(self, sort_key):
+        if sort_key in SORT_KEY_VALUES:
+            return SORT_KEY_MAPPINGS.get(sort_key, sort_key)
+
+        msg = ('sort_key must be one of the following: %s.' %
+               ', '.join(SORT_KEY_VALUES))
+        raise ValueError(msg)
+
+    def _format_sort_dir_param(self, sort_dir):
+        if sort_dir in SORT_DIR_VALUES:
+            return sort_dir
+
+        msg = ('sort_dir must be one of the following: %s.'
+               % ', '.join(SORT_DIR_VALUES))
+        raise ValueError(msg)
 
     @contextlib.contextmanager
     def completion_cache(self, cache_type, obj_class, mode):

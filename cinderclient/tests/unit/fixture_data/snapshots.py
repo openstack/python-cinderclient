@@ -52,5 +52,14 @@ class Fixture(base.Fixture):
             else:
                 raise AssertionError("Unexpected action: %s" % action)
             return ''
+
         self.requests.register_uri('POST', self.url('1234', 'action'),
                                    text=action_1234, status_code=202)
+
+        self.requests.register_uri('GET',
+                                   self.url('detail?limit=2&marker=1234'),
+                                   status_code=200, json={'snapshots': []})
+
+        self.requests.register_uri('GET',
+                                   self.url('detail?sort=id'),
+                                   status_code=200, json={'snapshots': []})

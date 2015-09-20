@@ -24,11 +24,11 @@ import time
 
 import six
 
+from cinderclient import base
 from cinderclient import exceptions
 from cinderclient import utils
 from cinderclient.openstack.common import strutils
 from cinderclient.v2 import availability_zones
-from cinderclient.v2 import volumes
 
 
 def _poll_for_status(poll_fn, obj_id, action, final_ok_states,
@@ -196,7 +196,7 @@ def _extract_metadata(args):
            help=(('Comma-separated list of sort keys and directions in the '
                   'form of <key>[:<asc|desc>]. '
                   'Valid keys: %s. '
-                  'Default=None.') % ', '.join(volumes.SORT_KEY_VALUES)))
+                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
 @utils.arg('--tenant',
            type=str,
            dest='tenant',
@@ -619,6 +619,23 @@ def do_image_metadata(cs, args):
            help='Filters results by a volume ID. Default=None.')
 @utils.arg('--volume_id',
            help=argparse.SUPPRESS)
+@utils.arg('--marker',
+           metavar='<marker>',
+           default=None,
+           help='Begin returning snapshots that appear later in the snapshot '
+                'list than that represented by this id. '
+                'Default=None.')
+@utils.arg('--limit',
+           metavar='<limit>',
+           default=None,
+           help='Maximum number of snapshots to return. Default=None.')
+@utils.arg('--sort',
+           metavar='<key>[:<direction>]',
+           default=None,
+           help=(('Comma-separated list of sort keys and directions in the '
+                  'form of <key>[:<asc|desc>]. '
+                  'Valid keys: %s. '
+                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
 @utils.service_type('volumev2')
 def do_snapshot_list(cs, args):
     """Lists all snapshots."""
@@ -634,7 +651,10 @@ def do_snapshot_list(cs, args):
         'volume_id': args.volume_id,
     }
 
-    snapshots = cs.volume_snapshots.list(search_opts=search_opts)
+    snapshots = cs.volume_snapshots.list(search_opts=search_opts,
+                                         marker=args.marker,
+                                         limit=args.limit,
+                                         sort=args.sort)
     _translate_volume_snapshot_keys(snapshots)
     utils.print_list(snapshots,
                      ['ID', 'Volume ID', 'Status', 'Name', 'Size'])
@@ -1312,6 +1332,23 @@ def do_backup_show(cs, args):
            help='Filters results by a volume ID. Default=None.')
 @utils.arg('--volume_id',
            help=argparse.SUPPRESS)
+@utils.arg('--marker',
+           metavar='<marker>',
+           default=None,
+           help='Begin returning backups that appear later in the backup '
+                'list than that represented by this id. '
+                'Default=None.')
+@utils.arg('--limit',
+           metavar='<limit>',
+           default=None,
+           help='Maximum number of backups to return. Default=None.')
+@utils.arg('--sort',
+           metavar='<key>[:<direction>]',
+           default=None,
+           help=(('Comma-separated list of sort keys and directions in the '
+                  'form of <key>[:<asc|desc>]. '
+                  'Valid keys: %s. '
+                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
 @utils.service_type('volumev2')
 def do_backup_list(cs, args):
     """Lists all backups."""
@@ -1323,7 +1360,10 @@ def do_backup_list(cs, args):
         'volume_id': args.volume_id,
     }
 
-    backups = cs.backups.list(search_opts=search_opts)
+    backups = cs.backups.list(search_opts=search_opts,
+                              marker=args.marker,
+                              limit=args.limit,
+                              sort=args.sort)
     _translate_volume_snapshot_keys(backups)
     columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'Object Count',
                'Container']
