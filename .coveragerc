@@ -4,4 +4,4 @@ source = cinderclient
 omit = cinderclient/openstack/*,cinderclient/tests/*
 
 [report]
-ignore-errors = True
+ignore_errors = True
