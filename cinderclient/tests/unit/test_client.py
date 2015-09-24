@@ -49,11 +49,12 @@ class ClientTest(utils.TestCase):
             )
         )
 
-        kwargs = {}
-        kwargs['headers'] = {"X-Foo": "bar"}
-        kwargs['data'] = ('{"auth": {"tenantName": "fakeService",'
-                          ' "passwordCredentials": {"username": "fakeUser",'
-                          ' "password": "fakePassword"}}}')
+        kwargs = {
+            'headers': {"X-Foo": "bar"},
+            'data': ('{"auth": {"tenantName": "fakeService",'
+                     ' "passwordCredentials": {"username": "fakeUser",'
+                     ' "password": "fakePassword"}}}')
+        }
 
         cs = cinderclient.client.HTTPClient("user", None, None,
                                             "http://127.0.0.1:5000")

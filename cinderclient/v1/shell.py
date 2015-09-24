@@ -1225,11 +1225,12 @@ def do_encryption_type_create(cs, args):
     """Creates encryption type for a volume type. Admin only."""
     volume_type = _find_volume_type(cs, args.volume_type)
 
-    body = {}
-    body['provider'] = args.provider
-    body['cipher'] = args.cipher
-    body['key_size'] = args.key_size
-    body['control_location'] = args.control_location
+    body = {
+        'provider': args.provider,
+        'cipher': args.cipher,
+        'key_size': args.key_size,
+        'control_location': args.control_location
+    }
 
     result = cs.volume_encryption_types.create(volume_type, body)
     _print_volume_encryption_type_list([result])

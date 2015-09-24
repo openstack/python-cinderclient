@@ -1660,11 +1660,12 @@ def do_encryption_type_create(cs, args):
     """Creates encryption type for a volume type. Admin only."""
     volume_type = _find_volume_type(cs, args.volume_type)
 
-    body = {}
-    body['provider'] = args.provider
-    body['cipher'] = args.cipher
-    body['key_size'] = args.key_size
-    body['control_location'] = args.control_location
+    body = {
+        'provider': args.provider,
+        'cipher': args.cipher,
+        'key_size': args.key_size,
+        'control_location': args.control_location
+    }
 
     result = cs.volume_encryption_types.create(volume_type, body)
     _print_volume_encryption_type_list([result])
@@ -2011,8 +2012,7 @@ def do_manage(cs, args):
         volume_metadata = _extract_metadata(args)
 
     # Build a dictionary of key/value pairs to pass to the API.
-    ref_dict = {}
-    ref_dict[args.id_type] = args.identifier
+    ref_dict = {args.id_type: args.identifier}
 
     # The recommended way to specify an existing volume is by ID or name, and
     # have the Cinder driver look for 'source-name' or 'source-id' elements in
