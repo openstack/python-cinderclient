@@ -161,20 +161,10 @@ class OpenStackCinderShell(object):
         parser.add_argument('--volume_service_name',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--endpoint-type',
-                            metavar='<endpoint-type>',
-                            dest='os_endpoint_type',
-                            default=utils.env('CINDER_ENDPOINT_TYPE',
-                            default=DEFAULT_CINDER_ENDPOINT_TYPE),
-                            help='DEPRECATED! Use --os-endpoint-type.')
-        parser.add_argument('--endpoint_type',
-                            dest='os_endpoint_type',
-                            help=argparse.SUPPRESS)
-
         parser.add_argument('--os-endpoint-type',
                             metavar='<os-endpoint-type>',
-                            default=utils.env('OS_ENDPOINT_TYPE',
                             default=utils.env('CINDER_ENDPOINT_TYPE',
+                            default=utils.env('OS_ENDPOINT_TYPE',
                             default=DEFAULT_CINDER_ENDPOINT_TYPE)),
                             help='Endpoint type, which is publicURL or '
                             'internalURL. '
@@ -182,6 +172,13 @@ class OpenStackCinderShell(object):
                             'nova env[CINDER_ENDPOINT_TYPE] or '
                             + DEFAULT_CINDER_ENDPOINT_TYPE + '.')
         parser.add_argument('--os_endpoint_type',
+                            help=argparse.SUPPRESS)
+        parser.add_argument('--endpoint-type',
+                            metavar='<endpoint-type>',
+                            dest='endpoint_type',
+                            help='DEPRECATED! Use --os-endpoint-type.')
+        parser.add_argument('--endpoint_type',
+                            dest='endpoint_type',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-volume-api-version',
