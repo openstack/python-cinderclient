@@ -128,7 +128,7 @@ class VolumeTypeManager(base.ManagerWithFind):
 
         return self._create("/types", body, "volume_type")
 
-    def update(self, volume_type, name=None, description=None):
+    def update(self, volume_type, name=None, description=None, is_public=None):
         """Update the name and/or description for a volume type.
 
         :param volume_type: The ID of the :class:`VolumeType` to update.
@@ -143,6 +143,8 @@ class VolumeTypeManager(base.ManagerWithFind):
                 "description": description
             }
         }
+        if is_public is not None:
+            body["volume_type"]["is_public"] = is_public
 
         return self._update("/types/%s" % base.getid(volume_type),
                             body, response_key="volume_type")

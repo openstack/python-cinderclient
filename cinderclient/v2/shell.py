@@ -817,10 +817,15 @@ def do_type_default(cs, args):
 @utils.arg('--description',
            metavar='<description>',
            help='Description of the volume type.')
+@utils.arg('--is-public',
+           metavar='<is-public>',
+           help='Make type accessible to the public or not.')
 @utils.service_type('volumev2')
 def do_type_update(cs, args):
-    """Updates volume type name and/or description."""
-    vtype = cs.volume_types.update(args.id, args.name, args.description)
+    """Updates volume type name ,description and/or is_public."""
+    is_public = strutils.bool_from_string(args.is_public)
+    vtype = cs.volume_types.update(args.id, args.name, args.description,
+                                   is_public)
     _print_volume_type_list([vtype])
 
 
