@@ -355,6 +355,43 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('POST', '/volumes', partial_body=expected)
         self.assert_called('GET', '/volumes/1234')
 
+    def test_upload_to_image(self):
+        expected = {'os-volume_upload_image': {'force': False,
+                                               'container_format': 'bare',
+                                               'disk_format': 'raw',
+                                               'image_name': 'test-image',
+                                               'protected': False,
+                                               'visibility': 'private'}}
+        self.run_command('upload-to-image 1234 test-image')
+        self.assert_called_anytime('GET', '/volumes/1234')
+        self.assert_called_anytime('POST', '/volumes/1234/action',
+                                   body=expected)
+
+    def test_upload_to_image_force(self):
+        expected = {'os-volume_upload_image': {'force': 'True',
+                                               'container_format': 'bare',
+                                               'disk_format': 'raw',
+                                               'image_name': 'test-image',
+                                               'protected': False,
+                                               'visibility': 'private'}}
+        self.run_command('upload-to-image --force=True 1234 test-image')
+        self.assert_called_anytime('GET', '/volumes/1234')
+        self.assert_called_anytime('POST', '/volumes/1234/action',
+                                   body=expected)
+
+    def test_upload_to_image_public_protected(self):
+        expected = {'os-volume_upload_image': {'force': False,
+                                               'container_format': 'bare',
+                                               'disk_format': 'raw',
+                                               'image_name': 'test-image',
+                                               'protected': 'True',
+                                               'visibility': 'public'}}
+        self.run_command('upload-to-image --visibility=public '
+                         '--protected=True 1234 test-image')
+        self.assert_called_anytime('GET', '/volumes/1234')
+        self.assert_called_anytime('POST', '/volumes/1234/action',
+                                   body=expected)
+
     def test_create_size_required_if_not_snapshot_or_clone(self):
         self.assertRaises(SystemExit, self.run_command, 'create')
 

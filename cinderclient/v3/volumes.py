@@ -15,6 +15,7 @@
 
 """Volume interface (v3 extension)."""
 
+from cinderclient import api_versions
 from cinderclient import base
 from cinderclient.openstack.common.apiclient import base as common_base
 
@@ -110,10 +111,11 @@ class Volume(base.Resource):
         return self.manager.show_image_metadata(self)
 
     def upload_to_image(self, force, image_name, container_format,
-                        disk_format):
+                        disk_format, visibility, protected):
         """Upload a volume to image service as an image."""
         return self.manager.upload_to_image(self, force, image_name,
-                                            container_format, disk_format)
+                                            container_format, disk_format,
+                                            visibility, protected)
 
     def force_delete(self):
         """Delete the specified volume ignoring its current state.
@@ -451,8 +453,9 @@ class VolumeManager(base.ManagerWithFind):
         """
         return self._action("os-show_image_metadata", volume)
 
+    @api_versions.wraps("2.0", "3.0")
     def upload_to_image(self, volume, force, image_name, container_format,
-                        disk_format):
+                        disk_format, visibility, protected):
         """Upload volume to image service as image.
 
         :param volume: The :class:`Volume` to upload.
@@ -463,6 +466,22 @@ class VolumeManager(base.ManagerWithFind):
                             'image_name': image_name,
                             'container_format': container_format,
                             'disk_format': disk_format})
+
+    @api_versions.wraps("3.1")
+    def upload_to_image(self, volume, force, image_name, container_format,
+                        disk_format, visibility, protected):
+        """Upload volume to image service as image.
+
+        :param volume: The :class:`Volume` to upload.
+        """
+        return self._action('os-volume_upload_image',
+                            volume,
+                            {'force': force,
+                            'image_name': image_name,
+                            'container_format': container_format,
+                            'disk_format': disk_format,
+                            'visibility': visibility,
+                            'protected': protected})
 
     def force_delete(self, volume):
         """Delete the specified volume ignoring its current state.
