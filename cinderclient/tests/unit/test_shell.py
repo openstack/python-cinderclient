@@ -122,6 +122,25 @@ class ShellTest(utils.TestCase):
         self.assertEqual(v3_url, os_auth_url, "Expected v3 url")
         self.assertIsNone(v2_url, "Expected no v2 url")
 
+    @requests_mock.Mocker()
+    def list_volumes_on_service(self, count, mocker):
+        os_auth_url = "http://multiple.service.names/v2.0"
+        mocker.register_uri('POST', os_auth_url + "/tokens",
+                            text=keystone_client.keystone_request_callback)
+        mocker.register_uri('GET',
+                            "http://cinder%i.api.com/v2/volumes/detail"
+                            % count, text='{"volumes": []}')
+        self.make_env(include={'OS_AUTH_URL': os_auth_url,
+                               'CINDER_SERVICE_NAME': 'cinder%i' % count})
+        _shell = shell.OpenStackCinderShell()
+        _shell.main(['list'])
+
+    def test_cinder_service_name(self):
+        # Failing with 'No mock address' means we are not
+        # choosing the correct endpoint
+        for count in range(1, 4):
+            self.list_volumes_on_service(count)
+
     @mock.patch('keystoneclient.adapter.Adapter.get_token',
                 side_effect=ks_exc.ConnectionRefused())
     @mock.patch('keystoneclient.discover.Discover',
