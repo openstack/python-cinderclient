@@ -437,6 +437,14 @@ class FakeHTTPClient(base_client.HTTPClient):
         elif action == 'os-migrate_volume':
             assert 'host' in body[action]
             assert 'force_host_copy' in body[action]
+        elif action == 'os-enable_replication':
+            assert body[action] is None
+        elif action == 'os-disable_replication':
+            assert body[action] is None
+        elif action == 'os-list_replication_targets':
+            assert body[action] is None
+        elif action == 'os-failover_replication':
+            assert 'secondary' in body[action]
         elif action == 'os-update_readonly_flag':
             assert list(body[action]) == ['readonly']
         elif action == 'os-retype':
