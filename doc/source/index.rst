@@ -53,11 +53,15 @@ MASTER
 1.2.2
 -----
 
+* IMPORTANT: version discovery breaks deployments using proxies and has been
+  reverted in v1.3.0 . Do not use this version.
 * Update requirements to resolve conflicts with other OpenStack projects
 
 1.2.1
 -----
 
+* IMPORTANT: version discovery breaks deployments using proxies and has been
+  reverted in v1.3.0 . Do not use this version.
 * Remove warnings about Keystone unable to contact endpoint for discovery.
 * backup-create subcommand allows specifying --incremental to do an incremental
   backup.
@@ -77,6 +81,8 @@ MASTER
 1.2.0
 -----
 
+* IMPORTANT: version discovery breaks deployments using proxies and has been
+  reverted in v1.3.0 . Do not use this version.
 * Add metadata during snapshot create.
 * Add TTY password entry when no password is environment vars or --os-password.
 * Ability to set backup quota in quota-update subcommand.
