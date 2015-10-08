@@ -114,6 +114,14 @@ class Volume(base.Resource):
         """
         return self.manager.delete_image_metadata(self, volume, keys)
 
+    def show_image_metadata(self, volume):
+        """Show a volume's image metadata.
+
+        :param volume : The :class: `Volume` where the image metadata
+            associated.
+        """
+        return self.manager.show_image_metadata(self)
+
     def upload_to_image(self, force, image_name, container_format,
                         disk_format):
         """Upload a volume to image service as an image."""
@@ -517,6 +525,14 @@ class VolumeManager(base.ManagerWithFind):
         for key in keys:
             self._action("os-unset_image_metadata", volume,
                          {'key': key})
+
+    def show_image_metadata(self, volume):
+        """Show a volume's image metadata.
+
+        :param volume : The :class: `Volume` where the image metadata
+            associated.
+        """
+        return self._action("os-show_image_metadata", volume)
 
     def upload_to_image(self, volume, force, image_name, container_format,
                         disk_format):

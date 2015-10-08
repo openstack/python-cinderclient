@@ -453,6 +453,8 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert list(body[action]) == ['metadata']
         elif action == 'os-unset_image_metadata':
             assert 'key' in body[action]
+        elif action == 'os-show_image_metadata':
+            assert body[action] is None
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)

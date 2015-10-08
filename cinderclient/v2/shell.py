@@ -1915,6 +1915,16 @@ def do_metadata_show(cs, args):
     utils.print_dict(volume._info['metadata'], 'Metadata-property')
 
 
+@utils.arg('volume', metavar='<volume>',
+           help='ID of volume.')
+@utils.service_type('volumev2')
+def do_image_metadata_show(cs, args):
+    """Shows volume image metadata."""
+    volume = utils.find_volume(cs, args.volume)
+    resp, body = volume.show_image_metadata(volume)
+    utils.print_dict(body['metadata'], 'Metadata-property')
+
+
 @utils.arg('volume',
            metavar='<volume>',
            help='ID of volume for which to update metadata.')

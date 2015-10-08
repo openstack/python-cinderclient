@@ -1100,3 +1100,15 @@ class ShellTest(utils.TestCase):
     def test_get_capabilities(self):
         self.run_command('get-capabilities host')
         self.assert_called('GET', '/capabilities/host')
+
+    def test_image_metadata_show(self):
+        # since the request is not actually sent to cinder API but is
+        # calling the method in :class:`v2.fakes.FakeHTTPClient` instead.
+        # Thus, ignore any exception which is false negative compare
+        # with real API call.
+        try:
+            self.run_command('image-metadata-show 1234')
+        except Exception:
+            pass
+        expected = {"os-show_image_metadata": None}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
