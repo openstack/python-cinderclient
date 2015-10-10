@@ -51,6 +51,14 @@ class VolumeBackupsTest(utils.TestCase):
         cs.backups.list()
         cs.assert_called('GET', '/backups/detail')
 
+    def test_list_with_pagination(self):
+        cs.backups.list(limit=2, marker=100)
+        cs.assert_called('GET', '/backups/detail?limit=2&marker=100')
+
+    def test_sorted_list(self):
+        cs.backups.list(sort="id")
+        cs.assert_called('GET', '/backups/detail?sort=id')
+
     def test_delete(self):
         b = cs.backups.list()[0]
         b.delete()

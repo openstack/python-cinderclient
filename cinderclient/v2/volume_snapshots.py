@@ -15,12 +15,6 @@
 
 """Volume snapshot interface (1.1 extension)."""
 
-import six
-try:
-    from urllib import urlencode
-except ImportError:
-    from urllib.parse import urlencode
-
 from cinderclient import base
 
 
@@ -101,34 +95,17 @@ class SnapshotManager(base.ManagerWithFind):
         """
         return self._get("/snapshots/%s" % snapshot_id, "snapshot")
 
-    def list(self, detailed=True, search_opts=None):
+    def list(self, detailed=True, search_opts=None, marker=None, limit=None,
+             sort=None):
         """Get a list of all snapshots.
 
         :rtype: list of :class:`Snapshot`
         """
-        if search_opts is None:
-            search_opts = {}
-
-        qparams = {}
-
-        for opt, val in six.iteritems(search_opts):
-            if val:
-                qparams[opt] = val
-
-        # Transform the dict to a sequence of two-element tuples in fixed
-        # order, then the encoded string will be consistent in Python 2&3.
-        if qparams:
-            new_qparams = sorted(qparams.items(), key=lambda x: x[0])
-            query_string = "?%s" % urlencode(new_qparams)
-        else:
-            query_string = ""
-
-        detail = ""
-        if detailed:
-            detail = "/detail"
-
-        return self._list("/snapshots%s%s" % (detail, query_string),
-                          "snapshots")
+        resource_type = "snapshots"
+        url = self._build_list_url(resource_type, detailed=detailed,
+                                   search_opts=search_opts, marker=marker,
+                                   limit=limit, sort=sort)
+        return self._list(url, resource_type, limit=limit)
 
     def delete(self, snapshot):
         """Delete a snapshot.

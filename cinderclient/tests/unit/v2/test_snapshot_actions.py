@@ -34,3 +34,11 @@ class SnapshotActionsTest(utils.FixturedTestCase):
         stat = {'status': 'available', 'progress': '73%'}
         self.cs.volume_snapshots.update_snapshot_status(s, stat)
         self.assert_called('POST', '/snapshots/1234/action')
+
+    def test_list_snapshots_with_marker_limit(self):
+        self.cs.volume_snapshots.list(marker=1234, limit=2)
+        self.assert_called('GET', '/snapshots/detail?limit=2&marker=1234')
+
+    def test_list_snapshots_with_sort(self):
+        self.cs.volume_snapshots.list(sort="id")
+        self.assert_called('GET', '/snapshots/detail?sort=id')
