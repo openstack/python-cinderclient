@@ -1,6 +1,14 @@
 Python bindings to the OpenStack Cinder API
 ===========================================
 
+.. image:: https://img.shields.io/pypi/v/python-cinderclient.svg
+    :target: https://pypi.python.org/pypi/python-cinderclient/
+    :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/dm/python-cinderclient.svg
+    :target: https://pypi.python.org/pypi/python-cinderclient/
+    :alt: Downloads
+
 This is a client for the OpenStack Cinder API. There's a Python API (the
 ``cinderclient`` module), and a command-line script (``cinder``). Each
 implements 100% of the OpenStack Cinder API.
@@ -25,6 +33,24 @@ for the Rackspace API solely or the BSD license, you should use that repository.
 python-cinderclient is licensed under the Apache License like the rest of OpenStack.
 
 __ https://github.com/jacobian-archive/python-cloudservers
+
+* License: Apache License, Version 2.0
+* `PyPi`_ - package installation
+* `Online Documentation`_
+* `Blueprints`_ - feature specifications
+* `Bugs`_ - issue tracking
+* `Source`_
+* `Specs`_
+* `How to Contribute`_
+
+.. _PyPi: https://pypi.python.org/pypi/python-cinderclient
+.. _Online Documentation: http://docs.openstack.org/developer/python-cinderclient
+.. _Blueprints: https://blueprints.launchpad.net/python-cinderclient
+.. _Bugs: https://bugs.launchpad.net/python-cinderclient
+.. _Source: https://git.openstack.org/cgit/openstack/python-cinderclient
+.. _How to Contribute: http://docs.openstack.org/infra/manual/developers.html
+.. _Specs: http://specs.openstack.org/openstack/cinder-specs/
+
 
 .. contents:: Contents:
    :local:
@@ -150,8 +176,3 @@ Quick-start using keystone::
     [...]
 
 See release notes and more at `<http://docs.openstack.org/developer/python-cinderclient/>`_.
-
-* License: Apache License, Version 2.0
-* Documentation: http://docs.openstack.org/developer/python-cinderclient
-* Source: http://git.openstack.org/cgit/openstack/python-cinderclient
-* Bugs: http://bugs.launchpad.net/python-cinderclient
