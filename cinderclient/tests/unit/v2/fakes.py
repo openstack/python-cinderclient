@@ -766,6 +766,20 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (200, {},
                 {'backup': _stub_backup_full(backup1, base_uri, tenant_id)})
 
+    def get_backups_1234(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        backup1 = '1234'
+        return (200, {},
+                {'backup': _stub_backup_full(backup1, base_uri, tenant_id)})
+
+    def get_backups_5678(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        backup1 = '5678'
+        return (200, {},
+                {'backup': _stub_backup_full(backup1, base_uri, tenant_id)})
+
     def get_backups_detail(self, **kw):
         base_uri = 'http://localhost:8776'
         tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
@@ -793,6 +807,15 @@ class FakeHTTPClient(base_client.HTTPClient):
     def post_backups_1234_restore(self, **kw):
         return (200, {},
                 {'restore': _stub_restore()})
+
+    def post_backups_76a17945_3c6f_435c_975b_b5685db10b62_action(self, **kw):
+        return(200, {}, None)
+
+    def post_backups_1234_action(self, **kw):
+        return(200, {}, None)
+
+    def post_backups_5678_action(self, **kw):
+        return(200, {}, None)
 
     def get_backups_76a17945_3c6f_435c_975b_b5685db10b62_export_record(self,
                                                                        **kw):

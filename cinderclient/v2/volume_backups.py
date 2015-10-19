@@ -29,6 +29,9 @@ class VolumeBackup(base.Resource):
         """Delete this volume backup."""
         return self.manager.delete(self)
 
+    def reset_state(self, state):
+        self.manager.reset_state(self, state)
+
 
 class VolumeBackupManager(base.ManagerWithFind):
     """Manage :class:`VolumeBackup` resources."""
@@ -81,6 +84,17 @@ class VolumeBackupManager(base.ManagerWithFind):
         :param backup: The :class:`VolumeBackup` to delete.
         """
         self._delete("/backups/%s" % base.getid(backup))
+
+    def reset_state(self, backup, state):
+        """Update the specified volume backup with the provided state."""
+        return self._action('os-reset_status', backup, {'status': state})
+
+    def _action(self, action, backup, info=None, **kwargs):
+        """Perform a volume backup action."""
+        body = {action: info}
+        self.run_hooks('modify_body_for_action', body, **kwargs)
+        url = '/backups/%s/action' % base.getid(backup)
+        return self.api.client.post(url, body=body)
 
     def export_record(self, backup_id):
         """Export volume backup metadata record.

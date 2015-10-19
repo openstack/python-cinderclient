@@ -1429,6 +1429,36 @@ def do_backup_import(cs, args):
     utils.print_dict(info)
 
 
+@utils.arg('backup', metavar='<backup>', nargs='+',
+           help='Name or ID of the backup to modify.')
+@utils.arg('--state', metavar='<state>',
+           default='available',
+           help='The state to assign to the backup. Valid values are '
+                '"available", "error", "creating", "deleting", and '
+                '"error_deleting". Default=available.')
+@utils.service_type('volumev2')
+def do_backup_reset_state(cs, args):
+    """Explicitly updates the backup state."""
+    failure_count = 0
+
+    single = (len(args.backup) == 1)
+
+    for backup in args.backup:
+        try:
+            _find_backup(cs, backup).reset_state(args.state)
+        except Exception as e:
+            failure_count += 1
+            msg = "Reset state for backup %s failed: %s" % (backup, e)
+            if not single:
+                print(msg)
+
+    if failure_count == len(args.backup):
+        if not single:
+            msg = ("Unable to reset the state for any of the specified "
+                   "backups.")
+        raise exceptions.CommandError(msg)
+
+
 @utils.arg('volume', metavar='<volume>',
            help='Name or ID of volume to transfer.')
 @utils.arg('--name',
