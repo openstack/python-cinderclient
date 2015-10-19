@@ -44,6 +44,8 @@ class Client(object):
 
     """
 
+    version = '1'
+
     def __init__(self, username=None, api_key=None, project_id=None,
                  auth_url='', insecure=False, timeout=None, tenant_id=None,
                  proxy_tenant_id=None, proxy_token=None, region_name=None,
