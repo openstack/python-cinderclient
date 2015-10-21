@@ -14,10 +14,11 @@
 #    under the License.
 
 from cinderclient import base
+from cinderclient.openstack.common.apiclient import base as common_base
 from cinderclient import utils
 
 
-class Extension(utils.HookableMixin):
+class Extension(common_base.HookableMixin):
     """Extension descriptor."""
 
     SUPPORTED_HOOKS = ('__pre_parse_args__', '__post_parse_args__')
