@@ -282,7 +282,7 @@ class CheckSizeArgForCreate(argparse.Action):
            nargs='?',
            type=int,
            action=CheckSizeArgForCreate,
-           help='Size of volume, in GBs. (Required unless '
+           help='Size of volume, in GiBs. (Required unless '
                 'snapshot-id/source-volid is specified).')
 @utils.arg('--consisgroup-id',
            metavar='<consistencygroup-id>',
@@ -1520,7 +1520,7 @@ def do_transfer_show(cs, args):
 @utils.arg('new_size',
            metavar='<new_size>',
            type=int,
-           help='New size of volume, in GBs.')
+           help='New size of volume, in GiBs.')
 @utils.service_type('volumev2')
 def do_extend(cs, args):
     """Attempts to extend size of an existing volume."""

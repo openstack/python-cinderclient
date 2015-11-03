@@ -214,7 +214,7 @@ def do_show(cs, args):
 @utils.arg('size',
            metavar='<size>',
            type=int,
-           help='Volume size, in GBs.')
+           help='Volume size, in GiBs.')
 @utils.arg(
     '--snapshot-id',
     metavar='<snapshot-id>',
@@ -1039,7 +1039,7 @@ def do_transfer_show(cs, args):
 @utils.arg('new_size',
            metavar='<new-size>',
            type=int,
-           help='Size of volume, in GBs.')
+           help='Size of volume, in GiBs.')
 @utils.service_type('volume')
 def do_extend(cs, args):
     """Attempts to extend size of an existing volume."""
