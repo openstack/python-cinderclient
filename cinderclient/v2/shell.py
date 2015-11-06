@@ -1189,7 +1189,8 @@ def do_upload_to_image(cs, args):
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of volume to migrate.')
-@utils.arg('host', metavar='<host>', help='Destination host.')
+@utils.arg('host', metavar='<host>', help='Destination host. Takes the form: '
+                                          'host@backend-name#pool')
 @utils.arg('--force-host-copy', metavar='<True|False>',
            choices=['True', 'False'],
            required=False,
