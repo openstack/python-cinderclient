@@ -556,6 +556,10 @@ class ShellTest(utils.TestCase):
         self.run_command('type-list')
         self.assert_called_anytime('GET', '/types?is_public=None')
 
+    def test_type_show(self):
+        self.run_command('type-show 1')
+        self.assert_called('GET', '/types/1')
+
     def test_type_create(self):
         self.run_command('type-create test-type-1')
         self.assert_called('POST', '/types')

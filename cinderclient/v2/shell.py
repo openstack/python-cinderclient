@@ -66,6 +66,11 @@ def _find_volume_snapshot(cs, snapshot):
     return utils.find_resource(cs.volume_snapshots, snapshot)
 
 
+def _find_vtype(cs, vtype):
+    """Gets a volume type by name or ID."""
+    return utils.find_resource(cs.volume_types, vtype)
+
+
 def _find_backup(cs, backup):
     """Gets a backup by name or ID."""
     return utils.find_resource(cs.backups, backup)
@@ -826,6 +831,20 @@ def do_type_default(cs, args):
     """List the default volume type."""
     vtype = cs.volume_types.default()
     _print_volume_type_list([vtype])
+
+
+@utils.arg('volume_type',
+           metavar='<volume_type>',
+           help='Name or ID of the volume type.')
+@utils.service_type('volumev2')
+def do_type_show(cs, args):
+    """Show volume type details."""
+    vtype = _find_vtype(cs, args.volume_type)
+    info = dict()
+    info.update(vtype._info)
+
+    info.pop('links', None)
+    utils.print_dict(info)
 
 
 @utils.arg('id',
