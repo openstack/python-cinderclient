@@ -39,7 +39,8 @@ class VolumeBackupManager(base.ManagerWithFind):
 
     def create(self, volume_id, container=None,
                name=None, description=None,
-               incremental=False, force=False):
+               incremental=False, force=False,
+               snapshot_id=None):
         """Creates a volume backup.
 
         :param volume_id: The ID of the volume to backup.
@@ -55,7 +56,8 @@ class VolumeBackupManager(base.ManagerWithFind):
                            'name': name,
                            'description': description,
                            'incremental': incremental,
-                           'force': force, }}
+                           'force': force,
+                           'snapshot_id': snapshot_id, }}
         return self._create('/backups', body, 'backup')
 
     def get(self, backup_id):

@@ -42,6 +42,12 @@ class VolumeBackupsTest(utils.TestCase):
                           None, None, False, True)
         cs.assert_called('POST', '/backups')
 
+    def test_create_snapshot(self):
+        cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4',
+                          None, None, False, False,
+                          '3c706gbg-c074-51d9-9575-385119gcdfg5')
+        cs.assert_called('POST', '/backups')
+
     def test_get(self):
         backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
         cs.backups.get(backup_id)

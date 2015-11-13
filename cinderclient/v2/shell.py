@@ -1358,6 +1358,10 @@ def do_retype(cs, args):
            'of an "in-use" volume means your data is crash '
            'consistent. Default=False.',
            default=False)
+@utils.arg('--snapshot-id',
+           metavar='<snapshot-id>',
+           default=None,
+           help='ID of snapshot to backup. Default=None.')
 @utils.service_type('volumev2')
 def do_backup_create(cs, args):
     """Creates a volume backup."""
@@ -1373,7 +1377,8 @@ def do_backup_create(cs, args):
                                args.name,
                                args.description,
                                args.incremental,
-                               args.force)
+                               args.force,
+                               args.snapshot_id)
 
     info = {"volume_id": volume.id}
     info.update(backup._info)
