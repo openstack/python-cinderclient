@@ -78,6 +78,17 @@ class VolumeBackupsTest(utils.TestCase):
         self.assertIsInstance(info,
                               volume_backups_restore.VolumeBackupsRestore)
 
+    def test_reset_state(self):
+        b = cs.backups.list()[0]
+        api = '/backups/76a17945-3c6f-435c-975b-b5685db10b62/action'
+        b.reset_state(state='error')
+        cs.assert_called('POST', api)
+        cs.backups.reset_state('76a17945-3c6f-435c-975b-b5685db10b62',
+                               state='error')
+        cs.assert_called('POST', api)
+        cs.backups.reset_state(b, state='error')
+        cs.assert_called('POST', api)
+
     def test_record_export(self):
         backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
         cs.backups.export_record(backup_id)

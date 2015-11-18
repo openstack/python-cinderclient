@@ -552,6 +552,24 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('POST', '/snapshots/5678/action',
                                    body=expected)
 
+    def test_backup_reset_state(self):
+        self.run_command('backup-reset-state 1234')
+        expected = {'os-reset_status': {'status': 'available'}}
+        self.assert_called('POST', '/backups/1234/action', body=expected)
+
+    def test_backup_reset_state_with_flag(self):
+        self.run_command('backup-reset-state --state error 1234')
+        expected = {'os-reset_status': {'status': 'error'}}
+        self.assert_called('POST', '/backups/1234/action', body=expected)
+
+    def test_backup_reset_state_multiple(self):
+        self.run_command('backup-reset-state 1234 5678')
+        expected = {'os-reset_status': {'status': 'available'}}
+        self.assert_called_anytime('POST', '/backups/1234/action',
+                                   body=expected)
+        self.assert_called_anytime('POST', '/backups/5678/action',
+                                   body=expected)
+
     def test_type_list(self):
         self.run_command('type-list')
         self.assert_called_anytime('GET', '/types?is_public=None')
