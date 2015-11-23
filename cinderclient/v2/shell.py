@@ -1942,6 +1942,7 @@ def do_qos_disassociate_all(cs, args):
            default=[],
            help='Metadata key and value pair to set or unset. '
                 'For unset, specify only the key.')
+@utils.service_type('volumev2')
 def do_qos_key(cs, args):
     """Sets or unsets specifications for a qos spec."""
     keypair = _extract_metadata(args)
