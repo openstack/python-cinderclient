@@ -32,8 +32,8 @@ import requests
 
 from cinderclient import exceptions
 from cinderclient.openstack.common import importutils
-from cinderclient.openstack.common import strutils
 from cinderclient.openstack.common.gettextutils import _
+from oslo_utils import strutils
 
 osprofiler_web = importutils.try_import("osprofiler.web")
 

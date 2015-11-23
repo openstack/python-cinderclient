@@ -24,7 +24,7 @@ import six
 import prettytable
 
 from cinderclient import exceptions
-from cinderclient.openstack.common import strutils
+from oslo_utils import encodeutils
 
 
 def arg(*args, **kwargs):
@@ -107,7 +107,7 @@ def _print(pt, order):
     if sys.version_info >= (3, 0):
         print(pt.get_string(sortby=order))
     else:
-        print(strutils.safe_encode(pt.get_string(sortby=order)))
+        print(encodeutils.safe_encode(pt.get_string(sortby=order)))
 
 
 def print_list(objs, fields, exclude_unavailable=False, formatters=None,
@@ -198,7 +198,7 @@ def find_resource(manager, name_or_id):
             pass
 
     if sys.version_info <= (3, 0):
-        name_or_id = strutils.safe_decode(name_or_id)
+        name_or_id = encodeutils.safe_decode(name_or_id)
 
     try:
         try:
