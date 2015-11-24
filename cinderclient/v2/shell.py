@@ -2535,3 +2535,63 @@ def do_get_capabilities(cs, args):
     prop = infos.pop('properties', None)
     utils.print_dict(infos, "Volume stats")
     utils.print_dict(prop, "Backend properties")
+
+
+@utils.arg('volume',
+           metavar='<volume>',
+           help='Cinder volume already exists in volume backend')
+@utils.arg('identifier',
+           metavar='<identifier>',
+           help='Name or other Identifier for existing snapshot')
+@utils.arg('--id-type',
+           metavar='<id-type>',
+           default='source-name',
+           help='Type of backend device identifier provided, '
+                'typically source-name or source-id (Default=source-name)')
+@utils.arg('--name',
+           metavar='<name>',
+           help='Snapshot name (Default=None)')
+@utils.arg('--description',
+           metavar='<description>',
+           help='Snapshot description (Default=None)')
+@utils.arg('--metadata',
+           type=str,
+           nargs='*',
+           metavar='<key=value>',
+           help='Metadata key=value pairs (Default=None)')
+@utils.service_type('volumev2')
+def do_snapshot_manage(cs, args):
+    """Manage an existing snapshot."""
+    snapshot_metadata = None
+    if args.metadata is not None:
+        snapshot_metadata = _extract_metadata(args)
+
+    # Build a dictionary of key/value pairs to pass to the API.
+    ref_dict = {args.id_type: args.identifier}
+
+    if hasattr(args, 'source_name') and args.source_name is not None:
+        ref_dict['source-name'] = args.source_name
+    if hasattr(args, 'source_id') and args.source_id is not None:
+        ref_dict['source-id'] = args.source_id
+
+    volume = utils.find_volume(cs, args.volume)
+    snapshot = cs.volume_snapshots.manage(volume_id=volume.id,
+                                          ref=ref_dict,
+                                          name=args.name,
+                                          description=args.description,
+                                          metadata=snapshot_metadata)
+
+    info = {}
+    snapshot = cs.volume_snapshots.get(snapshot.id)
+    info.update(snapshot._info)
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
+@utils.arg('snapshot', metavar='<snapshot>',
+           help='Name or ID of the snapshot to unmanage.')
+@utils.service_type('volumev2')
+def do_snapshot_unmanage(cs, args):
+    """Stop managing a snapshot."""
+    snapshot = _find_volume_snapshot(cs, args.snapshot)
+    cs.volume_snapshots.unmanage(snapshot.id)

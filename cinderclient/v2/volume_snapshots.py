@@ -56,6 +56,16 @@ class Snapshot(base.Resource):
         """Update_all metadata of this snapshot."""
         return self.manager.update_all_metadata(self, metadata)
 
+    def manage(self, volume_id, ref, name=None, description=None,
+               metadata=None):
+        """Manage an existing snapshot."""
+        self.manager.manage(volume_id=volume_id, ref=ref, name=name,
+                            description=description, metadata=metadata)
+
+    def unmanage(self, snapshot):
+        """Unmanage a snapshot."""
+        self.manager.unmanage(snapshot)
+
 
 class SnapshotManager(base.ManagerWithFind):
     """Manage :class:`Snapshot` resources."""
@@ -170,3 +180,19 @@ class SnapshotManager(base.ManagerWithFind):
         body = {'metadata': metadata}
         return self._update("/snapshots/%s/metadata" % base.getid(snapshot),
                             body)
+
+    def manage(self, volume_id, ref, name=None, description=None,
+               metadata=None):
+        """Manage an existing snapshot."""
+        body = {'snapshot': {'volume_id': volume_id,
+                             'ref': ref,
+                             'name': name,
+                             'description': description,
+                             'metadata': metadata
+                             }
+                }
+        return self._create('/os-snapshot-manage', body, 'snapshot')
+
+    def unmanage(self, snapshot):
+        """Unmanage a snapshot."""
+        return self._action('os-unmanage', snapshot, None)

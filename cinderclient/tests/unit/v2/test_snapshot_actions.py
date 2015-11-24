@@ -42,3 +42,9 @@ class SnapshotActionsTest(utils.FixturedTestCase):
     def test_list_snapshots_with_sort(self):
         self.cs.volume_snapshots.list(sort="id")
         self.assert_called('GET', '/snapshots/detail?sort=id')
+
+    def test_snapshot_unmanage(self):
+        s = self.cs.volume_snapshots.get('1234')
+        self.cs.volume_snapshots.unmanage(s)
+        self.assert_called('POST', '/snapshots/1234/action',
+                           {'os-unmanage': None})
