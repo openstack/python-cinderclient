@@ -38,7 +38,6 @@ from cinderclient import utils
 import cinderclient.auth_plugin
 import cinderclient.extension
 from cinderclient.openstack.common import importutils
-from cinderclient.openstack.common import strutils
 from cinderclient.openstack.common.gettextutils import _
 from cinderclient.v1 import shell as shell_v1
 from cinderclient.v2 import shell as shell_v2
@@ -49,6 +48,8 @@ from keystoneclient.auth.identity import v2 as v2_auth
 from keystoneclient.auth.identity import v3 as v3_auth
 from keystoneclient.exceptions import DiscoveryFailure
 import six.moves.urllib.parse as urlparse
+from oslo_utils import encodeutils
+from oslo_utils import strutils
 
 osprofiler_profiler = importutils.try_import("osprofiler.profiler")
 
@@ -902,7 +903,7 @@ def main():
         if sys.version_info >= (3, 0):
             OpenStackCinderShell().main(sys.argv[1:])
         else:
-            OpenStackCinderShell().main(map(strutils.safe_decode,
+            OpenStackCinderShell().main(map(encodeutils.safe_decode,
                                             sys.argv[1:]))
     except KeyboardInterrupt:
         print("... terminating cinder client", file=sys.stderr)

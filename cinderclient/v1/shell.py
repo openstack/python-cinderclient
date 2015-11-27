@@ -25,9 +25,9 @@ import sys
 import time
 
 from cinderclient import exceptions
-from cinderclient.openstack.common import strutils
 from cinderclient import utils
 from cinderclient.v1 import availability_zones
+from oslo_utils import strutils
 
 
 def _poll_for_status(poll_fn, obj_id, action, final_ok_states,

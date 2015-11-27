@@ -27,8 +27,8 @@ import six
 from cinderclient import base
 from cinderclient import exceptions
 from cinderclient import utils
-from cinderclient.openstack.common import strutils
 from cinderclient.v2 import availability_zones
+from oslo_utils import strutils
 
 
 def _poll_for_status(poll_fn, obj_id, action, final_ok_states,
