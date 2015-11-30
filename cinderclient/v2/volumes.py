@@ -144,6 +144,22 @@ class Volume(base.Resource):
         """Migrate the volume to a new host."""
         self.manager.migrate_volume(self, host, force_host_copy, lock_volume)
 
+    def replication_enable(self, volume):
+        """Enables volume replication on a given volume."""
+        return self.manager.replication_enable(volume)
+
+    def replication_disable(self, volume):
+        """Disables volume replication on a given volume."""
+        return self.manager.replication_disable(volume)
+
+    def replication_list_targets(self, volume):
+        """List replication targets available for a volume."""
+        return self.manager.replication_list_targets(volume)
+
+    def replication_failover(self, volume, secondary):
+        """Failover a volume to a secondary target."""
+        return self.manager.replication_failover(volume, secondary)
+
     def retype(self, volume_type, policy):
         """Change a volume's type."""
         self.manager.retype(self, volume_type, policy)
@@ -511,6 +527,46 @@ class VolumeManager(base.ManagerWithFind):
         return self._action('os-migrate_volume_completion',
                             old_volume,
                             {'new_volume': new_volume_id, 'error': error})[1]
+
+    def replication_enable(self, volume_id):
+        """
+        Enables volume replication on a given volume.
+
+        :param volume_id: The id of the volume to query
+        """
+        return self._action('os-enable_replication',
+                            volume_id)
+
+    def replication_disable(self, volume_id):
+        """
+        Disables volume replication on a given volume.
+
+        :param volume_id: The id of the volume to query
+        """
+        return self._action('os-disable_replication',
+                            volume_id)
+
+    def replication_list_targets(self, volume_id):
+        """
+        List replication targets available for a volume.
+
+        :param volume_id: The id of the volume to query
+        :return: a list of available replication targets
+        """
+        return self._action('os-list_replication_targets',
+                            volume_id)
+
+    def replication_failover(self, volume_id, secondary):
+        """
+        Failover a volume to a secondary target.
+
+        :param volume_id: The id of the volume to query
+        :param secondary: A unqiue identifier that represents a failover
+                          target
+        """
+        return self._action('os-failover_replication',
+                            volume_id,
+                            {"secondary": secondary})
 
     def update_all_metadata(self, volume, metadata):
         """Update all metadata of a volume.
