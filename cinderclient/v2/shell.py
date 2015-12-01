@@ -861,7 +861,7 @@ def do_type_show(cs, args):
            help='Make type accessible to the public or not.')
 @utils.service_type('volumev2')
 def do_type_update(cs, args):
-    """Updates volume type name ,description and/or is_public."""
+    """Updates volume type name, description, and/or is_public."""
     is_public = strutils.bool_from_string(args.is_public)
     vtype = cs.volume_types.update(args.id, args.name, args.description,
                                    is_public)
