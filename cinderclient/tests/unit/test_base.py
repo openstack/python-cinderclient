@@ -11,8 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from requests import Response
+
 from cinderclient import base
 from cinderclient import exceptions
+from cinderclient.openstack.common.apiclient import base as common_base
 from cinderclient.v1 import volumes
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v1 import fakes
@@ -21,11 +24,21 @@ from cinderclient.tests.unit.v1 import fakes
 cs = fakes.FakeClient()
 
 
+REQUEST_ID = 'req-test-request-id'
+
+
+def create_response_obj_with_header():
+    resp = Response()
+    resp.headers['x-openstack-request-id'] = REQUEST_ID
+    return resp
+
+
 class BaseTest(utils.TestCase):
 
     def test_resource_repr(self):
         r = base.Resource(None, dict(foo="bar", baz="spam"))
         self.assertEqual("<Resource baz=spam, foo=bar>", repr(r))
+        self.assertNotIn("x_openstack_request_ids", repr(r))
 
     def test_getid(self):
         self.assertEqual(4, base.getid(4))
@@ -63,3 +76,38 @@ class BaseTest(utils.TestCase):
     def test_to_dict(self):
         r1 = base.Resource(None, {'id': 1, 'name': 'hi'})
         self.assertEqual({'id': 1, 'name': 'hi'}, r1.to_dict())
+
+    def test_resource_object_with_request_ids(self):
+        resp_obj = create_response_obj_with_header()
+        r = base.Resource(None, {"name": "1"}, resp=resp_obj)
+        self.assertEqual([REQUEST_ID], r.request_ids)
+
+
+class ListWithMetaTest(utils.TestCase):
+    def test_list_with_meta(self):
+        resp = create_response_obj_with_header()
+        obj = common_base.ListWithMeta([], resp)
+        self.assertEqual([], obj)
+        # Check request_ids attribute is added to obj
+        self.assertTrue(hasattr(obj, 'request_ids'))
+        self.assertEqual([REQUEST_ID], obj.request_ids)
+
+
+class DictWithMetaTest(utils.TestCase):
+    def test_dict_with_meta(self):
+        resp = create_response_obj_with_header()
+        obj = common_base.DictWithMeta([], resp)
+        self.assertEqual({}, obj)
+        # Check request_ids attribute is added to obj
+        self.assertTrue(hasattr(obj, 'request_ids'))
+        self.assertEqual([REQUEST_ID], obj.request_ids)
+
+
+class TupleWithMetaTest(utils.TestCase):
+    def test_tuple_with_meta(self):
+        resp = create_response_obj_with_header()
+        obj = common_base.TupleWithMeta(resp, None)
+        self.assertIsInstance(obj, tuple)
+        # Check request_ids attribute is added to obj
+        self.assertTrue(hasattr(obj, 'request_ids'))
+        self.assertEqual([REQUEST_ID], obj.request_ids)
