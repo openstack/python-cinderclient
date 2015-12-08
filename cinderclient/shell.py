@@ -55,7 +55,7 @@ osprofiler_profiler = importutils.try_import("osprofiler.profiler")
 
 DEFAULT_OS_VOLUME_API_VERSION = "2"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
-DEFAULT_CINDER_SERVICE_TYPE = 'volume'
+DEFAULT_CINDER_SERVICE_TYPE = 'volumev2'
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
