@@ -187,6 +187,13 @@ def _extract_metadata(args):
            metavar='<limit>',
            default=None,
            help='Maximum number of volumes to return. Default=None.')
+@utils.arg('--fields',
+           default=None,
+           metavar='<fields>',
+           help='Comma-separated list of fields to display. '
+                'Use the show command to see which fields are available. '
+                'Unavailable/non-existent fields will be ignored. '
+                'Default=None.')
 @utils.arg('--sort_key',
            metavar='<sort_key>',
            default=None,
@@ -226,6 +233,13 @@ def do_list(cs, args):
         'metadata': _extract_metadata(args) if args.metadata else None,
     }
 
+    # If unavailable/non-existent fields are specified, these fields will
+    # be removed from key_list at the print_list() during key validation.
+    field_titles = []
+    if args.fields:
+        for field_title in args.fields.split(','):
+            field_titles.append(field_title)
+
     # --sort_key and --sort_dir deprecated in kilo and is not supported
     # with --sort
     if args.sort and (args.sort_key or args.sort_dir):
@@ -243,14 +257,16 @@ def do_list(cs, args):
         servers = [s.get('server_id') for s in vol.attachments]
         setattr(vol, 'attached_to', ','.join(map(str, servers)))
 
-    if all_tenants:
-        key_list = ['ID', 'Tenant ID', 'Status', 'Migration Status', 'Name',
-                    'Size', 'Volume Type', 'Bootable', 'Multiattach',
-                    'Attached to']
+    if field_titles:
+        key_list = ['ID'] + field_titles
     else:
-        key_list = ['ID', 'Status', 'Migration Status', 'Name',
-                    'Size', 'Volume Type', 'Bootable',
-                    'Multiattach', 'Attached to']
+        key_list = ['ID', 'Status', 'Name', 'Size', 'Volume Type',
+                    'Bootable', 'Attached to']
+        # If all_tenants is specified, print
+        # Tenant ID as well.
+        if search_opts['all_tenants']:
+            key_list.insert(1, 'Tenant ID')
+
     if args.sort_key or args.sort_dir or args.sort:
         sortby_index = None
     else:

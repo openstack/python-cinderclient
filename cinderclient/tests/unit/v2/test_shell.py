@@ -210,6 +210,33 @@ class ShellTest(utils.TestCase):
         self.run_command('list --limit=10')
         self.assert_called('GET', '/volumes/detail?limit=10')
 
+    @mock.patch("cinderclient.utils.print_list")
+    def test_list_field(self, mock_print):
+        self.run_command('list --field Status,Name,Size,Bootable')
+        self.assert_called('GET', '/volumes/detail')
+        key_list = ['ID', 'Status', 'Name', 'Size', 'Bootable']
+        mock_print.assert_called_once_with(mock.ANY, key_list,
+            exclude_unavailable=True, sortby_index=0)
+
+    @mock.patch("cinderclient.utils.print_list")
+    def test_list_field_with_all_tenants(self, mock_print):
+        self.run_command('list --field Status,Name,Size,Bootable '
+                         '--all-tenants 1')
+        self.assert_called('GET', '/volumes/detail?all_tenants=1')
+        key_list = ['ID', 'Status', 'Name', 'Size', 'Bootable']
+        mock_print.assert_called_once_with(mock.ANY, key_list,
+            exclude_unavailable=True, sortby_index=0)
+
+    @mock.patch("cinderclient.utils.print_list")
+    def test_list_field_with_tenant(self, mock_print):
+        self.run_command('list --field Status,Name,Size,Bootable '
+                         '--tenant 123')
+        self.assert_called('GET',
+            '/volumes/detail?all_tenants=1&project_id=123')
+        key_list = ['ID', 'Status', 'Name', 'Size', 'Bootable']
+        mock_print.assert_called_once_with(mock.ANY, key_list,
+            exclude_unavailable=True, sortby_index=0)
+
     def test_list_sort_valid(self):
         self.run_command('list --sort_key=id --sort_dir=asc')
         self.assert_called('GET', '/volumes/detail?sort_dir=asc&sort_key=id')

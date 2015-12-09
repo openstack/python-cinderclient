@@ -25,22 +25,10 @@ import cinderclient.tests.unit.utils as utils
 from cinderclient.v2 import client
 
 
-def _stub_volume(**kwargs):
+def _stub_volume(*args, **kwargs):
     volume = {
-        'id': '1234',
-        'name': None,
-        'description': None,
-        "attachments": [],
-        "bootable": "false",
-        "availability_zone": "cinder",
-        "created_at": "2012-08-27T00:00:00.000000",
-        "id": '00000000-0000-0000-0000-000000000000',
-        "metadata": {},
-        "size": 1,
-        "snapshot_id": None,
-        "status": "available",
-        "volume_type": "None",
-        "multiattach": "false",
+        "migration_status": None,
+        "attachments": [{'server_id': 1234}],
         "links": [
             {
                 "href": "http://localhost/v2/fake/volumes/1234",
@@ -51,7 +39,31 @@ def _stub_volume(**kwargs):
                 "rel": "bookmark"
             }
         ],
-    }
+        "availability_zone": "cinder",
+        "os-vol-host-attr:host": "ip-192-168-0-2",
+        "encrypted": "false",
+        "updated_at": "2013-11-12T21:00:00.000000",
+        "os-volume-replication:extended_status": "None",
+        "replication_status": "disabled",
+        "snapshot_id": None,
+        'id': 1234,
+        "size": 1,
+        "user_id": "1b2d6e8928954ca4ae7c243863404bdc",
+        "os-vol-tenant-attr:tenant_id": "eb72eb33a0084acf8eb21356c2b021a7",
+        "os-vol-mig-status-attr:migstat": None,
+        "metadata": {},
+        "status": "available",
+        'description': None,
+        "multiattach": "false",
+        "os-volume-replication:driver_data": None,
+        "source_volid": None,
+        "consistencygroup_id": None,
+        "os-vol-mig-status-attr:name_id": None,
+        "name": "sample-volume",
+        "bootable": "false",
+        "created_at": "2012-08-27T00:00:00.000000",
+        "volume_type": "None",
+   }
     volume.update(kwargs)
     return volume
 
@@ -380,13 +392,9 @@ class FakeHTTPClient(base_client.HTTPClient):
                 {'id': 5678, 'name': 'sample-volume2'}
             ]})
 
-    # TODO(jdg): This will need to change
-    # at the very least it's not complete
     def get_volumes_detail(self, **kw):
         return (200, {}, {"volumes": [
-            {'id': kw.get('id', 1234),
-             'name': 'sample-volume',
-             'attachments': [{'server_id': 1234}]},
+            _stub_volume(id=kw.get('id', 1234))
         ]})
 
     def get_volumes_1234(self, **kw):
