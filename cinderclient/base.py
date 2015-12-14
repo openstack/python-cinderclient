@@ -94,7 +94,7 @@ class Manager(common_base.HookableMixin):
             if margin <= len(items_new):
                 # If the limit is reached, return the items.
                 items = items + items_new[:margin]
-                return items
+                return common_base.ListWithMeta(items, resp)
             else:
                 items = items + items_new
         else:
@@ -116,7 +116,7 @@ class Manager(common_base.HookableMixin):
                 # till there is no more items.
                 items = self._list(next, response_key, obj_class, None,
                                    limit, items)
-        return items
+        return common_base.ListWithMeta(items, resp)
 
     def _build_list_url(self, resource_type, detailed=True, search_opts=None,
                         marker=None, limit=None, sort_key=None, sort_dir=None,
@@ -290,29 +290,38 @@ class Manager(common_base.HookableMixin):
     def _get(self, url, response_key=None):
         resp, body = self.api.client.get(url)
         if response_key:
-            return self.resource_class(self, body[response_key], loaded=True)
+            return self.resource_class(self, body[response_key], loaded=True,
+                                       resp=resp)
         else:
-            return self.resource_class(self, body, loaded=True)
+            return self.resource_class(self, body, loaded=True, resp=resp)
 
     def _create(self, url, body, response_key, return_raw=False, **kwargs):
         self.run_hooks('modify_body_for_create', body, **kwargs)
         resp, body = self.api.client.post(url, body=body)
         if return_raw:
-            return body[response_key]
+            return common_base.DictWithMeta(body[response_key], resp)
 
         with self.completion_cache('human_id', self.resource_class, mode="a"):
             with self.completion_cache('uuid', self.resource_class, mode="a"):
-                return self.resource_class(self, body[response_key])
+                return self.resource_class(self, body[response_key], resp=resp)
 
     def _delete(self, url):
         resp, body = self.api.client.delete(url)
+        return common_base.TupleWithMeta(resp, body)
 
     def _update(self, url, body, response_key=None, **kwargs):
         self.run_hooks('modify_body_for_update', body, **kwargs)
         resp, body = self.api.client.put(url, body=body)
         if response_key:
-            return self.resource_class(self, body[response_key], loaded=True)
-        return body
+            return self.resource_class(self, body[response_key], loaded=True,
+                                       resp=resp)
+
+        # (NOTE)ankit: In case of qos_specs.unset_keys method, None is
+        # returned back to the caller and in all other cases dict is
+        # returned but in order to return request_ids to the caller, it's
+        # not possible to return None so returning DictWithMeta for all cases.
+        body = body or {}
+        return common_base.DictWithMeta(body, resp)
 
 
 class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):

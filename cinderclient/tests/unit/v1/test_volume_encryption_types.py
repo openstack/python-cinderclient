@@ -96,4 +96,5 @@ class VolumeEncryptionTypesTest(utils.TestCase):
         """
         result = cs.volume_encryption_types.delete(1)
         cs.assert_called('DELETE', '/types/1/encryption/provider')
-        self.assertIsNone(result, "delete result must be None")
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(202, result[0].status_code)

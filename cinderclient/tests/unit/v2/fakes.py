@@ -25,6 +25,9 @@ import cinderclient.tests.unit.utils as utils
 from cinderclient.v2 import client
 
 
+REQUEST_ID = 'req-test-request-id'
+
+
 def _stub_volume(*args, **kwargs):
     volume = {
         "migration_status": None,
@@ -305,6 +308,8 @@ class FakeHTTPClient(base_client.HTTPClient):
         # Note the call
         self.callstack.append((method, url, kwargs.get('body', None)))
         status, headers, body = getattr(self, callback)(**kwargs)
+        # add fake request-id header
+        headers['x-openstack-request-id'] = REQUEST_ID
         r = utils.TestResponse({
             "status_code": status,
             "text": body,

@@ -21,6 +21,9 @@ import six
 import testtools
 
 
+REQUEST_ID = ['req-test-request-id']
+
+
 class TestCase(testtools.TestCase):
     TEST_REQUEST_BASE = {
         'verify': True,
@@ -36,6 +39,10 @@ class TestCase(testtools.TestCase):
                 os.environ.get('OS_STDERR_CAPTURE') == '1'):
             stderr = self.useFixture(fixtures.StringStream('stderr')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
+
+    def _assert_request_id(self, obj):
+        self.assertTrue(hasattr(obj, 'request_ids'))
+        self.assertEqual(REQUEST_ID, obj.request_ids)
 
 
 class FixturedTestCase(TestCase):
