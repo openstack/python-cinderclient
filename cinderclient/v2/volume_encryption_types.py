@@ -19,6 +19,7 @@ Volume Encryption Type interface
 """
 
 from cinderclient import base
+from cinderclient.openstack.common.apiclient import base as common_base
 
 
 class VolumeEncryptionType(base.Resource):
@@ -47,12 +48,16 @@ class VolumeEncryptionTypeManager(base.ManagerWithFind):
         # all encryption types without going through all volume types.
         volume_types = self.api.volume_types.list()
         encryption_types = []
+        list_of_resp = []
         for volume_type in volume_types:
             encryption_type = self._get("/types/%s/encryption"
                                         % base.getid(volume_type))
             if hasattr(encryption_type, 'volume_type_id'):
                 encryption_types.append(encryption_type)
-        return encryption_types
+
+            list_of_resp.extend(encryption_type.request_ids)
+
+        return common_base.ListWithMeta(encryption_types, list_of_resp)
 
     def get(self, volume_type):
         """
