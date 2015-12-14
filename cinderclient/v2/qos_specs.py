@@ -20,6 +20,7 @@ QoS Specs interface.
 """
 
 from cinderclient import base
+from cinderclient.openstack.common.apiclient import base as common_base
 
 
 class QoSSpecs(base.Resource):
@@ -65,8 +66,8 @@ class QoSSpecsManager(base.ManagerWithFind):
         :param force: Flag that indicates whether to delete target qos specs
                       if it was in-use.
         """
-        self._delete("/qos-specs/%s?force=%s" %
-                     (base.getid(qos_specs), force))
+        return self._delete("/qos-specs/%s?force=%s" %
+                            (base.getid(qos_specs), force))
 
     def create(self, name, specs):
         """Create a qos specs.
@@ -128,8 +129,10 @@ class QoSSpecsManager(base.ManagerWithFind):
         :param qos_specs: The qos specs to be associated with
         :param vol_type_id: The volume type id to be associated with
         """
-        self.api.client.get("/qos-specs/%s/associate?vol_type_id=%s" %
-                            (base.getid(qos_specs), vol_type_id))
+        resp, body = self.api.client.get(
+            "/qos-specs/%s/associate?vol_type_id=%s" %
+            (base.getid(qos_specs), vol_type_id))
+        return common_base.TupleWithMeta((resp, body), resp)
 
     def disassociate(self, qos_specs, vol_type_id):
         """Disassociate qos specs from volume type.
@@ -137,13 +140,17 @@ class QoSSpecsManager(base.ManagerWithFind):
         :param qos_specs: The qos specs to be associated with
         :param vol_type_id: The volume type id to be associated with
         """
-        self.api.client.get("/qos-specs/%s/disassociate?vol_type_id=%s" %
-                            (base.getid(qos_specs), vol_type_id))
+        resp, body = self.api.client.get(
+            "/qos-specs/%s/disassociate?vol_type_id=%s" %
+            (base.getid(qos_specs), vol_type_id))
+        return common_base.TupleWithMeta((resp, body), resp)
 
     def disassociate_all(self, qos_specs):
         """Disassociate all entities from specific qos specs.
 
         :param qos_specs: The qos specs to be associated with
         """
-        self.api.client.get("/qos-specs/%s/disassociate_all" %
-                            base.getid(qos_specs))
+        resp, body = self.api.client.get(
+            "/qos-specs/%s/disassociate_all" %
+            base.getid(qos_specs))
+        return common_base.TupleWithMeta((resp, body), resp)

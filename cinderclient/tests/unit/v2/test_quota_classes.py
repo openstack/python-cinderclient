@@ -24,8 +24,9 @@ class QuotaClassSetsTest(utils.TestCase):
 
     def test_class_quotas_get(self):
         class_name = 'test'
-        cs.quota_classes.get(class_name)
+        cls = cs.quota_classes.get(class_name)
         cs.assert_called('GET', '/os-quota-class-sets/%s' % class_name)
+        self._assert_request_id(cls)
 
     def test_update_quota(self):
         q = cs.quota_classes.get('test')
@@ -33,6 +34,7 @@ class QuotaClassSetsTest(utils.TestCase):
                  backups=2, backup_gigabytes=2000,
                  consistencygroups=2, per_volume_gigabytes=100)
         cs.assert_called('PUT', '/os-quota-class-sets/test')
+        self._assert_request_id(q)
 
     def test_refresh_quota(self):
         q = cs.quota_classes.get('test')
@@ -66,3 +68,5 @@ class QuotaClassSetsTest(utils.TestCase):
         self.assertEqual(q.backup_gigabytes, q2.backup_gigabytes)
         self.assertEqual(q.consistencygroups, q2.consistencygroups)
         self.assertEqual(q.per_volume_gigabytes, q2.per_volume_gigabytes)
+        self._assert_request_id(q)
+        self._assert_request_id(q2)

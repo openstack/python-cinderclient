@@ -28,6 +28,7 @@ class ServicesTest(utils.TestCase):
         cs.assert_called('GET', '/os-services')
         self.assertEqual(3, len(svs))
         [self.assertIsInstance(s, services.Service) for s in svs]
+        self._assert_request_id(svs)
 
     def test_list_services_with_hostname(self):
         svs = cs.services.list(host='host2')
@@ -35,6 +36,7 @@ class ServicesTest(utils.TestCase):
         self.assertEqual(2, len(svs))
         [self.assertIsInstance(s, services.Service) for s in svs]
         [self.assertEqual('host2', s.host) for s in svs]
+        self._assert_request_id(svs)
 
     def test_list_services_with_binary(self):
         svs = cs.services.list(binary='cinder-volume')
@@ -42,6 +44,7 @@ class ServicesTest(utils.TestCase):
         self.assertEqual(2, len(svs))
         [self.assertIsInstance(s, services.Service) for s in svs]
         [self.assertEqual('cinder-volume', s.binary) for s in svs]
+        self._assert_request_id(svs)
 
     def test_list_services_with_host_binary(self):
         svs = cs.services.list('host2', 'cinder-volume')
@@ -50,6 +53,7 @@ class ServicesTest(utils.TestCase):
         [self.assertIsInstance(s, services.Service) for s in svs]
         [self.assertEqual('host2', s.host) for s in svs]
         [self.assertEqual('cinder-volume', s.binary) for s in svs]
+        self._assert_request_id(svs)
 
     def test_services_enable(self):
         s = cs.services.enable('host1', 'cinder-volume')
@@ -57,6 +61,7 @@ class ServicesTest(utils.TestCase):
         cs.assert_called('PUT', '/os-services/enable', values)
         self.assertIsInstance(s, services.Service)
         self.assertEqual('enabled', s.status)
+        self._assert_request_id(s)
 
     def test_services_disable(self):
         s = cs.services.disable('host1', 'cinder-volume')
@@ -64,6 +69,7 @@ class ServicesTest(utils.TestCase):
         cs.assert_called('PUT', '/os-services/disable', values)
         self.assertIsInstance(s, services.Service)
         self.assertEqual('disabled', s.status)
+        self._assert_request_id(s)
 
     def test_services_disable_log_reason(self):
         s = cs.services.disable_log_reason(
@@ -73,3 +79,4 @@ class ServicesTest(utils.TestCase):
         cs.assert_called('PUT', '/os-services/disable-log-reason', values)
         self.assertIsInstance(s, services.Service)
         self.assertEqual('disabled', s.status)
+        self._assert_request_id(s)

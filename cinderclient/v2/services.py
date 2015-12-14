@@ -49,16 +49,16 @@ class ServiceManager(base.ManagerWithFind):
         """Enable the service specified by hostname and binary."""
         body = {"host": host, "binary": binary}
         result = self._update("/os-services/enable", body)
-        return self.resource_class(self, result)
+        return self.resource_class(self, result, resp=result.request_ids)
 
     def disable(self, host, binary):
         """Disable the service specified by hostname and binary."""
         body = {"host": host, "binary": binary}
         result = self._update("/os-services/disable", body)
-        return self.resource_class(self, result)
+        return self.resource_class(self, result, resp=result.request_ids)
 
     def disable_log_reason(self, host, binary, reason):
         """Disable the service with reason."""
         body = {"host": host, "binary": binary, "disabled_reason": reason}
         result = self._update("/os-services/disable-log-reason", body)
-        return self.resource_class(self, result)
+        return self.resource_class(self, result, resp=result.request_ids)

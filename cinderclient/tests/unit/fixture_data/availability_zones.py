@@ -15,6 +15,7 @@ from cinderclient.tests.unit.fixture_data import base
 
 # FIXME(jamielennox): use timeutils from oslo
 FORMAT = '%Y-%m-%d %H:%M:%S'
+REQUEST_ID = 'req-test-request-id'
 
 
 class Fixture(base.Fixture):
@@ -38,7 +39,10 @@ class Fixture(base.Fixture):
                 },
             ]
         }
-        self.requests.register_uri('GET', self.url(), json=get_availability)
+        self.requests.register_uri(
+            'GET', self.url(), json=get_availability,
+            headers={'x-openstack-request-id': REQUEST_ID}
+        )
 
         updated_1 = datetime(2012, 12, 26, 14, 45, 25, 0).strftime(FORMAT)
         updated_2 = datetime(2012, 12, 26, 14, 45, 24, 0).strftime(FORMAT)
@@ -77,4 +81,7 @@ class Fixture(base.Fixture):
                 },
             ]
         }
-        self.requests.register_uri('GET', self.url('detail'), json=get_detail)
+        self.requests.register_uri(
+            'GET', self.url('detail'), json=get_detail,
+            headers={'x-openstack-request-id': REQUEST_ID}
+        )

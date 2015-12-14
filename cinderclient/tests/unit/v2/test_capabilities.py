@@ -39,3 +39,4 @@ class CapabilitiesTest(utils.TestCase):
         capabilities = cs.capabilities.get('host')
         cs.assert_called('GET', '/capabilities/host')
         self.assertEqual(expected, capabilities._info)
+        self._assert_request_id(capabilities)

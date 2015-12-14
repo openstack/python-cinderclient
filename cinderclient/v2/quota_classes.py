@@ -42,4 +42,5 @@ class QuotaClassSetManager(base.Manager):
 
         result = self._update('/os-quota-class-sets/%s' % (class_name), body)
         return self.resource_class(self,
-                                   result['quota_class_set'], loaded=True)
+                                   result['quota_class_set'], loaded=True,
+                                   resp=result.request_ids)
