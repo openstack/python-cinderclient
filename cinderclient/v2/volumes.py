@@ -16,6 +16,7 @@
 """Volume interface (v2 extension)."""
 
 from cinderclient import base
+from cinderclient.openstack.common.apiclient import base as common_base
 
 
 class Volume(base.Resource):
@@ -25,11 +26,11 @@ class Volume(base.Resource):
 
     def delete(self):
         """Delete this volume."""
-        self.manager.delete(self)
+        return self.manager.delete(self)
 
     def update(self, **kwargs):
         """Update the name or description for this volume."""
-        self.manager.update(self, **kwargs)
+        return self.manager.update(self, **kwargs)
 
     def attach(self, instance_uuid, mountpoint, mode='rw', host_name=None):
         """Set attachment metadata.
@@ -119,7 +120,7 @@ class Volume(base.Resource):
 
         :param volume: The UUID of the volume to force-delete.
         """
-        self.manager.force_delete(self)
+        return self.manager.force_delete(self)
 
     def reset_state(self, state, attach_status=None, migration_status=None):
         """Update the volume with the provided state.
@@ -130,7 +131,8 @@ class Volume(base.Resource):
         :param migration_status: The migration_status of the volume to be set,
                                  or None to keep the current status.
         """
-        self.manager.reset_state(self, state, attach_status, migration_status)
+        return self.manager.reset_state(self, state, attach_status,
+                                        migration_status)
 
     def extend(self, volume, new_size):
         """Extend the size of the specified volume.
@@ -138,11 +140,12 @@ class Volume(base.Resource):
         :param volume: The UUID of the volume to extend
         :param new_size: The desired size to extend volume to.
         """
-        self.manager.extend(self, new_size)
+        return self.manager.extend(self, new_size)
 
     def migrate_volume(self, host, force_host_copy, lock_volume):
         """Migrate the volume to a new host."""
-        self.manager.migrate_volume(self, host, force_host_copy, lock_volume)
+        return self.manager.migrate_volume(self, host, force_host_copy,
+                                           lock_volume)
 
     def replication_enable(self, volume):
         """Enables volume replication on a given volume."""
@@ -162,7 +165,7 @@ class Volume(base.Resource):
 
     def retype(self, volume_type, policy):
         """Change a volume's type."""
-        self.manager.retype(self, volume_type, policy)
+        return self.manager.retype(self, volume_type, policy)
 
     def update_all_metadata(self, metadata):
         """Update all metadata of this volume."""
@@ -175,32 +178,33 @@ class Volume(base.Resource):
         :param read_only: The value to indicate whether to update volume to
             read-only access mode.
         """
-        self.manager.update_readonly_flag(self, read_only)
+        return self.manager.update_readonly_flag(self, read_only)
 
     def manage(self, host, ref, name=None, description=None,
                volume_type=None, availability_zone=None, metadata=None,
                bootable=False):
         """Manage an existing volume."""
-        self.manager.manage(host=host, ref=ref, name=name,
-                            description=description, volume_type=volume_type,
-                            availability_zone=availability_zone,
-                            metadata=metadata, bootable=bootable)
+        return self.manager.manage(host=host, ref=ref, name=name,
+                                   description=description,
+                                   volume_type=volume_type,
+                                   availability_zone=availability_zone,
+                                   metadata=metadata, bootable=bootable)
 
     def unmanage(self, volume):
         """Unmanage a volume."""
-        self.manager.unmanage(volume)
+        return self.manager.unmanage(volume)
 
     def promote(self, volume):
         """Promote secondary to be primary in relationship."""
-        self.manager.promote(volume)
+        return self.manager.promote(volume)
 
     def reenable(self, volume):
         """Sync the secondary volume with primary for a relationship."""
-        self.manager.reenable(volume)
+        return self.manager.reenable(volume)
 
     def get_pools(self, detail):
         """Show pool information for backends."""
-        self.manager.get_pools(detail)
+        return self.manager.get_pools(detail)
 
 
 class VolumeManager(base.ManagerWithFind):
@@ -298,7 +302,7 @@ class VolumeManager(base.ManagerWithFind):
 
         :param volume: The :class:`Volume` to delete.
         """
-        self._delete("/volumes/%s" % base.getid(volume))
+        return self._delete("/volumes/%s" % base.getid(volume))
 
     def update(self, volume, **kwargs):
         """Update the name or description for a volume.
@@ -310,7 +314,7 @@ class VolumeManager(base.ManagerWithFind):
 
         body = {"volume": kwargs}
 
-        self._update("/volumes/%s" % base.getid(volume), body)
+        return self._update("/volumes/%s" % base.getid(volume), body)
 
     def _action(self, action, volume, info=None, **kwargs):
         """Perform a volume "action."
@@ -318,7 +322,8 @@ class VolumeManager(base.ManagerWithFind):
         body = {action: info}
         self.run_hooks('modify_body_for_action', body, **kwargs)
         url = '/volumes/%s/action' % base.getid(volume)
-        return self.api.client.post(url, body=body)
+        resp, body = self.api.client.post(url, body=body)
+        return common_base.TupleWithMeta((resp, body), resp)
 
     def attach(self, volume, instance_uuid, mountpoint, mode='rw',
                host_name=None):
@@ -386,8 +391,9 @@ class VolumeManager(base.ManagerWithFind):
         :param volume: The :class:`Volume` (or its ID).
         :param connector: connector dict from nova.
         """
-        return self._action('os-initialize_connection', volume,
-                            {'connector': connector})[1]['connection_info']
+        resp, body = self._action('os-initialize_connection', volume,
+                                  {'connector': connector})
+        return common_base.DictWithMeta(body['connection_info'], resp)
 
     def terminate_connection(self, volume, connector):
         """Terminate a volume connection.
@@ -395,8 +401,8 @@ class VolumeManager(base.ManagerWithFind):
         :param volume: The :class:`Volume` (or its ID).
         :param connector: connector dict from nova.
         """
-        self._action('os-terminate_connection', volume,
-                     {'connector': connector})
+        return self._action('os-terminate_connection', volume,
+                            {'connector': connector})
 
     def set_metadata(self, volume, metadata):
         """Update/Set a volumes metadata.
@@ -414,8 +420,13 @@ class VolumeManager(base.ManagerWithFind):
         :param volume: The :class:`Volume`.
         :param keys: A list of keys to be removed.
         """
+        response_list = []
         for k in keys:
-            self._delete("/volumes/%s/metadata/%s" % (base.getid(volume), k))
+            resp, body = self._delete("/volumes/%s/metadata/%s" %
+                                      (base.getid(volume), k))
+            response_list.append(resp)
+
+        return common_base.ListWithMeta([], response_list)
 
     def set_image_metadata(self, volume, metadata):
         """Set a volume's image metadata.
@@ -433,9 +444,13 @@ class VolumeManager(base.ManagerWithFind):
         :param volume: The :class:`Volume`.
         :param keys: A list of keys to be removed.
         """
+        response_list = []
         for key in keys:
-            self._action("os-unset_image_metadata", volume,
-                         {'key': key})
+            resp, body = self._action("os-unset_image_metadata", volume,
+                                      {'key': key})
+            response_list.append(resp)
+
+        return common_base.ListWithMeta([], response_list)
 
     def show_image_metadata(self, volume):
         """Show a volume's image metadata.
@@ -500,7 +515,8 @@ class VolumeManager(base.ManagerWithFind):
         :param volume_id: the id of the volume to query
         :return: a dictionary of volume encryption metadata
         """
-        return self._get("/volumes/%s/encryption" % volume_id)._info
+        metadata = self._get("/volumes/%s/encryption" % volume_id)
+        return common_base.DictWithMeta(metadata._info, metadata.request_ids)
 
     def migrate_volume(self, volume, host, force_host_copy, lock_volume):
         """Migrate volume to new host.
@@ -524,9 +540,10 @@ class VolumeManager(base.ManagerWithFind):
         :param error: Inform of an error to cause migration cleanup
         """
         new_volume_id = base.getid(new_volume)
-        return self._action('os-migrate_volume_completion',
-                            old_volume,
-                            {'new_volume': new_volume_id, 'error': error})[1]
+        resp, body = self._action('os-migrate_volume_completion', old_volume,
+                                  {'new_volume': new_volume_id,
+                                   'error': error})
+        return common_base.DictWithMeta(body, resp)
 
     def replication_enable(self, volume_id):
         """

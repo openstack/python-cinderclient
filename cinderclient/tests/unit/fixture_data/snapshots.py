@@ -15,6 +15,9 @@ import json
 from cinderclient.tests.unit.fixture_data import base
 
 
+REQUEST_ID = 'req-test-request-id'
+
+
 def _stub_snapshot(**kwargs):
     snapshot = {
         "created_at": "2012-08-28T16:30:31.000000",
@@ -37,8 +40,11 @@ class Fixture(base.Fixture):
         super(Fixture, self).setUp()
 
         snapshot_1234 = _stub_snapshot(id='1234')
-        self.requests.register_uri('GET', self.url('1234'),
-                                   json={'snapshot': snapshot_1234})
+        self.requests.register_uri(
+            'GET', self.url('1234'),
+            json={'snapshot': snapshot_1234},
+            headers={'x-openstack-request-id': REQUEST_ID}
+        )
 
         def action_1234(request, context):
             return ''
@@ -53,13 +59,20 @@ class Fixture(base.Fixture):
                 raise AssertionError("Unexpected action: %s" % action)
             return ''
 
-        self.requests.register_uri('POST', self.url('1234', 'action'),
-                                   text=action_1234, status_code=202)
+        self.requests.register_uri(
+            'POST', self.url('1234', 'action'),
+            text=action_1234, status_code=202,
+            headers={'x-openstack-request-id': REQUEST_ID}
+        )
 
-        self.requests.register_uri('GET',
-                                   self.url('detail?limit=2&marker=1234'),
-                                   status_code=200, json={'snapshots': []})
+        self.requests.register_uri(
+            'GET', self.url('detail?limit=2&marker=1234'),
+            status_code=200, json={'snapshots': []},
+            headers={'x-openstack-request-id': REQUEST_ID}
+        )
 
-        self.requests.register_uri('GET',
-                                   self.url('detail?sort=id'),
-                                   status_code=200, json={'snapshots': []})
+        self.requests.register_uri(
+            'GET', self.url('detail?sort=id'),
+            status_code=200, json={'snapshots': []},
+            headers={'x-openstack-request-id': REQUEST_ID}
+        )

@@ -24,12 +24,14 @@ cs = fakes.FakeClient()
 class VolumesTest(utils.TestCase):
 
     def test_list_volumes_with_marker_limit(self):
-        cs.volumes.list(marker=1234, limit=2)
+        lst = cs.volumes.list(marker=1234, limit=2)
         cs.assert_called('GET', '/volumes/detail?limit=2&marker=1234')
+        self._assert_request_id(lst)
 
     def test_list_volumes_with_sort_key_dir(self):
-        cs.volumes.list(sort_key='id', sort_dir='asc')
+        lst = cs.volumes.list(sort_key='id', sort_dir='asc')
         cs.assert_called('GET', '/volumes/detail?sort_dir=asc&sort_key=id')
+        self._assert_request_id(lst)
 
     def test_list_volumes_with_invalid_sort_key(self):
         self.assertRaises(ValueError,
@@ -54,6 +56,7 @@ class VolumesTest(utils.TestCase):
         # osapi_max_limit is 1000 by default. If limit is less than
         # osapi_max_limit, we can get 2 volumes back.
         volumes = cs.volumes._list(url, response_key, limit=limit)
+        self._assert_request_id(volumes)
         cs.assert_called('GET', url)
         self.assertEqual(fake_volumes, volumes)
 
@@ -64,23 +67,28 @@ class VolumesTest(utils.TestCase):
         cs.client.osapi_max_limit = 1
         volumes = cs.volumes._list(url, response_key, limit=limit)
         self.assertEqual(fake_volumes, volumes)
+        self._assert_request_id(volumes)
         cs.client.osapi_max_limit = 1000
 
     def test_delete_volume(self):
         v = cs.volumes.list()[0]
-        v.delete()
+        del_v = v.delete()
         cs.assert_called('DELETE', '/volumes/1234')
-        cs.volumes.delete('1234')
+        self._assert_request_id(del_v)
+        del_v = cs.volumes.delete('1234')
         cs.assert_called('DELETE', '/volumes/1234')
-        cs.volumes.delete(v)
+        self._assert_request_id(del_v)
+        del_v = cs.volumes.delete(v)
         cs.assert_called('DELETE', '/volumes/1234')
+        self._assert_request_id(del_v)
 
     def test_create_volume(self):
-        cs.volumes.create(1)
+        vol = cs.volumes.create(1)
         cs.assert_called('POST', '/volumes')
+        self._assert_request_id(vol)
 
     def test_create_volume_with_hint(self):
-        cs.volumes.create(1, scheduler_hints='uuid')
+        vol = cs.volumes.create(1, scheduler_hints='uuid')
         expected = {'volume': {'status': 'creating',
                                'description': None,
                                'availability_zone': None,
@@ -99,31 +107,42 @@ class VolumesTest(utils.TestCase):
                                'multiattach': False},
                     'OS-SCH-HNT:scheduler_hints': 'uuid'}
         cs.assert_called('POST', '/volumes', body=expected)
+        self._assert_request_id(vol)
 
     def test_attach(self):
         v = cs.volumes.get('1234')
-        cs.volumes.attach(v, 1, '/dev/vdc', mode='ro')
+        self._assert_request_id(v)
+        vol = cs.volumes.attach(v, 1, '/dev/vdc', mode='ro')
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_attach_to_host(self):
         v = cs.volumes.get('1234')
-        cs.volumes.attach(v, None, None, host_name='test', mode='rw')
+        self._assert_request_id(v)
+        vol = cs.volumes.attach(v, None, None, host_name='test', mode='rw')
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_detach(self):
         v = cs.volumes.get('1234')
-        cs.volumes.detach(v, 'abc123')
+        self._assert_request_id(v)
+        vol = cs.volumes.detach(v, 'abc123')
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_reserve(self):
         v = cs.volumes.get('1234')
-        cs.volumes.reserve(v)
+        self._assert_request_id(v)
+        vol = cs.volumes.reserve(v)
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_unreserve(self):
         v = cs.volumes.get('1234')
-        cs.volumes.unreserve(v)
+        self._assert_request_id(v)
+        vol = cs.volumes.unreserve(v)
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_begin_detaching(self):
         v = cs.volumes.get('1234')
@@ -132,126 +151,161 @@ class VolumesTest(utils.TestCase):
 
     def test_roll_detaching(self):
         v = cs.volumes.get('1234')
-        cs.volumes.roll_detaching(v)
+        self._assert_request_id(v)
+        vol = cs.volumes.roll_detaching(v)
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_initialize_connection(self):
         v = cs.volumes.get('1234')
-        cs.volumes.initialize_connection(v, {})
+        self._assert_request_id(v)
+        vol = cs.volumes.initialize_connection(v, {})
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_terminate_connection(self):
         v = cs.volumes.get('1234')
-        cs.volumes.terminate_connection(v, {})
+        self._assert_request_id(v)
+        vol = cs.volumes.terminate_connection(v, {})
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_set_metadata(self):
-        cs.volumes.set_metadata(1234, {'k1': 'v2'})
+        vol = cs.volumes.set_metadata(1234, {'k1': 'v2'})
         cs.assert_called('POST', '/volumes/1234/metadata',
                          {'metadata': {'k1': 'v2'}})
+        self._assert_request_id(vol)
 
     def test_delete_metadata(self):
         keys = ['key1']
-        cs.volumes.delete_metadata(1234, keys)
+        vol = cs.volumes.delete_metadata(1234, keys)
         cs.assert_called('DELETE', '/volumes/1234/metadata/key1')
+        self._assert_request_id(vol)
 
     def test_extend(self):
         v = cs.volumes.get('1234')
-        cs.volumes.extend(v, 2)
+        self._assert_request_id(v)
+        vol = cs.volumes.extend(v, 2)
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_reset_state(self):
         v = cs.volumes.get('1234')
-        cs.volumes.reset_state(v, 'in-use', attach_status='detached',
-                               migration_status='none')
+        self._assert_request_id(v)
+        vol = cs.volumes.reset_state(v, 'in-use', attach_status='detached',
+                                     migration_status='none')
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_get_encryption_metadata(self):
-        cs.volumes.get_encryption_metadata('1234')
+        vol = cs.volumes.get_encryption_metadata('1234')
         cs.assert_called('GET', '/volumes/1234/encryption')
+        self._assert_request_id(vol)
 
     def test_migrate(self):
         v = cs.volumes.get('1234')
-        cs.volumes.migrate_volume(v, 'dest', False, False)
+        self._assert_request_id(v)
+        vol = cs.volumes.migrate_volume(v, 'dest', False, False)
         cs.assert_called('POST', '/volumes/1234/action',
                          {'os-migrate_volume': {'host': 'dest',
                                                 'force_host_copy': False,
                                                 'lock_volume': False}})
+        self._assert_request_id(vol)
 
     def test_migrate_with_lock_volume(self):
         v = cs.volumes.get('1234')
-        cs.volumes.migrate_volume(v, 'dest', False, True)
+        self._assert_request_id(v)
+        vol = cs.volumes.migrate_volume(v, 'dest', False, True)
         cs.assert_called('POST', '/volumes/1234/action',
                          {'os-migrate_volume': {'host': 'dest',
                                                 'force_host_copy': False,
                                                 'lock_volume': True}})
+        self._assert_request_id(vol)
 
     def test_metadata_update_all(self):
-        cs.volumes.update_all_metadata(1234, {'k1': 'v1'})
+        vol = cs.volumes.update_all_metadata(1234, {'k1': 'v1'})
         cs.assert_called('PUT', '/volumes/1234/metadata',
                          {'metadata': {'k1': 'v1'}})
+        self._assert_request_id(vol)
 
     def test_readonly_mode_update(self):
         v = cs.volumes.get('1234')
-        cs.volumes.update_readonly_flag(v, True)
+        self._assert_request_id(v)
+        vol = cs.volumes.update_readonly_flag(v, True)
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_retype(self):
         v = cs.volumes.get('1234')
-        cs.volumes.retype(v, 'foo', 'on-demand')
+        self._assert_request_id(v)
+        vol = cs.volumes.retype(v, 'foo', 'on-demand')
         cs.assert_called('POST', '/volumes/1234/action',
                          {'os-retype': {'new_type': 'foo',
                                         'migration_policy': 'on-demand'}})
+        self._assert_request_id(vol)
 
     def test_set_bootable(self):
         v = cs.volumes.get('1234')
-        cs.volumes.set_bootable(v, True)
+        self._assert_request_id(v)
+        vol = cs.volumes.set_bootable(v, True)
         cs.assert_called('POST', '/volumes/1234/action')
+        self._assert_request_id(vol)
 
     def test_volume_manage(self):
-        cs.volumes.manage('host1', {'k': 'v'})
+        vol = cs.volumes.manage('host1', {'k': 'v'})
         expected = {'host': 'host1', 'name': None, 'availability_zone': None,
                     'description': None, 'metadata': None, 'ref': {'k': 'v'},
                     'volume_type': None, 'bootable': False}
         cs.assert_called('POST', '/os-volume-manage', {'volume': expected})
+        self._assert_request_id(vol)
 
     def test_volume_manage_bootable(self):
-        cs.volumes.manage('host1', {'k': 'v'}, bootable=True)
+        vol = cs.volumes.manage('host1', {'k': 'v'}, bootable=True)
         expected = {'host': 'host1', 'name': None, 'availability_zone': None,
                     'description': None, 'metadata': None, 'ref': {'k': 'v'},
                     'volume_type': None, 'bootable': True}
         cs.assert_called('POST', '/os-volume-manage', {'volume': expected})
+        self._assert_request_id(vol)
 
     def test_volume_unmanage(self):
         v = cs.volumes.get('1234')
-        cs.volumes.unmanage(v)
+        self._assert_request_id(v)
+        vol = cs.volumes.unmanage(v)
         cs.assert_called('POST', '/volumes/1234/action', {'os-unmanage': None})
+        self._assert_request_id(vol)
 
     def test_snapshot_manage(self):
-        cs.volume_snapshots.manage('volume_id1', {'k': 'v'})
+        vol = cs.volume_snapshots.manage('volume_id1', {'k': 'v'})
         expected = {'volume_id': 'volume_id1', 'name': None,
                     'description': None, 'metadata': None, 'ref': {'k': 'v'}}
         cs.assert_called('POST', '/os-snapshot-manage', {'snapshot': expected})
+        self._assert_request_id(vol)
 
     def test_replication_promote(self):
         v = cs.volumes.get('1234')
-        cs.volumes.promote(v)
+        self._assert_request_id(v)
+        vol = cs.volumes.promote(v)
         cs.assert_called('POST', '/volumes/1234/action',
                          {'os-promote-replica': None})
+        self._assert_request_id(vol)
 
     def test_replication_reenable(self):
         v = cs.volumes.get('1234')
-        cs.volumes.reenable(v)
+        self._assert_request_id(v)
+        vol = cs.volumes.reenable(v)
         cs.assert_called('POST', '/volumes/1234/action',
                          {'os-reenable-replica': None})
+        self._assert_request_id(vol)
 
     def test_get_pools(self):
-        cs.volumes.get_pools('')
+        vol = cs.volumes.get_pools('')
         cs.assert_called('GET', '/scheduler-stats/get_pools')
+        self._assert_request_id(vol)
 
     def test_get_pools_detail(self):
-        cs.volumes.get_pools('--detail')
+        vol = cs.volumes.get_pools('--detail')
         cs.assert_called('GET', '/scheduler-stats/get_pools?detail=True')
+        self._assert_request_id(vol)
 
 
 class FormatSortParamTestCase(utils.TestCase):
