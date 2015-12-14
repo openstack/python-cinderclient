@@ -11,6 +11,7 @@ covhtml
 AUTHORS
 ChangeLog
 doc/build
+releasenotes/build
 build
 dist
 cinderclient/versioninfo
