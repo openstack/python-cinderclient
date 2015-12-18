@@ -22,12 +22,7 @@ from __future__ import print_function
 
 import argparse
 import getpass
-import glob
-import imp
-import itertools
 import logging
-import os
-import pkgutil
 import sys
 
 import requests
@@ -36,7 +31,6 @@ from cinderclient import client
 from cinderclient import exceptions as exc
 from cinderclient import utils
 import cinderclient.auth_plugin
-import cinderclient.extension
 from cinderclient.openstack.common import importutils
 from cinderclient.openstack.common.gettextutils import _
 from cinderclient.v1 import shell as shell_v1
@@ -412,42 +406,6 @@ class OpenStackCinderShell(object):
 
         return parser
 
-    def _discover_extensions(self, version):
-        extensions = []
-        for name, module in itertools.chain(
-                self._discover_via_python_path(version),
-                self._discover_via_contrib_path(version)):
-
-            extension = cinderclient.extension.Extension(name, module)
-            extensions.append(extension)
-
-        return extensions
-
-    def _discover_via_python_path(self, version):
-        for (module_loader, name, ispkg) in pkgutil.iter_modules():
-            if name.endswith('python_cinderclient_ext'):
-                if not hasattr(module_loader, 'load_module'):
-                    # Python 2.6 compat: actually get an ImpImporter obj
-                    module_loader = module_loader.find_module(name)
-
-                module = module_loader.load_module(name)
-                yield name, module
-
-    def _discover_via_contrib_path(self, version):
-        module_path = os.path.dirname(os.path.abspath(__file__))
-        version_str = "v%s" % version.replace('.', '_')
-        ext_path = os.path.join(module_path, version_str, 'contrib')
-        ext_glob = os.path.join(ext_path, "*.py")
-
-        for ext_path in glob.iglob(ext_glob):
-            name = os.path.basename(ext_path)[:-3]
-
-            if name == "__init__":
-                continue
-
-            module = imp.load_source(name, ext_path)
-            yield name, module
-
     def _add_bash_completion_subparser(self, subparsers):
         subparser = subparsers.add_parser(
             'bash_completion',
@@ -540,7 +498,7 @@ class OpenStackCinderShell(object):
             api_version_input = False
 
         # build available subcommands based on version
-        self.extensions = self._discover_extensions(
+        self.extensions = client.discover_extensions(
             options.os_volume_api_version)
         self._run_extension_hooks('__pre_parse_args__')
 

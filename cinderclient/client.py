@@ -20,7 +20,12 @@ OpenStack Client interface. Handles the REST calls and responses.
 
 from __future__ import print_function
 
+import glob
+import imp
+import itertools
 import logging
+import os
+import pkgutil
 import re
 import six
 
@@ -31,6 +36,7 @@ from keystoneclient import discover
 import requests
 
 from cinderclient import exceptions
+import cinderclient.extension
 from cinderclient.openstack.common import importutils
 from cinderclient.openstack.common.gettextutils import _
 from oslo_utils import strutils
@@ -568,6 +574,45 @@ def get_client_class(version):
         raise exceptions.UnsupportedVersion(msg)
 
     return importutils.import_class(client_path)
+
+
+def discover_extensions(version):
+    extensions = []
+    for name, module in itertools.chain(
+            _discover_via_python_path(),
+            _discover_via_contrib_path(version)):
+
+        extension = cinderclient.extension.Extension(name, module)
+        extensions.append(extension)
+
+    return extensions
+
+
+def _discover_via_python_path():
+    for (module_loader, name, ispkg) in pkgutil.iter_modules():
+        if name.endswith('python_cinderclient_ext'):
+            if not hasattr(module_loader, 'load_module'):
+                # Python 2.6 compat: actually get an ImpImporter obj
+                module_loader = module_loader.find_module(name)
+
+            module = module_loader.load_module(name)
+            yield name, module
+
+
+def _discover_via_contrib_path(version):
+    module_path = os.path.dirname(os.path.abspath(__file__))
+    version_str = "v%s" % version.replace('.', '_')
+    ext_path = os.path.join(module_path, version_str, 'contrib')
+    ext_glob = os.path.join(ext_path, "*.py")
+
+    for ext_path in glob.iglob(ext_glob):
+        name = os.path.basename(ext_path)[:-3]
+
+        if name == "__init__":
+            continue
+
+        module = imp.load_source(name, ext_path)
+        yield name, module
 
 
 def Client(version, *args, **kwargs):
