@@ -1178,3 +1178,21 @@ class ShellTest(utils.TestCase):
             pass
         expected = {"os-show_image_metadata": None}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_snapshot_manage(self):
+        self.run_command('snapshot-manage 1234 some_fake_name '
+                         '--name foo --description bar '
+                         '--metadata k1=v1 k2=v2')
+        expected = {'snapshot': {'volume_id': 1234,
+                                 'ref': {'source-name': 'some_fake_name'},
+                                 'name': 'foo',
+                                 'description': 'bar',
+                                 'metadata': {'k1': 'v1', 'k2': 'v2'}
+                                 }}
+        self.assert_called_anytime('POST', '/os-snapshot-manage',
+                                   body=expected)
+
+    def test_snapshot_unmanage(self):
+        self.run_command('snapshot-unmanage 1234')
+        self.assert_called('POST', '/snapshots/1234/action',
+                           body={'os-unmanage': None})

@@ -227,6 +227,12 @@ class VolumesTest(utils.TestCase):
         cs.volumes.unmanage(v)
         cs.assert_called('POST', '/volumes/1234/action', {'os-unmanage': None})
 
+    def test_snapshot_manage(self):
+        cs.volume_snapshots.manage('volume_id1', {'k': 'v'})
+        expected = {'volume_id': 'volume_id1', 'name': None,
+                    'description': None, 'metadata': None, 'ref': {'k': 'v'}}
+        cs.assert_called('POST', '/os-snapshot-manage', {'snapshot': expected})
+
     def test_replication_promote(self):
         v = cs.volumes.get('1234')
         cs.volumes.promote(v)

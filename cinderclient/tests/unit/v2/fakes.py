@@ -353,6 +353,8 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert 'status' in body['os-reset_status']
         elif action == 'os-update_snapshot_status':
             assert 'status' in body['os-update_snapshot_status']
+        elif action == 'os-unmanage':
+            assert body[action] is None
         else:
             raise AssertionError('Unexpected action: %s' % action)
         return (resp, {}, _body)
@@ -1076,6 +1078,11 @@ class FakeHTTPClient(base_client.HTTPClient):
         volume = _stub_volume(id='1234')
         volume.update(kw['body']['volume'])
         return (202, {}, {'volume': volume})
+
+    def post_os_snapshot_manage(self, **kw):
+        snapshot = _stub_snapshot(id='1234', volume_id='volume_id1')
+        snapshot.update(kw['body']['snapshot'])
+        return (202, {}, {'snapshot': snapshot})
 
     def post_os_promote_replica_1234(self, **kw):
         return (202, {}, {})
