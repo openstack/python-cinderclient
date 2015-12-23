@@ -1524,8 +1524,7 @@ def do_backup_import(cs, args):
 @utils.arg('--state', metavar='<state>',
            default='available',
            help='The state to assign to the backup. Valid values are '
-                '"available", "error", "creating", "deleting", and '
-                '"error_deleting". Default=available.')
+                '"available", "error". Default=available.')
 @utils.service_type('volumev2')
 def do_backup_reset_state(cs, args):
     """Explicitly updates the backup state."""
