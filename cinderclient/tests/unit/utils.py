@@ -68,8 +68,8 @@ class FixturedTestCase(TestCase):
             self.data_fixture = self.useFixture(fix)
 
     def assert_called(self, method, path, body=None):
-        self.assertEqual(self.requests.last_request.method, method)
-        self.assertEqual(self.requests.last_request.path_url, path)
+        self.assertEqual(method, self.requests.last_request.method)
+        self.assertEqual(path, self.requests.last_request.path_url)
 
         if body:
             req_data = self.requests.last_request.body
@@ -78,7 +78,7 @@ class FixturedTestCase(TestCase):
             if not isinstance(body, six.string_types):
                 # json load if the input body to match against is not a string
                 req_data = json.loads(req_data)
-            self.assertEqual(req_data, body)
+            self.assertEqual(body, req_data)
 
 
 class TestResponse(requests.Response):

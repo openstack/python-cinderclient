@@ -156,7 +156,7 @@ class ClientTest(utils.TestCase):
             resp, body = cl.get("/hi")
 
         test_get_call()
-        self.assertEqual(self.requests, [])
+        self.assertEqual([], self.requests)
 
     def test_retry_limit(self):
         cl = get_authed_client(retries=1)
@@ -277,4 +277,4 @@ class ClientTest(utils.TestCase):
             resp, body = cl.get("/hi")
 
         test_get_call()
-        self.assertEqual(self.requests, [])
+        self.assertEqual([], self.requests)
