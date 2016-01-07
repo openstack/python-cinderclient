@@ -24,9 +24,9 @@ class Volume(base.Resource):
     def __repr__(self):
         return "<Volume: %s>" % self.id
 
-    def delete(self):
+    def delete(self, cascade=False):
         """Delete this volume."""
-        return self.manager.delete(self)
+        return self.manager.delete(self, cascade=cascade)
 
     def update(self, **kwargs):
         """Update the name or description for this volume."""
@@ -297,12 +297,19 @@ class VolumeManager(base.ManagerWithFind):
                                    sort_dir=sort_dir, sort=sort)
         return self._list(url, resource_type, limit=limit)
 
-    def delete(self, volume):
+    def delete(self, volume, cascade=False):
         """Delete a volume.
 
         :param volume: The :class:`Volume` to delete.
+        :param cascade: Also delete dependent snapshots.
         """
-        return self._delete("/volumes/%s" % base.getid(volume))
+
+        loc = "/volumes/%s" % base.getid(volume)
+
+        if cascade:
+            loc += '?cascade=True'
+
+        return self._delete(loc)
 
     def update(self, volume, **kwargs):
         """Update the name or description for a volume.
