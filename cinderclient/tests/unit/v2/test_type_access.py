@@ -29,7 +29,7 @@ class TypeAccessTest(utils.TestCase):
         access = cs.volume_type_access.list(volume_type='3')
         cs.assert_called('GET', '/types/3/os-volume-type-access')
         for a in access:
-            self.assertTrue(isinstance(a, volume_type_access.VolumeTypeAccess))
+            self.assertIsInstance(a, volume_type_access.VolumeTypeAccess)
 
     def test_add_project_access(self):
         cs.volume_type_access.add_project_access('3', PROJECT_UUID)
