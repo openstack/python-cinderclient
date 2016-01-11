@@ -1308,7 +1308,7 @@ def do_replication_list_targets(cs, args):
            help='ID of volume to failover.')
 @utils.arg('secondary',
            metavar='<secondary>',
-           help='A unqiue identifier that represents a failover target.')
+           help='A unique identifier that represents a failover target.')
 @utils.service_type('volumev2')
 def do_replication_failover(cs, args):
     """Failover a volume to a secondary target"""
