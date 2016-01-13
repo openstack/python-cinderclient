@@ -590,7 +590,7 @@ def discover_extensions(version):
 
 def _discover_via_python_path():
     for (module_loader, name, ispkg) in pkgutil.iter_modules():
-        if name.endswith('python_cinderclient_ext'):
+        if name.endswith('cinderclient_ext'):
             if not hasattr(module_loader, 'load_module'):
                 # Python 2.6 compat: actually get an ImpImporter obj
                 module_loader = module_loader.find_module(name)
