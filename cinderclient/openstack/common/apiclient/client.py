@@ -33,13 +33,16 @@ try:
 except ImportError:
     import json
 
+import hashlib
 import requests
 
 from cinderclient.openstack.common.apiclient import exceptions
 from cinderclient.openstack.common import importutils
+from oslo_utils import encodeutils
 
 
 _logger = logging.getLogger(__name__)
+SENSITIVE_HEADERS = ('X-Auth-Token', 'X-Subject-Token',)
 
 
 class HTTPClient(object):
@@ -97,6 +100,16 @@ class HTTPClient(object):
 
         self.cached_token = None
 
+    def _safe_header(self, name, value):
+        if name in SENSITIVE_HEADERS:
+            encoded = value.encode('utf-8')
+            hashed = hashlib.sha1(encoded)
+            digested = hashed.hexdigest()
+            return encodeutils.safe_decode(name), "{SHA1}%s" % digested
+        else:
+            return (encodeutils.safe_decode(name),
+                    encodeutils.safe_decode(value))
+
     def _http_log_req(self, method, url, kwargs):
         if not self.debug:
             return
@@ -108,7 +121,8 @@ class HTTPClient(object):
         ]
 
         for element in kwargs['headers']:
-            header = "-H '%s: %s'" % (element, kwargs['headers'][element])
+            header = ("-H '%s: %s'" %
+                      self._safe_header(element, kwargs['headers'][element]))
             string_parts.append(header)
 
         _logger.debug("REQ: %s" % " ".join(string_parts))

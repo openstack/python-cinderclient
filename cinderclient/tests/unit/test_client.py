@@ -188,3 +188,30 @@ class ClientTest(utils.TestCase):
         # AuthorizationFailure exception, check exceptions.from_response
         # is not getting called.
         self.assertFalse(mock_from_resp.called)
+
+
+class ClientTestSensitiveInfo(utils.TestCase):
+    def test_req_does_not_log_sensitive_info(self):
+        self.logger = self.useFixture(
+            fixtures.FakeLogger(
+                format="%(message)s",
+                level=logging.DEBUG,
+                nuke_handlers=True
+            )
+        )
+
+        secret_auth_token = "MY_SECRET_AUTH_TOKEN"
+        kwargs = {
+            'headers': {"X-Auth-Token": secret_auth_token},
+            'data': ('{"auth": {"tenantName": "fakeService",'
+                     ' "passwordCredentials": {"username": "fakeUser",'
+                     ' "password": "fakePassword"}}}')
+        }
+
+        cs = cinderclient.client.HTTPClient("user", None, None,
+                                            "http://127.0.0.1:5000")
+        cs.http_log_debug = True
+        cs.http_log_req('PUT', kwargs)
+
+        output = self.logger.output.split('\n')
+        self.assertNotIn(secret_auth_token, output[1])
