@@ -13,10 +13,9 @@ command-line tool. You may also want to look at the
 .. _OpenStack API documentation: http://developer.openstack.org/api-ref.html
 
 The project is hosted on `Launchpad`_, where bugs can be filed. The code is
-hosted on `Github`_. Patches must be submitted using `Gerrit`_, *not* Github
-pull requests.
+hosted on `OpenStack`_. Patches must be submitted using `Gerrit`_.
 
-.. _Github: https://github.com/openstack/python-cinderclient
+.. _OpenStack: https://git.openstack.org/cgit/openstack/python-cinderclient
 .. _Launchpad: https://launchpad.net/python-cinderclient
 .. _Gerrit: http://docs.openstack.org/infra/manual/developers.html#development-workflow
 
