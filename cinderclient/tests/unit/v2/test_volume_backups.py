@@ -73,6 +73,10 @@ class VolumeBackupsTest(utils.TestCase):
         cs.assert_called('GET', '/backups/detail?sort=id')
         self._assert_request_id(lst)
 
+    def test_sorted_list_by_data_timestamp(self):
+        cs.backups.list(sort="data_timestamp")
+        cs.assert_called('GET', '/backups/detail?sort=data_timestamp')
+
     def test_delete(self):
         b = cs.backups.list()[0]
         del_back = b.delete()

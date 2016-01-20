@@ -37,6 +37,8 @@ SORT_KEY_VALUES = ('id', 'status', 'size', 'availability_zone', 'name',
                    'bootable', 'created_at')
 # Mapping of client keys to actual sort keys
 SORT_KEY_MAPPINGS = {'name': 'display_name'}
+# Additional sort keys for resources
+SORT_KEY_ADD_VALUES = {'backups': ('data_timestamp', ), }
 
 Resource = common_base.Resource
 
@@ -137,12 +139,14 @@ class Manager(common_base.HookableMixin):
             query_params['limit'] = limit
 
         if sort:
-            query_params['sort'] = self._format_sort_param(sort)
+            query_params['sort'] = self._format_sort_param(sort,
+                                                           resource_type)
         else:
             # sort_key and sort_dir deprecated in kilo, prefer sort
             if sort_key:
                 query_params['sort_key'] = self._format_sort_key_param(
-                    sort_key)
+                    sort_key,
+                    resource_type)
 
             if sort_dir:
                 query_params['sort_dir'] = self._format_sort_dir_param(
@@ -163,7 +167,7 @@ class Manager(common_base.HookableMixin):
                 {"resource_type": resource_type, "detail": detail,
                  "query_string": query_string})
 
-    def _format_sort_param(self, sort):
+    def _format_sort_param(self, sort, resource_type=None):
         '''Formats the sort information into the sort query string parameter.
 
         The input sort information can be any of the following:
@@ -196,11 +200,7 @@ class Manager(common_base.HookableMixin):
             else:
                 sort_key, _sep, sort_dir = sort_item.partition(':')
             sort_key = sort_key.strip()
-            if sort_key in SORT_KEY_VALUES:
-                sort_key = SORT_KEY_MAPPINGS.get(sort_key, sort_key)
-            else:
-                raise ValueError('sort_key must be one of the following: %s.'
-                                 % ', '.join(SORT_KEY_VALUES))
+            sort_key = self._format_sort_key_param(sort_key, resource_type)
             if sort_dir:
                 sort_dir = sort_dir.strip()
                 if sort_dir not in SORT_DIR_VALUES:
@@ -212,12 +212,18 @@ class Manager(common_base.HookableMixin):
                 sort_array.append(sort_key)
         return ','.join(sort_array)
 
-    def _format_sort_key_param(self, sort_key):
-        if sort_key in SORT_KEY_VALUES:
+    def _format_sort_key_param(self, sort_key, resource_type=None):
+        valid_sort_keys = SORT_KEY_VALUES
+        if resource_type:
+            add_sort_keys = SORT_KEY_ADD_VALUES.get(resource_type, None)
+            if add_sort_keys:
+                valid_sort_keys += add_sort_keys
+
+        if sort_key in valid_sort_keys:
             return SORT_KEY_MAPPINGS.get(sort_key, sort_key)
 
         msg = ('sort_key must be one of the following: %s.' %
-               ', '.join(SORT_KEY_VALUES))
+               ', '.join(valid_sort_keys))
         raise ValueError(msg)
 
     def _format_sort_dir_param(self, sort_dir):
