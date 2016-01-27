@@ -23,6 +23,7 @@ import requests
 from six import moves
 from testtools import matchers
 
+import cinderclient
 from cinderclient import exceptions
 from cinderclient import auth_plugin
 from cinderclient import shell
@@ -197,6 +198,21 @@ class ShellTest(utils.TestCase):
             data='{"fake": "me"}',
             allow_redirects=True,
             **self.TEST_REQUEST_BASE)
+
+    @mock.patch.object(cinderclient.client.HTTPClient, 'authenticate',
+                       side_effect=exceptions.Unauthorized('No'))
+    # Easiest way to make cinderclient use httpclient is a None session
+    @mock.patch.object(cinderclient.shell.OpenStackCinderShell,
+                       '_get_keystone_session', return_value=None)
+    def test_http_client_insecure(self, mock_authenticate, mock_session):
+        self.make_env(include={'CINDERCLIENT_INSECURE': True})
+
+        _shell = shell.OpenStackCinderShell()
+
+        # This "fails" but instantiates the client.
+        self.assertRaises(exceptions.CommandError, _shell.main, ['list'])
+
+        self.assertEqual(False, _shell.cs.client.verify_cert)
 
 
 class CinderClientArgumentParserTest(utils.TestCase):

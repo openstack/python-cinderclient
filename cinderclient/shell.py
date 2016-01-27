@@ -628,6 +628,8 @@ class OpenStackCinderShell(object):
         if not auth_plugin:
             auth_session = self._get_keystone_session()
 
+        insecure = self.options.insecure
+
         self.cs = client.Client(options.os_volume_api_version, os_username,
                                 os_password, os_tenant_name, os_auth_url,
                                 region_name=os_region_name,
@@ -640,6 +642,7 @@ class OpenStackCinderShell(object):
                                 bypass_url=bypass_url,
                                 retries=options.retries,
                                 http_log_debug=args.debug,
+                                insecure=insecure,
                                 cacert=cacert, auth_system=os_auth_system,
                                 auth_plugin=auth_plugin,
                                 session=auth_session)
