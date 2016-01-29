@@ -1,0 +1,10 @@
+---
+features:
+  - Added support to return "x-openstack-request-id" header in request_ids attribute
+    for better tracing.
+
+    | For ex.
+    | >>> from cinderclient import client
+    | >>> cinder = client.Client('2', $OS_USER_NAME, $OS_PASSWORD, $OS_TENANT_NAME, $OS_AUTH_URL)
+    | >>> res = cinder.volumes.list()
+    | >>> res.request_ids
