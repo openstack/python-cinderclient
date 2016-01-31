@@ -29,7 +29,8 @@ class VolumeType(base.Resource):
         """
         Provide a user-friendly accessor to os-volume-type-access:is_public
         """
-        return self._info.get("os-volume-type-access:is_public", 'N/A')
+        return self._info.get("os-volume-type-access:is_public",
+                              self._info.get("is_public", 'N/A'))
 
     def get_keys(self):
         """Get extra specs from a volume type.
