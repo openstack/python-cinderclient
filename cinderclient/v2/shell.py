@@ -165,6 +165,12 @@ def _extract_metadata(args):
            metavar='<status>',
            default=None,
            help='Filters results by a status. Default=None.')
+@utils.arg('--bootable',
+           metavar='<True|true|False|false>',
+           const=True,
+           nargs='?',
+           choices=['True', 'true', 'False', 'false'],
+           help='Filters results by bootable status. Default=None.')
 @utils.arg('--migration_status',
            metavar='<migration_status>',
            default=None,
@@ -229,6 +235,7 @@ def do_list(cs, args):
         'project_id': args.tenant,
         'name': args.name,
         'status': args.status,
+        'bootable': args.bootable,
         'migration_status': args.migration_status,
         'metadata': _extract_metadata(args) if args.metadata else None,
     }

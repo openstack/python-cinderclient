@@ -194,6 +194,14 @@ class ShellTest(utils.TestCase):
         self.run_command('list --status=available')
         self.assert_called('GET', '/volumes/detail?status=available')
 
+    def test_list_filter_bootable_true(self):
+        self.run_command('list --bootable=true')
+        self.assert_called('GET', '/volumes/detail?bootable=true')
+
+    def test_list_filter_bootable_false(self):
+        self.run_command('list --bootable=false')
+        self.assert_called('GET', '/volumes/detail?bootable=false')
+
     def test_list_filter_name(self):
         self.run_command('list --name=1234')
         self.assert_called('GET', '/volumes/detail?name=1234')
