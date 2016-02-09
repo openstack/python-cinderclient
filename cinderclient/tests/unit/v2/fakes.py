@@ -806,6 +806,12 @@ class FakeHTTPClient(base_client.HTTPClient):
     def delete_backups_76a17945_3c6f_435c_975b_b5685db10b62(self, **kw):
         return (202, {}, None)
 
+    def delete_backups_1234(self, **kw):
+        return (202, {}, None)
+
+    def delete_backups_5678(self, **kw):
+        return (202, {}, None)
+
     def post_backups(self, **kw):
         base_uri = 'http://localhost:8776'
         tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'

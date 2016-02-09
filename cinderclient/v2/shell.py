@@ -1472,13 +1472,22 @@ def do_backup_list(cs, args):
     utils.print_list(backups, columns)
 
 
-@utils.arg('backup', metavar='<backup>',
-           help='Name or ID of backup to delete.')
+@utils.arg('backup', metavar='<backup>', nargs='+',
+           help='Name or ID of backup(s) to delete.')
 @utils.service_type('volumev2')
 def do_backup_delete(cs, args):
-    """Removes a backup."""
-    backup = _find_backup(cs, args.backup)
-    backup.delete()
+    """Removes one or more backups."""
+    failure_count = 0
+    for backup in args.backup:
+        try:
+            _find_backup(cs, backup).delete()
+            print("Request to delete backup %s has been accepted." % (backup))
+        except Exception as e:
+            failure_count += 1
+            print("Delete for backup %s failed: %s" % (backup, e))
+    if failure_count == len(args.backup):
+        raise exceptions.CommandError("Unable to delete any of the specified "
+                                      "backups.")
 
 
 @utils.arg('backup', metavar='<backup>',
