@@ -26,6 +26,7 @@ Base utilities to build API operation managers and objects on top of.
 import abc
 import copy
 
+from requests import Response
 import six
 from six.moves.urllib import parse
 
@@ -409,7 +410,43 @@ class Extension(HookableMixin):
         return "<Extension '%s'>" % self.name
 
 
-class Resource(object):
+class RequestIdMixin(object):
+    """Wrapper class to expose x-openstack-request-id to the caller."""
+    def setup(self):
+        self.x_openstack_request_ids = []
+
+    @property
+    def request_ids(self):
+        return self.x_openstack_request_ids
+
+    def append_request_ids(self, resp):
+        """Add request_ids as an attribute to the object
+
+        :param resp: list, Response object or string
+        """
+        if resp is None:
+            return
+
+        if isinstance(resp, list):
+            # Add list of request_ids if response is of type list.
+            for resp_obj in resp:
+                self._append_request_id(resp_obj)
+        else:
+            # Add request_ids if response contains single object.
+            self._append_request_id(resp)
+
+    def _append_request_id(self, resp):
+        if isinstance(resp, Response):
+            # Extract 'x-openstack-request-id' from headers if
+            # response is a Response object.
+            request_id = resp.headers.get('x-openstack-request-id')
+            self.x_openstack_request_ids.append(request_id)
+        else:
+            # If resp is of type string (in case of encryption type list)
+            self.x_openstack_request_ids.append(resp)
+
+
+class Resource(RequestIdMixin):
     """Base class for OpenStack resources (tenant, user, etc.).
 
     This is pretty much just a bag for attributes.
@@ -418,22 +455,26 @@ class Resource(object):
     HUMAN_ID = False
     NAME_ATTR = 'name'
 
-    def __init__(self, manager, info, loaded=False):
+    def __init__(self, manager, info, loaded=False, resp=None):
         """Populate and bind to a manager.
 
         :param manager: BaseManager object
         :param info: dictionary representing resource attributes
         :param loaded: prevent lazy-loading if set to True
+        :param resp: Response or list of Response objects
         """
         self.manager = manager
         self._info = info
         self._add_details(info)
         self._loaded = loaded
+        self.setup()
+        self.append_request_ids(resp)
 
     def __repr__(self):
         reprkeys = sorted(k
                           for k in self.__dict__.keys()
-                          if k[0] != '_' and k != 'manager')
+                          if k[0] != '_' and
+                          k not in ['manager', 'x_openstack_request_ids'])
         info = ", ".join("%s=%s" % (k, getattr(self, k)) for k in reprkeys)
         return "<%s %s>" % (self.__class__.__name__, info)
 
@@ -493,3 +534,26 @@ class Resource(object):
 
     def to_dict(self):
         return copy.deepcopy(self._info)
+
+
+class ListWithMeta(list, RequestIdMixin):
+    def __init__(self, values, resp):
+        super(ListWithMeta, self).__init__(values)
+        self.setup()
+        self.append_request_ids(resp)
+
+
+class DictWithMeta(dict, RequestIdMixin):
+    def __init__(self, values, resp):
+        super(DictWithMeta, self).__init__(values)
+        self.setup()
+        self.append_request_ids(resp)
+
+
+class TupleWithMeta(tuple, RequestIdMixin):
+    def __new__(cls, resp, values):
+        return super(TupleWithMeta, cls).__new__(cls, (resp, values))
+
+    def __init__(self, resp, values):
+        self.setup()
+        self.append_request_ids(resp)
