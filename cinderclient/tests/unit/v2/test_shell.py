@@ -415,6 +415,11 @@ class ShellTest(utils.TestCase):
         self.run_command('backup-create 1234 --snapshot-id 4321')
         self.assert_called('POST', '/backups')
 
+    def test_multiple_backup_delete(self):
+        self.run_command('backup-delete 1234 5678')
+        self.assert_called_anytime('DELETE', '/backups/1234')
+        self.assert_called('DELETE', '/backups/5678')
+
     def test_restore(self):
         self.run_command('backup-restore 1234')
         self.assert_called('POST', '/backups/1234/restore')
