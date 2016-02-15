@@ -13,11 +13,11 @@ This is a client for the OpenStack Cinder API. There's a Python API (the
 ``cinderclient`` module), and a command-line script (``cinder``). Each
 implements 100% of the OpenStack Cinder API.
 
-See the `OpenStack CLI guide`_ for information on how to use the ``cinder``
+See the `OpenStack CLI Reference`_ for information on how to use the ``cinder``
 command-line tool. You may also want to look at the
 `OpenStack API documentation`_.
 
-.. _OpenStack CLI Guide: http://docs.openstack.org/user-guide/content/ch_cli.html
+.. _OpenStack CLI Reference: http://docs.openstack.org/cli-reference/overview.html
 .. _OpenStack API documentation: http://developer.openstack.org/api-ref.html
 
 The project is hosted on `Launchpad`_, where bugs can be filed. The code is
