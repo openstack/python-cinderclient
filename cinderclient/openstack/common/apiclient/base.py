@@ -551,9 +551,9 @@ class DictWithMeta(dict, RequestIdMixin):
 
 
 class TupleWithMeta(tuple, RequestIdMixin):
-    def __new__(cls, resp, values):
-        return super(TupleWithMeta, cls).__new__(cls, (resp, values))
+    def __new__(cls, values, resp):
+        return super(TupleWithMeta, cls).__new__(cls, values)
 
-    def __init__(self, resp, values):
+    def __init__(self, values, resp):
         self.setup()
         self.append_request_ids(resp)

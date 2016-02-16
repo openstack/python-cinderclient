@@ -307,7 +307,7 @@ class Manager(common_base.HookableMixin):
 
     def _delete(self, url):
         resp, body = self.api.client.delete(url)
-        return common_base.TupleWithMeta(resp, body)
+        return common_base.TupleWithMeta((resp, body), resp)
 
     def _update(self, url, body, response_key=None, **kwargs):
         self.run_hooks('modify_body_for_update', body, **kwargs)
