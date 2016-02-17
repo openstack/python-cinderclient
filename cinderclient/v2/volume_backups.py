@@ -102,18 +102,18 @@ class VolumeBackupManager(base.ManagerWithFind):
         """Export volume backup metadata record.
 
         :param backup_id: The ID of the backup to export.
-        :rtype: :class:`VolumeBackup`
+        :rtype: A dictionary containing 'backup_url' and 'backup_service'.
         """
         resp, body = \
             self.api.client.get("/backups/%s/export_record" % backup_id)
         return body['backup-record']
 
     def import_record(self, backup_service, backup_url):
-        """Export volume backup metadata record.
+        """Import volume backup metadata record.
 
         :param backup_service: Backup service to use for importing the backup
         :param backup_url: Backup URL for importing the backup metadata
-        :rtype: :class:`VolumeBackup`
+        :rtype: A dictionary containing volume backup metadata.
         """
         body = {'backup-record': {'backup_service': backup_service,
                                   'backup_url': backup_url}}
