@@ -348,6 +348,7 @@ class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):
         elif num_matches > 1:
             raise exceptions.NoUniqueMatch
         else:
+            matches[0].append_request_ids(matches.request_ids)
             return matches[0]
 
     def findall(self, **kwargs):
@@ -370,13 +371,15 @@ class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):
         elif 'display_name' in kwargs:
             search_opts['display_name'] = kwargs['display_name']
 
-        found = []
+        found = common_base.ListWithMeta([], None)
         searches = kwargs.items()
 
+        listing = self.list(search_opts=search_opts)
+        found.append_request_ids(listing.request_ids)
         # Not all resources attributes support filters on server side
         # (e.g. 'human_id' doesn't), so when doing findall some client
         # side filtering is still needed.
-        for obj in self.list(search_opts=search_opts):
+        for obj in listing:
             try:
                 if all(getattr(obj, attr) == value
                        for (attr, value) in searches):

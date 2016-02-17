@@ -20,7 +20,9 @@ from six import moves
 from cinderclient import exceptions
 from cinderclient import utils
 from cinderclient import base
+from cinderclient.openstack.common.apiclient import base as common_base
 from cinderclient.tests.unit import utils as test_utils
+from cinderclient.tests.unit.v2 import fakes
 
 UUID = '8e8ec658-c7b0-4243-bdf8-6f7f2952c0d0'
 
@@ -34,6 +36,9 @@ class FakeResource(object):
             self.name = properties['name']
         except KeyError:
             pass
+
+    def append_request_ids(self, resp):
+        pass
 
 
 class FakeManager(base.ManagerWithFind):
@@ -53,7 +58,7 @@ class FakeManager(base.ManagerWithFind):
         raise exceptions.NotFound(resource_id)
 
     def list(self, search_opts):
-        return self.resources
+        return common_base.ListWithMeta(self.resources, fakes.REQUEST_ID)
 
 
 class FakeDisplayResource(object):
@@ -65,6 +70,9 @@ class FakeDisplayResource(object):
             self.display_name = properties['display_name']
         except KeyError:
             pass
+
+    def append_request_ids(self, resp):
+        pass
 
 
 class FakeDisplayManager(FakeManager):
