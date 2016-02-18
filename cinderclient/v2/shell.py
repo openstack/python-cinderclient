@@ -1682,11 +1682,21 @@ def do_extend(cs, args):
            help='Host name. Default=None.')
 @utils.arg('--binary', metavar='<binary>', default=None,
            help='Service binary. Default=None.')
+@utils.arg('--withreplication',
+           metavar='<True|False>',
+           const=True,
+           nargs='?',
+           default=False,
+           help='Enables or disables display of '
+                'Replication info for c-vol services. Default=False.')
 @utils.service_type('volumev2')
 def do_service_list(cs, args):
     """Lists all services. Filter by host and service binary."""
+    replication = strutils.bool_from_string(args.withreplication)
     result = cs.services.list(host=args.host, binary=args.binary)
     columns = ["Binary", "Host", "Zone", "Status", "State", "Updated_at"]
+    if replication:
+        columns.extend(["Replication Status", "Active Backend ID", "Frozen"])
     # NOTE(jay-lau-513): we check if the response has disabled_reason
     # so as not to add the column when the extended ext is not enabled.
     if result and hasattr(result[0], 'disabled_reason'):
@@ -2641,3 +2651,24 @@ def do_snapshot_unmanage(cs, args):
     """Stop managing a snapshot."""
     snapshot = _find_volume_snapshot(cs, args.snapshot)
     cs.volume_snapshots.unmanage(snapshot.id)
+
+
+@utils.arg('host', metavar='<hostname>', help='Host name.')
+@utils.service_type('volumev2')
+def do_freeze_host(cs, args):
+    cs.services.freeze_host(args.host)
+
+
+@utils.arg('host', metavar='<hostname>', help='Host name.')
+@utils.service_type('volumev2')
+def do_thaw_host(cs, args):
+    cs.services.thaw_host(args.host)
+
+
+@utils.arg('host', metavar='<hostname>', help='Host name.')
+@utils.arg('--backend_id',
+           metavar='<backend-id>',
+           help='ID of backend to failover to (Default=None)')
+@utils.service_type('volumev2')
+def do_failover_host(cs, args):
+    cs.services.failover_host(args.host, args.backend_id)

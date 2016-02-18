@@ -62,3 +62,18 @@ class ServiceManager(base.ManagerWithFind):
         body = {"host": host, "binary": binary, "disabled_reason": reason}
         result = self._update("/os-services/disable-log-reason", body)
         return self.resource_class(self, result, resp=result.request_ids)
+
+    def freeze_host(self, host):
+        """Freeze the service specified by hostname."""
+        body = {"host": host}
+        return self._update("/os-services/freeze", body)
+
+    def thaw_host(self, host):
+        """Thaw the service specified by hostname."""
+        body = {"host": host}
+        return self._update("/os-services/thaw", body)
+
+    def failover_host(self, host, backend_id):
+        """Failover a replicated backend by hostname."""
+        body = {"host": host, "backend_id": backend_id}
+        return self._update("/os-services/failover_host", body)
