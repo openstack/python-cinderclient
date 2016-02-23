@@ -17,6 +17,7 @@
 Volume Backups interface (1.1 extension).
 """
 from cinderclient import base
+from cinderclient.openstack.common.apiclient import base as common_base
 
 
 class VolumeBackup(base.Resource):
@@ -30,7 +31,7 @@ class VolumeBackup(base.Resource):
         return self.manager.delete(self)
 
     def reset_state(self, state):
-        self.manager.reset_state(self, state)
+        return self.manager.reset_state(self, state)
 
 
 class VolumeBackupManager(base.ManagerWithFind):
@@ -85,7 +86,7 @@ class VolumeBackupManager(base.ManagerWithFind):
 
         :param backup: The :class:`VolumeBackup` to delete.
         """
-        self._delete("/backups/%s" % base.getid(backup))
+        return self._delete("/backups/%s" % base.getid(backup))
 
     def reset_state(self, backup, state):
         """Update the specified volume backup with the provided state."""
@@ -96,7 +97,8 @@ class VolumeBackupManager(base.ManagerWithFind):
         body = {action: info}
         self.run_hooks('modify_body_for_action', body, **kwargs)
         url = '/backups/%s/action' % base.getid(backup)
-        return self.api.client.post(url, body=body)
+        resp, body = self.api.client.post(url, body=body)
+        return common_base.TupleWithMeta((resp, body), resp)
 
     def export_record(self, backup_id):
         """Export volume backup metadata record.
@@ -106,7 +108,7 @@ class VolumeBackupManager(base.ManagerWithFind):
         """
         resp, body = \
             self.api.client.get("/backups/%s/export_record" % backup_id)
-        return body['backup-record']
+        return common_base.DictWithMeta(body['backup-record'], resp)
 
     def import_record(self, backup_service, backup_url):
         """Import volume backup metadata record.
@@ -119,4 +121,4 @@ class VolumeBackupManager(base.ManagerWithFind):
                                   'backup_url': backup_url}}
         self.run_hooks('modify_body_for_update', body, 'backup-record')
         resp, body = self.api.client.post("/backups/import_record", body=body)
-        return body['backup']
+        return common_base.DictWithMeta(body['backup'], resp)

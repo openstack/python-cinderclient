@@ -98,4 +98,4 @@ class VolumeTransferManager(base.ManagerWithFind):
 
         :param transfer_id: The :class:`VolumeTransfer` to delete.
         """
-        self._delete("/os-volume-transfer/%s" % base.getid(transfer_id))
+        return self._delete("/os-volume-transfer/%s" % base.getid(transfer_id))

@@ -24,23 +24,27 @@ cs = fakes.FakeClient()
 class VolumeBackupsTest(utils.TestCase):
 
     def test_create(self):
-        cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4')
+        vol = cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4')
         cs.assert_called('POST', '/backups')
+        self._assert_request_id(vol)
 
     def test_create_full(self):
-        cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4',
-                          None, None, False)
+        vol = cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4',
+                                None, None, False)
         cs.assert_called('POST', '/backups')
+        self._assert_request_id(vol)
 
     def test_create_incremental(self):
-        cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4',
-                          None, None, True)
+        vol = cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4',
+                                None, None, True)
         cs.assert_called('POST', '/backups')
+        self._assert_request_id(vol)
 
     def test_create_force(self):
-        cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4',
-                          None, None, False, True)
+        vol = cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4',
+                                None, None, False, True)
         cs.assert_called('POST', '/backups')
+        self._assert_request_id(vol)
 
     def test_create_snapshot(self):
         cs.backups.create('2b695faf-b963-40c8-8464-274008fbcef4',
@@ -50,32 +54,39 @@ class VolumeBackupsTest(utils.TestCase):
 
     def test_get(self):
         backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
-        cs.backups.get(backup_id)
+        back = cs.backups.get(backup_id)
         cs.assert_called('GET', '/backups/%s' % backup_id)
+        self._assert_request_id(back)
 
     def test_list(self):
-        cs.backups.list()
+        lst = cs.backups.list()
         cs.assert_called('GET', '/backups/detail')
+        self._assert_request_id(lst)
 
     def test_list_with_pagination(self):
-        cs.backups.list(limit=2, marker=100)
+        lst = cs.backups.list(limit=2, marker=100)
         cs.assert_called('GET', '/backups/detail?limit=2&marker=100')
+        self._assert_request_id(lst)
 
     def test_sorted_list(self):
-        cs.backups.list(sort="id")
+        lst = cs.backups.list(sort="id")
         cs.assert_called('GET', '/backups/detail?sort=id')
+        self._assert_request_id(lst)
 
     def test_delete(self):
         b = cs.backups.list()[0]
-        b.delete()
+        del_back = b.delete()
         cs.assert_called('DELETE',
                          '/backups/76a17945-3c6f-435c-975b-b5685db10b62')
-        cs.backups.delete('76a17945-3c6f-435c-975b-b5685db10b62')
+        self._assert_request_id(del_back)
+        del_back = cs.backups.delete('76a17945-3c6f-435c-975b-b5685db10b62')
         cs.assert_called('DELETE',
                          '/backups/76a17945-3c6f-435c-975b-b5685db10b62')
-        cs.backups.delete(b)
+        self._assert_request_id(del_back)
+        del_back = cs.backups.delete(b)
         cs.assert_called('DELETE',
                          '/backups/76a17945-3c6f-435c-975b-b5685db10b62')
+        self._assert_request_id(del_back)
 
     def test_restore(self):
         backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
@@ -83,28 +94,34 @@ class VolumeBackupsTest(utils.TestCase):
         cs.assert_called('POST', '/backups/%s/restore' % backup_id)
         self.assertIsInstance(info,
                               volume_backups_restore.VolumeBackupsRestore)
+        self._assert_request_id(info)
 
     def test_reset_state(self):
         b = cs.backups.list()[0]
         api = '/backups/76a17945-3c6f-435c-975b-b5685db10b62/action'
-        b.reset_state(state='error')
+        st = b.reset_state(state='error')
         cs.assert_called('POST', api)
-        cs.backups.reset_state('76a17945-3c6f-435c-975b-b5685db10b62',
-                               state='error')
+        self._assert_request_id(st)
+        st = cs.backups.reset_state('76a17945-3c6f-435c-975b-b5685db10b62',
+                                    state='error')
         cs.assert_called('POST', api)
-        cs.backups.reset_state(b, state='error')
+        self._assert_request_id(st)
+        st = cs.backups.reset_state(b, state='error')
         cs.assert_called('POST', api)
+        self._assert_request_id(st)
 
     def test_record_export(self):
         backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
-        cs.backups.export_record(backup_id)
+        export = cs.backups.export_record(backup_id)
         cs.assert_called('GET',
                          '/backups/%s/export_record' % backup_id)
+        self._assert_request_id(export)
 
     def test_record_import(self):
         backup_service = 'fake-backup-service'
         backup_url = 'fake-backup-url'
         expected_body = {'backup-record': {'backup_service': backup_service,
                                            'backup_url': backup_url}}
-        cs.backups.import_record(backup_service, backup_url)
+        impt = cs.backups.import_record(backup_service, backup_url)
         cs.assert_called('POST', '/backups/import_record', expected_body)
+        self._assert_request_id(impt)

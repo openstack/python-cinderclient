@@ -14,7 +14,7 @@
 #    under the License.
 
 from cinderclient.tests.unit import utils
-from cinderclient.tests.unit.v1 import fakes
+from cinderclient.tests.unit.v2 import fakes
 
 
 cs = fakes.FakeClient()
@@ -23,29 +23,36 @@ cs = fakes.FakeClient()
 class VolumeTransfersTest(utils.TestCase):
 
     def test_create(self):
-        cs.transfers.create('1234')
+        vol = cs.transfers.create('1234')
         cs.assert_called('POST', '/os-volume-transfer')
+        self._assert_request_id(vol)
 
     def test_get(self):
         transfer_id = '5678'
-        cs.transfers.get(transfer_id)
+        vol = cs.transfers.get(transfer_id)
         cs.assert_called('GET', '/os-volume-transfer/%s' % transfer_id)
+        self._assert_request_id(vol)
 
     def test_list(self):
-        cs.transfers.list()
+        lst = cs.transfers.list()
         cs.assert_called('GET', '/os-volume-transfer/detail')
+        self._assert_request_id(lst)
 
     def test_delete(self):
         b = cs.transfers.list()[0]
-        b.delete()
+        vol = b.delete()
         cs.assert_called('DELETE', '/os-volume-transfer/5678')
-        cs.transfers.delete('5678')
+        self._assert_request_id(vol)
+        vol = cs.transfers.delete('5678')
+        self._assert_request_id(vol)
         cs.assert_called('DELETE', '/os-volume-transfer/5678')
-        cs.transfers.delete(b)
+        vol = cs.transfers.delete(b)
         cs.assert_called('DELETE', '/os-volume-transfer/5678')
+        self._assert_request_id(vol)
 
     def test_accept(self):
         transfer_id = '5678'
         auth_key = '12345'
-        cs.transfers.accept(transfer_id, auth_key)
+        vol = cs.transfers.accept(transfer_id, auth_key)
         cs.assert_called('POST', '/os-volume-transfer/%s/accept' % transfer_id)
+        self._assert_request_id(vol)

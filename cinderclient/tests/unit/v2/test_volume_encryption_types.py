@@ -41,6 +41,7 @@ class VolumeEncryptionTypesTest(utils.TestCase):
         cs.assert_called_anytime('GET', '/types/1/encryption')
         for encryption_type in encryption_types:
             self.assertIsInstance(encryption_type, VolumeEncryptionType)
+            self._assert_request_id(encryption_type)
 
     def test_get(self):
         """
@@ -53,6 +54,7 @@ class VolumeEncryptionTypesTest(utils.TestCase):
         encryption_type = cs.volume_encryption_types.get(1)
         cs.assert_called('GET', '/types/1/encryption')
         self.assertIsInstance(encryption_type, VolumeEncryptionType)
+        self._assert_request_id(encryption_type)
 
     def test_get_no_encryption(self):
         """
@@ -65,6 +67,7 @@ class VolumeEncryptionTypesTest(utils.TestCase):
         self.assertIsInstance(encryption_type, VolumeEncryptionType)
         self.assertFalse(hasattr(encryption_type, 'id'),
                          'encryption type has an id')
+        self._assert_request_id(encryption_type)
 
     def test_create(self):
         """
@@ -80,6 +83,7 @@ class VolumeEncryptionTypesTest(utils.TestCase):
                                                        None})
         cs.assert_called('POST', '/types/2/encryption')
         self.assertIsInstance(result, VolumeEncryptionType)
+        self._assert_request_id(result)
 
     def test_update(self):
         """
@@ -96,6 +100,7 @@ class VolumeEncryptionTypesTest(utils.TestCase):
         cs.assert_called('PUT', '/types/1/encryption/provider')
         self.assertEqual(expected, result,
                          "empty update must yield original data")
+        self._assert_request_id(result)
 
     def test_delete(self):
         """
@@ -108,3 +113,4 @@ class VolumeEncryptionTypesTest(utils.TestCase):
         cs.assert_called('DELETE', '/types/1/encryption/provider')
         self.assertIsInstance(result, tuple)
         self.assertEqual(202, result[0].status_code)
+        self._assert_request_id(result)
