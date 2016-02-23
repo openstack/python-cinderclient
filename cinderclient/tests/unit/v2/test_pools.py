@@ -25,6 +25,7 @@ class PoolsTest(utils.TestCase):
     def test_get_pool_stats(self):
         sl = cs.pools.list()
         cs.assert_called('GET', '/scheduler-stats/get_pools')
+        self._assert_request_id(sl)
         for s in sl:
             self.assertIsInstance(s, Pool)
             self.assertTrue(hasattr(s, "name"))
@@ -35,6 +36,7 @@ class PoolsTest(utils.TestCase):
 
     def test_get_detail_pool_stats(self):
         sl = cs.pools.list(detailed=True)
+        self._assert_request_id(sl)
         cs.assert_called('GET', '/scheduler-stats/get_pools?detail=True')
         for s in sl:
             self.assertIsInstance(s, Pool)

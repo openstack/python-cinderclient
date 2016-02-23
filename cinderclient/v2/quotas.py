@@ -43,7 +43,8 @@ class QuotaSetManager(base.Manager):
             body['quota_set'][update] = updates[update]
 
         result = self._update('/os-quota-sets/%s' % (tenant_id), body)
-        return self.resource_class(self, result['quota_set'], loaded=True)
+        return self.resource_class(self, result['quota_set'], loaded=True,
+                                   resp=result.request_ids)
 
     def defaults(self, tenant_id):
         return self._get('/os-quota-sets/%s/defaults' % tenant_id,

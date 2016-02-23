@@ -24,13 +24,15 @@ class QuotaSetsTest(utils.TestCase):
 
     def test_tenant_quotas_get(self):
         tenant_id = 'test'
-        cs.quotas.get(tenant_id)
+        quota = cs.quotas.get(tenant_id)
         cs.assert_called('GET', '/os-quota-sets/%s?usage=False' % tenant_id)
+        self._assert_request_id(quota)
 
     def test_tenant_quotas_defaults(self):
         tenant_id = 'test'
-        cs.quotas.defaults(tenant_id)
+        quota = cs.quotas.defaults(tenant_id)
         cs.assert_called('GET', '/os-quota-sets/%s/defaults' % tenant_id)
+        self._assert_request_id(quota)
 
     def test_update_quota(self):
         q = cs.quotas.get('test')
@@ -42,6 +44,7 @@ class QuotaSetsTest(utils.TestCase):
         q.update(consistencygroups=2)
         q.update(per_volume_gigabytes=100)
         cs.assert_called('PUT', '/os-quota-sets/test')
+        self._assert_request_id(q)
 
     def test_refresh_quota(self):
         q = cs.quotas.get('test')
@@ -75,8 +78,11 @@ class QuotaSetsTest(utils.TestCase):
         self.assertEqual(q.backup_gigabytes, q2.backup_gigabytes)
         self.assertEqual(q.consistencygroups, q2.consistencygroups)
         self.assertEqual(q.per_volume_gigabytes, q2.per_volume_gigabytes)
+        self._assert_request_id(q)
+        self._assert_request_id(q2)
 
     def test_delete_quota(self):
         tenant_id = 'test'
-        cs.quotas.delete(tenant_id)
+        quota = cs.quotas.delete(tenant_id)
         cs.assert_called('DELETE', '/os-quota-sets/test')
+        self._assert_request_id(quota)

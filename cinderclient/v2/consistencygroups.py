@@ -22,6 +22,7 @@ except ImportError:
     from urllib.parse import urlencode
 
 from cinderclient import base
+from cinderclient.openstack.common.apiclient import base as common_base
 
 
 class Consistencygroup(base.Resource):
@@ -31,11 +32,11 @@ class Consistencygroup(base.Resource):
 
     def delete(self, force='False'):
         """Delete this consistencygroup."""
-        self.manager.delete(self, force)
+        return self.manager.delete(self, force)
 
     def update(self, **kwargs):
         """Update the name or description for this consistencygroup."""
-        self.manager.update(self, **kwargs)
+        return self.manager.update(self, **kwargs)
 
 
 class ConsistencygroupManager(base.ManagerWithFind):
@@ -93,7 +94,7 @@ class ConsistencygroupManager(base.ManagerWithFind):
                        'consistencygroup-from-src')
         resp, body = self.api.client.post(
             "/consistencygroups/create_from_src", body=body)
-        return body['consistencygroup']
+        return common_base.DictWithMeta(body['consistencygroup'], resp)
 
     def get(self, group_id):
         """Get a consistencygroup.
@@ -135,7 +136,8 @@ class ConsistencygroupManager(base.ManagerWithFind):
         body = {'consistencygroup': {'force': force}}
         self.run_hooks('modify_body_for_action', body, 'consistencygroup')
         url = '/consistencygroups/%s/delete' % base.getid(consistencygroup)
-        return self.api.client.post(url, body=body)
+        resp, body = self.api.client.post(url, body=body)
+        return common_base.TupleWithMeta((resp, body), resp)
 
     def update(self, consistencygroup, **kwargs):
         """Update the name or description for a consistencygroup.
@@ -147,8 +149,8 @@ class ConsistencygroupManager(base.ManagerWithFind):
 
         body = {"consistencygroup": kwargs}
 
-        self._update("/consistencygroups/%s" % base.getid(consistencygroup),
-                     body)
+        return self._update("/consistencygroups/%s" %
+                            base.getid(consistencygroup), body)
 
     def _action(self, action, consistencygroup, info=None, **kwargs):
         """Perform a consistencygroup "action."
@@ -156,4 +158,5 @@ class ConsistencygroupManager(base.ManagerWithFind):
         body = {action: info}
         self.run_hooks('modify_body_for_action', body, **kwargs)
         url = '/consistencygroups/%s/action' % base.getid(consistencygroup)
-        return self.api.client.post(url, body=body)
+        resp, body = self.api.client.post(url, body=body)
+        return common_base.TupleWithMeta((resp, body), resp)

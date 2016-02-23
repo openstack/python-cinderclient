@@ -22,6 +22,7 @@ except ImportError:
     from urllib.parse import urlencode
 
 from cinderclient import base
+from cinderclient.openstack.common.apiclient import base as common_base
 
 
 class Cgsnapshot(base.Resource):
@@ -31,11 +32,11 @@ class Cgsnapshot(base.Resource):
 
     def delete(self):
         """Delete this cgsnapshot."""
-        self.manager.delete(self)
+        return self.manager.delete(self)
 
     def update(self, **kwargs):
         """Update the name or description for this cgsnapshot."""
-        self.manager.update(self, **kwargs)
+        return self.manager.update(self, **kwargs)
 
 
 class CgsnapshotManager(base.ManagerWithFind):
@@ -101,7 +102,7 @@ class CgsnapshotManager(base.ManagerWithFind):
 
         :param cgsnapshot: The :class:`Cgsnapshot` to delete.
         """
-        self._delete("/cgsnapshots/%s" % base.getid(cgsnapshot))
+        return self._delete("/cgsnapshots/%s" % base.getid(cgsnapshot))
 
     def update(self, cgsnapshot, **kwargs):
         """Update the name or description for a cgsnapshot.
@@ -113,7 +114,7 @@ class CgsnapshotManager(base.ManagerWithFind):
 
         body = {"cgsnapshot": kwargs}
 
-        self._update("/cgsnapshots/%s" % base.getid(cgsnapshot), body)
+        return self._update("/cgsnapshots/%s" % base.getid(cgsnapshot), body)
 
     def _action(self, action, cgsnapshot, info=None, **kwargs):
         """Perform a cgsnapshot "action."
@@ -121,4 +122,5 @@ class CgsnapshotManager(base.ManagerWithFind):
         body = {action: info}
         self.run_hooks('modify_body_for_action', body, **kwargs)
         url = '/cgsnapshots/%s/action' % base.getid(cgsnapshot)
-        return self.api.client.post(url, body=body)
+        resp, body = self.api.client.post(url, body=body)
+        return common_base.TupleWithMeta((resp, body), resp)

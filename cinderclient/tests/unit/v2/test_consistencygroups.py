@@ -24,19 +24,23 @@ class ConsistencygroupsTest(utils.TestCase):
 
     def test_delete_consistencygroup(self):
         v = cs.consistencygroups.list()[0]
-        v.delete(force='True')
+        vol = v.delete(force='True')
+        self._assert_request_id(vol)
         cs.assert_called('POST', '/consistencygroups/1234/delete')
-        cs.consistencygroups.delete('1234', force=True)
+        vol = cs.consistencygroups.delete('1234', force=True)
+        self._assert_request_id(vol)
         cs.assert_called('POST', '/consistencygroups/1234/delete')
-        cs.consistencygroups.delete(v, force=True)
+        vol = cs.consistencygroups.delete(v, force=True)
+        self._assert_request_id(vol)
         cs.assert_called('POST', '/consistencygroups/1234/delete')
 
     def test_create_consistencygroup(self):
-        cs.consistencygroups.create('type1,type2', 'cg')
+        vol = cs.consistencygroups.create('type1,type2', 'cg')
         cs.assert_called('POST', '/consistencygroups')
+        self._assert_request_id(vol)
 
     def test_create_consistencygroup_with_volume_types(self):
-        cs.consistencygroups.create('type1,type2', 'cg')
+        vol = cs.consistencygroups.create('type1,type2', 'cg')
         expected = {'consistencygroup': {'status': 'creating',
                                          'description': None,
                                          'availability_zone': None,
@@ -45,48 +49,61 @@ class ConsistencygroupsTest(utils.TestCase):
                                          'volume_types': 'type1,type2',
                                          'project_id': None}}
         cs.assert_called('POST', '/consistencygroups', body=expected)
+        self._assert_request_id(vol)
 
     def test_update_consistencygroup_name(self):
         v = cs.consistencygroups.list()[0]
         expected = {'consistencygroup': {'name': 'cg2'}}
-        v.update(name='cg2')
+        vol = v.update(name='cg2')
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
-        cs.consistencygroups.update('1234', name='cg2')
+        self._assert_request_id(vol)
+        vol = cs.consistencygroups.update('1234', name='cg2')
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
-        cs.consistencygroups.update(v, name='cg2')
+        self._assert_request_id(vol)
+        vol = cs.consistencygroups.update(v, name='cg2')
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
+        self._assert_request_id(vol)
 
     def test_update_consistencygroup_description(self):
         v = cs.consistencygroups.list()[0]
         expected = {'consistencygroup': {'description': 'cg2 desc'}}
-        v.update(description='cg2 desc')
+        vol = v.update(description='cg2 desc')
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
-        cs.consistencygroups.update('1234', description='cg2 desc')
+        self._assert_request_id(vol)
+        vol = cs.consistencygroups.update('1234', description='cg2 desc')
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
-        cs.consistencygroups.update(v, description='cg2 desc')
+        self._assert_request_id(vol)
+        vol = cs.consistencygroups.update(v, description='cg2 desc')
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
+        self._assert_request_id(vol)
 
     def test_update_consistencygroup_add_volumes(self):
         v = cs.consistencygroups.list()[0]
         uuids = 'uuid1,uuid2'
         expected = {'consistencygroup': {'add_volumes': uuids}}
-        v.update(add_volumes=uuids)
+        vol = v.update(add_volumes=uuids)
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
-        cs.consistencygroups.update('1234', add_volumes=uuids)
+        self._assert_request_id(vol)
+        vol = cs.consistencygroups.update('1234', add_volumes=uuids)
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
-        cs.consistencygroups.update(v, add_volumes=uuids)
+        self._assert_request_id(vol)
+        vol = cs.consistencygroups.update(v, add_volumes=uuids)
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
+        self._assert_request_id(vol)
 
     def test_update_consistencygroup_remove_volumes(self):
         v = cs.consistencygroups.list()[0]
         uuids = 'uuid3,uuid4'
         expected = {'consistencygroup': {'remove_volumes': uuids}}
-        v.update(remove_volumes=uuids)
+        vol = v.update(remove_volumes=uuids)
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
-        cs.consistencygroups.update('1234', remove_volumes=uuids)
+        self._assert_request_id(vol)
+        vol = cs.consistencygroups.update('1234', remove_volumes=uuids)
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
-        cs.consistencygroups.update(v, remove_volumes=uuids)
+        self._assert_request_id(vol)
+        vol = cs.consistencygroups.update(v, remove_volumes=uuids)
         cs.assert_called('PUT', '/consistencygroups/1234', body=expected)
+        self._assert_request_id(vol)
 
     def test_update_consistencygroup_none(self):
         self.assertIsNone(cs.consistencygroups.update('1234'))
@@ -95,7 +112,7 @@ class ConsistencygroupsTest(utils.TestCase):
         cs.consistencygroups.update('1234')
 
     def test_create_consistencygroup_from_src_snap(self):
-        cs.consistencygroups.create_from_src('5678', None, name='cg')
+        vol = cs.consistencygroups.create_from_src('5678', None, name='cg')
         expected = {
             'consistencygroup-from-src': {
                 'status': 'creating',
@@ -109,9 +126,10 @@ class ConsistencygroupsTest(utils.TestCase):
         }
         cs.assert_called('POST', '/consistencygroups/create_from_src',
                          body=expected)
+        self._assert_request_id(vol)
 
     def test_create_consistencygroup_from_src_cg(self):
-        cs.consistencygroups.create_from_src(None, '5678', name='cg')
+        vol = cs.consistencygroups.create_from_src(None, '5678', name='cg')
         expected = {
             'consistencygroup-from-src': {
                 'status': 'creating',
@@ -125,24 +143,32 @@ class ConsistencygroupsTest(utils.TestCase):
         }
         cs.assert_called('POST', '/consistencygroups/create_from_src',
                          body=expected)
+        self._assert_request_id(vol)
 
     def test_list_consistencygroup(self):
-        cs.consistencygroups.list()
+        lst = cs.consistencygroups.list()
         cs.assert_called('GET', '/consistencygroups/detail')
+        self._assert_request_id(lst)
 
     def test_list_consistencygroup_detailed_false(self):
-        cs.consistencygroups.list(detailed=False)
+        lst = cs.consistencygroups.list(detailed=False)
         cs.assert_called('GET', '/consistencygroups')
+        self._assert_request_id(lst)
 
     def test_list_consistencygroup_with_search_opts(self):
-        cs.consistencygroups.list(search_opts={'foo': 'bar'})
+        lst = cs.consistencygroups.list(search_opts={'foo': 'bar'})
         cs.assert_called('GET', '/consistencygroups/detail?foo=bar')
+        self._assert_request_id(lst)
 
     def test_list_consistencygroup_with_empty_search_opt(self):
-        cs.consistencygroups.list(search_opts={'foo': 'bar', 'abc': None})
+        lst = cs.consistencygroups.list(
+            search_opts={'foo': 'bar', 'abc': None}
+        )
         cs.assert_called('GET', '/consistencygroups/detail?foo=bar')
+        self._assert_request_id(lst)
 
     def test_get_consistencygroup(self):
         consistencygroup_id = '1234'
-        cs.consistencygroups.get(consistencygroup_id)
+        vol = cs.consistencygroups.get(consistencygroup_id)
         cs.assert_called('GET', '/consistencygroups/%s' % consistencygroup_id)
+        self._assert_request_id(vol)

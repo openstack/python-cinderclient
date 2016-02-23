@@ -35,6 +35,7 @@ class AvailabilityZoneTest(utils.FixturedTestCase):
     def test_list_availability_zone(self):
         zones = self.cs.availability_zones.list(detailed=False)
         self.assert_called('GET', '/os-availability-zone')
+        self._assert_request_id(zones)
 
         for zone in zones:
             self.assertIsInstance(zone,
@@ -56,6 +57,7 @@ class AvailabilityZoneTest(utils.FixturedTestCase):
     def test_detail_availability_zone(self):
         zones = self.cs.availability_zones.list(detailed=True)
         self.assert_called('GET', '/os-availability-zone/detail')
+        self._assert_request_id(zones)
 
         for zone in zones:
             self.assertIsInstance(zone,
