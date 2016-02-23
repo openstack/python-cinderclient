@@ -433,7 +433,7 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert body[action] is None
         elif action == 'os-initialize_connection':
             assert list(body[action]) == ['connector']
-            return (202, {}, {'connection_info': 'foos'})
+            return (202, {}, {'connection_info': {'foos': 'bars'}})
         elif action == 'os-terminate_connection':
             assert list(body[action]) == ['connector']
         elif action == 'os-begin_detaching':

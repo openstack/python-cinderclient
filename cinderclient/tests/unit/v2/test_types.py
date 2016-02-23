@@ -26,12 +26,14 @@ class TypesTest(utils.TestCase):
     def test_list_types(self):
         tl = cs.volume_types.list()
         cs.assert_called('GET', '/types?is_public=None')
+        self._assert_request_id(tl)
         for t in tl:
             self.assertIsInstance(t, volume_types.VolumeType)
 
     def test_list_types_not_public(self):
-        cs.volume_types.list(is_public=None)
+        t1 = cs.volume_types.list(is_public=None)
         cs.assert_called('GET', '/types?is_public=None')
+        self._assert_request_id(t1)
 
     def test_create(self):
         t = cs.volume_types.create('test-type-3', 'test-type-3-desc')
@@ -42,6 +44,7 @@ class TypesTest(utils.TestCase):
                           'os-volume-type-access:is_public': True
                           }})
         self.assertIsInstance(t, volume_types.VolumeType)
+        self._assert_request_id(t)
 
     def test_create_non_public(self):
         t = cs.volume_types.create('test-type-3', 'test-type-3-desc', False)
@@ -52,6 +55,7 @@ class TypesTest(utils.TestCase):
                           'os-volume-type-access:is_public': False
                           }})
         self.assertIsInstance(t, volume_types.VolumeType)
+        self._assert_request_id(t)
 
     def test_update(self):
         t = cs.volume_types.update('1', 'test_type_1', 'test_desc_1', False)
@@ -61,16 +65,19 @@ class TypesTest(utils.TestCase):
                                           'description': 'test_desc_1',
                                           'is_public': False}})
         self.assertIsInstance(t, volume_types.VolumeType)
+        self._assert_request_id(t)
 
     def test_get(self):
         t = cs.volume_types.get('1')
         cs.assert_called('GET', '/types/1')
         self.assertIsInstance(t, volume_types.VolumeType)
+        self._assert_request_id(t)
 
     def test_default(self):
         t = cs.volume_types.default()
         cs.assert_called('GET', '/types/default')
         self.assertIsInstance(t, volume_types.VolumeType)
+        self._assert_request_id(t)
 
     def test_set_key(self):
         t = cs.volume_types.get(1)
@@ -78,12 +85,15 @@ class TypesTest(utils.TestCase):
         cs.assert_called('POST',
                          '/types/1/extra_specs',
                          {'extra_specs': {'k': 'v'}})
+        self._assert_request_id(t)
 
     def test_unsset_keys(self):
         t = cs.volume_types.get(1)
         t.unset_keys(['k'])
         cs.assert_called('DELETE', '/types/1/extra_specs/k')
+        self._assert_request_id(t)
 
     def test_delete(self):
-        cs.volume_types.delete(1)
+        t = cs.volume_types.delete(1)
         cs.assert_called('DELETE', '/types/1')
+        self._assert_request_id(t)

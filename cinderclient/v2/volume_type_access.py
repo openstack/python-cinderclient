@@ -15,6 +15,7 @@
 """Volume type access interface."""
 
 from cinderclient import base
+from cinderclient.openstack.common.apiclient import base as common_base
 
 
 class VolumeTypeAccess(base.Resource):
@@ -36,16 +37,17 @@ class VolumeTypeAccessManager(base.ManagerWithFind):
     def add_project_access(self, volume_type, project):
         """Add a project to the given volume type access list."""
         info = {'project': project}
-        self._action('addProjectAccess', volume_type, info)
+        return self._action('addProjectAccess', volume_type, info)
 
     def remove_project_access(self, volume_type, project):
         """Remove a project from the given volume type access list."""
         info = {'project': project}
-        self._action('removeProjectAccess', volume_type, info)
+        return self._action('removeProjectAccess', volume_type, info)
 
     def _action(self, action, volume_type, info, **kwargs):
         """Perform a volume type action."""
         body = {action: info}
         self.run_hooks('modify_body_for_action', body, **kwargs)
         url = '/types/%s/action' % base.getid(volume_type)
-        return self.api.client.post(url, body=body)
+        resp, body = self.api.client.post(url, body=body)
+        return common_base.TupleWithMeta((resp, body), resp)
