@@ -467,6 +467,14 @@ class ShellTest(utils.TestCase):
         self.assert_called('GET', '/snapshots/detail?'
                            'status=available&volume_id=1234')
 
+    @mock.patch("cinderclient.utils.print_list")
+    def test_snapshot_list_sort(self, mock_print_list):
+        self.run_command('snapshot-list --sort id')
+        self.assert_called('GET', '/snapshots/detail?sort=id')
+        columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size']
+        mock_print_list.assert_called_once_with(mock.ANY, columns,
+            sortby_index=None)
+
     def test_rename(self):
         # basic rename with positional arguments
         self.run_command('rename 1234 new-name')
@@ -1179,6 +1187,15 @@ class ShellTest(utils.TestCase):
     def test_backup_list(self):
         self.run_command('backup-list')
         self.assert_called('GET', '/backups/detail')
+
+    @mock.patch("cinderclient.utils.print_list")
+    def test_backup_list_sort(self, mock_print_list):
+        self.run_command('backup-list --sort id')
+        self.assert_called('GET', '/backups/detail?sort=id')
+        columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'Object Count',
+               'Container']
+        mock_print_list.assert_called_once_with(mock.ANY, columns,
+            sortby_index=None)
 
     def test_get_capabilities(self):
         self.run_command('get-capabilities host')

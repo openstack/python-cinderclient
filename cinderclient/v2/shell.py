@@ -684,8 +684,14 @@ def do_snapshot_list(cs, args):
                                          limit=args.limit,
                                          sort=args.sort)
     _translate_volume_snapshot_keys(snapshots)
+    if args.sort:
+        sortby_index = None
+    else:
+        sortby_index = 0
+
     utils.print_list(snapshots,
-                     ['ID', 'Volume ID', 'Status', 'Name', 'Size'])
+                     ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
+                     sortby_index=sortby_index)
 
 
 @utils.arg('snapshot',
@@ -1469,7 +1475,11 @@ def do_backup_list(cs, args):
     _translate_volume_snapshot_keys(backups)
     columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'Object Count',
                'Container']
-    utils.print_list(backups, columns)
+    if args.sort:
+        sortby_index = None
+    else:
+        sortby_index = 0
+    utils.print_list(backups, columns, sortby_index=sortby_index)
 
 
 @utils.arg('backup', metavar='<backup>', nargs='+',
