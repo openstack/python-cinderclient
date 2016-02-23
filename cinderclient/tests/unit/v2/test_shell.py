@@ -488,6 +488,14 @@ class ShellTest(utils.TestCase):
         # Call rename with no arguments
         self.assertRaises(SystemExit, self.run_command, 'rename')
 
+    def test_rename_invalid_args(self):
+        """Ensure that error generated does not reference an HTTP code."""
+
+        self.assertRaisesRegexp(exceptions.ClientException,
+                                '(?!HTTP)',
+                                self.run_command,
+                                'rename volume-1234-abcd')
+
     def test_rename_snapshot(self):
         # basic rename with positional arguments
         self.run_command('snapshot-rename 1234 new-name')
@@ -509,6 +517,11 @@ class ShellTest(utils.TestCase):
 
         # Call snapshot-rename with no arguments
         self.assertRaises(SystemExit, self.run_command, 'snapshot-rename')
+
+    def test_rename_snapshot_invalid_args(self):
+        self.assertRaises(exceptions.ClientException,
+                          self.run_command,
+                          'snapshot-rename snapshot-1234')
 
     def test_set_metadata_set(self):
         self.run_command('metadata 1234 set key1=val1 key2=val2')
@@ -1081,8 +1094,8 @@ class ShellTest(utils.TestCase):
         self.assert_called('PUT', '/consistencygroups/1234',
                            body=expected)
 
-    def test_consistencygroup_update_bad_request(self):
-        self.assertRaises(exceptions.BadRequest,
+    def test_consistencygroup_update_invalid_args(self):
+        self.assertRaises(exceptions.ClientException,
                           self.run_command,
                           'consisgroup-update 1234')
 
@@ -1123,13 +1136,13 @@ class ShellTest(utils.TestCase):
                            expected)
 
     def test_consistencygroup_create_from_src_fail_no_snap_cg(self):
-        self.assertRaises(exceptions.BadRequest,
+        self.assertRaises(exceptions.ClientException,
                           self.run_command,
                           'consisgroup-create-from-src '
                           '--name cg')
 
     def test_consistencygroup_create_from_src_fail_both_snap_cg(self):
-        self.assertRaises(exceptions.BadRequest,
+        self.assertRaises(exceptions.ClientException,
                           self.run_command,
                           'consisgroup-create-from-src '
                           '--name cg '

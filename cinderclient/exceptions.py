@@ -89,7 +89,10 @@ class ClientException(Exception):
         self.request_id = request_id
 
     def __str__(self):
-        formatted_string = "%s (HTTP %s)" % (self.message, self.code)
+        formatted_string = "%s" % self.message
+        if self.code >= 100:
+            # HTTP codes start at 100.
+            formatted_string += " (HTTP %s)" % self.code
         if self.request_id:
             formatted_string += " (Request-ID: %s)" % self.request_id
 
