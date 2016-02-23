@@ -106,8 +106,8 @@ class DictWithMetaTest(utils.TestCase):
 class TupleWithMetaTest(utils.TestCase):
     def test_tuple_with_meta(self):
         resp = create_response_obj_with_header()
-        obj = common_base.TupleWithMeta(resp, None)
-        self.assertIsInstance(obj, tuple)
+        obj = common_base.TupleWithMeta((), resp)
+        self.assertEqual((), obj)
         # Check request_ids attribute is added to obj
         self.assertTrue(hasattr(obj, 'request_ids'))
         self.assertEqual([REQUEST_ID], obj.request_ids)
