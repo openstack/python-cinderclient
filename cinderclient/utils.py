@@ -161,6 +161,13 @@ def print_list(objs, fields, exclude_unavailable=False, formatters=None,
     pt = prettytable.PrettyTable((f for f in fields), caching=False)
     pt.aligns = ['l' for f in fields]
     for row in rows:
+        count = 0
+        # Converts unicode values in dictionary to string
+        for part in row:
+            count = count + 1
+            if isinstance(part, dict):
+                part = unicode_key_value_to_string(part)
+                row[count - 1] = part
         pt.add_row(row)
 
     if sortby_index is None:
@@ -170,11 +177,25 @@ def print_list(objs, fields, exclude_unavailable=False, formatters=None,
     _print(pt, order_by)
 
 
-def print_dict(d, property="Property"):
+def unicode_key_value_to_string(dictionary):
+    """Recursively converts dictionary keys to strings."""
+    if not isinstance(dictionary, dict):
+        return dictionary
+    return dict((str(k), str(unicode_key_value_to_string(v)))
+        for k, v in dictionary.items())
+
+
+def print_dict(d, property="Property", formatters=None):
     pt = prettytable.PrettyTable([property, 'Value'], caching=False)
     pt.aligns = ['l', 'l']
+    formatters = formatters or {}
+
     for r in six.iteritems(d):
         r = list(r)
+
+        if r[0] in formatters:
+            r[1] = unicode_key_value_to_string(r[1])
+
         if isinstance(r[1], six.string_types) and "\r" in r[1]:
             r[1] = r[1].replace("\r", " ")
         pt.add_row(r)

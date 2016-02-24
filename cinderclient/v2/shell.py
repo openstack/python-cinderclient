@@ -293,7 +293,8 @@ def do_show(cs, args):
     info.update(volume._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    utils.print_dict(info,
+                     formatters=['metadata', 'volume_image_metadata'])
 
 
 class CheckSizeArgForCreate(argparse.Action):
@@ -1007,9 +1008,12 @@ def do_endpoints(cs, args):
 def do_credentials(cs, args):
     """Shows user credentials returned from auth."""
     catalog = cs.client.service_catalog.catalog
-    utils.print_dict(catalog['user'], "User Credentials")
-    utils.print_dict(catalog['token'], "Token")
 
+    # formatters defines field to be converted from unicode to string
+    utils.print_dict(catalog['user'], "User Credentials",
+                     formatters=['domain', 'roles'])
+    utils.print_dict(catalog['token'], "Token",
+                     formatters=['audit_ids', 'tenant'])
 
 _quota_resources = ['volumes', 'snapshots', 'gigabytes',
                     'backups', 'backup_gigabytes',
@@ -1935,7 +1939,9 @@ def do_encryption_type_delete(cs, args):
 
 
 def _print_qos_specs(qos_specs):
-    utils.print_dict(qos_specs._info)
+
+    # formatters defines field to be converted from unicode to string
+    utils.print_dict(qos_specs._info, formatters=['specs'])
 
 
 def _print_qos_specs_list(q_specs):
