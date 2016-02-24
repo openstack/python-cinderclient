@@ -140,7 +140,7 @@ def print_list(objs, fields, exclude_unavailable=False, formatters=None,
                     field_name = field.replace(' ', '_')
                 else:
                     field_name = field.lower().replace(' ', '_')
-                if type(o) == dict and field in o:
+                if isinstance(o, dict) and field in o:
                     data = o[field]
                 else:
                     if not hasattr(o, field_name) and exclude_unavailable:

@@ -42,7 +42,7 @@ class FakeClient(object):
         result = True
         try:
             for key, value in partial.items():
-                if type(value) is dict:
+                if isinstance(value, dict):
                     result = self._dict_match(value, real[key])
                 else:
                     assert real[key] == value
