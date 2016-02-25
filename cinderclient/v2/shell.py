@@ -2368,11 +2368,11 @@ def do_consisgroup_create_from_src(cs, args):
     if not args.cgsnapshot and not args.source_cg:
         msg = ('Cannot create consistency group because neither '
                'cgsnapshot nor source CG is provided.')
-        raise exceptions.BadRequest(code=400, message=msg)
+        raise exceptions.ClientException(code=1, message=msg)
     if args.cgsnapshot and args.source_cg:
         msg = ('Cannot create consistency group because both '
                'cgsnapshot and source CG are provided.')
-        raise exceptions.BadRequest(code=400, message=msg)
+        raise exceptions.ClientException(code=1, message=msg)
     cgsnapshot = None
     if args.cgsnapshot:
         cgsnapshot = _find_cgsnapshot(cs, args.cgsnapshot)
@@ -2454,7 +2454,7 @@ def do_consisgroup_update(cs, args):
     if not kwargs:
         msg = ('At least one of the following args must be supplied: '
                'name, description, add-volumes, remove-volumes.')
-        raise exceptions.BadRequest(code=400, message=msg)
+        raise exceptions.ClientException(code=1, message=msg)
 
     _find_consistencygroup(cs, args.consistencygroup).update(**kwargs)
 
