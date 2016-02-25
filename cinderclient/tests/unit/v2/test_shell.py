@@ -1230,3 +1230,7 @@ class ShellTest(utils.TestCase):
         self.run_command('snapshot-unmanage 1234')
         self.assert_called('POST', '/snapshots/1234/action',
                            body={'os-unmanage': None})
+
+    def test_extra_specs_list(self):
+        self.run_command('extra-specs-list')
+        self.assert_called('GET', '/types?is_public=None')
