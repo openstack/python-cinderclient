@@ -79,7 +79,7 @@ class ConsistencygroupManager(base.ManagerWithFind):
         :param description: Description of the ConsistencyGroup
         :param user_id: User id derived from context
         :param project_id: Project id derived from context
-        :rtype: :class:`Consistencygroup`
+        :rtype: A dictionary containing Consistencygroup metadata
         """
         body = {'consistencygroup-from-src': {'name': name,
                                               'description': description,
