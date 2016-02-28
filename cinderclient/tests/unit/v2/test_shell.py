@@ -475,6 +475,16 @@ class ShellTest(utils.TestCase):
         mock_print_list.assert_called_once_with(mock.ANY, columns,
             sortby_index=None)
 
+    def test_snapshot_list_filter_tenant_with_all_tenants(self):
+        self.run_command('snapshot-list --all-tenants=1 --tenant 123')
+        self.assert_called('GET',
+                           '/snapshots/detail?all_tenants=1&project_id=123')
+
+    def test_snapshot_list_filter_tenant_without_all_tenants(self):
+        self.run_command('snapshot-list --tenant 123')
+        self.assert_called('GET',
+                           '/snapshots/detail?all_tenants=1&project_id=123')
+
     def test_rename(self):
         # basic rename with positional arguments
         self.run_command('rename 1234 new-name')
