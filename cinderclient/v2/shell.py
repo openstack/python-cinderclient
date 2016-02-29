@@ -665,10 +665,17 @@ def do_image_metadata(cs, args):
                   'form of <key>[:<asc|desc>]. '
                   'Valid keys: %s. '
                   'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
+@utils.arg('--tenant',
+           type=str,
+           dest='tenant',
+           nargs='?',
+           metavar='<tenant>',
+           help='Display information from single tenant (Admin only).')
 @utils.service_type('volumev2')
 def do_snapshot_list(cs, args):
     """Lists all snapshots."""
-    all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
+    all_tenants = (1 if args.tenant else
+                   int(os.environ.get("ALL_TENANTS", args.all_tenants)))
 
     if args.display_name is not None:
         args.name = args.display_name
@@ -678,6 +685,7 @@ def do_snapshot_list(cs, args):
         'display_name': args.name,
         'status': args.status,
         'volume_id': args.volume_id,
+        'project_id': args.tenant,
     }
 
     snapshots = cs.volume_snapshots.list(search_opts=search_opts,
