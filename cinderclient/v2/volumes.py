@@ -578,7 +578,7 @@ class VolumeManager(base.ManagerWithFind):
         Failover a volume to a secondary target.
 
         :param volume_id: The id of the volume to query
-        :param secondary: A unqiue identifier that represents a failover
+        :param secondary: A unique identifier that represents a failover
                           target
         """
         return self._action('os-failover_replication',
