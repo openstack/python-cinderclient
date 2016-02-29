@@ -21,6 +21,7 @@ OpenStack Client interface. Handles the REST calls and responses.
 from __future__ import print_function
 
 import glob
+import hashlib
 import imp
 import itertools
 import logging
@@ -39,6 +40,7 @@ from cinderclient import exceptions
 import cinderclient.extension
 from cinderclient.openstack.common import importutils
 from cinderclient.openstack.common.gettextutils import _
+from oslo_utils import encodeutils
 from oslo_utils import strutils
 
 osprofiler_web = importutils.try_import("osprofiler.web")
@@ -145,6 +147,7 @@ class SessionClient(adapter.LegacyJsonAdapter):
 
 class HTTPClient(object):
 
+    SENSITIVE_HEADERS = ('X-Auth-Token', 'X-Subject-Token',)
     USER_AGENT = 'python-cinderclient'
 
     def __init__(self, user, password, projectid, auth_url=None,
@@ -198,6 +201,16 @@ class HTTPClient(object):
 
         self._logger = logging.getLogger(__name__)
 
+    def _safe_header(self, name, value):
+        if name in HTTPClient.SENSITIVE_HEADERS:
+            encoded = value.encode('utf-8')
+            hashed = hashlib.sha1(encoded)
+            digested = hashed.hexdigest()
+            return encodeutils.safe_decode(name), "{SHA1}%s" % digested
+        else:
+            return (encodeutils.safe_decode(name),
+                    encodeutils.safe_decode(value))
+
     def http_log_req(self, args, kwargs):
         if not self.http_log_debug:
             return
@@ -210,7 +223,8 @@ class HTTPClient(object):
                 string_parts.append(' %s' % element)
 
         for element in kwargs['headers']:
-            header = ' -H "%s: %s"' % (element, kwargs['headers'][element])
+            header = ("-H '%s: %s'" %
+                      self._safe_header(element, kwargs['headers'][element]))
             string_parts.append(header)
 
         if 'data' in kwargs:
