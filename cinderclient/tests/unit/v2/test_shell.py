@@ -869,23 +869,6 @@ class ShellTest(utils.TestCase):
         self.assert_called('POST', '/volumes/1234/action',
                            body=expected)
 
-    def test_replication_enable(self):
-        self.run_command('replication-enable 1234')
-        self.assert_called('POST', '/volumes/1234/action')
-
-    def test_replication_disable(self):
-        self.run_command('replication-disable 1234')
-        self.assert_called('POST', '/volumes/1234/action')
-
-    def test_replication_list_targets(self):
-        self.run_command('replication-list-targets 1234')
-        self.assert_called('POST', '/volumes/1234/action')
-
-    def test_replication_failover(self):
-        self.run_command('replication-failover 1234 target')
-        expected = {'os-failover_replication': {'secondary': 'target'}}
-        self.assert_called('POST', '/volumes/1234/action', body=expected)
-
     def test_snapshot_metadata_set(self):
         self.run_command('snapshot-metadata 1234 set key1=val1 key2=val2')
         self.assert_called('POST', '/snapshots/1234/metadata',

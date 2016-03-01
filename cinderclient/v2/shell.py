@@ -1287,60 +1287,6 @@ def do_migrate(cs, args):
                                                        six.text_type(e)))
 
 
-@utils.arg('volume',
-           metavar='<volume>',
-           help='ID of volume to enable replication.')
-@utils.service_type('volumev2')
-def do_replication_enable(cs, args):
-    """Enables volume replication on a given volume."""
-    volume = utils.find_volume(cs, args.volume)
-    volume.replication_enable(args.volume)
-
-
-@utils.arg('volume',
-           metavar='<volume>',
-           help='ID of volume to disable replication.')
-@utils.service_type('volumev2')
-def do_replication_disable(cs, args):
-    """Disables volume replication on a given volume."""
-    volume = utils.find_volume(cs, args.volume)
-    volume.replication_disable(args.volume)
-
-
-@utils.arg('volume',
-           metavar='<volume>',
-           help='ID of volume to list available replication targets.')
-@utils.service_type('volumev2')
-def do_replication_list_targets(cs, args):
-    """List replication targets available for a volume."""
-    volume = utils.find_volume(cs, args.volume)
-    resp, body = volume.replication_list_targets(args.volume)
-    if body:
-        targets = body['targets']
-        columns = ['target_device_id']
-        if targets:
-            utils.print_list(targets, columns)
-        else:
-            print("There are no replication targets found for volume %s." %
-                  args.volume)
-    else:
-        print("There is no replication information for volume %s." %
-              args.volume)
-
-
-@utils.arg('volume',
-           metavar='<volume>',
-           help='ID of volume to failover.')
-@utils.arg('secondary',
-           metavar='<secondary>',
-           help='A unique identifier that represents a failover target.')
-@utils.service_type('volumev2')
-def do_replication_failover(cs, args):
-    """Failover a volume to a secondary target"""
-    volume = utils.find_volume(cs, args.volume)
-    volume.replication_failover(args.volume, args.secondary)
-
-
 @utils.arg('volume', metavar='<volume>',
            help='Name or ID of volume for which to modify type.')
 @utils.arg('new_type', metavar='<volume-type>', help='New volume type.')
