@@ -446,6 +446,12 @@ def do_create(cs, args):
     utils.print_dict(info)
 
 
+@utils.arg('--cascade',
+           metavar='<cascade>',
+           default=False,
+           const=True,
+           nargs='?',
+           help='Remove any snapshots along with volume. Default=False.')
 @utils.arg('volume',
            metavar='<volume>', nargs='+',
            help='Name or ID of volume or volumes to delete.')
@@ -455,7 +461,7 @@ def do_delete(cs, args):
     failure_count = 0
     for volume in args.volume:
         try:
-            utils.find_volume(cs, volume).delete()
+            utils.find_volume(cs, volume).delete(cascade=args.cascade)
             print("Request to delete volume %s has been accepted." % (volume))
         except Exception as e:
             failure_count += 1
