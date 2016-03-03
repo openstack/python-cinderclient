@@ -522,8 +522,6 @@ class Resource(RequestIdMixin):
         # two resources of different types are not equal
         if not isinstance(other, self.__class__):
             return False
-        if hasattr(self, 'id') and hasattr(other, 'id'):
-            return self.id == other.id
         return self._info == other._info
 
     def is_loaded(self):
