@@ -501,7 +501,7 @@ class VolumeManager(base.ManagerWithFind):
         :param migration_status: The migration_status of the volume to be set,
                                  or None to keep the current status.
         """
-        body = {'status': state}
+        body = {'status': state} if state else {}
         if attach_status:
             body.update({'attach_status': attach_status})
         if migration_status:

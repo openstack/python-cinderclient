@@ -595,8 +595,7 @@ class ShellTest(utils.TestCase):
 
     def test_reset_state_with_attach_status(self):
         self.run_command('reset-state --attach-status detached 1234')
-        expected = {'os-reset_status': {'status': 'available',
-                                        'attach_status': 'detached'}}
+        expected = {'os-reset_status': {'attach_status': 'detached'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
 
     def test_reset_state_with_attach_status_with_flag(self):
@@ -608,8 +607,7 @@ class ShellTest(utils.TestCase):
 
     def test_reset_state_with_reset_migration_status(self):
         self.run_command('reset-state --reset-migration-status 1234')
-        expected = {'os-reset_status': {'status': 'available',
-                                        'migration_status': 'none'}}
+        expected = {'os-reset_status': {'migration_status': 'none'}}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
 
     def test_reset_state_multiple(self):

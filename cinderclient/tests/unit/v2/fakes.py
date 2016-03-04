@@ -439,7 +439,8 @@ class FakeHTTPClient(base_client.HTTPClient):
         elif action == 'os-roll_detaching':
             assert body[action] is None
         elif action == 'os-reset_status':
-            assert 'status' in body[action]
+            assert ('status' or 'attach_status' or 'migration_status'
+                    in body[action])
         elif action == 'os-extend':
             assert list(body[action]) == ['new_size']
         elif action == 'os-migrate_volume':

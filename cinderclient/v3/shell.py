@@ -491,14 +491,15 @@ def do_force_delete(cs, args):
 
 @utils.arg('volume', metavar='<volume>', nargs='+',
            help='Name or ID of volume to modify.')
-@utils.arg('--state', metavar='<state>', default='available',
+@utils.arg('--state', metavar='<state>', default=None,
            help=('The state to assign to the volume. Valid values are '
                  '"available", "error", "creating", "deleting", "in-use", '
                  '"attaching", "detaching", "error_deleting" and '
                  '"maintenance". '
                  'NOTE: This command simply changes the state of the '
                  'Volume in the DataBase with no regard to actual status, '
-                 'exercise caution when using. Default=available.'))
+                 'exercise caution when using. Default=None, that means the '
+                 'state is unchanged.'))
 @utils.arg('--attach-status', metavar='<attach-status>', default=None,
            help=('The attach status to assign to the volume in the DataBase, '
                  'with no regard to the actual status. Valid values are '
@@ -521,6 +522,9 @@ def do_reset_state(cs, args):
     """
     failure_flag = False
     migration_status = 'none' if args.reset_migration_status else None
+    if not (args.state or args.attach_status or migration_status):
+        # Nothing specified, default to resetting state
+        args.state = 'available'
 
     for volume in args.volume:
         try:

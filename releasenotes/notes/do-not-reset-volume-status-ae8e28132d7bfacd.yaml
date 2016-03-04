@@ -1,0 +1,5 @@
+---
+fixes:
+- Default value of reset-state ``state`` option is changed
+  from ``available`` to ``None`` because unexpected ``state``
+  reset happens when resetting migration status.
