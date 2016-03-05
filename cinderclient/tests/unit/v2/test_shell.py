@@ -1203,6 +1203,10 @@ class ShellTest(utils.TestCase):
         mock_print_list.assert_called_once_with(mock.ANY, columns,
             sortby_index=None)
 
+    def test_backup_list_data_timestamp(self):
+        self.run_command('backup-list --sort data_timestamp')
+        self.assert_called('GET', '/backups/detail?sort=data_timestamp')
+
     def test_get_capabilities(self):
         self.run_command('get-capabilities host')
         self.assert_called('GET', '/capabilities/host')
