@@ -10,7 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from keystoneclient import fixture
+from keystoneauth1 import fixture
 
 from cinderclient.tests.unit.fixture_data import base
 from cinderclient.v1 import client as v1client

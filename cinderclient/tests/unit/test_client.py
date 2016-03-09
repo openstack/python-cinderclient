@@ -11,19 +11,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import json
+import logging
 
 import fixtures
+from keystoneauth1 import adapter
+from keystoneauth1 import exceptions as keystone_exception
 import mock
+import six
 
 import cinderclient.client
 import cinderclient.v1.client
 import cinderclient.v2.client
 from cinderclient import exceptions
 from cinderclient.tests.unit import utils
-from keystoneclient import adapter
-from keystoneclient import exceptions as keystone_exception
 
 
 class ClientTest(utils.TestCase):
@@ -115,7 +116,7 @@ class ClientTest(utils.TestCase):
 
         mock_response = utils.TestResponse({
             "status_code": 202,
-            "text": json.dumps(resp),
+            "text": six.b(json.dumps(resp)),
         })
 
         # 'request' method of Adaptor will return 202 response
@@ -155,7 +156,7 @@ class ClientTest(utils.TestCase):
 
         mock_response = utils.TestResponse({
             "status_code": 400,
-            "text": json.dumps(resp),
+            "text": six.b(json.dumps(resp)),
         })
 
         # 'request' method of Adaptor will return 400 response
@@ -182,7 +183,7 @@ class ClientTest(utils.TestCase):
 
         mock_response = utils.TestResponse({
             "status_code": 413,
-            "text": json.dumps(resp),
+            "text": six.b(json.dumps(resp)),
         })
 
         # 'request' method of Adaptor will return 413 response

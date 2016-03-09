@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import mock
-
 import requests
 
 from cinderclient import client
@@ -24,18 +23,17 @@ fake_response = utils.TestResponse({
     "status_code": 200,
     "text": '{"hi": "there"}',
 })
-
-fake_response_empty = utils.TestResponse({
-    "status_code": 200,
-    "text": '{"access": {}}'
-})
-
 mock_request = mock.Mock(return_value=(fake_response))
-mock_request_empty = mock.Mock(return_value=(fake_response_empty))
+
+refused_response = utils.TestResponse({
+    "status_code": 400,
+    "text": '[Errno 111] Connection refused',
+})
+refused_mock_request = mock.Mock(return_value=(refused_response))
 
 bad_400_response = utils.TestResponse({
     "status_code": 400,
-    "text": '{"error": {"message": "n/a", "details": "Terrible!"}}',
+    "text": '',
 })
 bad_400_request = mock.Mock(return_value=(bad_400_response))
 
@@ -74,6 +72,7 @@ def get_authed_client(retries=0):
     cl = get_client(retries=retries)
     cl.management_url = "http://example.com"
     cl.auth_token = "token"
+    cl.get_service_url = mock.Mock(return_value="http://example.com")
     return cl
 
 
@@ -287,21 +286,10 @@ class ClientTest(utils.TestCase):
         cl = get_client()
 
         # response must not have x-server-management-url header
-        @mock.patch.object(requests, "request", mock_request_empty)
+        @mock.patch.object(requests, "request", mock_request)
         def test_auth_call():
             self.assertRaises(exceptions.AuthorizationFailure,
                               cl.authenticate)
-
-        test_auth_call()
-
-    def test_auth_not_implemented(self):
-        cl = get_client()
-
-        # response must not have x-server-management-url header
-        # {'hi': 'there'} is neither V2 or V3
-        @mock.patch.object(requests, "request", mock_request)
-        def test_auth_call():
-            self.assertRaises(NotImplementedError, cl.authenticate)
 
         test_auth_call()
 

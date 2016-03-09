@@ -87,24 +87,33 @@ class FixturedTestCase(TestCase):
 
 
 class TestResponse(requests.Response):
-    """Class used to wrap requests.Response and provide some
-       convenience to initialize with a dict.
+    """Class used to wrap requests.Response.
+
+    Provides some convenience to initialize with a dict.
     """
 
     def __init__(self, data):
+        super(TestResponse, self).__init__()
+        self._content = None
         self._text = None
-        super(TestResponse, self)
+
         if isinstance(data, dict):
             self.status_code = data.get('status_code', None)
             self.headers = data.get('headers', None)
             self.reason = data.get('reason', '')
-            # Fake the text attribute to streamline Response creation
-            self._text = data.get('text', None)
+            # Fake text and content attributes to streamline Response creation
+            text = data.get('text', None)
+            self._content = text
+            self._text = text
         else:
             self.status_code = data
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
+    @property
+    def content(self):
+        return self._content
 
     @property
     def text(self):

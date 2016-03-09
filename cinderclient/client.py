@@ -30,10 +30,10 @@ import pkgutil
 import re
 import six
 
-from keystoneclient import access
-from keystoneclient import adapter
-from keystoneclient.auth.identity import base
-from keystoneclient import discover
+from keystoneauth1 import access
+from keystoneauth1 import adapter
+from keystoneauth1.identity import base
+from keystoneauth1 import discover
 import requests
 
 from cinderclient import api_versions
@@ -109,7 +109,7 @@ class SessionClient(adapter.LegacyJsonAdapter):
         api_versions.update_headers(kwargs["headers"], self.api_version)
         kwargs.setdefault('authenticated', False)
         # Note(tpatil): The standard call raises errors from
-        # keystoneclient, here we need to raise the cinderclient errors.
+        # keystoneauth, here we need to raise the cinderclient errors.
         raise_exc = kwargs.pop('raise_exc', True)
         resp, body = super(SessionClient, self).request(*args,
                                                         raise_exc=False,
@@ -427,7 +427,7 @@ class HTTPClient(object):
         if resp.status_code == 200:  # content must always present
             try:
                 self.auth_url = url
-                self.auth_ref = access.AccessInfo.factory(resp, body)
+                self.auth_ref = access.create(resp=resp, body=body)
                 self.service_catalog = self.auth_ref.service_catalog
 
                 if extract_token:
@@ -435,7 +435,7 @@ class HTTPClient(object):
 
                 management_url = self.service_catalog.url_for(
                     region_name=self.region_name,
-                    endpoint_type=self.endpoint_type,
+                    interface=self.endpoint_type,
                     service_type=self.service_type,
                     service_name=self.service_name)
                 self.management_url = management_url.rstrip('/')
@@ -444,7 +444,10 @@ class HTTPClient(object):
                 print("Found more than one valid endpoint. Use a more "
                       "restrictive filter")
                 raise
-            except KeyError:
+            except ValueError:
+                # ValueError is raised when you pass an invalid response to
+                # access.create. This should never happen in reality if the
+                # status code is 200.
                 raise exceptions.AuthorizationFailure()
             except exceptions.EndpointNotFound:
                 print("Could not find any suitable endpoint. Correct region?")

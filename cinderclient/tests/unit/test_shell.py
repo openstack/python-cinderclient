@@ -16,6 +16,9 @@ import re
 import sys
 
 import fixtures
+import keystoneauth1.exceptions as ks_exc
+from keystoneauth1.exceptions import DiscoveryFailure
+from keystoneauth1 import session
 import mock
 import pkg_resources
 import requests_mock
@@ -31,8 +34,6 @@ from cinderclient.tests.unit.test_auth_plugins import mock_http_request
 from cinderclient.tests.unit.test_auth_plugins import requested_headers
 from cinderclient.tests.unit.fixture_data import keystone_client
 from cinderclient.tests.unit import utils
-import keystoneclient.exceptions as ks_exc
-from keystoneclient.exceptions import DiscoveryFailure
 
 
 class ShellTest(utils.TestCase):
@@ -103,23 +104,27 @@ class ShellTest(utils.TestCase):
     @requests_mock.Mocker()
     def test_version_discovery(self, mocker):
         _shell = shell.OpenStackCinderShell()
+        sess = session.Session()
 
         os_auth_url = "https://WrongDiscoveryResponse.discovery.com:35357/v2.0"
         self.register_keystone_auth_fixture(mocker, os_auth_url)
-        self.assertRaises(DiscoveryFailure, _shell._discover_auth_versions,
-                          None, auth_url=os_auth_url)
+
+        self.assertRaises(DiscoveryFailure,
+                          _shell._discover_auth_versions,
+                          sess,
+                          auth_url=os_auth_url)
 
         os_auth_url = "https://DiscoveryNotSupported.discovery.com:35357/v2.0"
         self.register_keystone_auth_fixture(mocker, os_auth_url)
-        v2_url, v3_url = _shell._discover_auth_versions(
-            None, auth_url=os_auth_url)
+        v2_url, v3_url = _shell._discover_auth_versions(sess,
+                                                        auth_url=os_auth_url)
         self.assertEqual(os_auth_url, v2_url, "Expected v2 url")
         self.assertIsNone(v3_url, "Expected no v3 url")
 
         os_auth_url = "https://DiscoveryNotSupported.discovery.com:35357/v3.0"
         self.register_keystone_auth_fixture(mocker, os_auth_url)
-        v2_url, v3_url = _shell._discover_auth_versions(
-            None, auth_url=os_auth_url)
+        v2_url, v3_url = _shell._discover_auth_versions(sess,
+                                                        auth_url=os_auth_url)
         self.assertEqual(os_auth_url, v3_url, "Expected v3 url")
         self.assertIsNone(v2_url, "Expected no v2 url")
 
@@ -142,18 +147,18 @@ class ShellTest(utils.TestCase):
         for count in range(1, 4):
             self.list_volumes_on_service(count)
 
-    @mock.patch('keystoneclient.auth.identity.v2.Password')
-    @mock.patch('keystoneclient.adapter.Adapter.get_token',
-                side_effect=ks_exc.ConnectionRefused())
-    @mock.patch('keystoneclient.discover.Discover',
-                side_effect=ks_exc.ConnectionRefused())
+    @mock.patch('keystoneauth1.identity.v2.Password')
+    @mock.patch('keystoneauth1.adapter.Adapter.get_token',
+                side_effect=ks_exc.ConnectFailure())
+    @mock.patch('keystoneauth1.discover.Discover',
+                side_effect=ks_exc.ConnectFailure())
     @mock.patch('sys.stdin', side_effect=mock.MagicMock)
     @mock.patch('getpass.getpass', return_value='password')
     def test_password_prompted(self, mock_getpass, mock_stdin, mock_discover,
                                mock_token, mock_password):
         self.make_env(exclude='OS_PASSWORD')
         _shell = shell.OpenStackCinderShell()
-        self.assertRaises(ks_exc.ConnectionRefused, _shell.main, ['list'])
+        self.assertRaises(ks_exc.ConnectFailure, _shell.main, ['list'])
         mock_getpass.assert_called_with('OS Password: ')
         # Verify that Password() is called with value of param 'password'
         # equal to mock_getpass.return_value.
@@ -223,7 +228,7 @@ class ShellTest(utils.TestCase):
 
         self.assertEqual(False, _shell.cs.client.verify_cert)
 
-    @mock.patch('keystoneclient.session.Session.__init__',
+    @mock.patch('keystoneauth1.session.Session.__init__',
                 side_effect=RuntimeError())
     def test_http_client_with_cert(self, mock_session):
         _shell = shell.OpenStackCinderShell()
@@ -234,7 +239,7 @@ class ShellTest(utils.TestCase):
         self.assertRaises(RuntimeError, _shell.main, args)
         mock_session.assert_called_once_with(cert='minnie', verify=mock.ANY)
 
-    @mock.patch('keystoneclient.session.Session.__init__',
+    @mock.patch('keystoneauth1.session.Session.__init__',
                 side_effect=RuntimeError())
     def test_http_client_with_cert_and_key(self, mock_session):
         _shell = shell.OpenStackCinderShell()

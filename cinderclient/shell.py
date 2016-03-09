@@ -34,11 +34,12 @@ from cinderclient import utils
 import cinderclient.auth_plugin
 from cinderclient._i18n import _
 
-from keystoneclient import discover
-from keystoneclient import session
-from keystoneclient.auth.identity import v2 as v2_auth
-from keystoneclient.auth.identity import v3 as v3_auth
-from keystoneclient.exceptions import DiscoveryFailure
+from keystoneauth1 import discover
+from keystoneauth1 import loading
+from keystoneauth1 import session
+from keystoneauth1.identity import v2 as v2_auth
+from keystoneauth1.identity import v3 as v3_auth
+from keystoneauth1.exceptions import DiscoveryFailure
 import six.moves.urllib.parse as urlparse
 from oslo_utils import encodeutils
 from oslo_utils import importutils
@@ -390,7 +391,7 @@ class OpenStackCinderShell(object):
             help=argparse.SUPPRESS)
 
         # Register the CLI arguments that have moved to the session object.
-        session.Session.register_cli_options(parser)
+        loading.register_session_argparse_arguments(parser)
         parser.set_defaults(insecure=utils.env('CINDERCLIENT_INSECURE',
                                                default=False))
 
@@ -468,9 +469,8 @@ class OpenStackCinderShell(object):
         if hasattr(requests, 'logging'):
             requests.logging.getLogger(requests.__name__).addHandler(ch)
 
-        # required for logging when using a keystone session
-        self.ks_logger = logging.getLogger("keystoneclient")
-        self.ks_logger.setLevel(logging.DEBUG)
+        ks_logger = logging.getLogger("keystoneauth")
+        ks_logger.setLevel(logging.DEBUG)
 
     def _delimit_metadata_args(self, argv):
         """This function adds -- separator at the appropriate spot
@@ -788,7 +788,7 @@ class OpenStackCinderShell(object):
         v2_auth_url = None
         v3_auth_url = None
         try:
-            ks_discover = discover.Discover(session=session, auth_url=auth_url)
+            ks_discover = discover.Discover(session=session, url=auth_url)
             v2_auth_url = ks_discover.url_for('2.0')
             v3_auth_url = ks_discover.url_for('3.0')
         except DiscoveryFailure:
