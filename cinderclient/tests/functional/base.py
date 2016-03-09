@@ -139,7 +139,7 @@ class ClientTestBase(base.ClientTestBase):
                       % (object_name, object_id, status, timeout))
 
     def check_object_deleted(self, object_name, object_id, timeout=60):
-        """Check that volume deleted successfully.
+        """Check that object deleted successfully.
 
         :param object_name: object name
         :param object_id: uuid4 id of an object
