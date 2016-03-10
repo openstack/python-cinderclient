@@ -1,5 +1,9 @@
-=============
-Release Notes
-=============
+=============================
+ Cinder Client Release Notes
+=============================
 
-.. release-notes::
+.. toctree::
+   :maxdepth: 1
+
+   unreleased
+   mitaka
