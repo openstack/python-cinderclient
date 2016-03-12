@@ -587,10 +587,6 @@ class VolumeManager(base.ManagerWithFind):
         """Unmanage a volume."""
         return self._action('os-unmanage', volume, None)
 
-    def promote(self, volume):
-        """Promote secondary to be primary in relationship."""
-        return self._action('os-promote-replica', volume, None)
-
     def reenable(self, volume):
         """Sync the secondary volume with primary for a relationship."""
         return self._action('os-reenable-replica', volume, None)
