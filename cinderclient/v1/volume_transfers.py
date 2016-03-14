@@ -27,7 +27,6 @@ from cinderclient import base
 
 class VolumeTransfer(base.Resource):
     """Transfer a volume from one tenant to another"""
-    NAME_ATTR = "display_name"
 
     def __repr__(self):
         return "<VolumeTransfer: %s>" % self.id

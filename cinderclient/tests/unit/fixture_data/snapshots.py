@@ -10,8 +10,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
-
 from cinderclient.tests.unit.fixture_data import base
 
 
@@ -47,16 +45,6 @@ class Fixture(base.Fixture):
         )
 
         def action_1234(request, context):
-            return ''
-            body = json.loads(request.body.decode('utf-8'))
-            assert len(list(body)) == 1
-            action = list(body)[0]
-            if action == 'os-reset_status':
-                assert 'status' in body['os-reset_status']
-            elif action == 'os-update_snapshot_status':
-                assert 'status' in body['os-update_snapshot_status']
-            else:
-                raise AssertionError("Unexpected action: %s" % action)
             return ''
 
         self.requests.register_uri(
