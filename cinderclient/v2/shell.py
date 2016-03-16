@@ -2236,6 +2236,16 @@ def do_unmanage(cs, args):
     cs.volumes.unmanage(volume.id)
 
 
+@utils.arg('volume', metavar='<volume>',
+           help='Name or ID of the volume to reenable replication. '
+                'The replication-status of the volume should be inactive.')
+@utils.service_type('volumev2')
+def do_replication_reenable(cs, args):
+    """Sync the secondary volume with primary for a relationship."""
+    volume = utils.find_volume(cs, args.volume)
+    cs.volumes.reenable(volume.id)
+
+
 @utils.arg('--all-tenants',
            dest='all_tenants',
            metavar='<0|1>',

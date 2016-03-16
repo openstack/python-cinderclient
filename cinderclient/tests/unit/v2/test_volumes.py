@@ -281,6 +281,14 @@ class VolumesTest(utils.TestCase):
         cs.assert_called('POST', '/os-snapshot-manage', {'snapshot': expected})
         self._assert_request_id(vol)
 
+    def test_replication_reenable(self):
+        v = cs.volumes.get('1234')
+        self._assert_request_id(v)
+        vol = cs.volumes.reenable(v)
+        cs.assert_called('POST', '/volumes/1234/action',
+                         {'os-reenable-replica': None})
+        self._assert_request_id(vol)
+
     def test_get_pools(self):
         vol = cs.volumes.get_pools('')
         cs.assert_called('GET', '/scheduler-stats/get_pools')

@@ -1029,6 +1029,11 @@ class ShellTest(utils.TestCase):
         self.assert_called('POST', '/volumes/1234/action',
                            body={'os-unmanage': None})
 
+    def test_replication_reenable(self):
+        self.run_command('replication-reenable 1234')
+        self.assert_called('POST', '/volumes/1234/action',
+                           body={'os-reenable-replica': None})
+
     def test_create_snapshot_from_volume_with_metadata(self):
         """
         Tests create snapshot with --metadata parameter.

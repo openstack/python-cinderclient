@@ -587,6 +587,10 @@ class VolumeManager(base.ManagerWithFind):
         """Unmanage a volume."""
         return self._action('os-unmanage', volume, None)
 
+    def reenable(self, volume):
+        """Sync the secondary volume with primary for a relationship."""
+        return self._action('os-reenable-replica', volume, None)
+
     def get_pools(self, detail):
         """Show pool information for backends."""
         query_string = ""
