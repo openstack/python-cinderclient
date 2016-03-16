@@ -281,14 +281,6 @@ class VolumesTest(utils.TestCase):
         cs.assert_called('POST', '/os-snapshot-manage', {'snapshot': expected})
         self._assert_request_id(vol)
 
-    def test_replication_promote(self):
-        v = cs.volumes.get('1234')
-        self._assert_request_id(v)
-        vol = cs.volumes.promote(v)
-        cs.assert_called('POST', '/volumes/1234/action',
-                         {'os-promote-replica': None})
-        self._assert_request_id(vol)
-
     def test_replication_reenable(self):
         v = cs.volumes.get('1234')
         self._assert_request_id(v)
