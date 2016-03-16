@@ -1029,6 +1029,11 @@ class ShellTest(utils.TestCase):
         self.assert_called('POST', '/volumes/1234/action',
                            body={'os-unmanage': None})
 
+    def test_replication_promote(self):
+        self.run_command('replication-promote 1234')
+        self.assert_called('POST', '/volumes/1234/action',
+                           body={'os-promote-replica': None})
+
     def test_replication_reenable(self):
         self.run_command('replication-reenable 1234')
         self.assert_called('POST', '/volumes/1234/action',

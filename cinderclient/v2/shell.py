@@ -2237,6 +2237,17 @@ def do_unmanage(cs, args):
 
 
 @utils.arg('volume', metavar='<volume>',
+           help='Name or ID of the volume to promote. '
+                'The volume should have the replica volume created with '
+                'source-replica argument.')
+@utils.service_type('volumev2')
+def do_replication_promote(cs, args):
+    """Promote a secondary volume to primary for a relationship."""
+    volume = utils.find_volume(cs, args.volume)
+    cs.volumes.promote(volume.id)
+
+
+@utils.arg('volume', metavar='<volume>',
            help='Name or ID of the volume to reenable replication. '
                 'The replication-status of the volume should be inactive.')
 @utils.service_type('volumev2')
