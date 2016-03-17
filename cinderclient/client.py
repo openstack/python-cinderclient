@@ -45,10 +45,7 @@ from oslo_utils import strutils
 
 osprofiler_web = importutils.try_import("osprofiler.web")
 
-try:
-    import urlparse
-except ImportError:
-    import urllib.parse as urlparse
+import six.moves.urllib.parse as urlparse
 
 try:
     from eventlet import sleep
