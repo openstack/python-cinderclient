@@ -31,7 +31,7 @@ import six
 from six.moves.urllib import parse
 
 from cinderclient.openstack.common.apiclient import exceptions
-from cinderclient.openstack.common import strutils
+from oslo_utils import strutils
 
 
 def getid(obj):

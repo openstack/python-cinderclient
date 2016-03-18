@@ -38,10 +38,14 @@ import requests
 
 from cinderclient import exceptions
 import cinderclient.extension
-from cinderclient.openstack.common import importutils
-from cinderclient.openstack.common.gettextutils import _
+from cinderclient._i18n import _
 from oslo_utils import encodeutils
+from oslo_utils import importutils
 from oslo_utils import strutils
+
+from cinderclient import _i18n
+# Enable i18n lazy translation
+_i18n.enable_lazy()
 
 osprofiler_web = importutils.try_import("osprofiler.web")
 
@@ -63,7 +67,6 @@ if not hasattr(urlparse, 'parse_qsl'):
     urlparse.parse_qsl = cgi.parse_qsl
 
 _VALID_VERSIONS = ['v1', 'v2']
-
 
 # tell keystoneclient that we can ignore the /v1|v2/{project_id} component of
 # the service catalog when doing discovery lookups

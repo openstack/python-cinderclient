@@ -37,8 +37,8 @@ import hashlib
 import requests
 
 from cinderclient.openstack.common.apiclient import exceptions
-from cinderclient.openstack.common import importutils
 from oslo_utils import encodeutils
+from oslo_utils import importutils
 
 
 _logger = logging.getLogger(__name__)
