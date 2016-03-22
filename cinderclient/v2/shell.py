@@ -2622,12 +2622,14 @@ def do_snapshot_unmanage(cs, args):
 @utils.arg('host', metavar='<hostname>', help='Host name.')
 @utils.service_type('volumev2')
 def do_freeze_host(cs, args):
+    """Freeze and disable the specified cinder-volume host."""
     cs.services.freeze_host(args.host)
 
 
 @utils.arg('host', metavar='<hostname>', help='Host name.')
 @utils.service_type('volumev2')
 def do_thaw_host(cs, args):
+    """Thaw and enable the specified cinder-volume host."""
     cs.services.thaw_host(args.host)
 
 
@@ -2637,4 +2639,5 @@ def do_thaw_host(cs, args):
            help='ID of backend to failover to (Default=None)')
 @utils.service_type('volumev2')
 def do_failover_host(cs, args):
+    """Failover a replicating cinder-volume host."""
     cs.services.failover_host(args.host, args.backend_id)
