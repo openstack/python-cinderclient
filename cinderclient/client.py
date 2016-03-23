@@ -291,8 +291,9 @@ class HTTPClient(object):
             if self.projectid:
                 kwargs['headers']['X-Auth-Project-Id'] = self.projectid
             try:
-                resp, body = self.request(self.management_url + url, method,
-                                          **kwargs)
+                if not url.startswith(self.management_url):
+                    url = self.management_url + url
+                resp, body = self.request(url, method, **kwargs)
                 return resp, body
             except exceptions.BadRequest as e:
                 if attempts > self.retries:
