@@ -2448,7 +2448,6 @@ def do_consisgroup_update(cs, args):
 @utils.service_type('volumev2')
 def do_cgsnapshot_list(cs, args):
     """Lists all cgsnapshots."""
-    cgsnapshots = cs.cgsnapshots.list()
 
     all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
 

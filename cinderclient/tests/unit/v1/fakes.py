@@ -233,11 +233,6 @@ class FakeHTTPClient(base_client.HTTPClient):
         })
         return r, body
 
-        if hasattr(status, 'items'):
-            return utils.TestResponse(status), body
-        else:
-            return utils.TestResponse({"status": status}), body
-
     def get_volume_api_version_from_endpoint(self):
         magic_tuple = urlparse.urlsplit(self.management_url)
         scheme, netloc, path, query, frag = magic_tuple
