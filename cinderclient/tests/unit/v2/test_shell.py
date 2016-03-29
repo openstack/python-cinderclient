@@ -722,6 +722,11 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('DELETE', '/types/1')
         self.assert_called('DELETE', '/types/3')
 
+    def test_type_delete_by_name(self):
+        self.run_command('type-delete test-type-1')
+        self.assert_called_anytime('GET', '/types?is_public=None')
+        self.assert_called('DELETE', '/types/1')
+
     def test_encryption_type_list(self):
         """
         Test encryption-type-list shell command.
