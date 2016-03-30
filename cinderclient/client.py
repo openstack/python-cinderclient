@@ -639,7 +639,8 @@ def _construct_http_client(username=None, password=None, project_id=None,
                           cacert=cacert,
                           auth_system=auth_system,
                           auth_plugin=auth_plugin,
-                          logger=logger
+                          logger=logger,
+                          api_version=api_version
                           )
 
 

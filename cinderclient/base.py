@@ -38,7 +38,11 @@ SORT_KEY_VALUES = ('id', 'status', 'size', 'availability_zone', 'name',
 # Mapping of client keys to actual sort keys
 SORT_KEY_MAPPINGS = {'name': 'display_name'}
 # Additional sort keys for resources
-SORT_KEY_ADD_VALUES = {'backups': ('data_timestamp', ), }
+SORT_KEY_ADD_VALUES = {
+    'backups': ('data_timestamp', ),
+    'messages': ('resource_type', 'event_id', 'resource_uuid',
+                 'message_level', 'guaranteed_until', 'request_id'),
+}
 
 Resource = common_base.Resource
 

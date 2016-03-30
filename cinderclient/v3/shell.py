@@ -113,6 +113,11 @@ def _find_qos_specs(cs, qos_specs):
     return utils.find_resource(cs.qos_specs, qos_specs)
 
 
+def _find_message(cs, message):
+    """Gets a message by ID."""
+    return utils.find_resource(cs.messages, message)
+
+
 def _print_volume_snapshot(snapshot):
     utils.print_dict(snapshot._info)
 
@@ -3352,11 +3357,11 @@ def do_thaw_host(cs, args):
     cs.services.thaw_host(args.host)
 
 
+@utils.service_type('volumev3')
 @utils.arg('host', metavar='<hostname>', help='Host name.')
 @utils.arg('--backend_id',
            metavar='<backend-id>',
            help='ID of backend to failover to (Default=None)')
-@utils.service_type('volumev3')
 def do_failover_host(cs, args):
     """Failover a replicating cinder-volume host."""
     cs.services.failover_host(args.host, args.backend_id)
@@ -3369,3 +3374,108 @@ def do_api_version(cs, args):
     columns = ['ID', 'Status', 'Version', 'Min_version']
     response = cs.services.server_api_version()
     utils.print_list(response, columns)
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps("3.3")
+@utils.arg('--marker',
+           metavar='<marker>',
+           default=None,
+           start_version='3.5',
+           help='Begin returning message that appear later in the message '
+                'list than that represented by this id. '
+                'Default=None.')
+@utils.arg('--limit',
+           metavar='<limit>',
+           default=None,
+           start_version='3.5',
+           help='Maximum number of messages to return. Default=None.')
+@utils.arg('--sort',
+           metavar='<key>[:<direction>]',
+           default=None,
+           start_version='3.5',
+           help=(('Comma-separated list of sort keys and directions in the '
+                  'form of <key>[:<asc|desc>]. '
+                  'Valid keys: %s. '
+                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
+@utils.arg('--resource_uuid',
+           metavar='<resource_uuid>',
+           default=None,
+           help='Filters results by a resource uuid. Default=None.')
+@utils.arg('--resource_type',
+           metavar='<type>',
+           default=None,
+           help='Filters results by a resource type. Default=None.')
+@utils.arg('--event_id',
+           metavar='<id>',
+           default=None,
+           help='Filters results by event id. Default=None.')
+@utils.arg('--request_id',
+           metavar='<request_id>',
+           default=None,
+           help='Filters results by request id. Default=None.')
+@utils.arg('--level',
+           metavar='<level>',
+           default=None,
+           help='Filters results by the message level. Default=None.')
+def do_message_list(cs, args):
+    """Lists all messages."""
+    search_opts = {
+        'resource_uuid': args.resource_uuid,
+        'event_id': args.event_id,
+        'request_id': args.request_id,
+    }
+    if args.resource_type:
+        search_opts['resource_type'] = args.resource_type.upper()
+    if args.level:
+        search_opts['message_level'] = args.level.upper()
+
+    marker = args.marker if hasattr(args, 'marker') else None
+    limit = args.limit if hasattr(args, 'limit') else None
+    sort = args.sort if hasattr(args, 'sort') else None
+
+    messages = cs.messages.list(search_opts=search_opts,
+                                marker=marker,
+                                limit=limit,
+                                sort=sort)
+
+    columns = ['ID', 'Resource Type', 'Resource UUID', 'Event ID',
+               'User Message']
+    if sort:
+        sortby_index = None
+    else:
+        sortby_index = 0
+    utils.print_list(messages, columns, sortby_index=sortby_index)
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps("3.3")
+@utils.arg('message',
+           metavar='<message>',
+           help='ID of message.')
+def do_message_show(cs, args):
+    """Shows message details."""
+    info = dict()
+    message = _find_message(cs, args.message)
+    info.update(message._info)
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps("3.3")
+@utils.arg('message',
+           metavar='<message>', nargs='+',
+           help='ID of one or more message to be deleted.')
+def do_message_delete(cs, args):
+    """Removes one or more messages."""
+    failure_count = 0
+    for message in args.message:
+        try:
+            _find_message(cs, message).delete()
+        except Exception as e:
+            failure_count += 1
+            print("Delete for message %s failed: %s" % (message, e))
+    if failure_count == len(args.message):
+        raise exceptions.CommandError("Unable to delete any of the specified "
+                                      "messages.")

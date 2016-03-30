@@ -14,7 +14,6 @@
 #    under the License.
 
 import ddt
-
 import fixtures
 import mock
 from requests_mock.contrib import fixture as requests_mock_fixture
@@ -339,3 +338,41 @@ class ShellTest(utils.TestCase):
         self.run_command('--os-volume-api-version 3.8 '
                          'snapshot-manageable-list fakehost --detailed False')
         self.assert_called('GET', '/manageable_snapshots?host=fakehost')
+
+    def test_list_messages(self):
+        self.run_command('--os-volume-api-version 3.3 message-list')
+        self.assert_called('GET', '/messages')
+
+    @ddt.data(('resource_type',), ('event_id',), ('resource_uuid',),
+              ('level', 'message_level'), ('request_id',))
+    def test_list_messages_with_filters(self, filter):
+        self.run_command('--os-volume-api-version 3.5 message-list --%s=TEST'
+                         % filter[0])
+        self.assert_called('GET', '/messages?%s=TEST' % filter[-1])
+
+    def test_list_messages_with_sort(self):
+        self.run_command('--os-volume-api-version 3.5 '
+                         'message-list --sort=id:asc')
+        self.assert_called('GET', '/messages?sort=id%3Aasc')
+
+    def test_list_messages_with_limit(self):
+        self.run_command('--os-volume-api-version 3.5 message-list --limit=1')
+        self.assert_called('GET', '/messages?limit=1')
+
+    def test_list_messages_with_marker(self):
+        self.run_command('--os-volume-api-version 3.5 message-list --marker=1')
+        self.assert_called('GET', '/messages?marker=1')
+
+    def test_show_message(self):
+        self.run_command('--os-volume-api-version 3.5 message-show 1234')
+        self.assert_called('GET', '/messages/1234')
+
+    def test_delete_message(self):
+        self.run_command('--os-volume-api-version 3.5 message-delete 1234')
+        self.assert_called('DELETE', '/messages/1234')
+
+    def test_delete_messages(self):
+        self.run_command(
+            '--os-volume-api-version 3.3 message-delete 1234 12345')
+        self.assert_called_anytime('DELETE', '/messages/1234')
+        self.assert_called_anytime('DELETE', '/messages/12345')

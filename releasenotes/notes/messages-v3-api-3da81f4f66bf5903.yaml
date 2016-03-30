@@ -1,0 +1,11 @@
+---
+features:
+  - |
+     Add support for /messages API
+
+     GET /messages
+        cinder --os-volume-api-version 3.3 message-list
+     GET /messages/{id}
+        cinder --os-volume-api-version 3.3 message-show {id}
+     DELETE /message/{id}
+        cinder --os-volume-api-version 3.3 message-delete {id}

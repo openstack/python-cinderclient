@@ -26,6 +26,7 @@ from cinderclient.v3 import groups
 from cinderclient.v3 import group_snapshots
 from cinderclient.v3 import group_types
 from cinderclient.v3 import limits
+from cinderclient.v3 import messages
 from cinderclient.v3 import pools
 from cinderclient.v3 import qos_specs
 from cinderclient.v3 import quota_classes
@@ -68,6 +69,7 @@ class Client(object):
         password = api_key
         self.version = '3.0'
         self.limits = limits.LimitsManager(self)
+        self.api_version = api_version or api_versions.APIVersion(self.version)
 
         # extensions
         self.volumes = volumes.VolumeManager(self)
@@ -82,6 +84,7 @@ class Client(object):
         self.quota_classes = quota_classes.QuotaClassSetManager(self)
         self.quotas = quotas.QuotaSetManager(self)
         self.backups = volume_backups.VolumeBackupManager(self)
+        self.messages = messages.MessageManager(self)
         self.restores = volume_backups_restore.VolumeBackupRestoreManager(self)
         self.transfers = volume_transfers.VolumeTransferManager(self)
         self.services = services.ServiceManager(self)
@@ -95,7 +98,6 @@ class Client(object):
             availability_zones.AvailabilityZoneManager(self)
         self.pools = pools.PoolManager(self)
         self.capabilities = capabilities.CapabilitiesManager(self)
-        self.api_version = api_version or api_versions.APIVersion(self.version)
 
         # Add in any extensions...
         if extensions:
