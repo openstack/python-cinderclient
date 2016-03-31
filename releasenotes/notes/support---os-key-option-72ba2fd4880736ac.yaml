@@ -1,0 +1,5 @@
+---
+features:
+  - |
+      Support --os-key option and OS_KEY environment variable which allows to
+      provide client cert and its private key separately.
