@@ -713,6 +713,15 @@ class ShellTest(utils.TestCase):
         self.assert_called('POST', '/types/3/action',
                            body=expected)
 
+    def test_type_delete(self):
+        self.run_command('type-delete 1')
+        self.assert_called('DELETE', '/types/1')
+
+    def test_type_delete_multiple(self):
+        self.run_command('type-delete 1 3')
+        self.assert_called_anytime('DELETE', '/types/1')
+        self.assert_called('DELETE', '/types/3')
+
     def test_encryption_type_list(self):
         """
         Test encryption-type-list shell command.

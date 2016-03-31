@@ -685,6 +685,12 @@ class FakeHTTPClient(base_client.HTTPClient):
     def delete_types_1(self, **kw):
         return (202, {}, None)
 
+    def delete_types_3_extra_specs_k(self, **kw):
+        return(204, {}, None)
+
+    def delete_types_3(self, **kw):
+        return (202, {}, None)
+
     def put_types_1(self, **kw):
         return self.get_types_1()
 

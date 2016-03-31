@@ -937,13 +937,25 @@ def do_type_create(cs, args):
     _print_volume_type_list([vtype])
 
 
-@utils.arg('id',
-           metavar='<id>',
-           help='ID of volume type to delete.')
+@utils.arg('vol_type',
+           metavar='<vol_type>', nargs='+',
+           help='Name or ID of volume type or types to delete.')
 @utils.service_type('volumev2')
 def do_type_delete(cs, args):
-    """Deletes a volume type."""
-    cs.volume_types.delete(args.id)
+    """Deletes volume type or types."""
+    failure_count = 0
+    for vol_type in args.vol_type:
+        try:
+            vtype = _find_volume_type(cs, vol_type)
+            cs.volume_types.delete(vtype)
+            print("Request to delete volume type %s has been accepted."
+                  % (vol_type))
+        except Exception as e:
+            failure_count += 1
+            print("Delete for volume type %s failed: %s" % (vol_type, e))
+    if failure_count == len(args.vol_type):
+        raise exceptions.CommandError("Unable to delete any of the "
+                                      "specified types.")
 
 
 @utils.arg('vtype',
