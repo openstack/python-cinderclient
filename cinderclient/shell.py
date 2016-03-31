@@ -32,8 +32,6 @@ from cinderclient import exceptions as exc
 from cinderclient import utils
 import cinderclient.auth_plugin
 from cinderclient._i18n import _
-from cinderclient.v1 import shell as shell_v1
-from cinderclient.v2 import shell as shell_v2
 
 from keystoneclient import discover
 from keystoneclient import session
@@ -54,6 +52,9 @@ _i18n.enable_lazy()
 DEFAULT_OS_VOLUME_API_VERSION = "2"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
 DEFAULT_CINDER_SERVICE_TYPE = 'volumev2'
+V1_SHELL = 'cinderclient.v1.shell'
+V2_SHELL = 'cinderclient.v2.shell'
+V3_SHELL = 'cinderclient.v3.shell'
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -392,13 +393,12 @@ class OpenStackCinderShell(object):
         self.subcommands = {}
         subparsers = parser.add_subparsers(metavar='<subcommand>')
 
-        try:
-            actions_module = {
-                '1.1': shell_v1,
-                '2': shell_v2,
-            }[version]
-        except KeyError:
-            actions_module = shell_v1
+        if version == '2':
+            actions_module = importutils.import_module(V2_SHELL)
+        elif version == '3':
+            actions_module = importutils.import_module(V3_SHELL)
+        else:
+            actions_module = importutils.import_module(V1_SHELL)
 
         self._find_actions(subparsers, actions_module)
         self._find_actions(subparsers, self)

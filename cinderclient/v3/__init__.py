@@ -1,4 +1,5 @@
 # Copyright (c) 2013 OpenStack Foundation
+#
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -13,7 +14,4 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""Volume interface (v2 extension)."""
-
-from cinderclient.v3.volumes import *  # flake8: noqa
-
+from cinderclient.v3.client import Client    # noqa

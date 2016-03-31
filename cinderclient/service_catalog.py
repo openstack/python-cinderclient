@@ -57,16 +57,18 @@ class ServiceCatalog(object):
             # enabled and the service_type is set to 'volume', go ahead and
             # accept that.
             skip_service_type_check = False
-            if service_type == 'volumev2' and service['type'] == 'volume':
+            if (service_type in ('volumev2', 'volumev3') and
+                    service['type'] == 'volume'):
                 version = service['endpoints'][0]['publicURL'].split('/')[3]
-                if version == 'v2':
+                if version in ('v2', 'v3'):
                     skip_service_type_check = True
 
             if (not skip_service_type_check
                     and service.get("type") != service_type):
                 continue
 
-            if (volume_service_name and service_type in ('volume', 'volumev2')
+            if (volume_service_name and service_type in
+                ('volume', 'volumev2', 'volumev3')
                     and service.get('name') != volume_service_name):
                 continue
 

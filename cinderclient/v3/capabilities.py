@@ -13,7 +13,27 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""Capabilities interface (v2 extension)"""
+"""Capabilities interface (v3 extension)"""
 
-from cinderclient.v3.capabilities import *  # flake8: noqa
 
+from cinderclient import base
+
+
+class Capabilities(base.Resource):
+    NAME_ATTR = 'name'
+
+    def __repr__(self):
+        return "<Capabilities: %s>" % self.name
+
+
+class CapabilitiesManager(base.Manager):
+    """Manage :class:`Capabilities` resources."""
+    resource_class = Capabilities
+
+    def get(self, host):
+        """Show backend volume stats and properties.
+
+        :param host: Specified backend to obtain volume stats and properties.
+        :rtype: :class:`Capabilities`
+        """
+        return self._get('/capabilities/%s' % host, None)
