@@ -132,6 +132,14 @@ class NotFound(ClientException):
     message = "Not found"
 
 
+class NotAcceptable(ClientException):
+    """
+    HTTP 406 - Not Acceptable
+    """
+    http_status = 406
+    message = "Not Acceptable"
+
+
 class OverLimit(ClientException):
     """
     HTTP 413 - Over limit: you're over the API limits for this time period.
@@ -157,6 +165,7 @@ class HTTPNotImplemented(ClientException):
 # Instead, we have to hardcode it:
 _code_map = dict((c.http_status, c) for c in [BadRequest, Unauthorized,
                                               Forbidden, NotFound,
+                                              NotAcceptable,
                                               OverLimit, HTTPNotImplemented])
 
 
@@ -188,3 +197,14 @@ def from_response(response, body):
     else:
         return cls(code=response.status_code, request_id=request_id,
                    message=response.reason)
+
+
+class VersionNotFoundForAPIMethod(Exception):
+    msg_fmt = "API version '%(vers)s' is not supported on '%(method)s' method."
+
+    def __init__(self, version, method):
+        self.version = version
+        self.method = method
+
+    def __str__(self):
+        return self.msg_fmt % {"vers": self.version, "method": self.method}

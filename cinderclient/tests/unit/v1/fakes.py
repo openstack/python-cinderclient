@@ -183,10 +183,11 @@ def _stub_extend(id, new_size):
 
 class FakeClient(fakes.FakeClient, client.Client):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, api_version=None, *args, **kwargs):
         client.Client.__init__(self, 'username', 'password',
                                'project_id', 'auth_url',
                                extensions=kwargs.get('extensions'))
+        self.api_version = api_version
         self.client = FakeHTTPClient(**kwargs)
 
     def get_volume_api_version_from_endpoint(self):

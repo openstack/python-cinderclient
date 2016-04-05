@@ -14,6 +14,7 @@
 #    under the License.
 
 from cinderclient import client
+from cinderclient import api_versions
 from cinderclient.v2 import availability_zones
 from cinderclient.v2 import cgsnapshots
 from cinderclient.v2 import consistencygroups
@@ -47,8 +48,6 @@ class Client(object):
         ...
     """
 
-    version = '2'
-
     def __init__(self, username=None, api_key=None, project_id=None,
                  auth_url='', insecure=False, timeout=None, tenant_id=None,
                  proxy_tenant_id=None, proxy_token=None, region_name=None,
@@ -56,10 +55,11 @@ class Client(object):
                  service_type='volumev2', service_name=None,
                  volume_service_name=None, bypass_url=None, retries=None,
                  http_log_debug=False, cacert=None, auth_system='keystone',
-                 auth_plugin=None, session=None, **kwargs):
+                 auth_plugin=None, session=None, api_version=None, **kwargs):
         # FIXME(comstud): Rename the api_key argument above when we
         # know it's not being used as keyword argument
         password = api_key
+        self.version = '2.0'
         self.limits = limits.LimitsManager(self)
 
         # extensions
@@ -84,6 +84,7 @@ class Client(object):
             availability_zones.AvailabilityZoneManager(self)
         self.pools = pools.PoolManager(self)
         self.capabilities = capabilities.CapabilitiesManager(self)
+        self.api_version = api_version or api_versions.APIVersion(self.version)
 
         # Add in any extensions...
         if extensions:
@@ -114,6 +115,7 @@ class Client(object):
             auth_system=auth_system,
             auth_plugin=auth_plugin,
             session=session,
+            api_version=api_version,
             **kwargs)
 
     def authenticate(self):

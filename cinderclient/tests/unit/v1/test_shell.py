@@ -16,6 +16,7 @@
 #    under the License.
 
 import fixtures
+import mock
 from requests_mock.contrib import fixture as requests_mock_fixture
 
 from cinderclient import client
@@ -27,6 +28,7 @@ from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.fixture_data import keystone_client
 
 
+@mock.patch.object(client, 'Client', fakes.FakeClient)
 class ShellTest(utils.TestCase):
 
     FAKE_ENV = {
@@ -48,25 +50,13 @@ class ShellTest(utils.TestCase):
         self.shell = shell.OpenStackCinderShell()
 
         # HACK(bcwaldon): replace this when we start using stubs
-        self.old_get_client_class = client.get_client_class
-        client.get_client_class = lambda *_: fakes.FakeClient
+        self.old_client_class = client.Client
+        client.Client = fakes.FakeClient
 
         self.requests = self.useFixture(requests_mock_fixture.Fixture())
         self.requests.register_uri(
             'GET', keystone_client.BASE_URL,
             text=keystone_client.keystone_request_callback)
-
-    def tearDown(self):
-        # For some method like test_image_meta_bad_action we are
-        # testing a SystemExit to be thrown and object self.shell has
-        # no time to get instantatiated which is OK in this case, so
-        # we make sure the method is there before launching it.
-        if hasattr(self.shell, 'cs'):
-            self.shell.cs.clear_callstack()
-
-        # HACK(bcwaldon): replace this when we start using stubs
-        client.get_client_class = self.old_get_client_class
-        super(ShellTest, self).tearDown()
 
     def run_command(self, cmd):
         self.shell.main(cmd.split())

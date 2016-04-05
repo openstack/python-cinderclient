@@ -64,6 +64,17 @@ def mock_http_request(resp=None):
                             },
                         ],
                     },
+                    {
+                        "type": "volumev3",
+                        "endpoints": [
+                            {
+                                "region": "RegionOne",
+                                "adminURL": "http://localhost:8774/v3",
+                                "internalURL": "http://localhost:8774/v3",
+                                "publicURL": "http://localhost:8774/v3/",
+                            },
+                        ],
+                    },
                 ],
             },
         }

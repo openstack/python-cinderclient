@@ -24,6 +24,7 @@ from cinderclient.tests.unit.v3 import fakes
 from cinderclient.tests.unit.fixture_data import keystone_client
 
 
+@mock.patch.object(client, 'Client', fakes.FakeClient)
 class ShellTest(utils.TestCase):
 
     FAKE_ENV = {
@@ -43,10 +44,6 @@ class ShellTest(utils.TestCase):
                                                          self.FAKE_ENV[var]))
 
         self.shell = shell.OpenStackCinderShell()
-
-        # HACK(bcwaldon): replace this when we start using stubs
-        self.old_get_client_class = client.get_client_class
-        client.get_client_class = lambda *_: fakes.FakeClient
 
         self.requests = self.useFixture(requests_mock_fixture.Fixture())
         self.requests.register_uri(
