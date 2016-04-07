@@ -17,11 +17,9 @@
 Volume interface (1.1 extension).
 """
 
-try:
-    from urllib import urlencode
-except ImportError:
-    from urllib.parse import urlencode
 import six
+from six.moves.urllib.parse import urlencode
+
 from cinderclient import base
 
 
