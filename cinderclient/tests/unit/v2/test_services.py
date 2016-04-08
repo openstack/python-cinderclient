@@ -80,3 +80,8 @@ class ServicesTest(utils.TestCase):
         self.assertIsInstance(s, services.Service)
         self.assertEqual('disabled', s.status)
         self._assert_request_id(s)
+
+    def test_api_version(self):
+        client = fakes.FakeClient(version_header='3.0')
+        svs = client.services.server_api_version()
+        [self.assertIsInstance(s, services.Service) for s in svs]

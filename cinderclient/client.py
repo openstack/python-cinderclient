@@ -151,6 +151,11 @@ class SessionClient(adapter.LegacyJsonAdapter):
     def delete(self, url, **kwargs):
         return self._cs_request(url, 'DELETE', **kwargs)
 
+    def _get_base_url(self):
+        endpoint = self.get_endpoint()
+        base_url = '/'.join(endpoint.split('/')[:3]) + '/'
+        return base_url
+
     def get_volume_api_version_from_endpoint(self):
         try:
             version = get_volume_api_from_url(self.get_endpoint())
@@ -175,6 +180,16 @@ class SessionClient(adapter.LegacyJsonAdapter):
 
         raise AttributeError('There is no service catalog for this type of '
                              'auth plugin.')
+
+    def _cs_request_base_url(self, url, method, **kwargs):
+        base_url = self._get_base_url(**kwargs)
+        return self._cs_request(
+            base_url + url,
+            method,
+            **kwargs)
+
+    def get_with_base_url(self, url, **kwargs):
+        return self._cs_request_base_url(url, 'GET', **kwargs)
 
 
 class HTTPClient(object):

@@ -24,6 +24,7 @@ import time
 
 import six
 
+from cinderclient import api_versions
 from cinderclient import base
 from cinderclient import exceptions
 from cinderclient import utils
@@ -2680,3 +2681,12 @@ def do_thaw_host(cs, args):
 def do_failover_host(cs, args):
     """Failover a replicating cinder-volume host."""
     cs.services.failover_host(args.host, args.backend_id)
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps("3.0")
+def do_api_version(cs, args):
+    """Display the API version information."""
+    columns = ['ID', 'Status', 'Version', 'Min_version']
+    response = cs.services.server_api_version()
+    utils.print_list(response, columns)

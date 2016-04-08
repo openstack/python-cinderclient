@@ -79,6 +79,13 @@ class ClientTest(utils.TestCase):
                           cinderclient.client.get_volume_api_from_url,
                           unknown_url)
 
+    @mock.patch('cinderclient.client.SessionClient.get_endpoint')
+    def test_get_base_url(self, mock_get_endpoint):
+        url = 'http://192.168.122.104:8776/v3/de50d1f33a38415fadfd3e1dea28f4d3'
+        mock_get_endpoint.return_value = url
+        cs = cinderclient.client.SessionClient(self, api_version='3.0')
+        self.assertEqual('http://192.168.122.104:8776/', cs._get_base_url())
+
     @mock.patch.object(cinderclient.client, '_log_request_id')
     @mock.patch.object(adapter.Adapter, 'request')
     @mock.patch.object(exceptions, 'from_response')

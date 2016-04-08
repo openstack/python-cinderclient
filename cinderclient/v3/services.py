@@ -16,6 +16,7 @@
 """
 service interface
 """
+from cinderclient import api_versions
 from cinderclient import base
 
 
@@ -77,3 +78,16 @@ class ServiceManager(base.ManagerWithFind):
         """Failover a replicated backend by hostname."""
         body = {"host": host, "backend_id": backend_id}
         return self._update("/os-services/failover_host", body)
+
+    @api_versions.wraps("3.0")
+    def server_api_version(self, url_append=""):
+        """Returns the API Version supported by the server.
+
+        :param url_append: String to append to url to obtain specific version
+        :return: Returns response obj for a server that supports microversions.
+                 Returns an empty list for Liberty and prior Cinder servers.
+        """
+        try:
+            return self._get_with_base_url(url_append, response_key='versions')
+        except LookupError:
+            return []
