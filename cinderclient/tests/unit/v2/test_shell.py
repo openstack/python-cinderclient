@@ -424,6 +424,17 @@ class ShellTest(utils.TestCase):
         self.run_command('backup-restore 1234')
         self.assert_called('POST', '/backups/1234/restore')
 
+    def test_restore_with_name(self):
+        self.run_command('backup-restore 1234 --name restore_vol')
+        expected = {'restore': {'volume_id': None, 'name': 'restore_vol'}}
+        self.assert_called('POST', '/backups/1234/restore',
+                           body=expected)
+
+    def test_restore_with_name_error(self):
+        self.assertRaises(exceptions.CommandError, self.run_command,
+                          'backup-restore 1234 --volume fake_vol --name '
+                          'restore_vol')
+
     @mock.patch('cinderclient.utils.print_dict')
     @mock.patch('cinderclient.utils.find_volume')
     def test_do_backup_restore(self,
@@ -431,9 +442,11 @@ class ShellTest(utils.TestCase):
                                mock_print_dict):
         backup_id = '1234'
         volume_id = '5678'
+        name = None
         input = {
             'backup': backup_id,
-            'volume': volume_id
+            'volume': volume_id,
+            'name': None
         }
 
         args = self._make_args(input)
@@ -445,7 +458,8 @@ class ShellTest(utils.TestCase):
             test_shell.do_backup_restore(self.cs, args)
             mocked_restore.assert_called_once_with(
                 input['backup'],
-                volume_id)
+                volume_id,
+                name)
             self.assertTrue(mock_print_dict.called)
 
     def test_record_export(self):

@@ -1483,7 +1483,14 @@ def do_backup_delete(cs, args):
            help=argparse.SUPPRESS)
 @utils.arg('--volume', metavar='<volume>',
            default=None,
-           help='Name or ID of volume to which to restore. '
+           help='Name or ID of existing volume to which to restore. '
+           'This is mutually exclusive with --name and takes priority. '
+           'Default=None.')
+@utils.arg('--name', metavar='<name>',
+           default=None,
+           help='Use the name for new volume creation to restore. '
+           'This is mutually exclusive with --volume (or the deprecated '
+           '--volume-id) and --volume (or --volume-id) takes priority. '
            'Default=None.')
 @utils.service_type('volumev3')
 def do_backup_restore(cs, args):
@@ -1491,10 +1498,15 @@ def do_backup_restore(cs, args):
     vol = args.volume or args.volume_id
     if vol:
         volume_id = utils.find_volume(cs, vol).id
+        if args.name:
+            args.name = None
+            print('Mutually exclusive options are specified simultaneously: '
+                  '"--volume (or the deprecated --volume-id) and --name". '
+                  'The --volume (or --volume-id) option takes priority.')
     else:
         volume_id = None
 
-    restore = cs.restores.restore(args.backup, volume_id)
+    restore = cs.restores.restore(args.backup, volume_id, args.name)
 
     info = {"backup_id": args.backup}
     info.update(restore._info)
