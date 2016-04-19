@@ -13,34 +13,5 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient import base
+from cinderclient.v3.quota_classes import *  # flake8: noqa
 
-
-class QuotaClassSet(base.Resource):
-
-    @property
-    def id(self):
-        """Needed by base.Resource to self-refresh and be indexed."""
-        return self.class_name
-
-    def update(self, *args, **kwargs):
-        return self.manager.update(self.class_name, *args, **kwargs)
-
-
-class QuotaClassSetManager(base.Manager):
-    resource_class = QuotaClassSet
-
-    def get(self, class_name):
-        return self._get("/os-quota-class-sets/%s" % (class_name),
-                         "quota_class_set")
-
-    def update(self, class_name, **updates):
-        body = {'quota_class_set': {'class_name': class_name}}
-
-        for update in updates:
-            body['quota_class_set'][update] = updates[update]
-
-        result = self._update('/os-quota-class-sets/%s' % (class_name), body)
-        return self.resource_class(self,
-                                   result['quota_class_set'], loaded=True,
-                                   resp=result.request_ids)

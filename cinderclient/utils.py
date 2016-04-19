@@ -18,6 +18,7 @@ from __future__ import print_function
 import os
 import pkg_resources
 import sys
+import types
 import uuid
 
 import six
@@ -268,3 +269,10 @@ def _load_entry_point(ep_name, name=None):
             return ep.load()
         except (ImportError, pkg_resources.UnknownExtra, AttributeError):
             continue
+
+
+def retype_method(old_type, new_type, namespace):
+    for attr in namespace.values():
+        if (isinstance(attr, types.FunctionType) and
+                getattr(attr, 'service_type', None) == old_type):
+            setattr(attr, 'service_type', new_type)

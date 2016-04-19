@@ -66,11 +66,11 @@ if not hasattr(urlparse, 'parse_qsl'):
     import cgi
     urlparse.parse_qsl = cgi.parse_qsl
 
-_VALID_VERSIONS = ['v1', 'v2']
+_VALID_VERSIONS = ['v1', 'v2', 'v3']
 
 # tell keystoneclient that we can ignore the /v1|v2/{project_id} component of
 # the service catalog when doing discovery lookups
-for svc in ('volume', 'volumev2'):
+for svc in ('volume', 'volumev2', 'volumev3'):
     discover.add_catalog_discover_hack(svc, re.compile('/v[12]/\w+/?$'), '/')
 
 
@@ -580,6 +580,7 @@ def get_client_class(version):
     version_map = {
         '1': 'cinderclient.v1.client.Client',
         '2': 'cinderclient.v2.client.Client',
+        '3': 'cinderclient.v3.client.Client',
     }
     try:
         client_path = version_map[str(version)]

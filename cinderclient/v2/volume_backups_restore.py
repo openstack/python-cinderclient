@@ -13,31 +13,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""Volume Backups Restore interface (1.1 extension).
+"""Volume Backups Restore interface (v2 extension).
 
 This is part of the Volume Backups interface.
 """
 
-from cinderclient import base
+from cinderclient.v3.volume_backups_restore import *  # flake8: noqa
 
-
-class VolumeBackupsRestore(base.Resource):
-    """A Volume Backups Restore represents a restore operation."""
-    def __repr__(self):
-        return "<VolumeBackupsRestore: %s>" % self.volume_id
-
-
-class VolumeBackupRestoreManager(base.Manager):
-    """Manage :class:`VolumeBackupsRestore` resources."""
-    resource_class = VolumeBackupsRestore
-
-    def restore(self, backup_id, volume_id=None):
-        """Restore a backup to a volume.
-
-        :param backup_id: The ID of the backup to restore.
-        :param volume_id: The ID of the volume to restore the backup to.
-        :rtype: :class:`Restore`
-        """
-        body = {'restore': {'volume_id': volume_id}}
-        return self._create("/backups/%s/restore" % backup_id,
-                            body, "restore")

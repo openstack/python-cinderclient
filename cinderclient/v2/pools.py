@@ -15,48 +15,5 @@
 
 """Pools interface (v2 extension)"""
 
-import six
+from cinderclient.v3.pools import *  # flake8: noqa
 
-from cinderclient import base
-
-
-class Pool(base.Resource):
-    NAME_ATTR = 'name'
-
-    def __repr__(self):
-        return "<Pool: %s>" % self.name
-
-
-class PoolManager(base.Manager):
-    """Manage :class:`Pool` resources."""
-    resource_class = Pool
-
-    def list(self, detailed=False):
-        """Lists all
-
-        :rtype: list of :class:`Pool`
-        """
-        if detailed is True:
-            pools = self._list("/scheduler-stats/get_pools?detail=True",
-                               "pools")
-            # Other than the name, all of the pool data is buried below in
-            # a 'capabilities' dictionary. In order to be consistent with the
-            # get-pools command line, these elements are moved up a level to
-            # be attributes of the pool itself.
-            for pool in pools:
-                if hasattr(pool, 'capabilities'):
-                    for k, v in six.iteritems(pool.capabilities):
-                        setattr(pool, k, v)
-
-                    # Remove the capabilities dictionary since all of its
-                    # elements have been copied up to the containing pool
-                    del pool.capabilities
-            return pools
-        else:
-            pools = self._list("/scheduler-stats/get_pools", "pools")
-
-            # avoid cluttering the basic pool list with capabilities dict
-            for pool in pools:
-                if hasattr(pool, 'capabilities'):
-                    del pool.capabilities
-            return pools
