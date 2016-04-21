@@ -16,10 +16,7 @@
 """cgsnapshot interface (v3 extension)."""
 
 import six
-try:
-    from urllib import urlencode
-except ImportError:
-    from urllib.parse import urlencode
+from six.moves.urllib.parse import urlencode
 
 from cinderclient import base
 from cinderclient.openstack.common.apiclient import base as common_base
