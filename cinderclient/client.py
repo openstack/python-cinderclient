@@ -62,11 +62,6 @@ try:
 except ImportError:
     import simplejson as json
 
-# Python 2.5 compat fix
-if not hasattr(urlparse, 'parse_qsl'):
-    import cgi
-    urlparse.parse_qsl = cgi.parse_qsl
-
 _VALID_VERSIONS = ['v1', 'v2', 'v3']
 V3_SERVICE_TYPE = 'volumev3'
 V2_SERVICE_TYPE = 'volumev2'
