@@ -79,10 +79,11 @@ class ClientTest(utils.TestCase):
                           cinderclient.client.get_volume_api_from_url,
                           unknown_url)
 
+    @mock.patch.object(cinderclient.client, '_log_request_id')
     @mock.patch.object(adapter.Adapter, 'request')
     @mock.patch.object(exceptions, 'from_response')
     def test_sessionclient_request_method(
-            self, mock_from_resp, mock_request):
+            self, mock_from_resp, mock_request, mock_log):
         kwargs = {
             "body": {
                 "volume": {
@@ -115,15 +116,17 @@ class ClientTest(utils.TestCase):
         session_client = cinderclient.client.SessionClient(session=mock.Mock())
         response, body = session_client.request(mock.sentinel.url,
                                                 'POST', **kwargs)
+        self.assertEqual(1, mock_log.call_count)
 
         # In this case, from_response method will not get called
         # because response status_code is < 400
         self.assertEqual(202, response.status_code)
         self.assertFalse(mock_from_resp.called)
 
+    @mock.patch.object(cinderclient.client, '_log_request_id')
     @mock.patch.object(adapter.Adapter, 'request')
     def test_sessionclient_request_method_raises_badrequest(
-            self, mock_request):
+            self, mock_request, mock_log):
         kwargs = {
             "body": {
                 "volume": {
@@ -157,6 +160,7 @@ class ClientTest(utils.TestCase):
         # resp.status_code is 400
         self.assertRaises(exceptions.BadRequest, session_client.request,
                           mock.sentinel.url, 'POST', **kwargs)
+        self.assertEqual(1, mock_log.call_count)
 
     @mock.patch.object(exceptions, 'from_response')
     def test_keystone_request_raises_auth_failure_exception(

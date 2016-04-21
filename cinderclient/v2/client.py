@@ -13,6 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import logging
+
 from cinderclient import client
 from cinderclient import api_versions
 from cinderclient.v2 import availability_zones
@@ -55,7 +57,8 @@ class Client(object):
                  service_type='volumev2', service_name=None,
                  volume_service_name=None, bypass_url=None, retries=None,
                  http_log_debug=False, cacert=None, auth_system='keystone',
-                 auth_plugin=None, session=None, api_version=None, **kwargs):
+                 auth_plugin=None, session=None, api_version=None,
+                 logger=None, **kwargs):
         # FIXME(comstud): Rename the api_key argument above when we
         # know it's not being used as keyword argument
         password = api_key
@@ -93,6 +96,9 @@ class Client(object):
                     setattr(self, extension.name,
                             extension.manager_class(self))
 
+        if not logger:
+            logger = logging.getLogger(__name__)
+
         self.client = client._construct_http_client(
             username=username,
             password=password,
@@ -116,6 +122,7 @@ class Client(object):
             auth_plugin=auth_plugin,
             session=session,
             api_version=self.api_version,
+            logger=logger,
             **kwargs)
 
     def authenticate(self):

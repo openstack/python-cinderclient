@@ -85,6 +85,16 @@ def get_volume_api_from_url(url):
     raise exceptions.UnsupportedVersion(msg)
 
 
+def _log_request_id(logger, resp, service_name):
+    request_id = resp.headers.get('x-openstack-request-id')
+    if request_id:
+        logger.debug('%(method)s call to %(service_type)s for %(url)s '
+                     'used request id %(response_request_id)s',
+                     {'method': resp.request.method,
+                      'service_type': service_name,
+                      'url': resp.url, 'response_request_id': request_id})
+
+
 class SessionClient(adapter.LegacyJsonAdapter):
 
     def __init__(self, *args, **kwargs):
@@ -102,6 +112,11 @@ class SessionClient(adapter.LegacyJsonAdapter):
         resp, body = super(SessionClient, self).request(*args,
                                                         raise_exc=False,
                                                         **kwargs)
+
+        # if service name is None then use service_type for logging
+        service = self.service_name or self.service_type
+        _log_request_id(self.logger, resp, service)
+
         if raise_exc and resp.status_code >= 400:
             raise exceptions.from_response(resp, body)
 
@@ -162,7 +177,8 @@ class HTTPClient(object):
                  service_name=None, volume_service_name=None,
                  bypass_url=None, retries=None,
                  http_log_debug=False, cacert=None,
-                 auth_system='keystone', auth_plugin=None, api_version=None):
+                 auth_system='keystone', auth_plugin=None, api_version=None,
+                 logger=None):
         self.user = user
         self.password = password
         self.projectid = projectid
@@ -205,7 +221,7 @@ class HTTPClient(object):
         self.auth_system = auth_system
         self.auth_plugin = auth_plugin
 
-        self._logger = logging.getLogger(__name__)
+        self._logger = logger or logging.getLogger(__name__)
 
     def _safe_header(self, name, value):
         if name in HTTPClient.SENSITIVE_HEADERS:
@@ -249,6 +265,10 @@ class HTTPClient(object):
             resp.status_code,
             resp.headers,
             resp.text)
+
+        # if service name is None then use service_type for logging
+        service = self.service_name or self.service_type
+        _log_request_id(self._logger, resp, service)
 
     def request(self, url, method, **kwargs):
         kwargs.setdefault('headers', kwargs.get('headers', {}))
@@ -561,6 +581,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
     else:
         # FIXME(jamielennox): username and password are now optional. Need
         # to test that they were provided in this mode.
+        logger = kwargs.get('logger')
         return HTTPClient(username,
                           password,
                           projectid=project_id,
@@ -581,6 +602,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                           cacert=cacert,
                           auth_system=auth_system,
                           auth_plugin=auth_plugin,
+                          logger=logger
                           )
 
 

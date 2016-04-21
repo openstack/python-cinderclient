@@ -107,6 +107,10 @@ class CinderClientArgumentParser(argparse.ArgumentParser):
 
 class OpenStackCinderShell(object):
 
+    def __init__(self):
+        self.ks_logger = None
+        self.client_logger = None
+
     def get_base_parser(self):
         parser = CinderClientArgumentParser(
             prog='cinder',
@@ -455,15 +459,16 @@ class OpenStackCinderShell(object):
         logger.setLevel(logging.WARNING)
         logger.addHandler(streamhandler)
 
-        client_logger = logging.getLogger(client.__name__)
+        self.client_logger = logging.getLogger(client.__name__)
         ch = logging.StreamHandler()
-        client_logger.setLevel(logging.DEBUG)
-        client_logger.addHandler(ch)
+        self.client_logger.setLevel(logging.DEBUG)
+        self.client_logger.addHandler(ch)
         if hasattr(requests, 'logging'):
             requests.logging.getLogger(requests.__name__).addHandler(ch)
+
         # required for logging when using a keystone session
-        ks_logger = logging.getLogger("keystoneclient")
-        ks_logger.setLevel(logging.DEBUG)
+        self.ks_logger = logging.getLogger("keystoneclient")
+        self.ks_logger.setLevel(logging.DEBUG)
 
     def _delimit_metadata_args(self, argv):
         """This function adds -- separator at the appropriate spot
@@ -633,22 +638,24 @@ class OpenStackCinderShell(object):
 
         insecure = self.options.insecure
 
-        self.cs = client.Client(api_version, os_username,
-                                os_password, os_tenant_name, os_auth_url,
-                                region_name=os_region_name,
-                                tenant_id=os_tenant_id,
-                                endpoint_type=endpoint_type,
-                                extensions=self.extensions,
-                                service_type=service_type,
-                                service_name=service_name,
-                                volume_service_name=volume_service_name,
-                                bypass_url=bypass_url,
-                                retries=options.retries,
-                                http_log_debug=args.debug,
-                                insecure=insecure,
-                                cacert=cacert, auth_system=os_auth_system,
-                                auth_plugin=auth_plugin,
-                                session=auth_session)
+        self.cs = client.Client(
+            api_version, os_username,
+            os_password, os_tenant_name, os_auth_url,
+            region_name=os_region_name,
+            tenant_id=os_tenant_id,
+            endpoint_type=endpoint_type,
+            extensions=self.extensions,
+            service_type=service_type,
+            service_name=service_name,
+            volume_service_name=volume_service_name,
+            bypass_url=bypass_url,
+            retries=options.retries,
+            http_log_debug=args.debug,
+            insecure=insecure,
+            cacert=cacert, auth_system=os_auth_system,
+            auth_plugin=auth_plugin,
+            session=auth_session,
+            logger=self.ks_logger if auth_session else self.client_logger)
 
         try:
             if not utils.isunauthenticated(args.func):
