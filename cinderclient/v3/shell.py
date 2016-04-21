@@ -1299,9 +1299,9 @@ def do_migrate(cs, args):
     try:
         volume.migrate_volume(args.host, args.force_host_copy,
                               args.lock_volume)
-        print("Request to migrate volume %s has been accepted." % (volume))
+        print("Request to migrate volume %s has been accepted." % (volume.id))
     except Exception as e:
-        print("Migration for volume %s failed: %s." % (volume,
+        print("Migration for volume %s failed: %s." % (volume.id,
                                                        six.text_type(e)))
 
 
