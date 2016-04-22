@@ -26,7 +26,6 @@ import os
 import six
 from six.moves.urllib import parse
 
-from cinderclient import api_versions
 from cinderclient import exceptions
 from cinderclient.openstack.common.apiclient import base as common_base
 from cinderclient import utils
@@ -63,12 +62,11 @@ class Manager(common_base.HookableMixin):
     resource_class = None
 
     def __init__(self, api):
-        self._api_version = api_versions.APIVersion()
         self.api = api
 
     @property
     def api_version(self):
-        return self._api_version
+        return self.api.api_version
 
     def _list(self, url, response_key, obj_class=None, body=None,
               limit=None, items=None):

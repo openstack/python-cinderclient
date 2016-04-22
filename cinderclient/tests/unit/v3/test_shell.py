@@ -74,10 +74,21 @@ class ShellTest(utils.TestCase):
         expected = {'os-volume_upload_image': {'force': False,
                                                'container_format': 'bare',
                                                'disk_format': 'raw',
+                                               'image_name': 'test-image'}}
+        self.run_command('upload-to-image 1234 test-image')
+        self.assert_called_anytime('GET', '/volumes/1234')
+        self.assert_called_anytime('POST', '/volumes/1234/action',
+                                   body=expected)
+
+    def test_upload_to_image_private_not_protected(self):
+        expected = {'os-volume_upload_image': {'force': False,
+                                               'container_format': 'bare',
+                                               'disk_format': 'raw',
                                                'image_name': 'test-image',
                                                'protected': False,
                                                'visibility': 'private'}}
-        self.run_command('upload-to-image 1234 test-image')
+        self.run_command('--os-volume-api-version 3.1 '
+                         'upload-to-image 1234 test-image')
         self.assert_called_anytime('GET', '/volumes/1234')
         self.assert_called_anytime('POST', '/volumes/1234/action',
                                    body=expected)
@@ -89,7 +100,8 @@ class ShellTest(utils.TestCase):
                                                'image_name': 'test-image',
                                                'protected': 'True',
                                                'visibility': 'public'}}
-        self.run_command('upload-to-image --visibility=public '
+        self.run_command('--os-volume-api-version 3.1 '
+                         'upload-to-image --visibility=public '
                          '--protected=True 1234 test-image')
         self.assert_called_anytime('GET', '/volumes/1234')
         self.assert_called_anytime('POST', '/volumes/1234/action',
