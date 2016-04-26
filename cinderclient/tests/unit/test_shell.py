@@ -142,6 +142,7 @@ class ShellTest(utils.TestCase):
         for count in range(1, 4):
             self.list_volumes_on_service(count)
 
+    @mock.patch('keystoneclient.auth.identity.v2.Password')
     @mock.patch('keystoneclient.adapter.Adapter.get_token',
                 side_effect=ks_exc.ConnectionRefused())
     @mock.patch('keystoneclient.discover.Discover',
@@ -149,11 +150,19 @@ class ShellTest(utils.TestCase):
     @mock.patch('sys.stdin', side_effect=mock.MagicMock)
     @mock.patch('getpass.getpass', return_value='password')
     def test_password_prompted(self, mock_getpass, mock_stdin, mock_discover,
-                               mock_token):
+                               mock_token, mock_password):
         self.make_env(exclude='OS_PASSWORD')
         _shell = shell.OpenStackCinderShell()
         self.assertRaises(ks_exc.ConnectionRefused, _shell.main, ['list'])
         mock_getpass.assert_called_with('OS Password: ')
+        # Verify that Password() is called with value of param 'password'
+        # equal to mock_getpass.return_value.
+        mock_password.assert_called_with(
+            self.FAKE_ENV['OS_AUTH_URL'],
+            password=mock_getpass.return_value,
+            tenant_id='',
+            tenant_name=self.FAKE_ENV['OS_TENANT_NAME'],
+            username=self.FAKE_ENV['OS_USERNAME'])
 
     @mock.patch.object(requests, "request")
     @mock.patch.object(pkg_resources, "iter_entry_points")

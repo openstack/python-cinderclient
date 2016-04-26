@@ -573,6 +573,9 @@ class OpenStackCinderShell(object):
                     # Check for Ctl-D
                     try:
                         os_password = getpass.getpass('OS Password: ')
+                        # Initialize options.os_password with password
+                        # input from tty. It is used in _get_keystone_session.
+                        options.os_password = os_password
                     except EOFError:
                         pass
                 # No password because we didn't have a tty or the
