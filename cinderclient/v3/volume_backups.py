@@ -26,9 +26,9 @@ class VolumeBackup(base.Resource):
     def __repr__(self):
         return "<VolumeBackup: %s>" % self.id
 
-    def delete(self):
+    def delete(self, force=False):
         """Delete this volume backup."""
-        return self.manager.delete(self)
+        return self.manager.delete(self, force)
 
     def reset_state(self, state):
         return self.manager.reset_state(self, state)
@@ -81,12 +81,16 @@ class VolumeBackupManager(base.ManagerWithFind):
                                    limit=limit, sort=sort)
         return self._list(url, resource_type, limit=limit)
 
-    def delete(self, backup):
+    def delete(self, backup, force=False):
         """Delete a volume backup.
 
         :param backup: The :class:`VolumeBackup` to delete.
+        :param force: Allow delete in state other than error or available.
         """
-        return self._delete("/backups/%s" % base.getid(backup))
+        if force:
+            return self._action('os-force_delete', backup)
+        else:
+            return self._delete("/backups/%s" % base.getid(backup))
 
     def reset_state(self, backup, state):
         """Update the specified volume backup with the provided state."""
