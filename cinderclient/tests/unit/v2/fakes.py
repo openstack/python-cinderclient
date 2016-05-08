@@ -356,6 +356,8 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert 'status' in body['os-reset_status']
         elif action == 'os-update_snapshot_status':
             assert 'status' in body['os-update_snapshot_status']
+        elif action == 'os-force_delete':
+            assert body[action] is None
         elif action == 'os-unmanage':
             assert body[action] is None
         else:

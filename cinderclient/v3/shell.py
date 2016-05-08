@@ -780,13 +780,19 @@ def do_snapshot_create(cs, args):
 @utils.arg('snapshot',
            metavar='<snapshot>', nargs='+',
            help='Name or ID of the snapshot(s) to delete.')
+@utils.arg('--force',
+           action="store_true",
+           help='Allows deleting snapshot of a volume '
+           'when its status is other than "available" or "error". '
+           'Default=False.')
 @utils.service_type('volumev3')
 def do_snapshot_delete(cs, args):
     """Removes one or more snapshots."""
     failure_count = 0
+
     for snapshot in args.snapshot:
         try:
-            _find_volume_snapshot(cs, snapshot).delete()
+            _find_volume_snapshot(cs, snapshot).delete(args.force)
         except Exception as e:
             failure_count += 1
             print("Delete for snapshot %s failed: %s" % (snapshot, e))
