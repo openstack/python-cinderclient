@@ -115,7 +115,7 @@ class Client(object):
             auth_system=auth_system,
             auth_plugin=auth_plugin,
             session=session,
-            api_version=api_version,
+            api_version=self.api_version,
             **kwargs)
 
     def authenticate(self):
