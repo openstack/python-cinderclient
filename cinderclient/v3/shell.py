@@ -1214,18 +1214,28 @@ def do_quota_class_update(cs, args):
     _quota_update(cs.quota_classes, args.class_name, args)
 
 
+@utils.arg('tenant',
+           metavar='<tenant_id>',
+           nargs='?',
+           default=None,
+           help='Display information for a single tenant (Admin only).')
 @utils.service_type('volumev3')
 def do_absolute_limits(cs, args):
     """Lists absolute limits for a user."""
-    limits = cs.limits.get().absolute
+    limits = cs.limits.get(args.tenant).absolute
     columns = ['Name', 'Value']
     utils.print_list(limits, columns)
 
 
+@utils.arg('tenant',
+           metavar='<tenant_id>',
+           nargs='?',
+           default=None,
+           help='Display information for a single tenant (Admin only).')
 @utils.service_type('volumev3')
 def do_rate_limits(cs, args):
     """Lists rate limits for a user."""
-    limits = cs.limits.get().rate
+    limits = cs.limits.get(args.tenant).rate
     columns = ['Verb', 'URI', 'Value', 'Remain', 'Unit', 'Next_Available']
     utils.print_list(limits, columns)
 

@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from six.moves.urllib import parse
+
 from cinderclient import base
 
 
@@ -83,9 +85,15 @@ class LimitsManager(base.Manager):
 
     resource_class = Limits
 
-    def get(self):
+    def get(self, tenant_id=None):
         """Get a specific extension.
 
         :rtype: :class:`Limits`
         """
-        return self._get("/limits", "limits")
+        opts = {}
+        if tenant_id:
+            opts['tenant_id'] = tenant_id
+
+        query_string = "?%s" % parse.urlencode(opts) if opts else ""
+
+        return self._get("/limits%s" % query_string, "limits")
