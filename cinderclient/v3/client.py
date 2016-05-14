@@ -22,6 +22,7 @@ from cinderclient.v3 import cgsnapshots
 from cinderclient.v3 import clusters
 from cinderclient.v3 import consistencygroups
 from cinderclient.v3 import capabilities
+from cinderclient.v3 import group_types
 from cinderclient.v3 import limits
 from cinderclient.v3 import pools
 from cinderclient.v3 import qos_specs
@@ -70,6 +71,7 @@ class Client(object):
         self.volumes = volumes.VolumeManager(self)
         self.volume_snapshots = volume_snapshots.SnapshotManager(self)
         self.volume_types = volume_types.VolumeTypeManager(self)
+        self.group_types = group_types.GroupTypeManager(self)
         self.volume_type_access = \
             volume_type_access.VolumeTypeAccessManager(self)
         self.volume_encryption_types = \

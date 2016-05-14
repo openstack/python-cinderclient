@@ -133,3 +133,41 @@ class ShellTest(utils.TestCase):
                           self.run_command,
                           '--os-volume-api-version 3.8 '
                           'backup-update --name new-name 1234')
+
+    def test_group_type_list(self):
+        self.run_command('--os-volume-api-version 3.11 group-type-list')
+        self.assert_called_anytime('GET', '/group_types?is_public=None')
+
+    def test_group_type_show(self):
+        self.run_command('--os-volume-api-version 3.11 '
+                         'group-type-show 1')
+        self.assert_called('GET', '/group_types/1')
+
+    def test_group_type_create(self):
+        self.run_command('--os-volume-api-version 3.11 '
+                         'group-type-create test-type-1')
+        self.assert_called('POST', '/group_types')
+
+    def test_group_type_create_public(self):
+        expected = {'group_type': {'name': 'test-type-1',
+                                   'description': 'test_type-1-desc',
+                                   'is_public': True}}
+        self.run_command('--os-volume-api-version 3.11 '
+                         'group-type-create test-type-1 '
+                         '--description=test_type-1-desc '
+                         '--is-public=True')
+        self.assert_called('POST', '/group_types', body=expected)
+
+    def test_group_type_create_private(self):
+        expected = {'group_type': {'name': 'test-type-3',
+                                   'description': 'test_type-3-desc',
+                                   'is_public': False}}
+        self.run_command('--os-volume-api-version 3.11 '
+                         'group-type-create test-type-3 '
+                         '--description=test_type-3-desc '
+                         '--is-public=False')
+        self.assert_called('POST', '/group_types', body=expected)
+
+    def test_group_specs_list(self):
+        self.run_command('--os-volume-api-version 3.11 group-specs-list')
+        self.assert_called('GET', '/group_types?is_public=None')

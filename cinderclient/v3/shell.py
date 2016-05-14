@@ -73,6 +73,11 @@ def _find_vtype(cs, vtype):
     return utils.find_resource(cs.volume_types, vtype)
 
 
+def _find_gtype(cs, gtype):
+    """Gets a group type by name or ID."""
+    return utils.find_resource(cs.group_types, gtype)
+
+
 def _find_backup(cs, backup):
     """Gets a backup by name or ID."""
     return utils.find_resource(cs.backups, backup)
@@ -873,6 +878,10 @@ def _print_volume_type_list(vtypes):
     utils.print_list(vtypes, ['ID', 'Name', 'Description', 'Is_Public'])
 
 
+def _print_group_type_list(gtypes):
+    utils.print_list(gtypes, ['ID', 'Name', 'Description'])
+
+
 @utils.service_type('volumev3')
 def do_type_list(cs, args):
     """Lists available 'volume types'. (Admin only will see private types)"""
@@ -881,10 +890,26 @@ def do_type_list(cs, args):
 
 
 @utils.service_type('volumev3')
+@api_versions.wraps('3.11')
+def do_group_type_list(cs, args):
+    """Lists available 'group types'. (Admin only will see private types)"""
+    gtypes = cs.group_types.list()
+    _print_group_type_list(gtypes)
+
+
+@utils.service_type('volumev3')
 def do_type_default(cs, args):
     """List the default volume type."""
     vtype = cs.volume_types.default()
     _print_volume_type_list([vtype])
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.11')
+def do_group_type_default(cs, args):
+    """List the default group type."""
+    gtype = cs.group_types.default()
+    _print_group_type_list([gtype])
 
 
 @utils.arg('volume_type',
@@ -899,6 +924,21 @@ def do_type_show(cs, args):
 
     info.pop('links', None)
     utils.print_dict(info, formatters=['extra_specs'])
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.11')
+@utils.arg('group_type',
+           metavar='<group_type>',
+           help='Name or ID of the group type.')
+def do_group_type_show(cs, args):
+    """Show group type details."""
+    gtype = _find_gtype(cs, args.group_type)
+    info = dict()
+    info.update(gtype._info)
+
+    info.pop('links', None)
+    utils.print_dict(info, formatters=['group_specs'])
 
 
 @utils.arg('id',
@@ -923,10 +963,40 @@ def do_type_update(cs, args):
 
 
 @utils.service_type('volumev3')
+@api_versions.wraps('3.11')
+@utils.arg('id',
+           metavar='<id>',
+           help='ID of the group type.')
+@utils.arg('--name',
+           metavar='<name>',
+           help='Name of the group type.')
+@utils.arg('--description',
+           metavar='<description>',
+           help='Description of the group type.')
+@utils.arg('--is-public',
+           metavar='<is-public>',
+           help='Make type accessible to the public or not.')
+def do_group_type_update(cs, args):
+    """Updates group type name, description, and/or is_public."""
+    is_public = strutils.bool_from_string(args.is_public)
+    gtype = cs.group_types.update(args.id, args.name, args.description,
+                                  is_public)
+    _print_group_type_list([gtype])
+
+
+@utils.service_type('volumev3')
 def do_extra_specs_list(cs, args):
     """Lists current volume types and extra specs."""
     vtypes = cs.volume_types.list()
     utils.print_list(vtypes, ['ID', 'Name', 'extra_specs'])
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.11')
+def do_group_specs_list(cs, args):
+    """Lists current group types and specs."""
+    gtypes = cs.group_types.list()
+    utils.print_list(gtypes, ['ID', 'Name', 'group_specs'])
 
 
 @utils.arg('name',
@@ -947,6 +1017,25 @@ def do_type_create(cs, args):
     _print_volume_type_list([vtype])
 
 
+@utils.service_type('volumev3')
+@api_versions.wraps('3.11')
+@utils.arg('name',
+           metavar='<name>',
+           help='Name of new group type.')
+@utils.arg('--description',
+           metavar='<description>',
+           help='Description of new group type.')
+@utils.arg('--is-public',
+           metavar='<is-public>',
+           default=True,
+           help='Make type accessible to the public (default true).')
+def do_group_type_create(cs, args):
+    """Creates a group type."""
+    is_public = strutils.bool_from_string(args.is_public)
+    gtype = cs.group_types.create(args.name, args.description, is_public)
+    _print_group_type_list([gtype])
+
+
 @utils.arg('vol_type',
            metavar='<vol_type>', nargs='+',
            help='Name or ID of volume type or types to delete.')
@@ -964,6 +1053,28 @@ def do_type_delete(cs, args):
             failure_count += 1
             print("Delete for volume type %s failed: %s" % (vol_type, e))
     if failure_count == len(args.vol_type):
+        raise exceptions.CommandError("Unable to delete any of the "
+                                      "specified types.")
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.11')
+@utils.arg('group_type',
+           metavar='<group_type>', nargs='+',
+           help='Name or ID of group type or types to delete.')
+def do_group_type_delete(cs, args):
+    """Deletes group type or types."""
+    failure_count = 0
+    for group_type in args.group_type:
+        try:
+            gtype = _find_group_type(cs, group_type)
+            cs.group_types.delete(gtype)
+            print("Request to delete group type %s has been accepted."
+                  % (group_type))
+        except Exception as e:
+            failure_count += 1
+            print("Delete for group type %s failed: %s" % (group_type, e))
+    if failure_count == len(args.group_type):
         raise exceptions.CommandError("Unable to delete any of the "
                                       "specified types.")
 
@@ -991,6 +1102,32 @@ def do_type_key(cs, args):
         vtype.set_keys(keypair)
     elif args.action == 'unset':
         vtype.unset_keys(list(keypair))
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.11')
+@utils.arg('gtype',
+           metavar='<gtype>',
+           help='Name or ID of group type.')
+@utils.arg('action',
+           metavar='<action>',
+           choices=['set', 'unset'],
+           help='The action. Valid values are "set" or "unset."')
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           default=[],
+           help='The group specs key and value pair to set or unset. '
+                'For unset, specify only the key.')
+def do_group_type_key(cs, args):
+    """Sets or unsets group_spec for a group type."""
+    gtype = _find_group_type(cs, args.gtype)
+    keypair = _extract_metadata(args)
+
+    if args.action == 'set':
+        gtype.set_keys(keypair)
+    elif args.action == 'unset':
+        gtype.unset_keys(list(keypair))
 
 
 @utils.arg('--volume-type', metavar='<volume_type>', required=True,
@@ -1248,6 +1385,11 @@ def do_rate_limits(cs, args):
 def _find_volume_type(cs, vtype):
     """Gets a volume type by name or ID."""
     return utils.find_resource(cs.volume_types, vtype)
+
+
+def _find_group_type(cs, gtype):
+    """Gets a group type by name or ID."""
+    return utils.find_resource(cs.group_types, gtype)
 
 
 @utils.arg('volume',

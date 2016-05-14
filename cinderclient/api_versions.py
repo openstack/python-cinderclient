@@ -32,7 +32,7 @@ if not LOG.handlers:
 
 # key is a deprecated version and value is an alternative version.
 DEPRECATED_VERSIONS = {"1": "2"}
-MAX_VERSION = "3.7"
+MAX_VERSION = "3.11"
 
 _SUBSTITUTIONS = {}
 

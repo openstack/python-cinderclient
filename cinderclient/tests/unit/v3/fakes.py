@@ -184,3 +184,67 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
             tenant_id='0fa851f6668144cf9cd8c8419c1646c1')
         return (200, {},
                 {'backups': backup})
+
+    #
+    # GroupTypes
+    #
+    def get_group_types(self, **kw):
+        return (200, {}, {
+            'group_types': [{'id': 1,
+                             'name': 'test-type-1',
+                             'description': 'test_type-1-desc',
+                             'group_specs': {}},
+                            {'id': 2,
+                             'name': 'test-type-2',
+                             'description': 'test_type-2-desc',
+                             'group_specs': {}}]})
+
+    def get_group_types_1(self, **kw):
+        return (200, {}, {'group_type': {'id': 1,
+                          'name': 'test-type-1',
+                          'description': 'test_type-1-desc',
+                          'group_specs': {u'key': u'value'}}})
+
+    def get_group_types_2(self, **kw):
+        return (200, {}, {'group_type': {'id': 2,
+                          'name': 'test-type-2',
+                          'description': 'test_type-2-desc',
+                          'group_specs': {}}})
+
+    def get_group_types_3(self, **kw):
+        return (200, {}, {'group_type': {'id': 3,
+                          'name': 'test-type-3',
+                          'description': 'test_type-3-desc',
+                          'group_specs': {},
+                          'is_public': False}})
+
+    def get_group_types_default(self, **kw):
+        return self.get_group_types_1()
+
+    def post_group_types(self, body, **kw):
+        return (202, {}, {'group_type': {'id': 3,
+                          'name': 'test-type-3',
+                          'description': 'test_type-3-desc',
+                          'group_specs': {}}})
+
+    def post_group_types_1_group_specs(self, body, **kw):
+        assert list(body) == ['group_specs']
+        return (200, {}, {'group_specs': {'k': 'v'}})
+
+    def delete_group_types_1_group_specs_k(self, **kw):
+        return(204, {}, None)
+
+    def delete_group_types_1_group_specs_m(self, **kw):
+        return(204, {}, None)
+
+    def delete_group_types_1(self, **kw):
+        return (202, {}, None)
+
+    def delete_group_types_3_group_specs_k(self, **kw):
+        return(204, {}, None)
+
+    def delete_group_types_3(self, **kw):
+        return (202, {}, None)
+
+    def put_group_types_1(self, **kw):
+        return self.get_group_types_1()
