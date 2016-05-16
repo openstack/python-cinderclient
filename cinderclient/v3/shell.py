@@ -88,6 +88,11 @@ def _find_consistencygroup(cs, consistencygroup):
     return utils.find_resource(cs.consistencygroups, consistencygroup)
 
 
+def _find_group(cs, group):
+    """Gets a group by name or ID."""
+    return utils.find_resource(cs.groups, group)
+
+
 def _find_cgsnapshot(cs, cgsnapshot):
     """Gets a cgsnapshot by name or ID."""
     return utils.find_resource(cs.cgsnapshots, cgsnapshot)
@@ -313,6 +318,7 @@ class CheckSizeArgForCreate(argparse.Action):
         setattr(args, self.dest, values)
 
 
+@utils.service_type('volumev3')
 @utils.arg('size',
            metavar='<size>',
            nargs='?',
@@ -325,6 +331,12 @@ class CheckSizeArgForCreate(argparse.Action):
            default=None,
            help='ID of a consistency group where the new volume belongs to. '
                 'Default=None.')
+@utils.arg('--group-id',
+           metavar='<group-id>',
+           default=None,
+           help='ID of a group where the new volume belongs to. '
+                'Default=None.',
+           start_version='3.13')
 @utils.arg('--snapshot-id',
            metavar='<snapshot-id>',
            default=None,
@@ -399,9 +411,9 @@ class CheckSizeArgForCreate(argparse.Action):
            help=('Allow volume to be attached more than once.'
                  ' Default=False'),
            default=False)
-@utils.service_type('volumev3')
 def do_create(cs, args):
     """Creates a volume."""
+
     # NOTE(thingee): Backwards-compatibility with v1 args
     if args.display_name is not None:
         args.name = args.display_name
@@ -431,8 +443,13 @@ def do_create(cs, args):
     # Keep backward compatibility with image_id, favoring explicit ID
     image_ref = args.image_id or args.image or args.image_ref
 
+    try:
+        group_id = args.group_id
+    except AttributeError:
+        group_id = None
     volume = cs.volumes.create(args.size,
                                args.consisgroup_id,
+                               group_id,
                                args.snapshot_id,
                                args.source_volid,
                                args.name,
@@ -1194,7 +1211,8 @@ def do_credentials(cs, args):
 
 _quota_resources = ['volumes', 'snapshots', 'gigabytes',
                     'backups', 'backup_gigabytes',
-                    'consistencygroups', 'per_volume_gigabytes']
+                    'consistencygroups', 'per_volume_gigabytes',
+                    'groups', ]
 _quota_infos = ['Type', 'In_use', 'Reserved', 'Limit']
 
 
@@ -1296,6 +1314,11 @@ def do_quota_defaults(cs, args):
            metavar='<consistencygroups>',
            type=int, default=None,
            help='The new "consistencygroups" quota value. Default=None.')
+@utils.arg('--groups',
+           metavar='<groups>',
+           type=int, default=None,
+           help='The new "groups" quota value. Default=None.',
+           start_version='3.13')
 @utils.arg('--volume-type',
            metavar='<volume_type_name>',
            default=None,
@@ -2596,15 +2619,47 @@ def do_consisgroup_list(cs, args):
     utils.print_list(consistencygroups, columns)
 
 
+@utils.service_type('volumev3')
+@api_versions.wraps('3.13')
+@utils.arg('--all-tenants',
+           dest='all_tenants',
+           metavar='<0|1>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=0,
+           help='Shows details for all tenants. Admin only.')
+def do_group_list(cs, args):
+    """Lists all groups."""
+    groups = cs.groups.list()
+
+    columns = ['ID', 'Status', 'Name']
+    utils.print_list(groups, columns)
+
+
+@utils.service_type('volumev3')
 @utils.arg('consistencygroup',
            metavar='<consistencygroup>',
            help='Name or ID of a consistency group.')
-@utils.service_type('volumev3')
 def do_consisgroup_show(cs, args):
     """Shows details of a consistency group."""
     info = dict()
     consistencygroup = _find_consistencygroup(cs, args.consistencygroup)
     info.update(consistencygroup._info)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
+@utils.arg('group',
+           metavar='<group>',
+           help='Name or ID of a group.')
+@utils.service_type('volumev3')
+def do_group_show(cs, args):
+    """Shows details of a group."""
+    info = dict()
+    group = _find_group(cs, args.group)
+    info.update(group._info)
 
     info.pop('links', None)
     utils.print_dict(info)
@@ -2637,6 +2692,43 @@ def do_consisgroup_create(cs, args):
     info = dict()
     consistencygroup = cs.consistencygroups.get(consistencygroup.id)
     info.update(consistencygroup._info)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.13')
+@utils.arg('grouptype',
+           metavar='<group-type>',
+           help='Group type.')
+@utils.arg('volumetypes',
+           metavar='<volume-types>',
+           help='Comma-separated list of volume types.')
+@utils.arg('--name',
+           metavar='<name>',
+           help='Name of a group.')
+@utils.arg('--description',
+           metavar='<description>',
+           default=None,
+           help='Description of a group. Default=None.')
+@utils.arg('--availability-zone',
+           metavar='<availability-zone>',
+           default=None,
+           help='Availability zone for group. Default=None.')
+def do_group_create(cs, args):
+    """Creates a group."""
+
+    group = cs.groups.create(
+        args.grouptype,
+        args.volumetypes,
+        args.name,
+        args.description,
+        availability_zone=args.availability_zone)
+
+    info = dict()
+    group = cs.groups.get(group.id)
+    info.update(group._info)
 
     info.pop('links', None)
     utils.print_dict(info)
@@ -2709,6 +2801,36 @@ def do_consisgroup_delete(cs, args):
                                       "consistency groups.")
 
 
+@utils.service_type('volumev3')
+@api_versions.wraps('3.13')
+@utils.arg('group',
+           metavar='<group>', nargs='+',
+           help='Name or ID of one or more groups '
+                'to be deleted.')
+@utils.arg('--delete-volumes',
+           action='store_true',
+           default=False,
+           help='Allows or disallows groups to be deleted '
+                'if they are not empty. If the group is empty, '
+                'it can be deleted without the delete-volumes flag. '
+                'If the group is not empty, the delete-volumes '
+                'flag is required for it to be deleted. If True, '
+                'all volumes in the group will also be deleted.')
+def do_group_delete(cs, args):
+    """Removes one or more groups."""
+    failure_count = 0
+    for group in args.group:
+        try:
+            _find_group(cs, group).delete(args.delete_volumes)
+        except Exception as e:
+            failure_count += 1
+            print("Delete for group %s failed: %s" %
+                  (group, e))
+    if failure_count == len(args.group):
+        raise exceptions.CommandError("Unable to delete any of the specified "
+                                      "groups.")
+
+
 @utils.arg('consistencygroup',
            metavar='<consistencygroup>',
            help='Name or ID of a consistency group.')
@@ -2749,6 +2871,49 @@ def do_consisgroup_update(cs, args):
         raise exceptions.ClientException(code=1, message=msg)
 
     _find_consistencygroup(cs, args.consistencygroup).update(**kwargs)
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.13')
+@utils.arg('group',
+           metavar='<group>',
+           help='Name or ID of a group.')
+@utils.arg('--name', metavar='<name>',
+           help='New name for group. Default=None.')
+@utils.arg('--description', metavar='<description>',
+           help='New description for group. Default=None.')
+@utils.arg('--add-volumes',
+           metavar='<uuid1,uuid2,......>',
+           help='UUID of one or more volumes '
+                'to be added to the group, '
+                'separated by commas. Default=None.')
+@utils.arg('--remove-volumes',
+           metavar='<uuid3,uuid4,......>',
+           help='UUID of one or more volumes '
+                'to be removed from the group, '
+                'separated by commas. Default=None.')
+def do_group_update(cs, args):
+    """Updates a group."""
+    kwargs = {}
+
+    if args.name is not None:
+        kwargs['name'] = args.name
+
+    if args.description is not None:
+        kwargs['description'] = args.description
+
+    if args.add_volumes is not None:
+        kwargs['add_volumes'] = args.add_volumes
+
+    if args.remove_volumes is not None:
+        kwargs['remove_volumes'] = args.remove_volumes
+
+    if not kwargs:
+        msg = ('At least one of the following args must be supplied: '
+               'name, description, add-volumes, remove-volumes.')
+        raise exceptions.ClientException(code=1, message=msg)
+
+    _find_group(cs, args.group).update(**kwargs)
 
 
 @utils.arg('--all-tenants',

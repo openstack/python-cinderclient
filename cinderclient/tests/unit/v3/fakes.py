@@ -19,6 +19,24 @@ from cinderclient.v3 import client
 from cinderclient.tests.unit.v2 import fakes as fake_v2
 
 
+def _stub_group(detailed=True, **kwargs):
+    group = {
+        "name": "test-1",
+        "id": "1234",
+    }
+    if detailed:
+        details = {
+            "created_at": "2012-08-28T16:30:31.000000",
+            "description": "test-1-desc",
+            "availability_zone": "zone1",
+            "status": "available",
+            "group_type": "my_group_type",
+        }
+        group.update(details)
+    group.update(kwargs)
+    return group
+
+
 class FakeClient(fakes.FakeClient, client.Client):
 
     def __init__(self, api_version=None, *args, **kwargs):
@@ -248,3 +266,39 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
 
     def put_group_types_1(self, **kw):
         return self.get_group_types_1()
+
+    #
+    # Groups
+    #
+
+    def get_groups_detail(self, **kw):
+        return (200, {}, {"groups": [
+            _stub_group(id='1234'),
+            _stub_group(id='4567')]})
+
+    def get_groups(self, **kw):
+        return (200, {}, {"groups": [
+            _stub_group(detailed=False, id='1234'),
+            _stub_group(detailed=False, id='4567')]})
+
+    def get_groups_1234(self, **kw):
+        return (200, {}, {'group':
+                          _stub_group(id='1234')})
+
+    def post_groups(self, **kw):
+        group = _stub_group(id='1234', group_type='my_group_type',
+                            volume_types=['type1', 'type2'])
+        return (202, {}, {'group': group})
+
+    def put_groups_1234(self, **kw):
+        return (200, {}, {'group': {}})
+
+    def post_groups_1234_action(self, body, **kw):
+        resp = 202
+        assert len(list(body)) == 1
+        action = list(body)[0]
+        if action == 'delete':
+            assert 'delete-volumes' in body[action]
+        else:
+            raise AssertionError("Unexpected action: %s" % action)
+        return (resp, {}, {})

@@ -214,7 +214,8 @@ class VolumeManager(base.ManagerWithFind):
     """Manage :class:`Volume` resources."""
     resource_class = Volume
 
-    def create(self, size, consistencygroup_id=None, snapshot_id=None,
+    def create(self, size, consistencygroup_id=None,
+               group_id=None, snapshot_id=None,
                source_volid=None, name=None, description=None,
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
@@ -224,6 +225,7 @@ class VolumeManager(base.ManagerWithFind):
 
         :param size: Size of volume in GB
         :param consistencygroup_id: ID of the consistencygroup
+        :param group_id: ID of the group
         :param snapshot_id: ID of the snapshot
         :param name: Name of the volume
         :param description: Description of the volume
@@ -263,6 +265,9 @@ class VolumeManager(base.ManagerWithFind):
                            'source_replica': source_replica,
                            'multiattach': multiattach,
                            }}
+
+        if group_id:
+            body['volume']['group_id'] = group_id
 
         if scheduler_hints:
             body['OS-SCH-HNT:scheduler_hints'] = scheduler_hints

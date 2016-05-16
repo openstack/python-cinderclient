@@ -13,6 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import ddt
+
 import fixtures
 import mock
 from requests_mock.contrib import fixture as requests_mock_fixture
@@ -25,6 +27,7 @@ from cinderclient.tests.unit.v3 import fakes
 from cinderclient.tests.unit.fixture_data import keystone_client
 
 
+@ddt.ddt
 @mock.patch.object(client, 'Client', fakes.FakeClient)
 class ShellTest(utils.TestCase):
 
@@ -183,3 +186,78 @@ class ShellTest(utils.TestCase):
     def test_group_specs_list(self):
         self.run_command('--os-volume-api-version 3.11 group-specs-list')
         self.assert_called('GET', '/group_types?is_public=None')
+
+    def test_create_volume_with_group(self):
+        self.run_command('--os-volume-api-version 3.13 create --group-id 5678 '
+                         '--volume-type 4321 1')
+        self.assert_called('GET', '/volumes/1234')
+        expected = {'volume': {'imageRef': None,
+                               'project_id': None,
+                               'status': 'creating',
+                               'size': 1,
+                               'user_id': None,
+                               'availability_zone': None,
+                               'source_replica': None,
+                               'attach_status': 'detached',
+                               'source_volid': None,
+                               'consistencygroup_id': None,
+                               'group_id': '5678',
+                               'name': None,
+                               'snapshot_id': None,
+                               'metadata': {},
+                               'volume_type': '4321',
+                               'description': None,
+                               'multiattach': False}}
+        self.assert_called_anytime('POST', '/volumes', expected)
+
+    def test_group_list(self):
+        self.run_command('--os-volume-api-version 3.13 group-list')
+        self.assert_called_anytime('GET', '/groups/detail')
+
+    def test_group_show(self):
+        self.run_command('--os-volume-api-version 3.13 '
+                         'group-show 1234')
+        self.assert_called('GET', '/groups/1234')
+
+    @ddt.data(True, False)
+    def test_group_delete(self, delete_vol):
+        cmd = '--os-volume-api-version 3.13 group-delete 1234'
+        if delete_vol:
+            cmd += ' --delete-volumes'
+        self.run_command(cmd)
+        expected = {'delete': {'delete-volumes': delete_vol}}
+        self.assert_called('POST', '/groups/1234/action', expected)
+
+    def test_group_create(self):
+        expected = {'group': {'name': 'test-1',
+                              'description': 'test-1-desc',
+                              'user_id': None,
+                              'project_id': None,
+                              'status': 'creating',
+                              'group_type': 'my_group_type',
+                              'volume_types': ['type1', 'type2'],
+                              'availability_zone': 'zone1'}}
+        self.run_command('--os-volume-api-version 3.13 '
+                         'group-create --name test-1 '
+                         '--description test-1-desc '
+                         '--availability-zone zone1 '
+                         'my_group_type type1,type2')
+        self.assert_called_anytime('POST', '/groups', body=expected)
+
+    def test_group_update(self):
+        self.run_command('--os-volume-api-version 3.13 group-update '
+                         '--name group2 --description desc2 '
+                         '--add-volumes uuid1,uuid2 '
+                         '--remove-volumes uuid3,uuid4 '
+                         '1234')
+        expected = {'group': {'name': 'group2',
+                              'description': 'desc2',
+                              'add_volumes': 'uuid1,uuid2',
+                              'remove_volumes': 'uuid3,uuid4'}}
+        self.assert_called('PUT', '/groups/1234',
+                           body=expected)
+
+    def test_group_update_invalid_args(self):
+        self.assertRaises(exceptions.ClientException,
+                          self.run_command,
+                          '--os-volume-api-version 3.13 group-update 1234')

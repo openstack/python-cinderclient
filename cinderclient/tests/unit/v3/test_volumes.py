@@ -1,4 +1,5 @@
 # Copyright 2016 FUJITSU LIMITED
+# Copyright (c) 2016 EMC Corporation
 #
 # All Rights Reserved.
 #
@@ -20,6 +21,8 @@ from cinderclient.tests.unit.v3 import fakes
 from cinderclient.v3.volumes import Volume
 from cinderclient.v3.volumes import VolumeManager
 
+cs = fakes.FakeClient()
+
 
 class VolumesTest(utils.TestCase):
 
@@ -40,3 +43,25 @@ class VolumesTest(utils.TestCase):
         fake_volume.upload_to_image(False, 'name', 'bare', 'raw',
                                     visibility='public', protected=True)
         cs.assert_called_anytime('POST', '/volumes/1234/action', body=expected)
+
+    def test_create_volume(self):
+        vol = cs.volumes.create(1, group_id='1234', volume_type='5678')
+        expected = {'volume': {'status': 'creating',
+                               'description': None,
+                               'availability_zone': None,
+                               'source_volid': None,
+                               'snapshot_id': None,
+                               'size': 1,
+                               'user_id': None,
+                               'name': None,
+                               'imageRef': None,
+                               'attach_status': 'detached',
+                               'volume_type': '5678',
+                               'project_id': None,
+                               'metadata': {},
+                               'source_replica': None,
+                               'consistencygroup_id': None,
+                               'multiattach': False,
+                               'group_id': '1234'}}
+        cs.assert_called('POST', '/volumes', body=expected)
+        self._assert_request_id(vol)
