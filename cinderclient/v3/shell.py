@@ -1256,6 +1256,14 @@ def _find_volume_type(cs, vtype):
            help='The new image name.')
 @utils.arg('--image_name',
            help=argparse.SUPPRESS)
+@utils.arg('--visibility',
+           metavar='<public|private>',
+           help='Makes image publicly accessible. Default=private.',
+           default='private')
+@utils.arg('--protected',
+           metavar='<True|False>',
+           help='Prevents image from being deleted. Default=False.',
+           default=False)
 @utils.service_type('volumev3')
 def do_upload_to_image(cs, args):
     """Uploads volume to Image Service as an image."""
@@ -1263,7 +1271,9 @@ def do_upload_to_image(cs, args):
     _print_volume_image(volume.upload_to_image(args.force,
                                                args.image_name,
                                                args.container_format,
-                                               args.disk_format))
+                                               args.disk_format,
+                                               args.visibility,
+                                               args.protected))
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of volume to migrate.')
