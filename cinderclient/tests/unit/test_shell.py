@@ -214,6 +214,29 @@ class ShellTest(utils.TestCase):
 
         self.assertEqual(False, _shell.cs.client.verify_cert)
 
+    @mock.patch('keystoneclient.session.Session.__init__',
+                side_effect=RuntimeError())
+    def test_http_client_with_cert(self, mock_session):
+        _shell = shell.OpenStackCinderShell()
+
+        # We crash the command after Session instantiation because this test
+        # focuses only on arguments provided to Session.__init__
+        args = '--os-cert', 'minnie', 'list'
+        self.assertRaises(RuntimeError, _shell.main, args)
+        mock_session.assert_called_once_with(cert='minnie', verify=mock.ANY)
+
+    @mock.patch('keystoneclient.session.Session.__init__',
+                side_effect=RuntimeError())
+    def test_http_client_with_cert_and_key(self, mock_session):
+        _shell = shell.OpenStackCinderShell()
+
+        # We crash the command after Session instantiation because this test
+        # focuses only on arguments provided to Session.__init__
+        args = '--os-cert', 'minnie', '--os-key', 'mickey', 'list'
+        self.assertRaises(RuntimeError, _shell.main, args)
+        mock_session.assert_called_once_with(cert=('minnie', 'mickey'),
+                                             verify=mock.ANY)
+
 
 class CinderClientArgumentParserTest(utils.TestCase):
 

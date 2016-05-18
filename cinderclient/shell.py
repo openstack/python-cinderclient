@@ -802,6 +802,9 @@ class OpenStackCinderShell(object):
         # first create a Keystone session
         cacert = self.options.os_cacert or None
         cert = self.options.os_cert or None
+        if cert and self.options.os_key:
+            cert = cert, self.options.os_key
+
         insecure = self.options.insecure or False
 
         if insecure:
