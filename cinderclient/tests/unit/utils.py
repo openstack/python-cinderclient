@@ -44,6 +44,11 @@ class TestCase(testtools.TestCase):
         self.assertTrue(hasattr(obj, 'request_ids'))
         self.assertEqual(REQUEST_ID, obj.request_ids)
 
+    def assert_called_anytime(self, method, url, body=None,
+                              partial_body=None):
+        return self.shell.cs.assert_called_anytime(method, url, body,
+                                                   partial_body)
+
 
 class FixturedTestCase(TestCase):
 

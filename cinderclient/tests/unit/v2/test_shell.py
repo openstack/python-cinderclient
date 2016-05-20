@@ -71,11 +71,6 @@ class ShellTest(utils.TestCase):
         return self.shell.cs.assert_called(method, url, body,
                                            partial_body, **kwargs)
 
-    def assert_called_anytime(self, method, url, body=None,
-                              partial_body=None):
-        return self.shell.cs.assert_called_anytime(method, url, body,
-                                                   partial_body)
-
     def test_list(self):
         self.run_command('list')
         # NOTE(jdg): we default to detail currently
@@ -359,9 +354,7 @@ class ShellTest(utils.TestCase):
         expected = {'os-volume_upload_image': {'force': False,
                                                'container_format': 'bare',
                                                'disk_format': 'raw',
-                                               'image_name': 'test-image',
-                                               'protected': False,
-                                               'visibility': 'private'}}
+                                               'image_name': 'test-image'}}
         self.run_command('upload-to-image 1234 test-image')
         self.assert_called_anytime('GET', '/volumes/1234')
         self.assert_called_anytime('POST', '/volumes/1234/action',
@@ -371,23 +364,8 @@ class ShellTest(utils.TestCase):
         expected = {'os-volume_upload_image': {'force': 'True',
                                                'container_format': 'bare',
                                                'disk_format': 'raw',
-                                               'image_name': 'test-image',
-                                               'protected': False,
-                                               'visibility': 'private'}}
+                                               'image_name': 'test-image'}}
         self.run_command('upload-to-image --force=True 1234 test-image')
-        self.assert_called_anytime('GET', '/volumes/1234')
-        self.assert_called_anytime('POST', '/volumes/1234/action',
-                                   body=expected)
-
-    def test_upload_to_image_public_protected(self):
-        expected = {'os-volume_upload_image': {'force': False,
-                                               'container_format': 'bare',
-                                               'disk_format': 'raw',
-                                               'image_name': 'test-image',
-                                               'protected': 'True',
-                                               'visibility': 'public'}}
-        self.run_command('upload-to-image --visibility=public '
-                         '--protected=True 1234 test-image')
         self.assert_called_anytime('GET', '/volumes/1234')
         self.assert_called_anytime('POST', '/volumes/1234/action',
                                    body=expected)

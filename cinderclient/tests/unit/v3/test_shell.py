@@ -68,3 +68,28 @@ class ShellTest(utils.TestCase):
     def test_list_availability_zone(self):
         self.run_command('availability-zone-list')
         self.assert_called('GET', '/os-availability-zone')
+
+    def test_upload_to_image(self):
+        expected = {'os-volume_upload_image': {'force': False,
+                                               'container_format': 'bare',
+                                               'disk_format': 'raw',
+                                               'image_name': 'test-image',
+                                               'protected': False,
+                                               'visibility': 'private'}}
+        self.run_command('upload-to-image 1234 test-image')
+        self.assert_called_anytime('GET', '/volumes/1234')
+        self.assert_called_anytime('POST', '/volumes/1234/action',
+                                   body=expected)
+
+    def test_upload_to_image_public_protected(self):
+        expected = {'os-volume_upload_image': {'force': False,
+                                               'container_format': 'bare',
+                                               'disk_format': 'raw',
+                                               'image_name': 'test-image',
+                                               'protected': 'True',
+                                               'visibility': 'public'}}
+        self.run_command('upload-to-image --visibility=public '
+                         '--protected=True 1234 test-image')
+        self.assert_called_anytime('GET', '/volumes/1234')
+        self.assert_called_anytime('POST', '/volumes/1234/action',
+                                   body=expected)

@@ -15,5 +15,31 @@
 
 """Volume interface (v2 extension)."""
 
-from cinderclient.v3.volumes import *  # flake8: noqa
+from cinderclient import api_versions
+from cinderclient.v3 import volumes
 
+
+class Volume(volumes.Volume):
+    def upload_to_image(self, force, image_name, container_format,
+                        disk_format):
+        """Upload a volume to image service as an image."""
+        return self.manager.upload_to_image(self, force, image_name,
+                                            container_format, disk_format)
+
+
+class VolumeManager(volumes.VolumeManager):
+    resource_class = Volume
+
+    @api_versions.wraps("2.0")
+    def upload_to_image(self, volume, force, image_name, container_format,
+                        disk_format):
+        """Upload volume to image service as image.
+
+        :param volume: The :class:`Volume` to upload.
+        """
+        return self._action('os-volume_upload_image',
+                            volume,
+                            {'force': force,
+                             'image_name': image_name,
+                             'container_format': container_format,
+                             'disk_format': disk_format})

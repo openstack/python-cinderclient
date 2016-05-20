@@ -453,9 +453,9 @@ class VolumeManager(base.ManagerWithFind):
         """
         return self._action("os-show_image_metadata", volume)
 
-    @api_versions.wraps("2.0", "3.0")
+    @api_versions.wraps("3.0")
     def upload_to_image(self, volume, force, image_name, container_format,
-                        disk_format, visibility, protected):
+                        disk_format):
         """Upload volume to image service as image.
 
         :param volume: The :class:`Volume` to upload.
