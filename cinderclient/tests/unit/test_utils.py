@@ -221,10 +221,10 @@ class PrintListTestCase(test_utils.TestCase):
         # Output should be sorted by the first key (a)
         self.assertEqual("""\
 +---+-----+
-| a |  b  |
+| a | b   |
 +---+-----+
 | 1 | c d |
-| 3 |  a  |
+| 3 | a   |
 +---+-----+
 """, cso.read())
 
@@ -237,12 +237,12 @@ class PrintDictTestCase(test_utils.TestCase):
             utils.print_dict(d)
         self.assertEqual("""\
 +----------+---------------+
-| Property |     Value     |
+| Property | Value         |
 +----------+---------------+
-|    a     |       A       |
-|    b     |       B       |
-|    c     |       C       |
-|    d     | test carriage |
-|          |     return    |
+| a        | A             |
+| b        | B             |
+| c        | C             |
+| d        | test carriage |
+|          |  return       |
 +----------+---------------+
 """, cso.read())

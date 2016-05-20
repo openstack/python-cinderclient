@@ -160,7 +160,7 @@ def print_list(objs, fields, exclude_unavailable=False, formatters=None,
         fields.remove(f)
 
     pt = prettytable.PrettyTable((f for f in fields), caching=False)
-    pt.aligns = ['l' for f in fields]
+    pt.align = 'l'
     for row in rows:
         count = 0
         # Converts unicode values in dictionary to string
@@ -188,7 +188,7 @@ def unicode_key_value_to_string(dictionary):
 
 def print_dict(d, property="Property", formatters=None):
     pt = prettytable.PrettyTable([property, 'Value'], caching=False)
-    pt.aligns = ['l', 'l']
+    pt.align = 'l'
     formatters = formatters or {}
 
     for r in six.iteritems(d):
