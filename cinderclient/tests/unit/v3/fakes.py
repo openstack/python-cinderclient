@@ -37,6 +37,25 @@ def _stub_group(detailed=True, **kwargs):
     return group
 
 
+def _stub_group_snapshot(detailed=True, **kwargs):
+    group_snapshot = {
+        "name": None,
+        "id": "5678",
+    }
+    if detailed:
+        details = {
+            "created_at": "2012-08-28T16:30:31.000000",
+            "description": None,
+            "name": None,
+            "id": "5678",
+            "status": "available",
+            "group_id": "1234",
+        }
+        group_snapshot.update(details)
+    group_snapshot.update(kwargs)
+    return group_snapshot
+
+
 class FakeClient(fakes.FakeClient, client.Client):
 
     def __init__(self, api_version=None, *args, **kwargs):
@@ -302,3 +321,46 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, {})
+
+    def post_groups_action(self, body, **kw):
+        group = _stub_group(id='1234', group_type='my_group_type',
+                            volume_types=['type1', 'type2'])
+        resp = 202
+        assert len(list(body)) == 1
+        action = list(body)[0]
+        if action == 'create-from-src':
+            assert ('group_snapshot_id' in body[action] or
+                    'source_group_id' in body[action])
+        else:
+            raise AssertionError("Unexpected action: %s" % action)
+        return (resp, {}, {'group': group})
+
+    #
+    # group_snapshots
+    #
+
+    def get_group_snapshots_detail(self, **kw):
+        return (200, {}, {"group_snapshots": [
+            _stub_group_snapshot(id='1234'),
+            _stub_group_snapshot(id='4567')]})
+
+    def get_group_snapshots(self, **kw):
+        return (200, {}, {"group_snapshots": [
+            _stub_group_snapshot(detailed=False, id='1234'),
+            _stub_group_snapshot(detailed=False, id='4567')]})
+
+    def get_group_snapshots_1234(self, **kw):
+        return (200, {}, {'group_snapshot': _stub_group_snapshot(id='1234')})
+
+    def get_group_snapshots_5678(self, **kw):
+        return (200, {}, {'group_snapshot': _stub_group_snapshot(id='5678')})
+
+    def post_group_snapshots(self, **kw):
+        group_snap = _stub_group_snapshot()
+        return (202, {}, {'group_snapshot': group_snap})
+
+    def put_group_snapshots_1234(self, **kw):
+        return (200, {}, {'group_snapshot': {}})
+
+    def delete_group_snapshots_1234(self, **kw):
+        return (202, {}, {})

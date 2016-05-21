@@ -23,6 +23,7 @@ from cinderclient.v3 import clusters
 from cinderclient.v3 import consistencygroups
 from cinderclient.v3 import capabilities
 from cinderclient.v3 import groups
+from cinderclient.v3 import group_snapshots
 from cinderclient.v3 import group_types
 from cinderclient.v3 import limits
 from cinderclient.v3 import pools
@@ -89,6 +90,7 @@ class Client(object):
             ConsistencygroupManager(self)
         self.groups = groups.GroupManager(self)
         self.cgsnapshots = cgsnapshots.CgsnapshotManager(self)
+        self.group_snapshots = group_snapshots.GroupSnapshotManager(self)
         self.availability_zones = \
             availability_zones.AvailabilityZoneManager(self)
         self.pools = pools.PoolManager(self)

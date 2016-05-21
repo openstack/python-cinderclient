@@ -261,3 +261,51 @@ class ShellTest(utils.TestCase):
         self.assertRaises(exceptions.ClientException,
                           self.run_command,
                           '--os-volume-api-version 3.13 group-update 1234')
+
+    def test_group_snapshot_list(self):
+        self.run_command('--os-volume-api-version 3.14 group-snapshot-list')
+        self.assert_called_anytime('GET', '/group_snapshots/detail')
+
+    def test_group_snapshot_show(self):
+        self.run_command('--os-volume-api-version 3.14 '
+                         'group-snapshot-show 1234')
+        self.assert_called('GET', '/group_snapshots/1234')
+
+    def test_group_snapshot_delete(self):
+        cmd = '--os-volume-api-version 3.14 group-snapshot-delete 1234'
+        self.run_command(cmd)
+        self.assert_called('DELETE', '/group_snapshots/1234')
+
+    def test_group_snapshot_create(self):
+        expected = {'group_snapshot': {'name': 'test-1',
+                                       'description': 'test-1-desc',
+                                       'user_id': None,
+                                       'project_id': None,
+                                       'group_id': '1234',
+                                       'status': 'creating'}}
+        self.run_command('--os-volume-api-version 3.14 '
+                         'group-snapshot-create --name test-1 '
+                         '--description test-1-desc 1234')
+        self.assert_called_anytime('POST', '/group_snapshots', body=expected)
+
+    @ddt.data(
+        {'grp_snap_id': '1234', 'src_grp_id': None,
+         'src': '--group-snapshot 1234'},
+        {'grp_snap_id': None, 'src_grp_id': '1234',
+         'src': '--source-group 1234'},
+    )
+    @ddt.unpack
+    def test_group_create_from_src(self, grp_snap_id, src_grp_id, src):
+        expected = {'create-from-src': {'name': 'test-1',
+                                        'description': 'test-1-desc',
+                                        'user_id': None,
+                                        'project_id': None,
+                                        'status': 'creating',
+                                        'group_snapshot_id': grp_snap_id,
+                                        'source_group_id': src_grp_id}}
+        cmd = ('--os-volume-api-version 3.14 '
+               'group-create-from-src --name test-1 '
+               '--description test-1-desc ')
+        cmd += src
+        self.run_command(cmd)
+        self.assert_called_anytime('POST', '/groups/action', body=expected)

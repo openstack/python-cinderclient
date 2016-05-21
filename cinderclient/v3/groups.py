@@ -66,6 +66,33 @@ class GroupManager(base.ManagerWithFind):
 
         return self._create('/groups', body, 'group')
 
+    def create_from_src(self, group_snapshot_id, source_group_id,
+                        name=None, description=None, user_id=None,
+                        project_id=None):
+        """Creates a group from a group snapshot or a source group.
+
+        :param group_snapshot_id: UUID of a GroupSnapshot
+        :param source_group_id: UUID of a source Group
+        :param name: Name of the Group
+        :param description: Description of the Group
+        :param user_id: User id derived from context
+        :param project_id: Project id derived from context
+        :rtype: A dictionary containing Group metadata
+        """
+        body = {'create-from-src': {'name': name,
+                                    'description': description,
+                                    'group_snapshot_id': group_snapshot_id,
+                                    'source_group_id': source_group_id,
+                                    'user_id': user_id,
+                                    'project_id': project_id,
+                                    'status': "creating", }}
+
+        self.run_hooks('modify_body_for_action', body,
+                       'create-from-src')
+        resp, body = self.api.client.post(
+            "/groups/action", body=body)
+        return common_base.DictWithMeta(body['group'], resp)
+
     def get(self, group_id):
         """Get a group.
 

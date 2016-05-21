@@ -98,6 +98,11 @@ def _find_cgsnapshot(cs, cgsnapshot):
     return utils.find_resource(cs.cgsnapshots, cgsnapshot)
 
 
+def _find_group_snapshot(cs, group_snapshot):
+    """Gets a group_snapshot by name or ID."""
+    return utils.find_resource(cs.group_snapshots, group_snapshot)
+
+
 def _find_transfer(cs, transfer):
     """Gets a transfer by name or ID."""
     return utils.find_resource(cs.transfers, transfer)
@@ -2773,6 +2778,46 @@ def do_consisgroup_create_from_src(cs, args):
     utils.print_dict(info)
 
 
+@utils.service_type('volumev3')
+@api_versions.wraps('3.14')
+@utils.arg('--group-snapshot',
+           metavar='<group-snapshot>',
+           help='Name or ID of a group snapshot. Default=None.')
+@utils.arg('--source-group',
+           metavar='<source-group>',
+           help='Name or ID of a source group. Default=None.')
+@utils.arg('--name',
+           metavar='<name>',
+           help='Name of a group. Default=None.')
+@utils.arg('--description',
+           metavar='<description>',
+           help='Description of a group. Default=None.')
+def do_group_create_from_src(cs, args):
+    """Creates a group from a group snapshot or a source group."""
+    if not args.group_snapshot and not args.source_group:
+        msg = ('Cannot create group because neither '
+               'group snapshot nor source group is provided.')
+        raise exceptions.ClientException(code=1, message=msg)
+    if args.group_snapshot and args.source_group:
+        msg = ('Cannot create group because both '
+               'group snapshot and source group are provided.')
+        raise exceptions.ClientException(code=1, message=msg)
+    group_snapshot = None
+    if args.group_snapshot:
+        group_snapshot = _find_group_snapshot(cs, args.group_snapshot)
+    source_group = None
+    if args.source_group:
+        source_group = _find_group(cs, args.source_group)
+    info = cs.groups.create_from_src(
+        group_snapshot.id if group_snapshot else None,
+        source_group.id if source_group else None,
+        args.name,
+        args.description)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
 @utils.arg('consistencygroup',
            metavar='<consistencygroup>', nargs='+',
            help='Name or ID of one or more consistency groups '
@@ -2950,6 +2995,41 @@ def do_cgsnapshot_list(cs, args):
     utils.print_list(cgsnapshots, columns)
 
 
+@utils.service_type('volumev3')
+@api_versions.wraps('3.14')
+@utils.arg('--all-tenants',
+           dest='all_tenants',
+           metavar='<0|1>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=0,
+           help='Shows details for all tenants. Admin only.')
+@utils.arg('--status',
+           metavar='<status>',
+           default=None,
+           help='Filters results by a status. Default=None.')
+@utils.arg('--group-id',
+           metavar='<group_id>',
+           default=None,
+           help='Filters results by a group ID. Default=None.')
+def do_group_snapshot_list(cs, args):
+    """Lists all group snapshots."""
+
+    all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
+
+    search_opts = {
+        'all_tenants': all_tenants,
+        'status': args.status,
+        'group_id': args.group_id,
+    }
+
+    group_snapshots = cs.group_snapshots.list(search_opts=search_opts)
+
+    columns = ['ID', 'Status', 'Name']
+    utils.print_list(group_snapshots, columns)
+
+
 @utils.arg('cgsnapshot',
            metavar='<cgsnapshot>',
            help='Name or ID of cgsnapshot.')
@@ -2959,6 +3039,21 @@ def do_cgsnapshot_show(cs, args):
     info = dict()
     cgsnapshot = _find_cgsnapshot(cs, args.cgsnapshot)
     info.update(cgsnapshot._info)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.14')
+@utils.arg('group_snapshot',
+           metavar='<group_snapshot>',
+           help='Name or ID of group snapshot.')
+def do_group_snapshot_show(cs, args):
+    """Shows group snapshot details."""
+    info = dict()
+    group_snapshot = _find_group_snapshot(cs, args.group_snapshot)
+    info.update(group_snapshot._info)
 
     info.pop('links', None)
     utils.print_dict(info)
@@ -2992,6 +3087,35 @@ def do_cgsnapshot_create(cs, args):
     utils.print_dict(info)
 
 
+@utils.service_type('volumev3')
+@api_versions.wraps('3.14')
+@utils.arg('group',
+           metavar='<group>',
+           help='Name or ID of a group.')
+@utils.arg('--name',
+           metavar='<name>',
+           default=None,
+           help='Group snapshot name. Default=None.')
+@utils.arg('--description',
+           metavar='<description>',
+           default=None,
+           help='Group snapshot description. Default=None.')
+def do_group_snapshot_create(cs, args):
+    """Creates a group snapshot."""
+    group = _find_group(cs, args.group)
+    group_snapshot = cs.group_snapshots.create(
+        group.id,
+        args.name,
+        args.description)
+
+    info = dict()
+    group_snapshot = cs.group_snapshots.get(group_snapshot.id)
+    info.update(group_snapshot._info)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
 @utils.arg('cgsnapshot',
            metavar='<cgsnapshot>', nargs='+',
            help='Name or ID of one or more cgsnapshots to be deleted.')
@@ -3008,6 +3132,26 @@ def do_cgsnapshot_delete(cs, args):
     if failure_count == len(args.cgsnapshot):
         raise exceptions.CommandError("Unable to delete any of the specified "
                                       "cgsnapshots.")
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.14')
+@utils.arg('group_snapshot',
+           metavar='<group_snapshot>', nargs='+',
+           help='Name or ID of one or more group snapshots to be deleted.')
+def do_group_snapshot_delete(cs, args):
+    """Removes one or more group snapshots."""
+    failure_count = 0
+    for group_snapshot in args.group_snapshot:
+        try:
+            _find_group_snapshot(cs, group_snapshot).delete()
+        except Exception as e:
+            failure_count += 1
+            print("Delete for group snapshot %s failed: %s" %
+                  (group_snapshot, e))
+    if failure_count == len(args.group_snapshot):
+        raise exceptions.CommandError("Unable to delete any of the specified "
+                                      "group snapshots.")
 
 
 @utils.arg('--detail',

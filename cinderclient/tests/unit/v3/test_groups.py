@@ -113,3 +113,37 @@ class GroupsTest(utils.TestCase):
         grp = cs.groups.get(group_id)
         cs.assert_called('GET', '/groups/%s' % group_id)
         self._assert_request_id(grp)
+
+    def test_create_group_from_src_snap(self):
+        grp = cs.groups.create_from_src('5678', None, name='group')
+        expected = {
+            'create-from-src': {
+                'status': 'creating',
+                'description': None,
+                'user_id': None,
+                'name': 'group',
+                'group_snapshot_id': '5678',
+                'project_id': None,
+                'source_group_id': None
+            }
+        }
+        cs.assert_called('POST', '/groups/action',
+                         body=expected)
+        self._assert_request_id(grp)
+
+    def test_create_group_from_src_group_(self):
+        grp = cs.groups.create_from_src(None, '5678', name='group')
+        expected = {
+            'create-from-src': {
+                'status': 'creating',
+                'description': None,
+                'user_id': None,
+                'name': 'group',
+                'source_group_id': '5678',
+                'project_id': None,
+                'group_snapshot_id': None
+            }
+        }
+        cs.assert_called('POST', '/groups/action',
+                         body=expected)
+        self._assert_request_id(grp)
