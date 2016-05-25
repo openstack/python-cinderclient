@@ -14,9 +14,9 @@ import os
 import time
 
 import six
-from tempest_lib.cli import base
-from tempest_lib.cli import output_parser
-from tempest_lib import exceptions
+from tempest.lib.cli import base
+from tempest.lib.cli import output_parser
+from tempest.lib import exceptions
 
 _CREDS_FILE = 'functional_creds.conf'
 
