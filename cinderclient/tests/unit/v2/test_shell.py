@@ -399,6 +399,16 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('DELETE', '/volumes/1234')
         self.assert_called('DELETE', '/volumes/5678')
 
+    def test_delete_with_cascade_true(self):
+        self.run_command('delete 1234 --cascade')
+        self.assert_called('DELETE', '/volumes/1234?cascade=True')
+        self.run_command('delete --cascade 1234')
+        self.assert_called('DELETE', '/volumes/1234?cascade=True')
+
+    def test_delete_with_cascade_with_invalid_value(self):
+        self.assertRaises(SystemExit, self.run_command,
+                          'delete 1234 --cascade 1234')
+
     def test_backup(self):
         self.run_command('backup-create 1234')
         self.assert_called('POST', '/backups')
