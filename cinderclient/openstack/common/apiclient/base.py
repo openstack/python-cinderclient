@@ -524,6 +524,9 @@ class Resource(RequestIdMixin):
             return False
         return self._info == other._info
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def is_loaded(self):
         return self._loaded
 
