@@ -44,10 +44,6 @@ from oslo_utils import encodeutils
 from oslo_utils import importutils
 from oslo_utils import strutils
 
-from cinderclient import _i18n
-# Enable i18n lazy translation
-_i18n.enable_lazy()
-
 osprofiler_web = importutils.try_import("osprofiler.web")
 
 import six.moves.urllib.parse as urlparse
