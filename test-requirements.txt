@@ -7,7 +7,7 @@ coverage>=3.6 # Apache-2.0
 ddt>=1.0.1 # MIT
 discover # BSD
 fixtures<2.0,>=1.3.1 # Apache-2.0/BSD
-mock>=1.2 # BSD
+mock>=2.0 # BSD
 oslosphinx!=3.4.0,>=2.5.0 # Apache-2.0
 python-subunit>=0.0.18 # Apache-2.0/BSD
 reno>=1.6.2 # Apache2
@@ -16,4 +16,4 @@ sphinx!=1.2.0,!=1.3b1,<1.3,>=1.1.2 # BSD
 tempest>=11.0.0 # Apache-2.0
 testtools>=1.4.0 # MIT
 testrepository>=0.0.18 # Apache-2.0/BSD
-os-testr>=0.4.1 # Apache-2.0
+os-testr>=0.7.0 # Apache-2.0
