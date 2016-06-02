@@ -25,9 +25,9 @@ class Snapshot(base.Resource):
     def __repr__(self):
         return "<Snapshot: %s>" % self.id
 
-    def delete(self):
+    def delete(self, force=False):
         """Delete this snapshot."""
-        return self.manager.delete(self)
+        return self.manager.delete(self, force)
 
     def update(self, **kwargs):
         """Update the name or description for this snapshot."""
@@ -118,12 +118,16 @@ class SnapshotManager(base.ManagerWithFind):
                                    limit=limit, sort=sort)
         return self._list(url, resource_type, limit=limit)
 
-    def delete(self, snapshot):
+    def delete(self, snapshot, force=False):
         """Delete a snapshot.
 
         :param snapshot: The :class:`Snapshot` to delete.
+        :param force: Allow delete in state other than error or available.
         """
-        return self._delete("/snapshots/%s" % base.getid(snapshot))
+        if force:
+            return self._action('os-force_delete', snapshot)
+        else:
+            return self._delete("/snapshots/%s" % base.getid(snapshot))
 
     def update(self, snapshot, **kwargs):
         """Update the name or description for a snapshot.

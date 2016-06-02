@@ -946,16 +946,43 @@ class ShellTest(utils.TestCase):
         self.assert_called('POST', '/volumes/1234/action', body=expected)
 
     def test_snapshot_delete(self):
+        """Tests delete snapshot without force parameter"""
         self.run_command('snapshot-delete 1234')
         self.assert_called('DELETE', '/snapshots/1234')
+
+    def test_snapshot_delete_multiple(self):
+        """Tests delete multiple snapshots without force parameter"""
+        self.run_command('snapshot-delete 5678 1234')
+        self.assert_called_anytime('DELETE', '/snapshots/5678')
+        self.assert_called('DELETE', '/snapshots/1234')
+
+    def test_force_snapshot_delete(self):
+        """Tests delete snapshot with default force parameter value(True)"""
+        self.run_command('snapshot-delete 1234 --force')
+        expected_body = {'os-force_delete': None}
+        self.assert_called('POST',
+                           '/snapshots/1234/action',
+                           expected_body)
+
+    def test_force_snapshot_delete_multiple(self):
+        """
+        Tests delete multiple snapshots with force parameter
+
+        Snapshot delete with force parameter allows deleting snapshot of a
+        volume when its status is other than "available" or "error".
+        """
+        self.run_command('snapshot-delete 5678 1234 --force')
+        expected_body = {'os-force_delete': None}
+        self.assert_called_anytime('POST',
+                                   '/snapshots/5678/action',
+                                   expected_body)
+        self.assert_called_anytime('POST',
+                                   '/snapshots/1234/action',
+                                   expected_body)
 
     def test_quota_delete(self):
         self.run_command('quota-delete 1234')
         self.assert_called('DELETE', '/os-quota-sets/1234')
-
-    def test_snapshot_delete_multiple(self):
-        self.run_command('snapshot-delete 5678')
-        self.assert_called('DELETE', '/snapshots/5678')
 
     def test_volume_manage(self):
         self.run_command('manage host1 some_fake_name '
