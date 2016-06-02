@@ -617,8 +617,16 @@ def do_rename(cs, args):
            metavar='<key=value>',
            nargs='+',
            default=[],
+           end_version='3.14',
            help='Metadata key and value pair to set or unset. '
                 'For unset, specify only the key.')
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           default=[],
+           start_version='3.15',
+           help='Metadata key and value pair to set or unset. '
+                'For unset, specify only the key(s): <key key>')
 @utils.service_type('volumev3')
 def do_metadata(cs, args):
     """Sets or deletes volume metadata."""

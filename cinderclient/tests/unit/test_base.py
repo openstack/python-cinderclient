@@ -33,6 +33,8 @@ REQUEST_ID = 'req-test-request-id'
 def create_response_obj_with_header():
     resp = Response()
     resp.headers['x-openstack-request-id'] = REQUEST_ID
+    resp.headers['Etag'] = 'd5103bf7b26ff0310200d110da3ed186'
+    resp.status_code = 200
     return resp
 
 

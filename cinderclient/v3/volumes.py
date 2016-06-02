@@ -435,6 +435,7 @@ class VolumeManager(base.ManagerWithFind):
         return self._create("/volumes/%s/metadata" % base.getid(volume),
                             body, "metadata")
 
+    @api_versions.wraps("2.0")
     def delete_metadata(self, volume, keys):
         """Delete specified keys from volumes metadata.
 
@@ -444,10 +445,27 @@ class VolumeManager(base.ManagerWithFind):
         response_list = []
         for k in keys:
             resp, body = self._delete("/volumes/%s/metadata/%s" %
-                                      (base.getid(volume), k))
+                                     (base.getid(volume), k))
             response_list.append(resp)
 
         return common_base.ListWithMeta([], response_list)
+
+    @api_versions.wraps("3.15")
+    def delete_metadata(self, volume, keys):
+        """Delete specified keys from volumes metadata.
+
+        :param volume: The :class:`Volume`.
+        :param keys: A list of keys to be removed.
+        """
+        data = self._get("/volumes/%s/metadata" % base.getid(volume))
+        metadata = data._info.get("metadata", {})
+        if set(keys).issubset(metadata.keys()):
+            for k in keys:
+                metadata.pop(k)
+            body = {'metadata': metadata}
+            kwargs = {'headers': {'If-Match': data._checksum}}
+            return self._update("/volumes/%s/metadata" % base.getid(volume),
+                                body, **kwargs)
 
     def set_image_metadata(self, volume, metadata):
         """Set a volume's image metadata.

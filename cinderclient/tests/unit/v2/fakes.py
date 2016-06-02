@@ -474,6 +474,10 @@ class FakeHTTPClient(base_client.HTTPClient):
         r = {'volume': self.get_volumes_detail(id=5678)[2]['volumes'][0]}
         return (200, {}, r)
 
+    def get_volumes_1234_metadata(self, **kw):
+        r = {"metadata": {'k1': 'v1', 'k2': 'v2', 'k3': 'v3'}}
+        return (200, {}, r)
+
     def get_volumes_1234_encryption(self, **kw):
         r = {'encryption_key_id': 'id'}
         return (200, {}, r)

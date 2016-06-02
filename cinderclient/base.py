@@ -328,7 +328,7 @@ class Manager(common_base.HookableMixin):
 
     def _update(self, url, body, response_key=None, **kwargs):
         self.run_hooks('modify_body_for_update', body, **kwargs)
-        resp, body = self.api.client.put(url, body=body)
+        resp, body = self.api.client.put(url, body=body, **kwargs)
         if response_key:
             return self.resource_class(self, body[response_key], loaded=True,
                                        resp=resp)

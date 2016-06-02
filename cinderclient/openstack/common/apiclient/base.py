@@ -467,6 +467,8 @@ class Resource(RequestIdMixin):
         self._info = info
         self._add_details(info)
         self._loaded = loaded
+        if resp and hasattr(resp, "headers"):
+            self._checksum = resp.headers.get("Etag")
         self.setup()
         self.append_request_ids(resp)
 

@@ -21,6 +21,7 @@ from requests_mock.contrib import fixture as requests_mock_fixture
 from cinderclient import client
 from cinderclient import exceptions
 from cinderclient import shell
+from cinderclient.v3 import volumes
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 from cinderclient.tests.unit.fixture_data import keystone_client
@@ -376,3 +377,17 @@ class ShellTest(utils.TestCase):
             '--os-volume-api-version 3.3 message-delete 1234 12345')
         self.assert_called_anytime('DELETE', '/messages/1234')
         self.assert_called_anytime('DELETE', '/messages/12345')
+
+    @mock.patch('cinderclient.utils.find_volume')
+    def test_delete_metadata(self, mock_find_volume):
+        mock_find_volume.return_value = volumes.Volume(self,
+                                                       {'id': '1234',
+                                                        'metadata':
+                                                            {'k1': 'v1',
+                                                             'k2': 'v2',
+                                                             'k3': 'v3'}},
+                                                       loaded = True)
+        expected = {'metadata': {'k2': 'v2'}}
+        self.run_command('--os-volume-api-version 3.15 '
+                         'metadata 1234 unset k1 k3')
+        self.assert_called('PUT', '/volumes/1234/metadata', body=expected)
