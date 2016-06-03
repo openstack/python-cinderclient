@@ -79,7 +79,7 @@ def _get_normalized_token_data(**kwargs):
     ref['username'] = ref.get('username', uuid.uuid4().hex)
     ref['project_id'] = ref.get('project_id',
                                 ref.get('tenant_id', uuid.uuid4().hex))
-    ref['project_name'] = ref.get('tenant_name',
+    ref['project_name'] = ref.get('project_name',
                                   ref.get('tenant_name', uuid.uuid4().hex))
     ref['user_domain_id'] = ref.get('user_domain_id', uuid.uuid4().hex)
     ref['user_domain_name'] = ref.get('user_domain_name', uuid.uuid4().hex)
