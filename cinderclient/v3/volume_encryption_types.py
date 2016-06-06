@@ -28,7 +28,7 @@ class VolumeEncryptionType(base.Resource):
     encryption for a specific volume type.
     """
     def __repr__(self):
-        return "<VolumeEncryptionType: %s>" % self.name
+        return "<VolumeEncryptionType: %s>" % self.encryption_id
 
 
 class VolumeEncryptionTypeManager(base.ManagerWithFind):

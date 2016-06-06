@@ -19,6 +19,13 @@ from cinderclient.tests.unit.v2 import fakes
 
 cs = fakes.FakeClient()
 
+FAKE_ENCRY_TYPE = {'provider': 'Test',
+                   'key_size': None,
+                   'cipher': None,
+                   'control_location': None,
+                   'volume_type_id': '65922555-7bc0-47e9-8d88-c7fdbcac4781',
+                   'encryption_id': '62daf814-cf9b-401c-8fc8-f84d7850fb7c'}
+
 
 class VolumeEncryptionTypesTest(utils.TestCase):
     """
@@ -114,3 +121,14 @@ class VolumeEncryptionTypesTest(utils.TestCase):
         self.assertIsInstance(result, tuple)
         self.assertEqual(202, result[0].status_code)
         self._assert_request_id(result)
+
+    def test___repr__(self):
+        """
+        Unit test for VolumeEncryptionTypes.__repr__
+
+        Verify that one encryption type can be printed
+        """
+        encry_type = VolumeEncryptionType(None, FAKE_ENCRY_TYPE)
+        self.assertEqual(
+            "<VolumeEncryptionType: %s>" % FAKE_ENCRY_TYPE['encryption_id'],
+            repr(encry_type))
