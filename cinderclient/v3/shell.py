@@ -898,7 +898,7 @@ def do_type_show(cs, args):
     info.update(vtype._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    utils.print_dict(info, formatters=['extra_specs'])
 
 
 @utils.arg('id',
