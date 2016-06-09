@@ -24,6 +24,7 @@ import time
 
 import six
 
+from cinderclient import api_versions
 from cinderclient import base
 from cinderclient import exceptions
 from cinderclient import utils
@@ -1604,6 +1605,80 @@ def do_transfer_create(cs, args):
     utils.print_dict(info)
 
 
+@utils.service_type('volumev3')
+@api_versions.wraps('3.7')
+@utils.arg('--name', metavar='<name>', default=None,
+           help='Filter by cluster name, without backend will list all '
+                'clustered services from the same cluster. Default=None.')
+@utils.arg('--binary', metavar='<binary>', default=None,
+           help='Cluster binary. Default=None.')
+@utils.arg('--is-up', metavar='<True|true|False|false>', default=None,
+           choices=('True', 'true', 'False', 'false'),
+           help='Filter by up/dow status. Default=None.')
+@utils.arg('--disabled', metavar='<True|true|False|false>', default=None,
+           choices=('True', 'true', 'False', 'false'),
+           help='Filter by disabled status. Default=None.')
+@utils.arg('--num-hosts', metavar='<num-hosts>', default=None,
+           help='Filter by number of hosts in the cluster.')
+@utils.arg('--num-down-hosts', metavar='<num-down-hosts>', default=None,
+           help='Filter by number of hosts that are down.')
+@utils.arg('--detailed', dest='detailed', default=False,
+           help='Get detailed clustered service information (Default=False).',
+           action='store_true')
+def do_cluster_list(cs, args):
+    """Lists clustered services with optional filtering."""
+    clusters = cs.clusters.list(name=args.name, binary=args.binary,
+                                is_up=args.is_up, disabled=args.disabled,
+                                num_hosts=args.num_hosts,
+                                num_down_hosts=args.num_down_hosts,
+                                detailed=args.detailed)
+
+    columns = ['Name', 'Binary', 'State', 'Status']
+    if args.detailed:
+        columns.extend(('Num Hosts', 'Num Down Hosts', 'Last Heartbeat',
+                        'Disabled Reason', 'Created At', 'Updated at'))
+    utils.print_list(clusters, columns)
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.7')
+@utils.arg('binary', metavar='<binary>', nargs='?', default='cinder-volume',
+           help='Binary to filter by.  Default: cinder-volume.')
+@utils.arg('name', metavar='<cluster-name>',
+           help='Name of the clustered service to show.')
+def do_cluster_show(cs, args):
+    """Show detailed information on a clustered service."""
+    cluster = cs.clusters.show(args.name, args.binary)
+    utils.print_dict(cluster.to_dict())
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.7')
+@utils.arg('binary', metavar='<binary>', nargs='?', default='cinder-volume',
+           help='Binary to filter by.  Default: cinder-volume.')
+@utils.arg('name', metavar='<cluster-name>',
+           help='Name of the clustered services to update.')
+def do_cluster_enable(cs, args):
+    """Enables clustered services."""
+    cluster = cs.clusters.update(args.name, args.binary, disabled=False)
+    utils.print_dict(cluster.to_dict())
+
+
+@utils.service_type('volumev3')
+@api_versions.wraps('3.7')
+@utils.arg('binary', metavar='<binary>', nargs='?', default='cinder-volume',
+           help='Binary to filter by.  Default: cinder-volume.')
+@utils.arg('name', metavar='<cluster-name>',
+           help='Name of the clustered services to update.')
+@utils.arg('--reason', metavar='<reason>', default=None,
+           help='Reason for disabling clustered service.')
+def do_cluster_disable(cs, args):
+    """Disables clustered services."""
+    cluster = cs.clusters.update(args.name, args.binary, disabled=True,
+                                 disabled_reason=args.reason)
+    utils.print_dict(cluster.to_dict())
+
+
 @utils.arg('transfer', metavar='<transfer>',
            help='Name or ID of transfer to delete.')
 @utils.service_type('volumev3')
@@ -1696,6 +1771,8 @@ def do_service_list(cs, args):
     replication = strutils.bool_from_string(args.withreplication)
     result = cs.services.list(host=args.host, binary=args.binary)
     columns = ["Binary", "Host", "Zone", "Status", "State", "Updated_at"]
+    if cs.api_version.matches('3.7'):
+        columns.append('Cluster')
     if replication:
         columns.extend(["Replication Status", "Active Backend ID", "Frozen"])
     # NOTE(jay-lau-513): we check if the response has disabled_reason

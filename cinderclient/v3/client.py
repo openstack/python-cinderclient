@@ -17,6 +17,7 @@ from cinderclient import client
 from cinderclient import api_versions
 from cinderclient.v3 import availability_zones
 from cinderclient.v3 import cgsnapshots
+from cinderclient.v3 import clusters
 from cinderclient.v3 import consistencygroups
 from cinderclient.v3 import capabilities
 from cinderclient.v3 import limits
@@ -77,6 +78,7 @@ class Client(object):
         self.restores = volume_backups_restore.VolumeBackupRestoreManager(self)
         self.transfers = volume_transfers.VolumeTransferManager(self)
         self.services = services.ServiceManager(self)
+        self.clusters = clusters.ClusterManager(self)
         self.consistencygroups = consistencygroups.\
             ConsistencygroupManager(self)
         self.cgsnapshots = cgsnapshots.CgsnapshotManager(self)
