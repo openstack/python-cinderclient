@@ -95,7 +95,7 @@ class ShellTest(utils.TestCase):
                 'id': 1234, 'display_name': 'sample-volume',
                 'os-vol-tenant-attr:tenant_id': 'fake_tenant'})
         shell_v1._translate_volume_keys([v])
-        self.assertEqual(v.tenant_id, 'fake_tenant')
+        self.assertEqual('fake_tenant', v.tenant_id)
 
     def test_list(self):
         self.run_command('list')
