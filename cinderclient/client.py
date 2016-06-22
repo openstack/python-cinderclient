@@ -100,6 +100,8 @@ class SessionClient(adapter.LegacyJsonAdapter):
     def __init__(self, *args, **kwargs):
         self.api_version = kwargs.pop('api_version', None)
         self.api_version = self.api_version or api_versions.APIVersion()
+        self.retries = kwargs.pop('retries', 0)
+        self._logger = logging.getLogger(__name__)
         super(SessionClient, self).__init__(*args, **kwargs)
 
     def request(self, *args, **kwargs):
@@ -125,7 +127,17 @@ class SessionClient(adapter.LegacyJsonAdapter):
     def _cs_request(self, url, method, **kwargs):
         # this function is mostly redundant but makes compatibility easier
         kwargs.setdefault('authenticated', True)
-        return self.request(url, method, **kwargs)
+        attempts = 0
+        while True:
+            attempts += 1
+            try:
+                return self.request(url, method, **kwargs)
+            except exceptions.OverLimit as overlim:
+                if attempts > self.retries or overlim.retry_after < 1:
+                    raise
+                msg = "Retrying after %s seconds." % overlim.retry_after
+                self._logger.debug(msg)
+                sleep(overlim.retry_after)
 
     def get(self, url, **kwargs):
         return self._cs_request(url, 'GET', **kwargs)
@@ -333,6 +345,13 @@ class HTTPClient(object):
                 # First reauth. Discount this attempt.
                 attempts -= 1
                 auth_attempts += 1
+                continue
+            except exceptions.OverLimit as overlim:
+                if attempts > self.retries or overlim.retry_after < 1:
+                    raise
+                msg = "Retrying after %s seconds." % overlim.retry_after
+                self._logger.debug(msg)
+                sleep(overlim.retry_after)
                 continue
             except exceptions.ClientException as e:
                 if attempts > self.retries:
@@ -576,6 +595,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                              service_type=service_type,
                              service_name=service_name,
                              region_name=region_name,
+                             retries=retries,
                              api_version=api_version,
                              **kwargs)
     else:

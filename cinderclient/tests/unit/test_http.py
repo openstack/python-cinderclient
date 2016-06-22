@@ -45,6 +45,12 @@ bad_401_response = utils.TestResponse({
 })
 bad_401_request = mock.Mock(return_value=(bad_401_response))
 
+bad_413_response = utils.TestResponse({
+    "status_code": 413,
+    "headers": {"Retry-After": "1", "x-compute-request-id": "1234"},
+})
+bad_413_request = mock.Mock(return_value=(bad_413_response))
+
 bad_500_response = utils.TestResponse({
     "status_code": 500,
     "text": '{"error": {"message": "FAILED!", "details": "DETAILS!"}}',
@@ -156,6 +162,43 @@ class ClientTest(utils.TestCase):
             resp, body = cl.get("/hi")
 
         test_get_call()
+        self.assertEqual([], self.requests)
+
+    def test_rate_limit_overlimit_exception(self):
+        cl = get_authed_client(retries=1)
+
+        self.requests = [bad_413_request,
+                         bad_413_request,
+                         mock_request]
+
+        def request(*args, **kwargs):
+            next_request = self.requests.pop(0)
+            return next_request(*args, **kwargs)
+
+        @mock.patch.object(requests, "request", request)
+        @mock.patch('time.time', mock.Mock(return_value=1234))
+        def test_get_call():
+            resp, body = cl.get("/hi")
+        self.assertRaises(exceptions.OverLimit, test_get_call)
+        self.assertEqual([mock_request], self.requests)
+
+    def test_rate_limit(self):
+        cl = get_authed_client(retries=1)
+
+        self.requests = [bad_413_request, mock_request]
+
+        def request(*args, **kwargs):
+            next_request = self.requests.pop(0)
+            return next_request(*args, **kwargs)
+
+        @mock.patch.object(requests, "request", request)
+        @mock.patch('time.time', mock.Mock(return_value=1234))
+        def test_get_call():
+            resp, body = cl.get("/hi")
+            return resp, body
+
+        resp, body = test_get_call()
+        self.assertEqual(200, resp.status_code)
         self.assertEqual([], self.requests)
 
     def test_retry_limit(self):

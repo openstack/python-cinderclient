@@ -162,6 +162,31 @@ class ClientTest(utils.TestCase):
                           mock.sentinel.url, 'POST', **kwargs)
         self.assertEqual(1, mock_log.call_count)
 
+    @mock.patch.object(cinderclient.client, '_log_request_id')
+    @mock.patch.object(adapter.Adapter, 'request')
+    def test_sessionclient_request_method_raises_overlimit(
+            self, mock_request, mock_log):
+        resp = {
+            "overLimitFault": {
+                "message": "This request was rate-limited.",
+                "code": 413
+            }
+        }
+
+        mock_response = utils.TestResponse({
+            "status_code": 413,
+            "text": json.dumps(resp),
+        })
+
+        # 'request' method of Adaptor will return 413 response
+        mock_request.return_value = mock_response
+        session_client = cinderclient.client.SessionClient(
+            session=mock.Mock())
+
+        self.assertRaises(exceptions.OverLimit, session_client.request,
+                          mock.sentinel.url, 'GET')
+        self.assertEqual(1, mock_log.call_count)
+
     @mock.patch.object(exceptions, 'from_response')
     def test_keystone_request_raises_auth_failure_exception(
             self, mock_from_resp):

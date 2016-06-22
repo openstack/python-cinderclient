@@ -16,6 +16,9 @@
 """
 Exception definitions.
 """
+from datetime import datetime
+
+from oslo_utils import timeutils
 
 
 class UnsupportedVersion(Exception):
@@ -80,7 +83,8 @@ class ClientException(Exception):
     """
     The base exception class for all exceptions this library raises.
     """
-    def __init__(self, code, message=None, details=None, request_id=None):
+    def __init__(self, code, message=None, details=None,
+                 request_id=None, response=None):
         self.code = code
         # NOTE(mriedem): Use getattr on self.__class__.message since
         # BaseException.message was dropped in python 3, see PEP 0352.
@@ -147,6 +151,27 @@ class OverLimit(ClientException):
     http_status = 413
     message = "Over limit"
 
+    def __init__(self, code, message=None, details=None,
+                 request_id=None, response=None):
+        super(OverLimit, self).__init__(code, message=message,
+                                        details=details, request_id=request_id,
+                                        response=response)
+        self.retry_after = 0
+        self._get_rate_limit(response)
+
+    def _get_rate_limit(self, resp):
+        if resp.headers:
+            utc_now = timeutils.utcnow()
+            value = resp.headers.get('Retry-After', '0')
+            try:
+                value = datetime.strptime(value, '%a, %d %b %Y %H:%M:%S %Z')
+                if value > utc_now:
+                    self.retry_after = ((value - utc_now).seconds)
+                else:
+                    self.retry_after = 0
+            except ValueError:
+                self.retry_after = int(value)
+
 
 # NotImplemented is a python keyword.
 class HTTPNotImplemented(ClientException):
@@ -193,10 +218,10 @@ def from_response(response, body):
             message = error.get('message', message)
             details = error.get('details', details)
         return cls(code=response.status_code, message=message, details=details,
-                   request_id=request_id)
+                   request_id=request_id, response=response)
     else:
         return cls(code=response.status_code, request_id=request_id,
-                   message=response.reason)
+                   message=response.reason, response=response)
 
 
 class VersionNotFoundForAPIMethod(Exception):

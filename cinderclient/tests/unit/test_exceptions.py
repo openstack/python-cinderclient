@@ -14,6 +14,8 @@
 
 """Tests the cinderclient.exceptions module."""
 
+import datetime
+import mock
 import requests
 
 from cinderclient import exceptions
@@ -30,3 +32,33 @@ class ExceptionsTest(utils.TestCase):
         ex = exceptions.from_response(response, body)
         self.assertIs(exceptions.ClientException, type(ex))
         self.assertEqual('n/a', ex.message)
+
+    def test_from_response_overlimit(self):
+        response = requests.Response()
+        response.status_code = 413
+        response.headers = {"Retry-After": '10'}
+        body = {'keys': ({})}
+        ex = exceptions.from_response(response, body)
+        self.assertEqual(10, ex.retry_after)
+        self.assertIs(exceptions.OverLimit, type(ex))
+
+    @mock.patch('oslo_utils.timeutils.utcnow',
+                return_value=datetime.datetime(2016, 6, 30, 12, 41, 55))
+    def test_from_response_overlimit_gmt(self, mock_utcnow):
+        response = requests.Response()
+        response.status_code = 413
+        response.headers = {"Retry-After": "Thu, 30 Jun 2016 12:43:20 GMT"}
+        body = {'keys': ({})}
+        ex = exceptions.from_response(response, body)
+        self.assertEqual(85, ex.retry_after)
+        self.assertIs(exceptions.OverLimit, type(ex))
+        self.assertTrue(mock_utcnow.called)
+
+    def test_from_response_overlimit_without_header(self):
+        response = requests.Response()
+        response.status_code = 413
+        response.headers = {}
+        body = {'keys': ({})}
+        ex = exceptions.from_response(response, body)
+        self.assertEqual(0, ex.retry_after)
+        self.assertIs(exceptions.OverLimit, type(ex))
