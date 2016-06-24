@@ -13,30 +13,42 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from cinderclient.v2.capabilities import Capabilities
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v2 import fakes
 
 cs = fakes.FakeClient()
 
+FAKE_CAPABILITY = {
+    'namespace': 'OS::Storage::Capabilities::fake',
+    'vendor_name': 'OpenStack',
+    'volume_backend_name': 'lvm',
+    'pool_name': 'pool',
+    'storage_protocol': 'iSCSI',
+    'properties': {
+        'compression': {
+            'title': 'Compression',
+            'description': 'Enables compression.',
+            'type': 'boolean',
+        },
+    },
+}
+
 
 class CapabilitiesTest(utils.TestCase):
 
     def test_get_capabilities(self):
-        expected = {
-            'namespace': 'OS::Storage::Capabilities::fake',
-            'vendor_name': 'OpenStack',
-            'volume_backend_name': 'lvm',
-            'pool_name': 'pool',
-            'storage_protocol': 'iSCSI',
-            'properties': {
-                'compression': {
-                    'title': 'Compression',
-                    'description': 'Enables compression.',
-                    'type': 'boolean'},
-            }
-        }
-
         capabilities = cs.capabilities.get('host')
         cs.assert_called('GET', '/capabilities/host')
-        self.assertEqual(expected, capabilities._info)
+        self.assertEqual(FAKE_CAPABILITY, capabilities._info)
         self._assert_request_id(capabilities)
+
+    def test___repr__(self):
+        """
+        Unit test for Capabilities.__repr__
+
+        Verify that Capabilities object can be printed.
+        """
+        cap = Capabilities(None, FAKE_CAPABILITY)
+        self.assertEqual(
+            "<Capabilities: %s>" % FAKE_CAPABILITY['namespace'], repr(cap))
