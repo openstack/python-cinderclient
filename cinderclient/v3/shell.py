@@ -447,10 +447,8 @@ def do_create(cs, args):
 
 
 @utils.arg('--cascade',
-           metavar='<cascade>',
+           action='store_true',
            default=False,
-           const=True,
-           nargs='?',
            help='Remove any snapshots along with volume. Default=False.')
 @utils.arg('volume',
            metavar='<volume>', nargs='+',
