@@ -20,6 +20,11 @@ from cinderclient.v1 import services
 
 cs = fakes.FakeClient()
 
+FAKE_SERVICE = {"host": "host1",
+                'binary': 'cinder-volume',
+                "status": "enable",
+                "availability_zone": "nova"}
+
 
 class ServicesTest(utils.TestCase):
 
@@ -73,3 +78,14 @@ class ServicesTest(utils.TestCase):
         cs.assert_called('PUT', '/os-services/disable-log-reason', values)
         self.assertIsInstance(s, services.Service)
         self.assertEqual('disabled', s.status)
+
+    def test___repr__(self):
+        """
+        Unit test for Service.__repr__
+
+        Verify that one Service object can be printed.
+        """
+        svs = services.Service(None, FAKE_SERVICE)
+        self.assertEqual(
+            "<Service: binary=%s host=%s>" % (FAKE_SERVICE['binary'],
+            FAKE_SERVICE['host']), repr(svs))
