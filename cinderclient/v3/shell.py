@@ -914,7 +914,7 @@ def do_type_show(cs, args):
 @utils.service_type('volumev3')
 def do_type_update(cs, args):
     """Updates volume type name, description, and/or is_public."""
-    is_public = strutils.bool_from_string(args.is_public)
+    is_public = strutils.bool_from_string(args.is_public, strict=True)
     vtype = cs.volume_types.update(args.id, args.name, args.description,
                                    is_public)
     _print_volume_type_list([vtype])
@@ -940,7 +940,7 @@ def do_extra_specs_list(cs, args):
 @utils.service_type('volumev3')
 def do_type_create(cs, args):
     """Creates a volume type."""
-    is_public = strutils.bool_from_string(args.is_public)
+    is_public = strutils.bool_from_string(args.is_public, strict=True)
     vtype = cs.volume_types.create(args.name, args.description, is_public)
     _print_volume_type_list([vtype])
 
@@ -1691,7 +1691,8 @@ def do_extend(cs, args):
 @utils.service_type('volumev3')
 def do_service_list(cs, args):
     """Lists all services. Filter by host and service binary."""
-    replication = strutils.bool_from_string(args.withreplication)
+    replication = strutils.bool_from_string(args.withreplication,
+                                            strict=True)
     result = cs.services.list(host=args.host, binary=args.binary)
     columns = ["Binary", "Host", "Zone", "Status", "State", "Updated_at"]
     if replication:
@@ -2008,7 +2009,8 @@ def do_qos_show(cs, args):
 @utils.service_type('volumev3')
 def do_qos_delete(cs, args):
     """Deletes a specified qos specs."""
-    force = strutils.bool_from_string(args.force)
+    force = strutils.bool_from_string(args.force,
+                                      strict=True)
     qos_specs = _find_qos_specs(cs, args.qos_specs)
     cs.qos_specs.delete(qos_specs, force)
 
@@ -2173,7 +2175,8 @@ def do_readonly_mode_update(cs, args):
     """Updates volume read-only access-mode flag."""
     volume = utils.find_volume(cs, args.volume)
     cs.volumes.update_readonly_flag(volume,
-                                    strutils.bool_from_string(args.read_only))
+                                    strutils.bool_from_string(args.read_only,
+                                                              strict=True))
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of the volume to update.')
@@ -2186,7 +2189,8 @@ def do_set_bootable(cs, args):
     """Update bootable status of a volume."""
     volume = utils.find_volume(cs, args.volume)
     cs.volumes.set_bootable(volume,
-                            strutils.bool_from_string(args.bootable))
+                            strutils.bool_from_string(args.bootable,
+                                                      strict=True))
 
 
 @utils.arg('host',

@@ -1323,7 +1323,7 @@ def do_qos_show(cs, args):
 @utils.service_type('volume')
 def do_qos_delete(cs, args):
     """Deletes a specified qos specs."""
-    force = strutils.bool_from_string(args.force)
+    force = strutils.bool_from_string(args.force, strict=True)
     qos_specs = _find_qos_specs(cs, args.qos_specs)
     cs.qos_specs.delete(qos_specs, force)
 
@@ -1477,7 +1477,8 @@ def do_readonly_mode_update(cs, args):
     """Updates volume read-only access-mode flag."""
     volume = utils.find_volume(cs, args.volume)
     cs.volumes.update_readonly_flag(volume,
-                                    strutils.bool_from_string(args.read_only))
+                                    strutils.bool_from_string(args.read_only,
+                                                              strict=True))
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of the volume to update.')
@@ -1490,4 +1491,5 @@ def do_set_bootable(cs, args):
     """Update bootable status of a volume."""
     volume = utils.find_volume(cs, args.volume)
     cs.volumes.set_bootable(volume,
-                            strutils.bool_from_string(args.bootable))
+                            strutils.bool_from_string(args.bootable,
+                                                      strict=True))

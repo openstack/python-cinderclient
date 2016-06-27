@@ -683,6 +683,13 @@ class ShellTest(utils.TestCase):
                          '--is-public=False')
         self.assert_called('POST', '/types', body=expected)
 
+    def test_type_create_with_invalid_bool(self):
+        self.assertRaises(ValueError,
+                          self.run_command,
+                          ('type-create test-type-3 '
+                          '--description=test_type-3-desc '
+                          '--is-public=invalid_bool'))
+
     def test_type_update(self):
         expected = {'volume_type': {'name': 'test-type-1',
                                     'description': 'test_type-1-desc',
@@ -691,6 +698,13 @@ class ShellTest(utils.TestCase):
                          '--description=test_type-1-desc '
                          '--is-public=False 1')
         self.assert_called('PUT', '/types/1', body=expected)
+
+    def test_type_update_with_invalid_bool(self):
+        self.assertRaises(ValueError,
+                          self.run_command,
+                          'type-update --name test-type-1 '
+                          '--description=test_type-1-desc '
+                          '--is-public=invalid_bool 1')
 
     def test_type_access_list(self):
         self.run_command('type-access-list --volume-type 3')
