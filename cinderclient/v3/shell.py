@@ -1602,6 +1602,31 @@ def do_backup_reset_state(cs, args):
         raise exceptions.CommandError(msg)
 
 
+@utils.arg('backup', metavar='<backup>',
+           help='Name or ID of backup to rename.')
+@utils.arg('--name', nargs='?', metavar='<name>',
+           help='New name for backup.')
+@utils.arg('--description', metavar='<description>',
+           help='Backup description. Default=None.')
+@utils.service_type('volumev3')
+@api_versions.wraps('3.9')
+def do_backup_update(cs, args):
+    """Renames a backup."""
+    kwargs = {}
+
+    if args.name is not None:
+        kwargs['name'] = args.name
+
+    if args.description is not None:
+        kwargs['description'] = args.description
+
+    if not kwargs:
+        msg = 'Must supply either name or description.'
+        raise exceptions.ClientException(code=1, message=msg)
+
+    _find_backup(cs, args.backup).update(**kwargs)
+
+
 @utils.arg('volume', metavar='<volume>',
            help='Name or ID of volume to transfer.')
 @utils.arg('--name',

@@ -18,6 +18,7 @@ import mock
 from requests_mock.contrib import fixture as requests_mock_fixture
 
 from cinderclient import client
+from cinderclient import exceptions
 from cinderclient import shell
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
@@ -93,3 +94,42 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('GET', '/volumes/1234')
         self.assert_called_anytime('POST', '/volumes/1234/action',
                                    body=expected)
+
+    def test_backup_update(self):
+        self.run_command('--os-volume-api-version 3.9 '
+                         'backup-update --name new_name 1234')
+        expected = {'backup': {'name': 'new_name'}}
+        self.assert_called('PUT', '/backups/1234', body=expected)
+
+    def test_backup_update_with_description(self):
+        self.run_command('--os-volume-api-version 3.9 '
+                         'backup-update 1234 --description=new-description')
+        expected = {'backup': {'description': 'new-description'}}
+        self.assert_called('PUT', '/backups/1234', body=expected)
+
+    def test_backup_update_all(self):
+        # rename and change description
+        self.run_command('--os-volume-api-version 3.9 '
+                         'backup-update --name new-name '
+                         '--description=new-description 1234')
+        expected = {'backup': {
+            'name': 'new-name',
+            'description': 'new-description',
+        }}
+        self.assert_called('PUT', '/backups/1234', body=expected)
+
+    def test_backup_update_without_arguments(self):
+        # Call rename with no arguments
+        self.assertRaises(SystemExit, self.run_command,
+                          '--os-volume-api-version 3.9 backup-update')
+
+    def test_backup_update_bad_request(self):
+        self.assertRaises(exceptions.ClientException,
+                          self.run_command,
+                          '--os-volume-api-version 3.9 backup-update 1234')
+
+    def test_backup_update_wrong_version(self):
+        self.assertRaises(exceptions.VersionNotFoundForAPIMethod,
+                          self.run_command,
+                          '--os-volume-api-version 3.8 '
+                          'backup-update --name new-name 1234')
