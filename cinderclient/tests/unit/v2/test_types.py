@@ -81,17 +81,24 @@ class TypesTest(utils.TestCase):
 
     def test_set_key(self):
         t = cs.volume_types.get(1)
-        t.set_keys({'k': 'v'})
+        res = t.set_keys({'k': 'v'})
         cs.assert_called('POST',
                          '/types/1/extra_specs',
                          {'extra_specs': {'k': 'v'}})
-        self._assert_request_id(t)
+        self._assert_request_id(res)
 
-    def test_unsset_keys(self):
+    def test_unset_keys(self):
         t = cs.volume_types.get(1)
-        t.unset_keys(['k'])
+        res = t.unset_keys(['k'])
         cs.assert_called('DELETE', '/types/1/extra_specs/k')
-        self._assert_request_id(t)
+        self._assert_request_id(res)
+
+    def test_unset_multiple_keys(self):
+        t = cs.volume_types.get(1)
+        res = t.unset_keys(['k', 'm'])
+        cs.assert_called_anytime('DELETE', '/types/1/extra_specs/k')
+        cs.assert_called_anytime('DELETE', '/types/1/extra_specs/m')
+        self._assert_request_id(res, count=2)
 
     def test_delete(self):
         t = cs.volume_types.delete(1)

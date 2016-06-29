@@ -62,16 +62,12 @@ class VolumeType(base.Resource):
         """
 
         # NOTE(jdg): This wasn't actually doing all of the keys before
-        # the return in the loop resulted in ony ONE key being unset.
-        # since on success the return was NONE, we'll only interrupt the loop
-        # and return if there's an error
-        resp = None
+        # the return in the loop resulted in only ONE key being unset,
+        # since on success the return was None, we'll only interrupt
+        # the loop and if an exception is raised.
         for k in keys:
-            resp = self.manager._delete(
-                "/types/%s/extra_specs/%s" % (
-                base.getid(self), k))
-            if resp is not None:
-                return resp
+            self.manager._delete("/types/%s/extra_specs/%s" %
+                                 (base.getid(self), k))
 
 
 class VolumeTypeManager(base.ManagerWithFind):
