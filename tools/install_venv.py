@@ -43,7 +43,7 @@ def print_help(project, venv, root):
 
     $ %(root)s/tools/with_venv.sh <your command>
     """
-    print (help % dict(project=project, venv=venv, root=root))
+    print(help % dict(project=project, venv=venv, root=root))
 
 
 def main(argv):
