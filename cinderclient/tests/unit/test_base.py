@@ -58,7 +58,7 @@ class BaseTest(utils.TestCase):
         r2 = base.Resource(None, {'id': 1, 'name': 'hello'})
         self.assertEqual(r1, r2)
 
-        # Two resoruces of different types: never equal
+        # Two resources of different types: never equal
         r1 = base.Resource(None, {'id': 1})
         r2 = volumes.Volume(None, {'id': 1})
         self.assertNotEqual(r1, r2)
