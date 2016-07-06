@@ -160,7 +160,7 @@ class OverLimit(ClientException):
         self._get_rate_limit(response)
 
     def _get_rate_limit(self, resp):
-        if resp.headers:
+        if (resp is not None) and resp.headers:
             utc_now = timeutils.utcnow()
             value = resp.headers.get('Retry-After', '0')
             try:
