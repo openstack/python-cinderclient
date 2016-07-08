@@ -40,9 +40,9 @@ class TestCase(testtools.TestCase):
             stderr = self.useFixture(fixtures.StringStream('stderr')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
 
-    def _assert_request_id(self, obj):
+    def _assert_request_id(self, obj, count=1):
         self.assertTrue(hasattr(obj, 'request_ids'))
-        self.assertEqual(REQUEST_ID, obj.request_ids)
+        self.assertEqual(REQUEST_ID * count, obj.request_ids)
 
     def assert_called_anytime(self, method, url, body=None,
                               partial_body=None):

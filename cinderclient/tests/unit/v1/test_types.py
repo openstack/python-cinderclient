@@ -37,10 +37,16 @@ class TypesTest(utils.TestCase):
                          '/types/1/extra_specs',
                          {'extra_specs': {'k': 'v'}})
 
-    def test_unsset_keys(self):
+    def test_unset_keys(self):
         t = cs.volume_types.get(1)
         t.unset_keys(['k'])
         cs.assert_called('DELETE', '/types/1/extra_specs/k')
+
+    def test_unset_multiple_keys(self):
+        t = cs.volume_types.get(1)
+        t.unset_keys(['k', 'm'])
+        cs.assert_called_anytime('DELETE', '/types/1/extra_specs/k')
+        cs.assert_called_anytime('DELETE', '/types/1/extra_specs/m')
 
     def test_delete(self):
         cs.volume_types.delete(1)

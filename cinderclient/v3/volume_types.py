@@ -17,6 +17,7 @@
 """Volume Type interface."""
 
 from cinderclient import base
+from cinderclient.openstack.common.apiclient import base as common_base
 
 
 class VolumeType(base.Resource):
@@ -63,15 +64,17 @@ class VolumeType(base.Resource):
         """
 
         # NOTE(jdg): This wasn't actually doing all of the keys before
-        # the return in the loop resulted in ony ONE key being unset.
-        # since on success the return was NONE, we'll only interrupt the loop
-        # and return if there's an error
+        # the return in the loop resulted in only ONE key being unset,
+        # since on success the return was ListWithMeta class, we'll only
+        # interrupt the loop and if an exception is raised.
+        response_list = []
         for k in keys:
-            resp = self.manager._delete(
+            resp, body = self.manager._delete(
                 "/types/%s/extra_specs/%s" % (
                 base.getid(self), k))
-            if resp is not None:
-                return resp
+            response_list.append(resp)
+
+        return common_base.ListWithMeta([], response_list)
 
 
 class VolumeTypeManager(base.ManagerWithFind):
