@@ -645,7 +645,7 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (200, {}, {'volume_type': {'id': 1,
                           'name': 'test-type-1',
                           'description': 'test_type-1-desc',
-                          'extra_specs': {}}})
+                          'extra_specs': {u'key': u'value'}}})
 
     def get_types_2(self, **kw):
         return (200, {}, {'volume_type': {'id': 2,
