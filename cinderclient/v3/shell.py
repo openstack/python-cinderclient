@@ -1174,7 +1174,74 @@ def do_group_update(cs, args):
     print("Request to update group '%s' has been accepted." % args.group)
 
 
-@api_versions.wraps('3.14')
+@api_versions.wraps('3.38')
+@utils.arg('group',
+           metavar='<group>',
+           help='Name or ID of the group.')
+def do_group_enable_replication(cs, args):
+    """Enables replication for group."""
+
+    shell_utils.find_group(cs, args.group).enable_replication()
+
+
+@api_versions.wraps('3.38')
+@utils.arg('group',
+           metavar='<group>',
+           help='Name or ID of the group.')
+def do_group_disable_replication(cs, args):
+    """Disables replication for group."""
+
+    shell_utils.find_group(cs, args.group).disable_replication()
+
+
+@api_versions.wraps('3.38')
+@utils.arg('group',
+           metavar='<group>',
+           help='Name or ID of the group.')
+@utils.arg('--allow-attached-volume',
+           action='store_true',
+           default=False,
+           help='Allows or disallows group with '
+                'attached volumes to be failed over.')
+@utils.arg('--secondary-backend-id',
+           metavar='<secondary_backend_id>',
+           help='Secondary backend id. Default=None.')
+def do_group_failover_replication(cs, args):
+    """Fails over replication for group."""
+
+    shell_utils.find_group(cs, args.group).failover_replication(
+        allow_attached_volume=args.allow_attached_volume,
+        secondary_backend_id=args.secondary_backend_id)
+
+
+@api_versions.wraps('3.38')
+@utils.arg('group',
+           metavar='<group>',
+           help='Name or ID of the group.')
+def do_group_list_replication_targets(cs, args):
+    """Lists replication targets for group.
+
+    Example value for replication_targets:
+
+    .. code-block: json
+
+        {
+            'replication_targets': [{'backend_id': 'vendor-id-1',
+                                     'unique_key': 'val1',
+                                     ......},
+                                    {'backend_id': 'vendor-id-2',
+                                     'unique_key': 'val2',
+                                     ......}]
+        }
+    """
+
+    rc, replication_targets = shell_utils.find_group(
+        cs, args.group).list_replication_targets()
+    rep_targets = replication_targets.get('replication_targets')
+    if rep_targets and len(rep_targets) > 0:
+        utils.print_list(rep_targets, [key for key in rep_targets[0].keys()])
+
+
 @utils.arg('--all-tenants',
            dest='all_tenants',
            metavar='<0|1>',

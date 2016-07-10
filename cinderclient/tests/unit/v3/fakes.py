@@ -369,6 +369,9 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         action = list(body)[0]
         if action == 'delete':
             assert 'delete-volumes' in body[action]
+        elif action in ('enable_replication', 'disable_replication',
+                        'failover_replication', 'list_replication_targets'):
+            assert action in body
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, {})

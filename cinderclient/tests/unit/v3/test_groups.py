@@ -158,3 +158,57 @@ class GroupsTest(utils.TestCase):
         cs.assert_called('POST', '/groups/action',
                          body=expected)
         self._assert_request_id(grp)
+
+    def test_enable_replication_group(self):
+        expected = {'enable_replication': {}}
+        g0 = cs.groups.list()[0]
+        grp = g0.enable_replication()
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+        grp = cs.groups.enable_replication('1234')
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+        grp = cs.groups.enable_replication(g0)
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+
+    def test_disable_replication_group(self):
+        expected = {'disable_replication': {}}
+        g0 = cs.groups.list()[0]
+        grp = g0.disable_replication()
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+        grp = cs.groups.disable_replication('1234')
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+        grp = cs.groups.disable_replication(g0)
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+
+    def test_failover_replication_group(self):
+        expected = {'failover_replication':
+                    {'allow_attached_volume': False,
+                     'secondary_backend_id': None}}
+        g0 = cs.groups.list()[0]
+        grp = g0.failover_replication()
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+        grp = cs.groups.failover_replication('1234')
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+        grp = cs.groups.failover_replication(g0)
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+
+    def test_list_replication_targets(self):
+        expected = {'list_replication_targets': {}}
+        g0 = cs.groups.list()[0]
+        grp = g0.list_replication_targets()
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+        grp = cs.groups.list_replication_targets('1234')
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)
+        grp = cs.groups.list_replication_targets(g0)
+        self._assert_request_id(grp)
+        cs.assert_called('POST', '/groups/1234/action', body=expected)

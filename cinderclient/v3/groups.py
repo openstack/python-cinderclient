@@ -39,6 +39,25 @@ class Group(base.Resource):
         """Reset the group's state with specified one"""
         return self.manager.reset_state(self, state)
 
+    def enable_replication(self):
+        """Enables replication for this group."""
+        return self.manager.enable_replication(self)
+
+    def disable_replication(self):
+        """Disables replication for this group."""
+        return self.manager.disable_replication(self)
+
+    def failover_replication(self, allow_attached_volume=False,
+                             secondary_backend_id=None):
+        """Fails over replication for this group."""
+        return self.manager.failover_replication(self,
+            allow_attached_volume,
+            secondary_backend_id)
+
+    def list_replication_targets(self):
+        """Lists replication targets for this group."""
+        return self.manager.list_replication_targets(self)
+
 
 class GroupManager(base.ManagerWithFind):
     """Manage :class:`Group` resources."""
@@ -177,6 +196,58 @@ class GroupManager(base.ManagerWithFind):
 
         body = {action: info}
         self.run_hooks('modify_body_for_action', body, **kwargs)
+        url = '/groups/%s/action' % base.getid(group)
+        resp, body = self.api.client.post(url, body=body)
+        return common_base.TupleWithMeta((resp, body), resp)
+
+    def enable_replication(self, group):
+        """Enables replication for a group.
+
+        :param group: the :class:`Group` to enable replication.
+        """
+        body = {'enable_replication': {}}
+        self.run_hooks('modify_body_for_action', body, 'group')
+        url = '/groups/%s/action' % base.getid(group)
+        resp, body = self.api.client.post(url, body=body)
+        return common_base.TupleWithMeta((resp, body), resp)
+
+    def disable_replication(self, group):
+        """disables replication for a group.
+
+        :param group: the :class:`Group` to disable replication.
+        """
+        body = {'disable_replication': {}}
+        self.run_hooks('modify_body_for_action', body, 'group')
+        url = '/groups/%s/action' % base.getid(group)
+        resp, body = self.api.client.post(url, body=body)
+        return common_base.TupleWithMeta((resp, body), resp)
+
+    def failover_replication(self, group, allow_attached_volume=False,
+                             secondary_backend_id=None):
+        """fails over replication for a group.
+
+        :param group: the :class:`Group` to failover.
+        :param allow attached volumes: allow attached volumes in the group.
+        :param secondary_backend_id: secondary backend id.
+        """
+        body = {
+            'failover_replication': {
+                'allow_attached_volume': allow_attached_volume,
+                'secondary_backend_id': secondary_backend_id
+            }
+        }
+        self.run_hooks('modify_body_for_action', body, 'group')
+        url = '/groups/%s/action' % base.getid(group)
+        resp, body = self.api.client.post(url, body=body)
+        return common_base.TupleWithMeta((resp, body), resp)
+
+    def list_replication_targets(self, group):
+        """List replication targets for a group.
+
+        :param group: the :class:`Group` to list replication targets.
+        """
+        body = {'list_replication_targets': {}}
+        self.run_hooks('modify_body_for_action', body, 'group')
         url = '/groups/%s/action' % base.getid(group)
         resp, body = self.api.client.post(url, body=body)
         return common_base.TupleWithMeta((resp, body), resp)

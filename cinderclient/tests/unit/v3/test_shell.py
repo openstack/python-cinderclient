@@ -754,3 +754,37 @@ class ShellTest(utils.TestCase):
             command += ' --withreplication %s' % replication
         self.run_command(command)
         self.assert_called('GET', '/os-services')
+
+    def test_group_enable_replication(self):
+        cmd = '--os-volume-api-version 3.38 group-enable-replication 1234'
+        self.run_command(cmd)
+        expected = {'enable_replication': {}}
+        self.assert_called('POST', '/groups/1234/action', body=expected)
+
+    def test_group_disable_replication(self):
+        cmd = '--os-volume-api-version 3.38 group-disable-replication 1234'
+        self.run_command(cmd)
+        expected = {'disable_replication': {}}
+        self.assert_called('POST', '/groups/1234/action', body=expected)
+
+    @ddt.data((False, None), (True, None),
+              (False, "backend1"), (True, "backend1"),
+              (False, "default"), (True, "default"))
+    @ddt.unpack
+    def test_group_failover_replication(self, attach_vol, backend):
+        attach = '--allow-attached-volume ' if attach_vol else ''
+        backend_id = ('--secondary-backend-id ' + backend) if backend else ''
+        cmd = ('--os-volume-api-version 3.38 group-failover-replication 1234 '
+               + attach + backend_id)
+        self.run_command(cmd)
+        expected = {'failover_replication':
+                    {'allow_attached_volume': attach_vol,
+                     'secondary_backend_id': backend if backend else None}}
+        self.assert_called('POST', '/groups/1234/action', body=expected)
+
+    def test_group_list_replication_targets(self):
+        cmd = ('--os-volume-api-version 3.38 group-list-replication-targets'
+               ' 1234')
+        self.run_command(cmd)
+        expected = {'list_replication_targets': {}}
+        self.assert_called('POST', '/groups/1234/action', body=expected)

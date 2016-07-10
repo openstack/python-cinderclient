@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Added support for replication group APIs ``enable_replication``,
+    ``disable_replication``, ``failover_replication`` and
+    ``list_replication_targets``.
