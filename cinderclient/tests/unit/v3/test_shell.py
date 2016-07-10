@@ -129,7 +129,7 @@ class ShellTest(utils.TestCase):
                           '--os-volume-api-version 3.9 backup-update 1234')
 
     def test_backup_update_wrong_version(self):
-        self.assertRaises(exceptions.VersionNotFoundForAPIMethod,
+        self.assertRaises(SystemExit,
                           self.run_command,
                           '--os-volume-api-version 3.8 '
                           'backup-update --name new-name 1234')

@@ -1602,14 +1602,14 @@ def do_backup_reset_state(cs, args):
         raise exceptions.CommandError(msg)
 
 
+@utils.service_type('volumev3')
+@api_versions.wraps('3.9')
 @utils.arg('backup', metavar='<backup>',
            help='Name or ID of backup to rename.')
 @utils.arg('--name', nargs='?', metavar='<name>',
            help='New name for backup.')
 @utils.arg('--description', metavar='<description>',
            help='Backup description. Default=None.')
-@utils.service_type('volumev3')
-@api_versions.wraps('3.9')
 def do_backup_update(cs, args):
     """Renames a backup."""
     kwargs = {}

@@ -28,6 +28,34 @@ class UnsupportedVersion(Exception):
     pass
 
 
+class UnsupportedAttribute(AttributeError):
+    """Indicates that the user is trying to transmit the argument to a method,
+    which is not supported by selected version.
+    """
+
+    def __init__(self, argument_name, start_version, end_version):
+        if not start_version.is_null() and not end_version.is_null():
+            self.message = (
+                "'%(name)s' argument is only allowed for microversions "
+                "%(start)s - %(end)s." % {"name": argument_name,
+                                          "start": start_version.get_string(),
+                                          "end": end_version.get_string()})
+        elif not start_version.is_null():
+            self.message = (
+                "'%(name)s' argument is only allowed since microversion "
+                "%(start)s." % {"name": argument_name,
+                                "start": start_version.get_string()})
+
+        elif not end_version.is_null():
+            self.message = (
+                "'%(name)s' argument is not allowed after microversion "
+                "%(end)s." % {"name": argument_name,
+                              "end": end_version.get_string()})
+
+    def __str__(self):
+        return self.message
+
+
 class InvalidAPIVersion(Exception):
     pass
 

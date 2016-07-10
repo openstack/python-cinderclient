@@ -26,6 +26,7 @@ import logging
 import sys
 
 import requests
+import six
 
 from cinderclient import api_versions
 from cinderclient import client
@@ -56,6 +57,8 @@ DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
 V1_SHELL = 'cinderclient.v1.shell'
 V2_SHELL = 'cinderclient.v2.shell'
 V3_SHELL = 'cinderclient.v3.shell'
+HINT_HELP_MSG = (" [hint: use '--os-volume-api-version' flag to show help "
+                 "message for proper version]")
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -395,24 +398,26 @@ class OpenStackCinderShell(object):
         parser.set_defaults(insecure=utils.env('CINDERCLIENT_INSECURE',
                                                default=False))
 
-    def get_subcommand_parser(self, version):
+    def get_subcommand_parser(self, version, do_help=False, input_args=None):
         parser = self.get_base_parser()
 
         self.subcommands = {}
         subparsers = parser.add_subparsers(metavar='<subcommand>')
 
-        if version == '2':
+        if version.ver_major == 2:
             actions_module = importutils.import_module(V2_SHELL)
-        elif version == '3':
+        elif version.ver_major == 3:
             actions_module = importutils.import_module(V3_SHELL)
         else:
             actions_module = importutils.import_module(V1_SHELL)
 
-        self._find_actions(subparsers, actions_module)
-        self._find_actions(subparsers, self)
+        self._find_actions(subparsers, actions_module, version, do_help,
+                           input_args)
+        self._find_actions(subparsers, self, version, do_help, input_args)
 
         for extension in self.extensions:
-            self._find_actions(subparsers, extension.module)
+            self._find_actions(subparsers, extension.module, version, do_help,
+                               input_args)
 
         self._add_bash_completion_subparser(subparsers)
 
@@ -427,18 +432,53 @@ class OpenStackCinderShell(object):
         self.subcommands['bash_completion'] = subparser
         subparser.set_defaults(func=self.do_bash_completion)
 
-    def _find_actions(self, subparsers, actions_module):
+    def _build_versioned_help_message(self, start_version, end_version):
+        if not start_version.is_null() and not end_version.is_null():
+            msg = (_(" (Supported by API versions %(start)s - %(end)s)")
+                % {"start": start_version.get_string(),
+                   "end": end_version.get_string()})
+        elif not start_version.is_null():
+            msg = (_(" (Supported by API version %(start)s and later)")
+                % {"start": start_version.get_string()})
+        else:
+            msg = (_(" Supported until API version %(end)s)")
+                % {"end": end_version.get_string()})
+        return six.text_type(msg)
+
+    def _find_actions(self, subparsers, actions_module, version,
+                      do_help, input_args):
         for attr in (a for a in dir(actions_module) if a.startswith('do_')):
             # I prefer to be hyphen-separated instead of underscores.
             command = attr[3:].replace('_', '-')
             callback = getattr(actions_module, attr)
             desc = callback.__doc__ or ''
-            help = desc.strip().split('\n')[0]
+            action_help = desc.strip().split('\n')[0]
+            if hasattr(callback, "versioned"):
+                additional_msg = ""
+                subs = api_versions.get_substitutions(
+                    utils.get_function_name(callback))
+                if do_help:
+                    additional_msg = self._build_versioned_help_message(
+                        subs[0].start_version, subs[-1].end_version)
+                    if version.is_latest():
+                        additional_msg += HINT_HELP_MSG
+                subs = [versioned_method for versioned_method in subs
+                        if version.matches(versioned_method.start_version,
+                                           versioned_method.end_version)]
+                if not subs:
+                    # There is no proper versioned method.
+                    continue
+                # Use the "latest" substitution.
+                callback = subs[-1].func
+                desc = callback.__doc__ or desc
+                action_help = desc.strip().split('\n')[0]
+                action_help += additional_msg
+
             arguments = getattr(callback, 'arguments', [])
 
             subparser = subparsers.add_parser(
                 command,
-                help=help,
+                help=action_help,
                 description=desc,
                 add_help=False,
                 formatter_class=OpenStackHelpFormatter)
@@ -448,8 +488,40 @@ class OpenStackCinderShell(object):
                                    help=argparse.SUPPRESS,)
 
             self.subcommands[command] = subparser
+
+            # NOTE(ntpttr): We get a counter for each argument in this
+            # command here because during the microversion check we only
+            # want to raise an exception if no version of the argument
+            # matches the current microversion. The exception will only
+            # be raised after the last instance of a particular argument
+            # fails the check.
+            arg_counter = dict()
             for (args, kwargs) in arguments:
-                subparser.add_argument(*args, **kwargs)
+                arg_counter[args[0]] = arg_counter.get(args[0], 0) + 1
+
+            for (args, kwargs) in arguments:
+                start_version = kwargs.get("start_version", None)
+                start_version = api_versions.APIVersion(start_version)
+                end_version = kwargs.get('end_version', None)
+                end_version = api_versions.APIVersion(end_version)
+                if do_help and not (start_version.is_null()
+                                    and end_version.is_null()):
+                    kwargs["help"] = kwargs.get("help", "") + (
+                        self._build_versioned_help_message(start_version,
+                                                           end_version))
+                if not version.matches(start_version, end_version):
+                    if args[0] in input_args and command == input_args[0]:
+                        if arg_counter[args[0]] == 1:
+                            # This is the last version of this argument,
+                            # raise the exception.
+                            raise exc.UnsupportedAttribute(args[0],
+                                start_version, end_version)
+                        arg_counter[args[0]] -= 1
+                    continue
+                kw = kwargs.copy()
+                kw.pop("start_version", None)
+                kw.pop("end_version", None)
+                subparser.add_argument(*args, **kw)
             subparser.set_defaults(func=callback)
 
     def setup_debugging(self, debug):
@@ -502,6 +574,9 @@ class OpenStackCinderShell(object):
         api_version_input = True
         self.options = options
 
+        do_help = ('help' in argv) or (
+            '--help' in argv) or ('-h' in argv) or not argv
+
         if not options.os_volume_api_version:
             api_version = api_versions.get_api_version(
                 DEFAULT_MAJOR_OS_VOLUME_API_VERSION)
@@ -514,7 +589,8 @@ class OpenStackCinderShell(object):
         self.extensions = client.discover_extensions(major_version_string)
         self._run_extension_hooks('__pre_parse_args__')
 
-        subcommand_parser = self.get_subcommand_parser(major_version_string)
+        subcommand_parser = self.get_subcommand_parser(api_version,
+                                                       do_help, args)
         self.parser = subcommand_parser
 
         if options.help or not argv:
