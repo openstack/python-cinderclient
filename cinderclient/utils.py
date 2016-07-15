@@ -182,8 +182,9 @@ def unicode_key_value_to_string(dictionary):
     """Recursively converts dictionary keys to strings."""
     if not isinstance(dictionary, dict):
         return dictionary
-    return dict((str(k), str(unicode_key_value_to_string(v)))
-        for k, v in dictionary.items())
+    return dict((six.text_type(k),
+                 six.text_type(unicode_key_value_to_string(v)))
+                for k, v in dictionary.items())
 
 
 def print_dict(d, property="Property", formatters=None):

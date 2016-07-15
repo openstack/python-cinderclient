@@ -228,6 +228,10 @@ class PrintListTestCase(test_utils.TestCase):
 +---+-----+
 """, cso.read())
 
+    def test_unicode_key_value_to_string(self):
+        expected = {u'key': u'\u043f\u043f\u043f\u043f\u043f'}
+        self.assertEqual(expected, utils.unicode_key_value_to_string(expected))
+
 
 class PrintDictTestCase(test_utils.TestCase):
 
