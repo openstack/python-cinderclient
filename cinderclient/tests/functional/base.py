@@ -34,7 +34,8 @@ def credentials():
 
     username = os.environ.get('OS_USERNAME')
     password = os.environ.get('OS_PASSWORD')
-    tenant_name = os.environ.get('OS_TENANT_NAME')
+    tenant_name = (os.environ.get('OS_TENANT_NAME')
+                   or os.environ.get('OS_PROJECT_NAME'))
     auth_url = os.environ.get('OS_AUTH_URL')
 
     config = six.moves.configparser.RawConfigParser()

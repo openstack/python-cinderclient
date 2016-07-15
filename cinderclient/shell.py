@@ -269,6 +269,7 @@ class OpenStackCinderShell(object):
         parser.add_argument('--os-tenant-name',
                             metavar='<auth-tenant-name>',
                             default=utils.env('OS_TENANT_NAME',
+                                              'OS_PROJECT_NAME',
                                               'CINDER_PROJECT_ID'),
                             help='Tenant name. '
                             'Default=env[OS_TENANT_NAME].')
@@ -278,6 +279,7 @@ class OpenStackCinderShell(object):
         parser.add_argument('--os-tenant-id',
                             metavar='<auth-tenant-id>',
                             default=utils.env('OS_TENANT_ID',
+                                              'OS_PROJECT_ID',
                                               'CINDER_TENANT_ID'),
                             help='ID for the tenant. '
                             'Default=env[OS_TENANT_ID].')
@@ -739,8 +741,10 @@ class OpenStackCinderShell(object):
 
         username = self.options.os_username
         password = self.options.os_password
-        tenant_id = self.options.os_tenant_id
-        tenant_name = self.options.os_tenant_name
+        tenant_id = (self.options.os_tenant_id
+                     or self.options.os_project_id)
+        tenant_name = (self.options.os_tenant_name
+                       or self.options.os_project_name)
 
         return v2_auth.Password(
             v2_auth_url,
