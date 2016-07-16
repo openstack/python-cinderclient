@@ -228,7 +228,7 @@ def get_api_version(version_string):
     version_string = str(version_string)
     if version_string in DEPRECATED_VERSIONS:
         LOG.warning("Version %(deprecated_version)s is deprecated, use "
-                    "alternative version %(alternative)s instead." %
+                    "alternative version %(alternative)s instead.",
                    {"deprecated_version": version_string,
                     "alternative": DEPRECATED_VERSIONS[version_string]})
     if strutils.is_int_like(version_string):
