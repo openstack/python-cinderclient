@@ -1501,7 +1501,7 @@ def do_backup_delete(cs, args):
 
 
 @utils.arg('backup', metavar='<backup>',
-           help='ID of backup to restore.')
+           help='Name or ID of backup to restore.')
 @utils.arg('--volume-id', metavar='<volume>',
            default=None,
            help=argparse.SUPPRESS)
@@ -1530,9 +1530,10 @@ def do_backup_restore(cs, args):
     else:
         volume_id = None
 
+    backup = _find_backup(cs, args.backup)
     restore = cs.restores.restore(args.backup, volume_id, args.name)
 
-    info = {"backup_id": args.backup}
+    info = {"backup_id": backup.id}
     info.update(restore._info)
 
     info.pop('links', None)
