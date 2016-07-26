@@ -52,7 +52,7 @@ class CinderClientReadOnlyTests(base.ClientTestBase):
         tables = self.parser.tables(out)
         for table in tables:
             headers = table['headers']
-            self.assertTrue(2 >= len(headers))
+            self.assertGreaterEqual(2, len(headers))
             self.assertEqual('Value', headers[1])
 
     def test_extra_specs_list(self):
