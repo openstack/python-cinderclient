@@ -601,8 +601,8 @@ def _construct_http_client(username=None, password=None, project_id=None,
                            auth=None, api_version=None,
                            **kwargs):
 
-    # Don't use sessions if third party plugin is used
-    if session and not auth_plugin:
+    # Don't use sessions if third party plugin or bypass_url being used
+    if session and not auth_plugin and not bypass_url:
         kwargs.setdefault('user_agent', 'python-cinderclient')
         kwargs.setdefault('interface', endpoint_type)
         return SessionClient(session=session,

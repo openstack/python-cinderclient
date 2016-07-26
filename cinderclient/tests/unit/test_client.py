@@ -40,6 +40,19 @@ class ClientTest(utils.TestCase):
         self.assertRaises(cinderclient.exceptions.UnsupportedVersion,
                           cinderclient.client.get_client_class, '0')
 
+    @mock.patch.object(cinderclient.client.HTTPClient, '__init__')
+    @mock.patch('cinderclient.client.SessionClient')
+    def test_construct_http_client_bypass_url(
+            self, session_mock, httpclient_mock):
+        bypass_url = 'http://example.com/'
+        httpclient_mock.return_value = None
+        cinderclient.client._construct_http_client(
+            bypass_url=bypass_url)
+        self.assertTrue(httpclient_mock.called)
+        self.assertEqual(bypass_url,
+                         httpclient_mock.call_args[1].get('bypass_url'))
+        session_mock.assert_not_called()
+
     def test_log_req(self):
         self.logger = self.useFixture(
             fixtures.FakeLogger(
