@@ -179,13 +179,22 @@ def print_list(objs, fields, exclude_unavailable=False, formatters=None,
     _print(pt, order_by)
 
 
-def unicode_key_value_to_string(dictionary):
+def _encode(src):
+    """remove extra 'u' in PY2."""
+    if six.PY2 and isinstance(src, unicode):
+        return src.encode('utf-8')
+    return src
+
+
+def unicode_key_value_to_string(src):
     """Recursively converts dictionary keys to strings."""
-    if not isinstance(dictionary, dict):
-        return dictionary
-    return dict((six.text_type(k),
-                 six.text_type(unicode_key_value_to_string(v)))
-                for k, v in dictionary.items())
+    if isinstance(src, dict):
+        return dict((_encode(k),
+                    _encode(unicode_key_value_to_string(v)))
+                    for k, v in src.items())
+    if isinstance(src, list):
+        return [unicode_key_value_to_string(l) for l in src]
+    return _encode(src)
 
 
 def build_query_param(params, sort=False):

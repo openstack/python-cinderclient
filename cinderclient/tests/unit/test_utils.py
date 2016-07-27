@@ -16,6 +16,7 @@ import sys
 
 import mock
 from six import moves
+import six
 
 from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
@@ -281,8 +282,14 @@ class PrintListTestCase(test_utils.TestCase):
 """, cso.read())
 
     def test_unicode_key_value_to_string(self):
-        expected = {u'key': u'\u043f\u043f\u043f\u043f\u043f'}
-        self.assertEqual(expected, utils.unicode_key_value_to_string(expected))
+        src = {u'key': u'\u70fd\u7231\u5a77'}
+        expected = {'key': '\xe7\x83\xbd\xe7\x88\xb1\xe5\xa9\xb7'}
+        if six.PY2:
+            self.assertEqual(expected, utils.unicode_key_value_to_string(src))
+        else:
+            # u'xxxx' in PY3 is str, we will not get extra 'u' from cli
+            # output in PY3
+            self.assertEqual(src, utils.unicode_key_value_to_string(src))
 
 
 class PrintDictTestCase(test_utils.TestCase):

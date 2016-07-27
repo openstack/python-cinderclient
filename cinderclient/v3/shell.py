@@ -332,7 +332,8 @@ def do_show(cs, args):
 
     info.pop('links', None)
     utils.print_dict(info,
-                     formatters=['metadata', 'volume_image_metadata'])
+                     formatters=['metadata', 'volume_image_metadata',
+                                 'attachments'])
 
 
 class CheckSizeArgForCreate(argparse.Action):
