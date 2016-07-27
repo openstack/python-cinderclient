@@ -228,6 +228,17 @@ class ShellTest(utils.TestCase):
 
         self.assertEqual(False, _shell.cs.client.verify_cert)
 
+    @mock.patch.object(cinderclient.client.SessionClient, 'authenticate',
+                       side_effect=exceptions.Unauthorized('No'))
+    def test_session_client_debug_logger(self, mock_session):
+        _shell = shell.OpenStackCinderShell()
+        # This "fails" but instantiates the client.
+        self.assertRaises(exceptions.CommandError, _shell.main,
+                          ['--debug', 'list'])
+        # In case of SessionClient when --debug switch is specified
+        # 'keystoneauth' logger should be initialized.
+        self.assertEqual('keystoneauth', _shell.cs.client.logger.name)
+
     @mock.patch('keystoneauth1.session.Session.__init__',
                 side_effect=RuntimeError())
     def test_http_client_with_cert(self, mock_session):

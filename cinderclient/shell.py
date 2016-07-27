@@ -469,8 +469,8 @@ class OpenStackCinderShell(object):
         if hasattr(requests, 'logging'):
             requests.logging.getLogger(requests.__name__).addHandler(ch)
 
-        ks_logger = logging.getLogger("keystoneauth")
-        ks_logger.setLevel(logging.DEBUG)
+        self.ks_logger = logging.getLogger("keystoneauth")
+        self.ks_logger.setLevel(logging.DEBUG)
 
     def _delimit_metadata_args(self, argv):
         """This function adds -- separator at the appropriate spot
