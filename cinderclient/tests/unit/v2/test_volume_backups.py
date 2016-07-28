@@ -126,6 +126,16 @@ class VolumeBackupsTest(utils.TestCase):
                               volume_backups_restore.VolumeBackupsRestore)
         self._assert_request_id(info)
 
+    def test_restore_with_name(self):
+        backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
+        name = 'restore_vol'
+        info = cs.restores.restore(backup_id, name=name)
+        expected_body = {'restore': {'volume_id': None, 'name': name}}
+        cs.assert_called('POST', '/backups/%s/restore' % backup_id,
+                         body=expected_body)
+        self.assertIsInstance(info,
+                              volume_backups_restore.VolumeBackupsRestore)
+
     def test_reset_state(self):
         b = cs.backups.list()[0]
         api = '/backups/76a17945-3c6f-435c-975b-b5685db10b62/action'
