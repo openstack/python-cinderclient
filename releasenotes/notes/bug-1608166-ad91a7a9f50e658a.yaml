@@ -1,0 +1,7 @@
+---
+deprecations:
+  - |
+    The ``cinder endpoints`` command has been deprecated. This
+    command performs an identity operation, and should now be
+    handled by ``openstack catalog list``.
+    [Bug `1608166 <https://bugs.launchpad.net/bugs/1608166>`_]

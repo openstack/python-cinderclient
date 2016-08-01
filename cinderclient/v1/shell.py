@@ -23,6 +23,7 @@ import copy
 import os
 import sys
 import time
+import warnings
 
 from cinderclient import exceptions
 from cinderclient import utils
@@ -654,6 +655,10 @@ def do_type_key(cs, args):
 
 def do_endpoints(cs, args):
     """Discovers endpoints registered by authentication service."""
+    warnings.warn(
+        "``cinder endpoints`` is deprecated, use ``openstack catalog list`` "
+        "instead. The ``cinder endpoints`` command may be removed in the P "
+        "release or next major release of cinderclient (v2.0.0 or greater).")
     catalog = cs.client.service_catalog.catalog
     for e in catalog:
         utils.print_dict(e['endpoints'][0], e['name'])

@@ -21,6 +21,7 @@ import copy
 import os
 import sys
 import time
+import warnings
 
 import six
 
@@ -1034,6 +1035,10 @@ def do_type_access_remove(cs, args):
 @utils.service_type('volumev3')
 def do_endpoints(cs, args):
     """Discovers endpoints registered by authentication service."""
+    warnings.warn(
+        "``cinder endpoints`` is deprecated, use ``openstack catalog list`` "
+        "instead. The ``cinder endpoints`` command may be removed in the P "
+        "release or next major release of cinderclient (v2.0.0 or greater).")
     catalog = cs.client.service_catalog.catalog
     for e in catalog:
         utils.print_dict(e['endpoints'][0], e['name'])
