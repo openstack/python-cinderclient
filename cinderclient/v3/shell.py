@@ -1035,7 +1035,7 @@ def do_type_access_remove(cs, args):
 def do_endpoints(cs, args):
     """Discovers endpoints registered by authentication service."""
     catalog = cs.client.service_catalog.catalog
-    for e in catalog['serviceCatalog']:
+    for e in catalog:
         utils.print_dict(e['endpoints'][0], e['name'])
 
 
