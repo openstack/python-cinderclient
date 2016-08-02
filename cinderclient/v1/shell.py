@@ -1142,11 +1142,11 @@ def do_availability_zone_list(cs, _args):
     """Lists all availability zones."""
     try:
         availability_zones = cs.availability_zones.list()
-    except exceptions.Forbidden as e:  # policy doesn't allow probably
+    except exceptions.Forbidden:  # policy doesn't allow probably
         try:
             availability_zones = cs.availability_zones.list(detailed=False)
         except Exception:
-            raise e
+            raise
 
     result = []
     for zone in availability_zones:
