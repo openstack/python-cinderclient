@@ -22,6 +22,7 @@ from cinderclient import client
 from cinderclient import exceptions
 from cinderclient import shell
 from cinderclient.v2 import volumes
+from cinderclient.v2 import volume_backups
 from cinderclient.v2 import shell as test_shell
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v2 import fakes
@@ -445,11 +446,13 @@ class ShellTest(utils.TestCase):
                           'backup-restore 1234 --volume fake_vol --name '
                           'restore_vol')
 
+    @mock.patch('cinderclient.v3.shell._find_backup')
     @mock.patch('cinderclient.utils.print_dict')
     @mock.patch('cinderclient.utils.find_volume')
     def test_do_backup_restore(self,
                                mock_find_volume,
-                               mock_print_dict):
+                               mock_print_dict,
+                               mock_find_backup):
         backup_id = '1234'
         volume_id = '5678'
         name = None
@@ -465,9 +468,16 @@ class ShellTest(utils.TestCase):
             mock_find_volume.return_value = volumes.Volume(self,
                                                            {'id': volume_id},
                                                            loaded = True)
+            mock_find_backup.return_value = volume_backups.VolumeBackup(
+                self,
+                {'id': backup_id},
+                loaded = True)
             test_shell.do_backup_restore(self.cs, args)
+            mock_find_backup.assert_called_once_with(
+                self.cs,
+                backup_id)
             mocked_restore.assert_called_once_with(
-                input['backup'],
+                backup_id,
                 volume_id,
                 name)
             self.assertTrue(mock_print_dict.called)
