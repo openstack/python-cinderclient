@@ -27,7 +27,10 @@ class ServicesTest(utils.TestCase):
         svs = cs.services.list()
         cs.assert_called('GET', '/os-services')
         self.assertEqual(3, len(svs))
-        [self.assertIsInstance(s, services.Service) for s in svs]
+        for service in svs:
+            self.assertIsInstance(service, services.Service)
+            # Make sure cluster fields from v3.7 are not there
+            self.assertFalse(hasattr(service, 'cluster'))
         self._assert_request_id(svs)
 
     def test_list_services_with_hostname(self):

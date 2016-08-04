@@ -1,0 +1,9 @@
+---
+features:
+  - Service listings will display additional "cluster" field when working with
+    microversion 3.7 or higher.
+  - Add clustered services commands to list -summary and detailed-
+    (`cluster-list`), show (`cluster-show`), and update (`cluster-enable`,
+    `cluster-disable`).  Listing supports filtering by name, binary,
+    disabled status, number of hosts, number of hosts that are down, and
+    up/down status.  These commands require API version 3.7 or higher.
