@@ -34,7 +34,7 @@ from cinderclient import utils
 # Valid sort directions and client sort keys
 SORT_DIR_VALUES = ('asc', 'desc')
 SORT_KEY_VALUES = ('id', 'status', 'size', 'availability_zone', 'name',
-                   'bootable', 'created_at')
+                   'bootable', 'created_at', 'reference')
 # Mapping of client keys to actual sort keys
 SORT_KEY_MAPPINGS = {'name': 'display_name'}
 # Additional sort keys for resources
@@ -126,7 +126,7 @@ class Manager(common_base.HookableMixin):
 
     def _build_list_url(self, resource_type, detailed=True, search_opts=None,
                         marker=None, limit=None, sort_key=None, sort_dir=None,
-                        sort=None):
+                        sort=None, offset=None):
 
         if search_opts is None:
             search_opts = {}
@@ -155,6 +155,9 @@ class Manager(common_base.HookableMixin):
             if sort_dir:
                 query_params['sort_dir'] = self._format_sort_dir_param(
                     sort_dir)
+
+        if offset:
+            query_params['offset'] = offset
 
         # Transform the dict to a sequence of two-element tuples in fixed
         # order, then the encoded string will be consistent in Python 2&3.

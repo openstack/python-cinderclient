@@ -43,3 +43,11 @@ class VolumeManager(volumes.VolumeManager):
                              'image_name': image_name,
                              'container_format': container_format,
                              'disk_format': disk_format})
+
+    @api_versions.wraps("2.0")
+    def list_manageable(self, host, detailed=True, marker=None, limit=None,
+                        offset=None, sort=None):
+        url = self._build_list_url("os-volume-manage", detailed=detailed,
+                                   search_opts={'host': host}, marker=marker,
+                                   limit=limit, offset=offset, sort=sort)
+        return self._list(url, "manageable-volumes")

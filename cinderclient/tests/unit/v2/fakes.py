@@ -1156,10 +1156,57 @@ class FakeHTTPClient(base_client.HTTPClient):
     def put_snapshots_1234_metadata(self, **kw):
         return (200, {}, {"metadata": {"key1": "val1", "key2": "val2"}})
 
+    def get_os_volume_manage(self, **kw):
+        vol_id = "volume-ffffffff-0000-ffff-0000-ffffffffffff"
+        vols = [{"size": 4, "safe_to_manage": False, "actual_size": 4.0,
+                 "reference": {"source-name": vol_id}},
+                {"size": 5, "safe_to_manage": True, "actual_size": 4.3,
+                 "reference": {"source-name": "myvol"}}]
+        return (200, {}, {"manageable-volumes": vols})
+
+    def get_os_volume_manage_detail(self, **kw):
+        vol_id = "volume-ffffffff-0000-ffff-0000-ffffffffffff"
+        vols = [{"size": 4, "reason_not_safe": "volume in use",
+                 "safe_to_manage": False, "extra_info": "qos_setting:high",
+                 "reference": {"source-name": vol_id},
+                 "actual_size": 4.0},
+                {"size": 5, "reason_not_safe": None, "safe_to_manage": True,
+                 "extra_info": "qos_setting:low", "actual_size": 4.3,
+                 "reference": {"source-name": "myvol"}}]
+        return (200, {}, {"manageable-volumes": vols})
+
     def post_os_volume_manage(self, **kw):
         volume = _stub_volume(id='1234')
         volume.update(kw['body']['volume'])
         return (202, {}, {'volume': volume})
+
+    def get_os_snapshot_manage(self, **kw):
+        snap_id = "snapshot-ffffffff-0000-ffff-0000-ffffffffffff"
+        snaps = [{"actual_size": 4.0, "size": 4,
+                 "safe_to_manage": False, "source_id_type": "source-name",
+                 "source_cinder_id": "00000000-ffff-0000-ffff-00000000",
+                 "reference": {"source-name": snap_id},
+                 "source_identifier": "volume-00000000-ffff-0000-ffff-000000"},
+                {"actual_size": 4.3, "reference": {"source-name": "mysnap"},
+                 "source_id_type": "source-name", "source_identifier": "myvol",
+                 "safe_to_manage": True, "source_cinder_id": None, "size": 5}]
+        return (200, {}, {"manageable-snapshots": snaps})
+
+    def get_os_snapshot_manage_detail(self, **kw):
+        snap_id = "snapshot-ffffffff-0000-ffff-0000-ffffffffffff"
+        snaps = [{"actual_size": 4.0, "size": 4,
+                 "safe_to_manage": False, "source_id_type": "source-name",
+                 "source_cinder_id": "00000000-ffff-0000-ffff-00000000",
+                 "reference": {"source-name": snap_id},
+                 "source_identifier": "volume-00000000-ffff-0000-ffff-000000",
+                 "extra_info": "qos_setting:high",
+                 "reason_not_safe": "snapshot in use"},
+                {"actual_size": 4.3, "reference": {"source-name": "mysnap"},
+                 "safe_to_manage": True, "source_cinder_id": None,
+                 "source_id_type": "source-name", "identifier": "mysnap",
+                 "source_identifier": "myvol", "size": 5,
+                 "extra_info": "qos_setting:low", "reason_not_safe": None}]
+        return (200, {}, {"manageable-snapshots": snaps})
 
     def post_os_snapshot_manage(self, **kw):
         snapshot = _stub_snapshot(id='1234', volume_id='volume_id1')

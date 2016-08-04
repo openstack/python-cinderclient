@@ -108,3 +108,89 @@ def do_upload_to_image(cs, args):
                                                args.image_name,
                                                args.container_format,
                                                args.disk_format))
+
+@utils.arg('host',
+           metavar='<host>',
+           help='Cinder host on which to list manageable volumes; '
+                'takes the form: host@backend-name#pool')
+@utils.arg('--detailed',
+           metavar='<detailed>',
+           default=True,
+           help='Returned detailed information (default true).')
+@utils.arg('--marker',
+           metavar='<marker>',
+           default=None,
+           help='Begin returning volumes that appear later in the volume '
+                'list than that represented by this volume id. '
+                'Default=None.')
+@utils.arg('--limit',
+           metavar='<limit>',
+           default=None,
+           help='Maximum number of volumes to return. Default=None.')
+@utils.arg('--offset',
+           metavar='<offset>',
+           default=None,
+           help='Number of volumes to skip after marker. Default=None.')
+@utils.arg('--sort',
+           metavar='<key>[:<direction>]',
+           default=None,
+           help=(('Comma-separated list of sort keys and directions in the '
+                  'form of <key>[:<asc|desc>]. '
+                  'Valid keys: %s. '
+                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
+@utils.service_type('volumev2')
+def do_manageable_list(cs, args):
+    """Lists all manageable volumes."""
+    detailed = strutils.bool_from_string(args.detailed)
+    volumes = cs.volumes.list_manageable(host=args.host, detailed=detailed,
+                                         marker=args.marker, limit=args.limit,
+                                         offset=args.offset, sort=args.sort)
+    columns = ['reference', 'size', 'safe_to_manage']
+    if detailed:
+        columns.extend(['reason_not_safe', 'cinder_id', 'extra_info'])
+    utils.print_list(volumes, columns, sortby_index=None)
+
+
+@utils.arg('host',
+           metavar='<host>',
+           help='Cinder host on which to list manageable snapshots; '
+                'takes the form: host@backend-name#pool')
+@utils.arg('--detailed',
+           metavar='<detailed>',
+           default=True,
+           help='Returned detailed information (default true).')
+@utils.arg('--marker',
+           metavar='<marker>',
+           default=None,
+           help='Begin returning volumes that appear later in the volume '
+                'list than that represented by this volume id. '
+                'Default=None.')
+@utils.arg('--limit',
+           metavar='<limit>',
+           default=None,
+           help='Maximum number of volumes to return. Default=None.')
+@utils.arg('--offset',
+           metavar='<offset>',
+           default=None,
+           help='Number of volumes to skip after marker. Default=None.')
+@utils.arg('--sort',
+           metavar='<key>[:<direction>]',
+           default=None,
+           help=(('Comma-separated list of sort keys and directions in the '
+                  'form of <key>[:<asc|desc>]. '
+                  'Valid keys: %s. '
+                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
+@utils.service_type('volumev2')
+def do_snapshot_manageable_list(cs, args):
+    """Lists all manageable snapshots."""
+    detailed = strutils.bool_from_string(args.detailed)
+    snapshots = cs.volume_snapshots.list_manageable(host=args.host,
+                                                    detailed=detailed,
+                                                    marker=args.marker,
+                                                    limit=args.limit,
+                                                    offset=args.offset,
+                                                    sort=args.sort)
+    columns = ['reference', 'size', 'safe_to_manage', 'source_reference']
+    if detailed:
+        columns.extend(['reason_not_safe', 'cinder_id', 'extra_info'])
+    utils.print_list(snapshots, columns, sortby_index=None)

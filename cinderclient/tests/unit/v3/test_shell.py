@@ -309,3 +309,33 @@ class ShellTest(utils.TestCase):
         cmd += src
         self.run_command(cmd)
         self.assert_called_anytime('POST', '/groups/action', body=expected)
+
+    def test_volume_manageable_list(self):
+        self.run_command('--os-volume-api-version 3.8 '
+                         'manageable-list fakehost')
+        self.assert_called('GET', '/manageable_volumes/detail?host=fakehost')
+
+    def test_volume_manageable_list_details(self):
+        self.run_command('--os-volume-api-version 3.8 '
+                         'manageable-list fakehost --detailed True')
+        self.assert_called('GET', '/manageable_volumes/detail?host=fakehost')
+
+    def test_volume_manageable_list_no_details(self):
+        self.run_command('--os-volume-api-version 3.8 '
+                         'manageable-list fakehost --detailed False')
+        self.assert_called('GET', '/manageable_volumes?host=fakehost')
+
+    def test_snapshot_manageable_list(self):
+        self.run_command('--os-volume-api-version 3.8 '
+                         'snapshot-manageable-list fakehost')
+        self.assert_called('GET', '/manageable_snapshots/detail?host=fakehost')
+
+    def test_snapshot_manageable_list_details(self):
+        self.run_command('--os-volume-api-version 3.8 '
+                         'snapshot-manageable-list fakehost --detailed True')
+        self.assert_called('GET', '/manageable_snapshots/detail?host=fakehost')
+
+    def test_snapshot_manageable_list_no_details(self):
+        self.run_command('--os-volume-api-version 3.8 '
+                         'snapshot-manageable-list fakehost --detailed False')
+        self.assert_called('GET', '/manageable_snapshots?host=fakehost')

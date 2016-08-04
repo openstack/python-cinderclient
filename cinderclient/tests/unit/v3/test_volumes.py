@@ -65,3 +65,23 @@ class VolumesTest(utils.TestCase):
                                'group_id': '1234'}}
         cs.assert_called('POST', '/volumes', body=expected)
         self._assert_request_id(vol)
+
+    def test_volume_list_manageable(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.8'))
+        cs.volumes.list_manageable('host1', detailed=False)
+        cs.assert_called('GET', '/manageable_volumes?host=host1')
+
+    def test_volume_list_manageable_detailed(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.8'))
+        cs.volumes.list_manageable('host1', detailed=True)
+        cs.assert_called('GET', '/manageable_volumes/detail?host=host1')
+
+    def test_snapshot_list_manageable(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.8'))
+        cs.volume_snapshots.list_manageable('host1', detailed=False)
+        cs.assert_called('GET', '/manageable_snapshots?host=host1')
+
+    def test_snapshot_list_manageable_detailed(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.8'))
+        cs.volume_snapshots.list_manageable('host1', detailed=True)
+        cs.assert_called('GET', '/manageable_snapshots/detail?host=host1')

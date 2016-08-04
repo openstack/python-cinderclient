@@ -193,6 +193,12 @@ class Volume(base.Resource):
                                    availability_zone=availability_zone,
                                    metadata=metadata, bootable=bootable)
 
+    def list_manageable(self, host, detailed=True, marker=None, limit=None,
+                        offset=None, sort=None):
+        return self.manager.list_manageable(host, detailed=detailed,
+                                            marker=marker, limit=limit,
+                                            offset=offset, sort=sort)
+
     def unmanage(self, volume):
         """Unmanage a volume."""
         return self.manager.unmanage(volume)
@@ -623,6 +629,14 @@ class VolumeManager(base.ManagerWithFind):
                            'bootable': bootable
                            }}
         return self._create('/os-volume-manage', body, 'volume')
+
+    @api_versions.wraps("3.8")
+    def list_manageable(self, host, detailed=True, marker=None, limit=None,
+                        offset=None, sort=None):
+        url = self._build_list_url("manageable_volumes", detailed=detailed,
+                                   search_opts={'host': host}, marker=marker,
+                                   limit=limit, offset=offset, sort=sort)
+        return self._list(url, "manageable-volumes")
 
     def unmanage(self, volume):
         """Unmanage a volume."""

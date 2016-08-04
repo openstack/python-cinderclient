@@ -1115,6 +1115,18 @@ class ShellTest(utils.TestCase):
                                'bootable': False}}
         self.assert_called_anytime('POST', '/os-volume-manage', body=expected)
 
+    def test_volume_manageable_list(self):
+        self.run_command('manageable-list fakehost')
+        self.assert_called('GET', '/os-volume-manage/detail?host=fakehost')
+
+    def test_volume_manageable_list_details(self):
+        self.run_command('manageable-list fakehost --detailed True')
+        self.assert_called('GET', '/os-volume-manage/detail?host=fakehost')
+
+    def test_volume_manageable_list_no_details(self):
+        self.run_command('manageable-list fakehost --detailed False')
+        self.assert_called('GET', '/os-volume-manage?host=fakehost')
+
     def test_volume_unmanage(self):
         self.run_command('unmanage 1234')
         self.assert_called('POST', '/volumes/1234/action',
@@ -1326,6 +1338,18 @@ class ShellTest(utils.TestCase):
                                  }}
         self.assert_called_anytime('POST', '/os-snapshot-manage',
                                    body=expected)
+
+    def test_snapshot_manageable_list(self):
+        self.run_command('snapshot-manageable-list fakehost')
+        self.assert_called('GET', '/os-snapshot-manage/detail?host=fakehost')
+
+    def test_snapshot_manageable_list_details(self):
+        self.run_command('snapshot-manageable-list fakehost --detailed True')
+        self.assert_called('GET', '/os-snapshot-manage/detail?host=fakehost')
+
+    def test_snapshot_manageable_list_no_details(self):
+        self.run_command('snapshot-manageable-list fakehost --detailed False')
+        self.assert_called('GET', '/os-snapshot-manage?host=fakehost')
 
     def test_snapshot_unmanage(self):
         self.run_command('snapshot-unmanage 1234')

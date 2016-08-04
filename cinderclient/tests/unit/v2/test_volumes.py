@@ -274,6 +274,14 @@ class VolumesTest(utils.TestCase):
         cs.assert_called('POST', '/os-volume-manage', {'volume': expected})
         self._assert_request_id(vol)
 
+    def test_volume_list_manageable(self):
+        cs.volumes.list_manageable('host1', detailed=False)
+        cs.assert_called('GET', '/os-volume-manage?host=host1')
+
+    def test_volume_list_manageable_detailed(self):
+        cs.volumes.list_manageable('host1', detailed=True)
+        cs.assert_called('GET', '/os-volume-manage/detail?host=host1')
+
     def test_volume_unmanage(self):
         v = cs.volumes.get('1234')
         self._assert_request_id(v)
@@ -287,6 +295,14 @@ class VolumesTest(utils.TestCase):
                     'description': None, 'metadata': None, 'ref': {'k': 'v'}}
         cs.assert_called('POST', '/os-snapshot-manage', {'snapshot': expected})
         self._assert_request_id(vol)
+
+    def test_snapshot_list_manageable(self):
+        cs.volume_snapshots.list_manageable('host1', detailed=False)
+        cs.assert_called('GET', '/os-snapshot-manage?host=host1')
+
+    def test_snapshot_list_manageable_detailed(self):
+        cs.volume_snapshots.list_manageable('host1', detailed=True)
+        cs.assert_called('GET', '/os-snapshot-manage/detail?host=host1')
 
     def test_replication_promote(self):
         v = cs.volumes.get('1234')

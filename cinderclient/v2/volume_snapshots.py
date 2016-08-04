@@ -15,5 +15,25 @@
 
 """Volume snapshot interface (v2 extension)."""
 
-from cinderclient.v3.volume_snapshots import *  # flake8: noqa
+from cinderclient import api_versions
+from cinderclient.v3 import volume_snapshots
 
+
+class Snapshot(volume_snapshots.Snapshot):
+    def list_manageable(self, host, detailed=True, marker=None, limit=None,
+                        offset=None, sort=None):
+        return self.manager.list_manageable(host, detailed=detailed,
+                                            marker=marker, limit=limit,
+                                            offset=offset, sort=sort)
+
+
+class SnapshotManager(volume_snapshots.SnapshotManager):
+    resource_class = Snapshot
+
+    @api_versions.wraps("2.0")
+    def list_manageable(self, host, detailed=True, marker=None, limit=None,
+                        offset=None, sort=None):
+        url = self._build_list_url("os-snapshot-manage", detailed=detailed,
+                                   search_opts={'host': host}, marker=marker,
+                                   limit=limit, offset=offset, sort=sort)
+        return self._list(url, "manageable-snapshots")
