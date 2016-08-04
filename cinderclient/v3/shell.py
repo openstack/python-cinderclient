@@ -2785,7 +2785,7 @@ def do_failover_host(cs, args):
 @utils.service_type('volumev3')
 @api_versions.wraps("3.0")
 def do_api_version(cs, args):
-    """Display the API version information."""
+    """Display the server API version information."""
     columns = ['ID', 'Status', 'Version', 'Min_version']
     response = cs.services.server_api_version()
     utils.print_list(response, columns)
