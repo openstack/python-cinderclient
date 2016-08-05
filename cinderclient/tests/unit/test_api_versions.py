@@ -40,7 +40,11 @@ class APIVersionTestCase(utils.TestCase):
 
     def test_null_version(self):
         v = api_versions.APIVersion()
-        self.assertTrue(v.is_null())
+        self.assertFalse(v)
+
+    def test_not_null_version(self):
+        v = api_versions.APIVersion('1.1')
+        self.assertTrue(v)
 
     @ddt.data("2", "200", "2.1.4", "200.23.66.3", "5 .3", "5. 3", "5.03",
               "02.1", "2.001", "", " 2.1", "2.1 ")
@@ -159,16 +163,24 @@ class GetAPIVersionTestCase(utils.TestCase):
         self.assertRaises(exceptions.UnsupportedVersion,
                           api_versions.get_api_version, "4")
 
+    @mock.patch("cinderclient.api_versions.get_available_major_versions")
     @mock.patch("cinderclient.api_versions.APIVersion")
-    def test_only_major_part_is_presented(self, mock_apiversion):
+    def test_only_major_part_is_presented(self, mock_apiversion,
+                                          mock_get_majors):
+        mock_get_majors.return_value = [
+            str(mock_apiversion.return_value.ver_major)]
         version = 7
         self.assertEqual(mock_apiversion.return_value,
                          api_versions.get_api_version(version))
         mock_apiversion.assert_called_once_with("%s.0" % str(version))
 
+    @mock.patch("cinderclient.api_versions.get_available_major_versions")
     @mock.patch("cinderclient.api_versions.APIVersion")
-    def test_major_and_minor_parts_is_presented(self, mock_apiversion):
+    def test_major_and_minor_parts_is_presented(self, mock_apiversion,
+                                                mock_get_majors):
         version = "2.7"
+        mock_get_majors.return_value = [
+            str(mock_apiversion.return_value.ver_major)]
         self.assertEqual(mock_apiversion.return_value,
                          api_versions.get_api_version(version))
         mock_apiversion.assert_called_once_with(version)
