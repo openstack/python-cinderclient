@@ -43,7 +43,7 @@ from keystoneauth1.exceptions import DiscoveryFailure
 import six.moves.urllib.parse as urlparse
 from oslo_utils import encodeutils
 from oslo_utils import importutils
-from oslo_utils import strutils
+import six
 
 osprofiler_profiler = importutils.try_import("osprofiler.profiler")
 
@@ -884,7 +884,7 @@ def main():
         sys.exit(130)
     except Exception as e:
         logger.debug(e, exc_info=1)
-        print("ERROR: %s" % strutils.six.text_type(e), file=sys.stderr)
+        print("ERROR: %s" % six.text_type(e), file=sys.stderr)
         sys.exit(1)
 
 
