@@ -182,10 +182,10 @@ class OpenStackCinderShell(object):
                             help=argparse.SUPPRESS)
         parser.add_argument('--endpoint-type',
                             metavar='<endpoint-type>',
-                            dest='endpoint_type',
+                            dest='os_endpoint_type',
                             help=_('DEPRECATED! Use --os-endpoint-type.'))
         parser.add_argument('--endpoint_type',
-                            dest='endpoint_type',
+                            dest='os_endpoint_type',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-volume-api-version',
