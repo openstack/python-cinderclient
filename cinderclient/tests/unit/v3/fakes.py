@@ -21,11 +21,13 @@ from cinderclient.tests.unit.v2 import fakes as fake_v2
 
 class FakeClient(fakes.FakeClient, client.Client):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, api_version=None, *args, **kwargs):
         client.Client.__init__(self, 'username', 'password',
                                'project_id', 'auth_url',
                                extensions=kwargs.get('extensions'))
-        self.client = FakeHTTPClient(**kwargs)
+        self.api_version = api_version
+        self.client = FakeHTTPClient(api_version=api_version,
+                                     **kwargs)
 
     def get_volume_api_version_from_endpoint(self):
         return self.client.get_volume_api_version_from_endpoint()
@@ -171,3 +173,14 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
     def put_clusters_disable(self, body):
         res = self.get_clusters(id=3)
         return (200, {}, {'cluster': res[2]['clusters'][0]})
+
+    #
+    # Backups
+    #
+    def put_backups_1234(self, **kw):
+        backup = fake_v2._stub_backup(
+            id='1234',
+            base_uri='http://localhost:8776',
+            tenant_id='0fa851f6668144cf9cd8c8419c1646c1')
+        return (200, {},
+                {'backups': backup})
