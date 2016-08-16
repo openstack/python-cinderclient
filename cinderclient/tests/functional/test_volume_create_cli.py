@@ -36,3 +36,40 @@ class CinderVolumeNegativeTests(base.ClientTestBase):
 
         six.assertRaisesRegex(self, exceptions.CommandFailed, ex_text,
                               self.object_create, 'volume', params=value)
+
+
+class CinderVolumeTests(base.ClientTestBase):
+    """Check of cinder volume create commands."""
+    def setUp(self):
+        super(CinderVolumeTests, self).setUp()
+        self.volume = self.object_create('volume', params='1')
+
+    def test_volume_create_from_snapshot(self):
+        """Test steps:
+
+        1) create volume in Setup()
+        2) create snapshot
+        3) create volume from snapshot
+        4) check that volume from snapshot has been successfully created
+        """
+        snapshot = self.object_create('snapshot', params=self.volume['id'])
+        volume_from_snapshot = self.object_create('volume',
+                                           params='--snapshot-id {0} 1'.
+                                           format(snapshot['id']))
+        self.object_delete('snapshot', snapshot['id'])
+        self.check_object_deleted('snapshot', snapshot['id'])
+        cinder_list = self.cinder('list')
+        self.assertIn(volume_from_snapshot['id'], cinder_list)
+
+    def test_volume_create_from_volume(self):
+        """Test steps:
+
+        1) create volume in Setup()
+        2) create volume from volume
+        3) check that volume from volume has been successfully created
+        """
+        volume_from_volume = self.object_create('volume',
+                                         params='--source-volid {0} 1'.
+                                         format(self.volume['id']))
+        cinder_list = self.cinder('list')
+        self.assertIn(volume_from_volume['id'], cinder_list)
