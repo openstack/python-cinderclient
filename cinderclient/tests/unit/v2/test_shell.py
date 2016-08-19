@@ -505,6 +505,10 @@ class ShellTest(utils.TestCase):
         self.assert_called('GET', '/snapshots/detail?'
                            'status=available&volume_id=1234')
 
+    def test_snapshot_list_filter_name(self):
+        self.run_command('snapshot-list --name abc')
+        self.assert_called('GET', '/snapshots/detail?name=abc')
+
     @mock.patch("cinderclient.utils.print_list")
     def test_snapshot_list_sort(self, mock_print_list):
         self.run_command('snapshot-list --sort id')
