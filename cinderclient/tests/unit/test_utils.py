@@ -17,6 +17,7 @@ import sys
 import mock
 from six import moves
 
+from cinderclient import api_versions
 from cinderclient import exceptions
 from cinderclient import utils
 from cinderclient import base
@@ -59,6 +60,17 @@ class FakeManager(base.ManagerWithFind):
 
     def list(self, search_opts):
         return common_base.ListWithMeta(self.resources, fakes.REQUEST_ID)
+
+
+class FakeManagerWithApi(base.Manager):
+
+    @api_versions.wraps('3.1')
+    def return_api_version(self):
+        return '3.1'
+
+    @api_versions.wraps('3.2')
+    def return_api_version(self):
+        return '3.2'
 
 
 class FakeDisplayResource(object):

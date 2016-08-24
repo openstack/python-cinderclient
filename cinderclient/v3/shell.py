@@ -1424,22 +1424,31 @@ def _find_group_type(cs, gtype):
            help=argparse.SUPPRESS)
 @utils.arg('--visibility',
            metavar='<public|private>',
-           help='Makes image publicly accessible. Default=private.',
-           default='private')
+           help='Set image visibility to either public or private. '
+                'Default=private.',
+           default='private',
+           start_version='3.1')
 @utils.arg('--protected',
            metavar='<True|False>',
            help='Prevents image from being deleted. Default=False.',
-           default=False)
+           default=False,
+           start_version='3.1')
 @utils.service_type('volumev3')
 def do_upload_to_image(cs, args):
     """Uploads volume to Image Service as an image."""
     volume = utils.find_volume(cs, args.volume)
-    _print_volume_image(volume.upload_to_image(args.force,
-                                               args.image_name,
-                                               args.container_format,
-                                               args.disk_format,
-                                               args.visibility,
-                                               args.protected))
+    if cs.api_version >= api_versions.APIVersion("3.1"):
+        _print_volume_image(volume.upload_to_image(args.force,
+                                                   args.image_name,
+                                                   args.container_format,
+                                                   args.disk_format,
+                                                   args.visibility,
+                                                   args.protected))
+    else:
+        _print_volume_image(volume.upload_to_image(args.force,
+                                                   args.image_name,
+                                                   args.container_format,
+                                                   args.disk_format))
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of volume to migrate.')

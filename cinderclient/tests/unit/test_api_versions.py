@@ -18,7 +18,9 @@ import mock
 
 from cinderclient import api_versions
 from cinderclient import exceptions
+from cinderclient.v3 import client
 from cinderclient.tests.unit import utils
+from cinderclient.tests.unit import test_utils
 
 
 @ddt.ddt
@@ -91,6 +93,37 @@ class APIVersionTestCase(utils.TestCase):
 
         self.assertRaises(ValueError,
                           api_versions.APIVersion().get_string)
+
+
+class ManagerTest(utils.TestCase):
+    def test_api_version(self):
+        # The function manager.return_api_version has two versions,
+        # when called with api version 3.1 it should return the
+        # string '3.1' and when called with api version 3.2 or higher
+        # it should return the string '3.2'.
+        version = api_versions.APIVersion('3.1')
+        api = client.Client(api_version=version)
+        manager = test_utils.FakeManagerWithApi(api)
+        self.assertEqual('3.1', manager.return_api_version())
+
+        version = api_versions.APIVersion('3.2')
+        api = client.Client(api_version=version)
+        manager = test_utils.FakeManagerWithApi(api)
+        self.assertEqual('3.2', manager.return_api_version())
+
+        # pick up the highest version
+        version = api_versions.APIVersion('3.3')
+        api = client.Client(api_version=version)
+        manager = test_utils.FakeManagerWithApi(api)
+        self.assertEqual('3.2', manager.return_api_version())
+
+        version = api_versions.APIVersion('3.0')
+        api = client.Client(api_version=version)
+        manager = test_utils.FakeManagerWithApi(api)
+        # An exception will be returned here because the function
+        # return_api_version doesn't support version 3.0
+        self.assertRaises(exceptions.VersionNotFoundForAPIMethod,
+                          manager.return_api_version)
 
 
 class UpdateHeadersTestCase(utils.TestCase):

@@ -111,11 +111,28 @@ class Volume(base.Resource):
         return self.manager.show_image_metadata(self)
 
     def upload_to_image(self, force, image_name, container_format,
-                        disk_format, visibility, protected):
-        """Upload a volume to image service as an image."""
-        return self.manager.upload_to_image(self, force, image_name,
-                                            container_format, disk_format,
-                                            visibility, protected)
+                        disk_format, visibility=None,
+                        protected=None):
+        """Upload a volume to image service as an image.
+        :param force: Boolean to enables or disables upload of a volume that
+                      is attached to an instance.
+        :param image_name: The new image name.
+        :param container_format: Container format type.
+        :param disk_format: Disk format type.
+        :param visibility: The accessibility of image (allowed for
+                           3.1-latest).
+        :param protected: Boolean to decide whether prevents image from being
+                          deleted (allowed for 3.1-latest).
+        """
+        if self.manager.api_version >= api_versions.APIVersion("3.1"):
+            visibility = 'private' if visibility is None else visibility
+            protected = False if protected is None else protected
+            return self.manager.upload_to_image(self, force, image_name,
+                                                container_format, disk_format,
+                                                visibility, protected)
+        else:
+            return self.manager.upload_to_image(self, force, image_name,
+                                                container_format, disk_format)
 
     def force_delete(self):
         """Delete the specified volume ignoring its current state.
