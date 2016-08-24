@@ -79,7 +79,8 @@ def _print_volume_image(image):
            default=False,
            help='Enables or disables upload of '
            'a volume that is attached to an instance. '
-           'Default=False.')
+           'Default=False. '
+           'This option may not be supported by your cloud.')
 @utils.arg('--container-format',
            metavar='<container-format>',
            default='bare',
