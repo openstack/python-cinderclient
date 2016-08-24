@@ -117,7 +117,7 @@ class SessionClient(adapter.LegacyJsonAdapter):
 
         # if service name is None then use service_type for logging
         service = self.service_name or self.service_type
-        _log_request_id(self.logger, resp, service)
+        _log_request_id(self._logger, resp, service)
 
         if raise_exc and resp.status_code >= 400:
             raise exceptions.from_response(resp, body)

@@ -137,7 +137,9 @@ class ClientTest(utils.TestCase):
         session_client = cinderclient.client.SessionClient(session=mock.Mock())
         response, body = session_client.request(mock.sentinel.url,
                                                 'POST', **kwargs)
-        self.assertEqual(1, mock_log.call_count)
+        self.assertIsNotNone(session_client._logger)
+        mock_log.assert_called_once_with(session_client._logger, mock_response,
+                                         mock.ANY)
 
         # In this case, from_response method will not get called
         # because response status_code is < 400
@@ -181,7 +183,9 @@ class ClientTest(utils.TestCase):
         # resp.status_code is 400
         self.assertRaises(exceptions.BadRequest, session_client.request,
                           mock.sentinel.url, 'POST', **kwargs)
-        self.assertEqual(1, mock_log.call_count)
+        self.assertIsNotNone(session_client._logger)
+        mock_log.assert_called_once_with(session_client._logger, mock_response,
+                                         mock.ANY)
 
     @mock.patch.object(cinderclient.client, '_log_request_id')
     @mock.patch.object(adapter.Adapter, 'request')
@@ -206,7 +210,9 @@ class ClientTest(utils.TestCase):
 
         self.assertRaises(exceptions.OverLimit, session_client.request,
                           mock.sentinel.url, 'GET')
-        self.assertEqual(1, mock_log.call_count)
+        self.assertIsNotNone(session_client._logger)
+        mock_log.assert_called_once_with(session_client._logger, mock_response,
+                                         mock.ANY)
 
     @mock.patch.object(exceptions, 'from_response')
     def test_keystone_request_raises_auth_failure_exception(
