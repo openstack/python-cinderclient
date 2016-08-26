@@ -15,6 +15,7 @@
 
 import fixtures
 import mock
+import ddt
 from requests_mock.contrib import fixture as requests_mock_fixture
 from six.moves.urllib import parse
 
@@ -29,6 +30,7 @@ from cinderclient.tests.unit.v2 import fakes
 from cinderclient.tests.unit.fixture_data import keystone_client
 
 
+@ddt.ddt
 @mock.patch.object(client, 'Client', fakes.FakeClient)
 class ShellTest(utils.TestCase):
 
@@ -446,10 +448,12 @@ class ShellTest(utils.TestCase):
                           'backup-restore 1234 --volume fake_vol --name '
                           'restore_vol')
 
+    @ddt.data('backup_name', '1234')
     @mock.patch('cinderclient.v3.shell._find_backup')
     @mock.patch('cinderclient.utils.print_dict')
     @mock.patch('cinderclient.utils.find_volume')
-    def test_do_backup_restore(self,
+    def test_do_backup_restore_with_name(self,
+                               value,
                                mock_find_volume,
                                mock_print_dict,
                                mock_find_backup):
@@ -457,7 +461,7 @@ class ShellTest(utils.TestCase):
         volume_id = '5678'
         name = None
         input = {
-            'backup': backup_id,
+            'backup': value,
             'volume': volume_id,
             'name': None
         }
@@ -475,7 +479,7 @@ class ShellTest(utils.TestCase):
             test_shell.do_backup_restore(self.cs, args)
             mock_find_backup.assert_called_once_with(
                 self.cs,
-                backup_id)
+                value)
             mocked_restore.assert_called_once_with(
                 backup_id,
                 volume_id,

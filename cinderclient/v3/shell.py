@@ -1698,7 +1698,7 @@ def do_backup_restore(cs, args):
         volume_id = None
 
     backup = _find_backup(cs, args.backup)
-    restore = cs.restores.restore(args.backup, volume_id, args.name)
+    restore = cs.restores.restore(backup.id, volume_id, args.name)
 
     info = {"backup_id": backup.id}
     info.update(restore._info)
