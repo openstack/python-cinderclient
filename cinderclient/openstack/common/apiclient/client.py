@@ -144,11 +144,7 @@ class HTTPClient(object):
     def serialize(self, kwargs):
         if kwargs.get('json') is not None:
             kwargs['headers']['Content-Type'] = 'application/json'
-            kwargs['data'] = json.dumps(kwargs['json'])
-        try:
-            del kwargs['json']
-        except KeyError:
-            pass
+            kwargs['data'] = json.dumps(kwargs.pop('json'))
 
     def get_timings(self):
         return self.times
