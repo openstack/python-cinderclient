@@ -34,19 +34,19 @@ class UnsupportedAttribute(AttributeError):
     """
 
     def __init__(self, argument_name, start_version, end_version):
-        if not start_version.is_null() and not end_version.is_null():
+        if start_version and end_version:
             self.message = (
                 "'%(name)s' argument is only allowed for microversions "
                 "%(start)s - %(end)s." % {"name": argument_name,
                                           "start": start_version.get_string(),
                                           "end": end_version.get_string()})
-        elif not start_version.is_null():
+        elif start_version:
             self.message = (
                 "'%(name)s' argument is only allowed since microversion "
                 "%(start)s." % {"name": argument_name,
                                 "start": start_version.get_string()})
 
-        elif not end_version.is_null():
+        elif end_version:
             self.message = (
                 "'%(name)s' argument is not allowed after microversion "
                 "%(end)s." % {"name": argument_name,

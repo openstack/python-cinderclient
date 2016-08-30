@@ -75,13 +75,14 @@ class APIVersion(object):
                 % (self.ver_major, self.ver_minor))
 
     def __repr__(self):
-        if self.is_null():
-            return "<APIVersion: null>"
-        else:
+        if self:
             return "<APIVersion: %s>" % self.get_string()
+        return "<APIVersion: null>"
 
-    def is_null(self):
-        return self.ver_major == 0 and self.ver_minor == 0
+    def __bool__(self):
+        return self.ver_major != 0 or self.ver_minor != 0
+
+    __nonzero__ = __bool__
 
     def is_latest(self):
         return self.ver_minor == float("inf")
@@ -133,7 +134,7 @@ class APIVersion(object):
         If self is null then raise ValueError
         """
 
-        if self.is_null():
+        if not self:
             raise ValueError("Null APIVersion doesn't support 'matches'.")
 
         if isinstance(min_version, str):
@@ -141,24 +142,21 @@ class APIVersion(object):
         if isinstance(max_version, str):
             max_version = APIVersion(version_str=max_version)
 
+        # This will work when they are None and when they are version 0.0
         if not min_version and not max_version:
             return True
-        elif ((min_version and max_version) and
-              max_version.is_null() and min_version.is_null()):
-            return True
 
-        elif not max_version or max_version.is_null():
+        if not max_version:
             return min_version <= self
-        elif not min_version or min_version.is_null():
+        if not min_version:
             return self <= max_version
-        else:
-            return min_version <= self <= max_version
+        return min_version <= self <= max_version
 
     def get_string(self):
         """Converts object to string representation which if used to create
         an APIVersion object results in the same version.
         """
-        if self.is_null():
+        if not self:
             raise ValueError("Null APIVersion cannot be converted to string.")
         elif self.is_latest():
             return "%s.%s" % (self.ver_major, "latest")
@@ -208,8 +206,7 @@ def check_major_version(api_version):
                                                       supported
     """
     available_versions = get_available_major_versions()
-    if (not api_version.is_null() and
-            str(api_version.ver_major) not in available_versions):
+    if (api_version and str(api_version.ver_major) not in available_versions):
         if len(available_versions) == 1:
             msg = ("Invalid client version '%(version)s'. "
                    "Major part should be '%(major)s'") % {
@@ -260,9 +257,10 @@ def discover_version(client, requested_version):
     server_start_version, server_end_version = _get_server_version_range(
         client)
 
+    both_versions_null = not (server_start_version or server_end_version)
     if (not requested_version.is_latest() and
             requested_version != APIVersion('2.0')):
-        if server_start_version.is_null() and server_end_version.is_null():
+        if both_versions_null:
             raise exceptions.UnsupportedVersion(
                 _("Server doesn't support microversions"))
         if not requested_version.matches(server_start_version,
@@ -275,18 +273,15 @@ def discover_version(client, requested_version):
         return requested_version
 
     if requested_version == APIVersion('2.0'):
-        if (server_start_version == APIVersion('2.1') or
-                (server_start_version.is_null() and
-                 server_end_version.is_null())):
+        if server_start_version == APIVersion('2.1') or both_versions_null:
             return APIVersion('2.0')
-        else:
-            raise exceptions.UnsupportedVersion(
-                _("The server isn't backward compatible with Cinder V2 REST "
-                  "API"))
+        raise exceptions.UnsupportedVersion(
+            _("The server isn't backward compatible with Cinder V2 REST "
+              "API"))
 
-    if server_start_version.is_null() and server_end_version.is_null():
+    if both_versions_null:
         return APIVersion('2.0')
-    elif cinderclient.API_MIN_VERSION > server_end_version:
+    if cinderclient.API_MIN_VERSION > server_end_version:
         raise exceptions.UnsupportedVersion(
             _("Server version is too old. The client valid version range is "
               "'%(client_min)s' to '%(client_max)s'. The server valid version "
@@ -315,7 +310,7 @@ def update_headers(headers, api_version):
        null
     """
 
-    if not api_version.is_null() and api_version.ver_minor != 0:
+    if api_version and api_version.ver_minor != 0:
         headers["OpenStack-API-Version"] = "volume " + api_version.get_string()
 
 
@@ -326,7 +321,7 @@ def add_substitution(versioned_method):
 
 def get_substitutions(func_name, api_version=None):
     substitutions = _SUBSTITUTIONS.get(func_name, [])
-    if api_version and not api_version.is_null():
+    if api_version:
         return [m for m in substitutions
                 if api_version.matches(m.start_version, m.end_version)]
     return substitutions

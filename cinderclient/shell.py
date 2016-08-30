@@ -433,11 +433,11 @@ class OpenStackCinderShell(object):
         subparser.set_defaults(func=self.do_bash_completion)
 
     def _build_versioned_help_message(self, start_version, end_version):
-        if not start_version.is_null() and not end_version.is_null():
+        if start_version and end_version:
             msg = (_(" (Supported by API versions %(start)s - %(end)s)")
                 % {"start": start_version.get_string(),
                    "end": end_version.get_string()})
-        elif not start_version.is_null():
+        elif start_version:
             msg = (_(" (Supported by API version %(start)s and later)")
                 % {"start": start_version.get_string()})
         else:
@@ -504,8 +504,7 @@ class OpenStackCinderShell(object):
                 start_version = api_versions.APIVersion(start_version)
                 end_version = kwargs.get('end_version', None)
                 end_version = api_versions.APIVersion(end_version)
-                if do_help and not (start_version.is_null()
-                                    and end_version.is_null()):
+                if do_help and (start_version or end_version):
                     kwargs["help"] = kwargs.get("help", "") + (
                         self._build_versioned_help_message(start_version,
                                                            end_version))
