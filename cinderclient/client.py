@@ -307,8 +307,7 @@ class HTTPClient(object):
 
         if 'body' in kwargs:
             kwargs['headers']['Content-Type'] = 'application/json'
-            kwargs['data'] = json.dumps(kwargs['body'])
-            del kwargs['body']
+            kwargs['data'] = json.dumps(kwargs.pop('body'))
         api_versions.update_headers(kwargs["headers"], self.api_version)
 
         if self.timeout:
