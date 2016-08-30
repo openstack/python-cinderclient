@@ -13,12 +13,14 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from cinderclient import api_versions
+from cinderclient import exceptions as exc
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 import ddt
 
 
-cs = fakes.FakeClient()
+cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.7'))
 
 
 @ddt.ddt
@@ -53,6 +55,13 @@ class ClusterTest(utils.TestCase):
         self.assertEqual(3, len(lst))
         self._assert_request_id(lst)
         self._check_fields_present(lst, detailed)
+
+    @ddt.data(True, False)
+    def test_clusters_list_pre_version(self, detailed):
+        pre_cs = fakes.FakeClient(api_version=
+                                  api_versions.APIVersion('3.6'))
+        self.assertRaises(exc.VersionNotFoundForAPIMethod,
+                          pre_cs.clusters.list, detailed=detailed)
 
     @ddt.data(True, False)
     def test_cluster_list_name(self, detailed):
