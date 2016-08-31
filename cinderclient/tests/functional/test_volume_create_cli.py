@@ -73,3 +73,39 @@ class CinderVolumeTests(base.ClientTestBase):
                                          format(self.volume['id']))
         cinder_list = self.cinder('list')
         self.assertIn(volume_from_volume['id'], cinder_list)
+
+
+class CinderVolumeTestsWithParameters(base.ClientTestBase):
+    """Check of cinder volume create commands with parameters."""
+    def test_volume_create_description(self):
+        """Test steps:
+
+        1) create volume with description
+        2) check that volume has right description
+        """
+        volume_description = 'test_description'
+        volume = self.object_create('volume',
+                                    params='--description {0} 1'.
+                                    format(volume_description))
+        self.assertEqual(volume_description, volume['description'])
+
+    def test_volume_create_multiattach(self):
+        """Test steps:
+
+        1) create volume and allow multiattach
+        2) check that multiattach is true
+        """
+        volume = self.object_create('volume',
+                                    params='--allow-multiattach 1')
+        self.assertEqual('True', volume['multiattach'])
+
+    def test_volume_create_metadata(self):
+        """Test steps:
+
+        1) create volume with metadata
+        2) check that metadata complies entered
+        """
+        volume = self.object_create('volume',
+                                params='--metadata test_metadata=test_date 1')
+        self.assertEqual("{u'test_metadata': u'test_date'}",
+                         volume['metadata'])
