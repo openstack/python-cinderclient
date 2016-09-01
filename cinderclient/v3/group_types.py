@@ -33,6 +33,7 @@ class GroupType(base.Resource):
         return self._info.get("is_public",
                               self._info.get("is_public", 'N/A'))
 
+    @api_versions.wraps("3.11")
     def get_keys(self):
         """Get group specs from a group type.
 
@@ -43,6 +44,7 @@ class GroupType(base.Resource):
             base.getid(self))
         return body["group_specs"]
 
+    @api_versions.wraps("3.11")
     def set_keys(self, metadata):
         """Set group specs on a group type.
 
@@ -56,6 +58,7 @@ class GroupType(base.Resource):
             "group_specs",
             return_raw=True)
 
+    @api_versions.wraps("3.11")
     def unset_keys(self, keys):
         """Unset specs on a group type.
 
