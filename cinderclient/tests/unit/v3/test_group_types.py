@@ -21,6 +21,7 @@ from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 
 cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.11'))
+pre_cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.10'))
 
 
 class GroupTypesTest(utils.TestCase):
@@ -33,8 +34,6 @@ class GroupTypesTest(utils.TestCase):
             self.assertIsInstance(t, group_types.GroupType)
 
     def test_list_group_types_pre_version(self):
-        pre_cs = fakes.FakeClient(api_version=
-                                  api_versions.APIVersion('3.10'))
         self.assertRaises(exc.VersionNotFoundForAPIMethod,
                           pre_cs.group_types.list)
 
@@ -94,6 +93,11 @@ class GroupTypesTest(utils.TestCase):
                          '/group_types/1/group_specs',
                          {'group_specs': {'k': 'v'}})
         self._assert_request_id(res)
+
+    def test_set_key_pre_version(self):
+        t = group_types.GroupType(pre_cs, {'id': 1})
+        self.assertRaises(exc.VersionNotFoundForAPIMethod,
+             t.set_keys, {'k': 'v'})
 
     def test_unset_keys(self):
         t = cs.group_types.get(1)
