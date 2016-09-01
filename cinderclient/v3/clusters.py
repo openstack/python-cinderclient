@@ -16,6 +16,7 @@
 """
 Interface to clusters API
 """
+from cinderclient import api_versions
 from cinderclient import base
 
 
@@ -35,6 +36,7 @@ class ClusterManager(base.ManagerWithFind):
             url = "%s?%s" % (url, "&".join(filters))
         return url
 
+    @api_versions.wraps("3.7")
     def list(self, name=None, binary=None, is_up=None, disabled=None,
              num_hosts=None, num_down_hosts=None, detailed=False):
         """Clustered Service list.
@@ -53,6 +55,7 @@ class ClusterManager(base.ManagerWithFind):
                               num_down_hosts=num_down_hosts)
         return self._list(url, 'clusters')
 
+    @api_versions.wraps("3.7")
     def show(self, name, binary=None):
         """Clustered Service show.
 
@@ -64,6 +67,7 @@ class ClusterManager(base.ManagerWithFind):
         return self.resource_class(self, body['cluster'], loaded=True,
                                    resp=resp)
 
+    @api_versions.wraps("3.7")
     def update(self, name, binary, disabled, disabled_reason=None):
         """Enable or disable a clustered service.
 
