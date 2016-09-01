@@ -506,6 +506,10 @@ class Resource(RequestIdMixin):
         else:
             return self.__dict__[k]
 
+    @property
+    def api_version(self):
+        return self.manager.api_version
+
     def get(self):
         # set_loaded() first ... so if we have to bail, we know we tried.
         self.set_loaded(True)
