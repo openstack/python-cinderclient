@@ -14,11 +14,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from cinderclient import api_versions
+from cinderclient import exceptions as exc
 from cinderclient.v3 import group_types
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 
-cs = fakes.FakeClient()
+cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.11'))
 
 
 class GroupTypesTest(utils.TestCase):
@@ -29,6 +31,12 @@ class GroupTypesTest(utils.TestCase):
         self._assert_request_id(tl)
         for t in tl:
             self.assertIsInstance(t, group_types.GroupType)
+
+    def test_list_group_types_pre_version(self):
+        pre_cs = fakes.FakeClient(api_version=
+                                  api_versions.APIVersion('3.10'))
+        self.assertRaises(exc.VersionNotFoundForAPIMethod,
+                          pre_cs.group_types.list)
 
     def test_list_group_types_not_public(self):
         t1 = cs.group_types.list(is_public=None)

@@ -16,6 +16,7 @@
 
 """Group Type interface."""
 
+from cinderclient import api_versions
 from cinderclient import base
 
 
@@ -74,6 +75,7 @@ class GroupTypeManager(base.ManagerWithFind):
     """Manage :class:`GroupType` resources."""
     resource_class = GroupType
 
+    @api_versions.wraps("3.11")
     def list(self, search_opts=None, is_public=None):
         """Lists all group types.
 
@@ -84,6 +86,7 @@ class GroupTypeManager(base.ManagerWithFind):
             query_string = '?is_public=%s' % is_public
         return self._list("/group_types%s" % (query_string), "group_types")
 
+    @api_versions.wraps("3.11")
     def get(self, group_type):
         """Get a specific group type.
 
@@ -93,6 +96,7 @@ class GroupTypeManager(base.ManagerWithFind):
         return self._get("/group_types/%s" % base.getid(group_type),
                          "group_type")
 
+    @api_versions.wraps("3.11")
     def default(self):
         """Get the default group type.
 
@@ -100,6 +104,7 @@ class GroupTypeManager(base.ManagerWithFind):
         """
         return self._get("/group_types/default", "group_type")
 
+    @api_versions.wraps("3.11")
     def delete(self, group_type):
         """Deletes a specific group_type.
 
@@ -107,6 +112,7 @@ class GroupTypeManager(base.ManagerWithFind):
         """
         return self._delete("/group_types/%s" % base.getid(group_type))
 
+    @api_versions.wraps("3.11")
     def create(self, name, description=None, is_public=True):
         """Creates a group type.
 
@@ -126,6 +132,7 @@ class GroupTypeManager(base.ManagerWithFind):
 
         return self._create("/group_types", body, "group_type")
 
+    @api_versions.wraps("3.11")
     def update(self, group_type, name=None, description=None, is_public=None):
         """Update the name and/or description for a group type.
 
