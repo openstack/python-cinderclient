@@ -289,7 +289,6 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
     #
     # Groups
     #
-
     def get_groups_detail(self, **kw):
         return (200, {}, {"groups": [
             _stub_group(id='1234'),
@@ -414,3 +413,50 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
                  "source_identifier": "myvol", "size": 5,
                  "extra_info": "qos_setting:low", "reason_not_safe": None}]
         return (200, {}, {"manageable-snapshots": snaps})
+
+    #
+    # Messages
+    #
+    def get_messages(self, **kw):
+        return 200, {}, {'messages': [
+            {
+                'id': '1234',
+                'event_id': 'VOLUME_000002',
+                'user_message': 'Fake Message',
+                'created_at': '2012-08-27T00:00:00.000000',
+                'guaranteed_until': "2013-11-12T21:00:00.000000",
+            },
+            {
+                'id': '12345',
+                'event_id': 'VOLUME_000002',
+                'user_message': 'Fake Message',
+                'created_at': '2012-08-27T00:00:00.000000',
+                'guaranteed_until': "2013-11-12T21:00:00.000000",
+            }
+        ]}
+
+    def delete_messages_1234(self, **kw):
+        return 204, {}, None
+
+    def delete_messages_12345(self, **kw):
+        return 204, {}, None
+
+    def get_messages_1234(self, **kw):
+        message = {
+            'id': '1234',
+            'event_id': 'VOLUME_000002',
+            'user_message': 'Fake Message',
+            'created_at': '2012-08-27T00:00:00.000000',
+            'guaranteed_until': "2013-11-12T21:00:00.000000",
+        }
+        return 200, {}, {'message': message}
+
+    def get_messages_12345(self, **kw):
+        message = {
+            'id': '12345',
+            'event_id': 'VOLUME_000002',
+            'user_message': 'Fake Message',
+            'created_at': '2012-08-27T00:00:00.000000',
+            'guaranteed_until': "2013-11-12T21:00:00.000000",
+        }
+        return 200, {}, {'message': message}
