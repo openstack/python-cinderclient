@@ -118,7 +118,7 @@ class OpenStackCinderShell(object):
         parser = CinderClientArgumentParser(
             prog='cinder',
             description=__doc__.strip(),
-            epilog='Run "cinder help SUBCOMMAND" for help on a subcommand.',
+            epilog=_('Run "cinder help SUBCOMMAND" for help on a subcommand.'),
             add_help=False,
             formatter_class=OpenStackHelpFormatter,
         )
@@ -136,35 +136,35 @@ class OpenStackCinderShell(object):
                             action='store_true',
                             default=utils.env('CINDERCLIENT_DEBUG',
                                               default=False),
-                            help="Shows debugging output.")
+                            help=_('Shows debugging output.'))
 
         parser.add_argument('--os-auth-system',
                             metavar='<auth-system>',
                             default=utils.env('OS_AUTH_SYSTEM'),
-                            help='Defaults to env[OS_AUTH_SYSTEM].')
+                            help=_('Defaults to env[OS_AUTH_SYSTEM].'))
         parser.add_argument('--os_auth_system',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--service-type',
                             metavar='<service-type>',
-                            help='Service type. '
-                            'For most actions, default is volume.')
+                            help=_('Service type. '
+                            'For most actions, default is volume.'))
         parser.add_argument('--service_type',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--service-name',
                             metavar='<service-name>',
                             default=utils.env('CINDER_SERVICE_NAME'),
-                            help='Service name. '
-                            'Default=env[CINDER_SERVICE_NAME].')
+                            help=_('Service name. '
+                            'Default=env[CINDER_SERVICE_NAME].'))
         parser.add_argument('--service_name',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--volume-service-name',
                             metavar='<volume-service-name>',
                             default=utils.env('CINDER_VOLUME_SERVICE_NAME'),
-                            help='Volume service name. '
-                            'Default=env[CINDER_VOLUME_SERVICE_NAME].')
+                            help=_('Volume service name. '
+                            'Default=env[CINDER_VOLUME_SERVICE_NAME].'))
         parser.add_argument('--volume_service_name',
                             help=argparse.SUPPRESS)
 
@@ -173,17 +173,17 @@ class OpenStackCinderShell(object):
                             default=utils.env('CINDER_ENDPOINT_TYPE',
                             default=utils.env('OS_ENDPOINT_TYPE',
                             default=DEFAULT_CINDER_ENDPOINT_TYPE)),
-                            help='Endpoint type, which is publicURL or '
+                            help=_('Endpoint type, which is publicURL or '
                             'internalURL. '
                             'Default=env[OS_ENDPOINT_TYPE] or '
-                            'nova env[CINDER_ENDPOINT_TYPE] or '
-                            + DEFAULT_CINDER_ENDPOINT_TYPE + '.')
+                            'nova env[CINDER_ENDPOINT_TYPE] or %s.')
+                            % DEFAULT_CINDER_ENDPOINT_TYPE)
         parser.add_argument('--os_endpoint_type',
                             help=argparse.SUPPRESS)
         parser.add_argument('--endpoint-type',
                             metavar='<endpoint-type>',
                             dest='endpoint_type',
-                            help='DEPRECATED! Use --os-endpoint-type.')
+                            help=_('DEPRECATED! Use --os-endpoint-type.'))
         parser.add_argument('--endpoint_type',
                             dest='endpoint_type',
                             help=argparse.SUPPRESS)
@@ -192,10 +192,10 @@ class OpenStackCinderShell(object):
                             metavar='<volume-api-ver>',
                             default=utils.env('OS_VOLUME_API_VERSION',
                                               default=None),
-                            help='Block Storage API version. '
+                            help=_('Block Storage API version. '
                             'Accepts X, X.Y (where X is major and Y is minor '
                             'part).'
-                            'Default=env[OS_VOLUME_API_VERSION].')
+                            'Default=env[OS_VOLUME_API_VERSION].'))
         parser.add_argument('--os_volume_api_version',
                             help=argparse.SUPPRESS)
 
@@ -203,9 +203,9 @@ class OpenStackCinderShell(object):
                             metavar='<bypass-url>',
                             dest='bypass_url',
                             default=utils.env('CINDERCLIENT_BYPASS_URL'),
-                            help="Use this API endpoint instead of the "
+                            help=_("Use this API endpoint instead of the "
                             "Service Catalog. Defaults to "
-                            "env[CINDERCLIENT_BYPASS_URL].")
+                            "env[CINDERCLIENT_BYPASS_URL]."))
         parser.add_argument('--bypass_url',
                             help=argparse.SUPPRESS)
 
@@ -213,18 +213,18 @@ class OpenStackCinderShell(object):
                             metavar='<retries>',
                             type=int,
                             default=0,
-                            help='Number of retries.')
+                            help=_('Number of retries.'))
 
         if osprofiler_profiler:
             parser.add_argument('--profile',
                                 metavar='HMAC_KEY',
-                                help='HMAC key to use for encrypting context '
-                                'data for performance profiling of operation. '
-                                'This key needs to match the one configured '
-                                'on the cinder api server. '
+                                help=_('HMAC key to use for encrypting '
+                                'context data for performance profiling '
+                                'of operation. This key needs to match the '
+                                'one configured on the cinder api server. '
                                 'Without key the profiling will not be '
                                 'triggered even if osprofiler is enabled '
-                                'on server side.')
+                                'on server side.'))
 
         self._append_global_identity_args(parser)
 
@@ -255,8 +255,8 @@ class OpenStackCinderShell(object):
                             metavar='<auth-user-name>',
                             default=utils.env('OS_USERNAME',
                                               'CINDER_USERNAME'),
-                            help='OpenStack user name. '
-                            'Default=env[OS_USERNAME].')
+                            help=_('OpenStack user name. '
+                            'Default=env[OS_USERNAME].'))
         parser.add_argument('--os_username',
                             help=argparse.SUPPRESS)
 
@@ -264,8 +264,8 @@ class OpenStackCinderShell(object):
                             metavar='<auth-password>',
                             default=utils.env('OS_PASSWORD',
                                               'CINDER_PASSWORD'),
-                            help='Password for OpenStack user. '
-                            'Default=env[OS_PASSWORD].')
+                            help=_('Password for OpenStack user. '
+                            'Default=env[OS_PASSWORD].'))
         parser.add_argument('--os_password',
                             help=argparse.SUPPRESS)
 
@@ -274,8 +274,8 @@ class OpenStackCinderShell(object):
                             default=utils.env('OS_TENANT_NAME',
                                               'OS_PROJECT_NAME',
                                               'CINDER_PROJECT_ID'),
-                            help='Tenant name. '
-                            'Default=env[OS_TENANT_NAME].')
+                            help=_('Tenant name. '
+                            'Default=env[OS_TENANT_NAME].'))
         parser.add_argument('--os_tenant_name',
                             help=argparse.SUPPRESS)
 
@@ -284,8 +284,8 @@ class OpenStackCinderShell(object):
                             default=utils.env('OS_TENANT_ID',
                                               'OS_PROJECT_ID',
                                               'CINDER_TENANT_ID'),
-                            help='ID for the tenant. '
-                            'Default=env[OS_TENANT_ID].')
+                            help=_('ID for the tenant. '
+                            'Default=env[OS_TENANT_ID].'))
         parser.add_argument('--os_tenant_id',
                             help=argparse.SUPPRESS)
 
@@ -293,8 +293,8 @@ class OpenStackCinderShell(object):
                             metavar='<auth-url>',
                             default=utils.env('OS_AUTH_URL',
                                               'CINDER_URL'),
-                            help='URL for the authentication service. '
-                            'Default=env[OS_AUTH_URL].')
+                            help=_('URL for the authentication service. '
+                            'Default=env[OS_AUTH_URL].'))
         parser.add_argument('--os_auth_url',
                             help=argparse.SUPPRESS)
 
@@ -311,8 +311,8 @@ class OpenStackCinderShell(object):
             '--os-user-domain-id',
             metavar='<auth-user-domain-id>',
             default=utils.env('OS_USER_DOMAIN_ID'),
-            help='OpenStack user domain ID. '
-            'Defaults to env[OS_USER_DOMAIN_ID].')
+            help=_('OpenStack user domain ID. '
+            'Defaults to env[OS_USER_DOMAIN_ID].'))
 
         parser.add_argument(
             '--os_user_domain_id',
@@ -322,8 +322,8 @@ class OpenStackCinderShell(object):
             '--os-user-domain-name',
             metavar='<auth-user-domain-name>',
             default=utils.env('OS_USER_DOMAIN_NAME'),
-            help='OpenStack user domain name. '
-                 'Defaults to env[OS_USER_DOMAIN_NAME].')
+            help=_('OpenStack user domain name. '
+                 'Defaults to env[OS_USER_DOMAIN_NAME].'))
 
         parser.add_argument(
             '--os_user_domain_name',
@@ -333,10 +333,10 @@ class OpenStackCinderShell(object):
             '--os-project-id',
             metavar='<auth-project-id>',
             default=utils.env('OS_PROJECT_ID'),
-            help='Another way to specify tenant ID. '
+            help=_('Another way to specify tenant ID. '
             'This option is mutually exclusive with '
             ' --os-tenant-id. '
-            'Defaults to env[OS_PROJECT_ID].')
+            'Defaults to env[OS_PROJECT_ID].'))
 
         parser.add_argument(
             '--os_project_id',
@@ -346,10 +346,10 @@ class OpenStackCinderShell(object):
             '--os-project-name',
             metavar='<auth-project-name>',
             default=utils.env('OS_PROJECT_NAME'),
-            help='Another way to specify tenant name. '
+            help=_('Another way to specify tenant name. '
                  'This option is mutually exclusive with '
                  ' --os-tenant-name. '
-                 'Defaults to env[OS_PROJECT_NAME].')
+                 'Defaults to env[OS_PROJECT_NAME].'))
 
         parser.add_argument(
             '--os_project_name',
@@ -359,20 +359,20 @@ class OpenStackCinderShell(object):
             '--os-project-domain-id',
             metavar='<auth-project-domain-id>',
             default=utils.env('OS_PROJECT_DOMAIN_ID'),
-            help='Defaults to env[OS_PROJECT_DOMAIN_ID].')
+            help=_('Defaults to env[OS_PROJECT_DOMAIN_ID].'))
 
         parser.add_argument(
             '--os-project-domain-name',
             metavar='<auth-project-domain-name>',
             default=utils.env('OS_PROJECT_DOMAIN_NAME'),
-            help='Defaults to env[OS_PROJECT_DOMAIN_NAME].')
+            help=_('Defaults to env[OS_PROJECT_DOMAIN_NAME].'))
 
         parser.add_argument('--os-region-name',
                             metavar='<region-name>',
                             default=utils.env('OS_REGION_NAME',
                                               'CINDER_REGION_NAME'),
-                            help='Region name. '
-                            'Default=env[OS_REGION_NAME].')
+                            help=_('Region name. '
+                            'Default=env[OS_REGION_NAME].'))
         parser.add_argument('--os_region_name',
                             help=argparse.SUPPRESS)
 
