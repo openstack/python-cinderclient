@@ -84,20 +84,6 @@ class ClientTestBase(base.ClientTestBase):
         for field in field_names:
             self.assertIn(field, headers)
 
-    def assertTableStruct(self, items, field_names):
-        """Verify that all items has keys listed in field_names.
-
-        :param items: items to assert are field names in the output table
-        :type items: list
-        :param field_names: field names from the output table of the cmd
-        :type field_names: list
-        """
-        # Strip off the --- if present
-
-        for item in items:
-            for field in field_names:
-                self.assertIn(field, item)
-
     def assert_object_details(self, expected, items):
         """Check presence of common object properties.
 
