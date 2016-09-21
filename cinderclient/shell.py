@@ -44,7 +44,6 @@ from keystoneauth1.exceptions import DiscoveryFailure
 import six.moves.urllib.parse as urlparse
 from oslo_utils import encodeutils
 from oslo_utils import importutils
-import six
 
 osprofiler_profiler = importutils.try_import("osprofiler.profiler")
 
