@@ -491,14 +491,17 @@ class Resource(RequestIdMixin):
     def _add_details(self, info):
         for (k, v) in six.iteritems(info):
             try:
-                setattr(self, k, v)
+                try:
+                    setattr(self, k, v)
+                except UnicodeEncodeError:
+                    pass
                 self._info[k] = v
             except AttributeError:
                 # In this case we already defined the attribute on the class
                 pass
 
     def __getattr__(self, k):
-        if k not in self.__dict__:
+        if k not in self.__dict__ or k not in self._info:
             # NOTE(bcwaldon): disallow lazy-loading if already loaded once
             if not self.is_loaded():
                 self.get()
@@ -506,7 +509,9 @@ class Resource(RequestIdMixin):
 
             raise AttributeError(k)
         else:
-            return self.__dict__[k]
+            if k in self.__.dict__:
+                return self.__dict__[k]
+            return self._info[k]
 
     @property
     def api_version(self):
