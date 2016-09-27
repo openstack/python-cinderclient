@@ -93,7 +93,7 @@ This will show the following help information::
           prefer to run tests NOT in a virtual environment, simply pass the -N option.
 
 Because ``run_tests.sh`` is a wrapper around testr, it also accepts the same
-flags as testr. See the the documentation for details about these additional flags:
+flags as testr. See the documentation for details about these additional flags:
 `ostestr documentation <http://docs.openstack.org/developer/os-testr/>`_.
 
 .. _nose options documentation: http://readthedocs.org/docs/nose/en/latest/usage.html#options

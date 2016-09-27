@@ -120,7 +120,7 @@ class GroupTypeManager(base.ManagerWithFind):
         """Creates a group type.
 
         :param name: Descriptive name of the group type
-        :param description: Description of the the group type
+        :param description: Description of the group type
         :param is_public: Group type visibility
         :rtype: :class:`GroupType`
         """
@@ -141,7 +141,7 @@ class GroupTypeManager(base.ManagerWithFind):
 
         :param group_type: The ID of the :class:`GroupType` to update.
         :param name: Descriptive name of the group type.
-        :param description: Description of the the group type.
+        :param description: Description of the group type.
         :rtype: :class:`GroupType`
         """
 

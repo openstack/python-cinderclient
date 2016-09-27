@@ -117,7 +117,7 @@ class VolumeTypeManager(base.ManagerWithFind):
         """Creates a volume type.
 
         :param name: Descriptive name of the volume type
-        :param description: Description of the the volume type
+        :param description: Description of the volume type
         :param is_public: Volume type visibility
         :rtype: :class:`VolumeType`
         """
@@ -137,7 +137,7 @@ class VolumeTypeManager(base.ManagerWithFind):
 
         :param volume_type: The ID of the :class:`VolumeType` to update.
         :param name: Descriptive name of the volume type.
-        :param description: Description of the the volume type.
+        :param description: Description of the volume type.
         :rtype: :class:`VolumeType`
         """
 
