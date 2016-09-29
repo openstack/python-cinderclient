@@ -146,6 +146,46 @@ class CaptureStdout(object):
         self.read = self.stringio.read
 
 
+class BuildQueryParamTestCase(test_utils.TestCase):
+
+    def test_build_param_without_sort_switch(self):
+        dict_param = {
+            'key1': 'val1',
+            'key2': 'val2',
+            'key3': 'val3',
+        }
+        result = utils.build_query_param(dict_param, True)
+
+        self.assertIn('key1=val1', result)
+        self.assertIn('key2=val2', result)
+        self.assertIn('key3=val3', result)
+
+    def test_build_param_with_sort_switch(self):
+        dict_param = {
+            'key1': 'val1',
+            'key2': 'val2',
+            'key3': 'val3',
+        }
+        result = utils.build_query_param(dict_param, True)
+
+        expected = "?key1=val1&key2=val2&key3=val3"
+        self.assertEqual(expected, result)
+
+    def test_build_param_with_none(self):
+        dict_param = {
+            'key1': 'val1',
+            'key2': None,
+            'key3': False,
+            'key4': ''
+        }
+        result_1 = utils.build_query_param(dict_param)
+        result_2 = utils.build_query_param(None)
+
+        expected = "?key1=val1"
+        self.assertEqual(expected, result_1)
+        self.assertFalse(result_2)
+
+
 class PrintListTestCase(test_utils.TestCase):
 
     def test_print_list_with_list(self):

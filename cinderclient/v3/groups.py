@@ -15,11 +15,9 @@
 
 """Group interface (v3 extension)."""
 
-import six
-from six.moves.urllib.parse import urlencode
-
-from cinderclient.apiclient import base as common_base
 from cinderclient import base
+from cinderclient.apiclient import base as common_base
+from cinderclient import utils
 
 
 class Group(base.Resource):
@@ -107,16 +105,7 @@ class GroupManager(base.ManagerWithFind):
 
         :rtype: list of :class:`Group`
         """
-        if search_opts is None:
-            search_opts = {}
-
-        qparams = {}
-
-        for opt, val in six.iteritems(search_opts):
-            if val:
-                qparams[opt] = val
-
-        query_string = "?%s" % urlencode(qparams) if qparams else ""
+        query_string = utils.build_query_param(search_opts)
 
         detail = ""
         if detailed:

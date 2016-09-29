@@ -22,6 +22,7 @@ import types
 import uuid
 
 import six
+from six.moves.urllib import parse
 import prettytable
 
 from cinderclient import exceptions
@@ -185,6 +186,24 @@ def unicode_key_value_to_string(dictionary):
     return dict((six.text_type(k),
                  six.text_type(unicode_key_value_to_string(v)))
                 for k, v in dictionary.items())
+
+
+def build_query_param(params, sort=False):
+    """parse list to url query parameters"""
+
+    if params is None:
+        params = {}
+    if not sort:
+        param_list = list(params.items())
+    else:
+        param_list = list(sorted(params.items()))
+
+    query_string = parse.urlencode(
+        [(k, v) for (k, v) in param_list if v])
+    if query_string:
+        query_string = "?%s" % (query_string,)
+
+    return query_string
 
 
 def print_dict(d, property="Property", formatters=None):

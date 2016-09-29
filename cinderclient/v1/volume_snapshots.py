@@ -17,10 +17,8 @@
 Volume snapshot interface (1.1 extension).
 """
 
-import six
-from six.moves.urllib.parse import urlencode
-
 from cinderclient import base
+from cinderclient import utils
 
 
 class Snapshot(base.Resource):
@@ -109,23 +107,7 @@ class SnapshotManager(base.ManagerWithFind):
 
         :rtype: list of :class:`Snapshot`
         """
-
-        if search_opts is None:
-            search_opts = {}
-
-        qparams = {}
-
-        for opt, val in six.iteritems(search_opts):
-            if val:
-                qparams[opt] = val
-
-        # Transform the dict to a sequence of two-element tuples in fixed
-        # order, then the encoded string will be consistent in Python 2&3.
-        if qparams:
-            new_qparams = sorted(qparams.items(), key=lambda x: x[0])
-            query_string = "?%s" % urlencode(new_qparams)
-        else:
-            query_string = ""
+        query_string = utils.build_query_param(search_opts, True)
 
         detail = ""
         if detailed:
