@@ -14,7 +14,7 @@
 #    under the License.
 
 """Volume interface (v3 extension)."""
-
+from cinderclient.apiclient import base as common_base
 from cinderclient import api_versions
 from cinderclient import base
 from cinderclient.v2 import volumes
@@ -108,6 +108,21 @@ class VolumeManager(volumes.VolumeManager):
             body['OS-SCH-HNT:scheduler_hints'] = scheduler_hints
 
         return self._create('/volumes', body, 'volume')
+
+    @api_versions.wraps("3.0")
+    def delete_metadata(self, volume, keys):
+        """Delete specified keys from volumes metadata.
+
+        :param volume: The :class:`Volume`.
+        :param keys: A list of keys to be removed.
+        """
+        response_list = []
+        for k in keys:
+            resp, body = self._delete("/volumes/%s/metadata/%s" %
+                                      (base.getid(volume), k))
+        response_list.append(resp)
+
+        return common_base.ListWithMeta([], response_list)
 
     @api_versions.wraps("3.15")
     def delete_metadata(self, volume, keys):
