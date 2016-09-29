@@ -2,7 +2,7 @@
 # of appearance. Changing the order has an impact on the overall integration
 # process, which may cause wedges in the gate later.
 # Hacking already pins down pep8, pyflakes and flake8
-hacking<0.11,>=0.10.0
+hacking>=0.11.0,<0.12  # Apache-2.0
 coverage>=3.6 # Apache-2.0
 ddt>=1.0.1 # MIT
 discover # BSD
