@@ -154,7 +154,7 @@ class ShellTest(utils.TestCase):
                 side_effect=ks_exc.ConnectFailure())
     @mock.patch('keystoneauth1.discover.Discover',
                 side_effect=ks_exc.ConnectFailure())
-    @mock.patch('sys.stdin', side_effect=mock.MagicMock)
+    @mock.patch('sys.stdin', side_effect=mock.Mock)
     @mock.patch('getpass.getpass', return_value='password')
     def test_password_prompted(self, mock_getpass, mock_stdin, mock_discover,
                                mock_token, mock_password):
