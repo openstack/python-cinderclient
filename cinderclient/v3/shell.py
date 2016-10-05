@@ -150,9 +150,13 @@ def _translate_availability_zone_keys(collection):
     _translate_keys(collection, convert)
 
 
-def _extract_metadata(args):
+def _extract_metadata(args, type='user_metadata'):
     metadata = {}
-    for metadatum in args.metadata:
+    if type == 'image_metadata':
+        args_metadata = args.image_metadata
+    else:
+        args_metadata = args.metadata
+    for metadatum in args_metadata:
         # unset doesn't require a val, so we have the if/else
         if '=' in metadatum:
             (key, value) = metadatum.split('=', 1)
@@ -203,7 +207,14 @@ def _extract_metadata(args):
            nargs='*',
            metavar='<key=value>',
            default=None,
-           help='Filters results by a metadata key and value pair. '
+           help='Filters results by a metadata key and value pair. Require '
+                'volume api version >=3.4. Default=None.')
+@utils.arg('--image_metadata',
+           type=str,
+           nargs='*',
+           metavar='<key=value>',
+           default=None,
+           help='Filters results by a image metadata key and value pair. '
                 'Default=None.')
 @utils.arg('--marker',
            metavar='<marker>',
@@ -260,6 +271,8 @@ def do_list(cs, args):
         'bootable': args.bootable,
         'migration_status': args.migration_status,
         'metadata': _extract_metadata(args) if args.metadata else None,
+        'glance_metadata': _extract_metadata(args, type='image_metadata')
+        if args.image_metadata else None,
     }
 
     # If unavailable/non-existent fields are specified, these fields will

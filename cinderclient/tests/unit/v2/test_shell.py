@@ -189,6 +189,12 @@ class ShellTest(utils.TestCase):
         self.run_command('list --name=1234')
         self.assert_called('GET', '/volumes/detail?name=1234')
 
+    def test_list_filter_image_metadata(self):
+        self.run_command('list --image_metadata image_name=1234')
+        url = ('/volumes/detail?%s' %
+               parse.urlencode([('glance_metadata', {"image_name": "1234"})]))
+        self.assert_called('GET', url)
+
     def test_list_all_tenants(self):
         self.run_command('list --all-tenants=1')
         self.assert_called('GET', '/volumes/detail?all_tenants=1')
