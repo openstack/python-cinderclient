@@ -529,7 +529,7 @@ class OpenStackCinderShell(object):
         streamhandler = logging.StreamHandler()
         streamformat = "%(levelname)s (%(module)s:%(lineno)d) %(message)s"
         streamhandler.setFormatter(logging.Formatter(streamformat))
-        logger.setLevel(logging.WARNING)
+        logger.setLevel(logging.DEBUG if debug else logging.WARNING)
         logger.addHandler(streamhandler)
 
         self.client_logger = logging.getLogger(client.__name__)
