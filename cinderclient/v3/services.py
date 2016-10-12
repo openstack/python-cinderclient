@@ -25,14 +25,14 @@ Service = services.Service
 
 class ServiceManager(services.ServiceManager):
     @api_versions.wraps("3.0")
-    def server_api_version(self, url_append=""):
+    def server_api_version(self):
         """Returns the API Version supported by the server.
 
-        :param url_append: String to append to url to obtain specific version
         :return: Returns response obj for a server that supports microversions.
                  Returns an empty list for Liberty and prior Cinder servers.
         """
+
         try:
-            return self._get_with_base_url(url_append, response_key='versions')
+            return self._get_with_base_url("", response_key='versions')
         except LookupError:
             return []

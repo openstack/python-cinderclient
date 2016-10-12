@@ -36,3 +36,8 @@ class ServicesTest(utils.TestCase):
             # Make sure cluster fields from v3.7 is present and not None
             self.assertIsNotNone(getattr(service, 'cluster'))
         self._assert_request_id(services_list)
+
+    def test_api_version(self):
+        client = fakes.FakeClient(version_header='3.0')
+        svs = client.services.server_api_version()
+        [self.assertIsInstance(s, services.Service) for s in svs]

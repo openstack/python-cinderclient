@@ -19,7 +19,6 @@ import re
 
 from oslo_utils import strutils
 
-import cinderclient
 from cinderclient import exceptions
 from cinderclient import utils
 from cinderclient._i18n import _
@@ -29,7 +28,9 @@ LOG = logging.getLogger(__name__)
 
 # key is a deprecated version and value is an alternative version.
 DEPRECATED_VERSIONS = {"1": "2"}
+DEPRECATED_VERSION = "2.0"
 MAX_VERSION = "3.27"
+MIN_VERSION = "3.0"
 
 _SUBSTITUTIONS = {}
 
@@ -234,12 +235,13 @@ def get_api_version(version_string):
 
 
 def _get_server_version_range(client):
-    version = client.versions.get_current()
+    versions = client.services.server_api_version()
 
-    if not hasattr(version, 'version') or not version.version:
+    if not versions:
         return APIVersion(), APIVersion()
-
-    return APIVersion(version.min_version), APIVersion(version.version)
+    for version in versions:
+        if '3.' in version.version:
+            return APIVersion(version.min_version), APIVersion(version.version)
 
 
 def discover_version(client, requested_version):
@@ -254,52 +256,87 @@ def discover_version(client, requested_version):
     server_start_version, server_end_version = _get_server_version_range(
         client)
 
-    both_versions_null = not (server_start_version or server_end_version)
-    if (not requested_version.is_latest() and
-            requested_version != APIVersion('2.0')):
-        if both_versions_null:
-            raise exceptions.UnsupportedVersion(
-                _("Server doesn't support microversions"))
-        if not requested_version.matches(server_start_version,
-                                         server_end_version):
+    valid_version = requested_version
+    if not server_start_version and not server_end_version:
+        msg = ("Server does not support microversions. Changing server "
+               "version to %(min_version)s.")
+        LOG.debug(msg, {"min_version": DEPRECATED_VERSION})
+        valid_version = APIVersion(DEPRECATED_VERSION)
+    else:
+        valid_version = _validate_requested_version(
+            requested_version,
+            server_start_version,
+            server_end_version)
+
+        _validate_server_version(server_start_version, server_end_version)
+    return valid_version
+
+
+def _validate_requested_version(requested_version,
+                                server_start_version,
+                                server_end_version):
+    """Validates the requested version.
+
+    Checks 'requested_version' is within the min/max range supported by the
+    server. If 'requested_version' is not within range then attempts to
+    downgrade to 'server_end_version'. Otherwise an UnsupportedVersion
+    exception is thrown.
+
+    :param requested_version: requestedversion represented by APIVersion obj
+    :param server_start_version: APIVersion object representing server min
+    :param server_end_version: APIVersion object representing server max
+    """
+    valid_version = requested_version
+    if not requested_version.matches(server_start_version, server_end_version):
+        if server_end_version <= requested_version:
+            if (APIVersion(MIN_VERSION) <= server_end_version and
+                    server_end_version <= APIVersion(MAX_VERSION)):
+                msg = _("Requested version %(requested_version)s is "
+                        "not supported. Downgrading requested version "
+                        "to %(server_end_version)s.")
+                LOG.debug(msg, {
+                    "requested_version": requested_version,
+                    "server_end_version": server_end_version})
+            valid_version = server_end_version
+        else:
             raise exceptions.UnsupportedVersion(
                 _("The specified version isn't supported by server. The valid "
                   "version range is '%(min)s' to '%(max)s'") % {
                     "min": server_start_version.get_string(),
                     "max": server_end_version.get_string()})
-        return requested_version
 
-    if requested_version == APIVersion('2.0'):
-        if server_start_version == APIVersion('2.1') or both_versions_null:
-            return APIVersion('2.0')
-        raise exceptions.UnsupportedVersion(
-            _("The server isn't backward compatible with Cinder V2 REST "
-              "API"))
+    return valid_version
 
-    if both_versions_null:
-        return APIVersion('2.0')
-    if cinderclient.API_MIN_VERSION > server_end_version:
+
+def _validate_server_version(server_start_version, server_end_version):
+    """Validates the server version.
+
+    Checks that the 'server_end_version' is greater than the minimum version
+    supported by the client. Then checks that the 'server_start_version' is
+    less than the maximum version supported by the client.
+
+    :param server_start_version:
+    :param server_end_version:
+    :return:
+    """
+    if APIVersion(MIN_VERSION) > server_end_version:
         raise exceptions.UnsupportedVersion(
-            _("Server version is too old. The client valid version range is "
-              "'%(client_min)s' to '%(client_max)s'. The server valid version "
-              "range is '%(server_min)s' to '%(server_max)s'.") % {
-                  'client_min': cinderclient.API_MIN_VERSION.get_string(),
-                  'client_max': cinderclient.API_MAX_VERSION.get_string(),
+            _("Server's version is too old. The client's valid version range "
+              "is '%(client_min)s' to '%(client_max)s'. The server valid "
+              "version range is '%(server_min)s' to '%(server_max)s'.") % {
+                  'client_min': MIN_VERSION,
+                  'client_max': MAX_VERSION,
                   'server_min': server_start_version.get_string(),
                   'server_max': server_end_version.get_string()})
-    elif cinderclient.API_MAX_VERSION < server_start_version:
+    elif APIVersion(MAX_VERSION) < server_start_version:
         raise exceptions.UnsupportedVersion(
-            _("Server version is too new. The client valid version range is "
-              "'%(client_min)s' to '%(client_max)s'. The server valid version "
-              "range is '%(server_min)s' to '%(server_max)s'.") % {
-                  'client_min': cinderclient.API_MIN_VERSION.get_string(),
-                  'client_max': cinderclient.API_MAX_VERSION.get_string(),
+            _("Server's version is too new. The client's valid version range "
+              "is '%(client_min)s' to '%(client_max)s'. The server valid "
+              "version range is '%(server_min)s' to '%(server_max)s'.") % {
+                  'client_min': MIN_VERSION,
+                  'client_max': MAX_VERSION,
                   'server_min': server_start_version.get_string(),
                   'server_max': server_end_version.get_string()})
-    elif cinderclient.API_MAX_VERSION <= server_end_version:
-        return cinderclient.API_MAX_VERSION
-    elif server_end_version < cinderclient.API_MAX_VERSION:
-        return server_end_version
 
 
 def update_headers(headers, api_version):

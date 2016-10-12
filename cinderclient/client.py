@@ -93,8 +93,15 @@ def get_server_version(url):
                         api_versions.APIVersion(version['version']))
     except exceptions.ClientException as e:
         logger.warning(_LW("Error in server version query:%s\n"
-                 "Returning APIVersion 2.0") % six.text_type(e.message))
+                 "Returning APIVersion 2.0"), six.text_type(e.message))
         return api_versions.APIVersion("2.0"), api_versions.APIVersion("2.0")
+
+
+def get_highest_client_server_version(url):
+    min_server, max_server = get_server_version(url)
+    max_server_version = api_versions.APIVersion.get_string(max_server)
+
+    return min(float(max_server_version), float(api_versions.MAX_VERSION))
 
 
 def get_volume_api_from_url(url):
@@ -203,7 +210,7 @@ class SessionClient(adapter.LegacyJsonAdapter):
                              'auth plugin.')
 
     def _cs_request_base_url(self, url, method, **kwargs):
-        base_url = self._get_base_url(**kwargs)
+        base_url = self._get_base_url()
         return self._cs_request(
             base_url + url,
             method,
