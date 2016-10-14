@@ -770,6 +770,13 @@ class FakeHTTPClient(base_client.HTTPClient):
     def put_types_1(self, **kw):
         return self.get_types_1()
 
+    def put_types_3(self, **kw):
+        return (200, {}, {'volume_type': {'id': 3,
+                          'name': 'test-type-2',
+                          'description': 'test_type-3-desc',
+                          'is_public': True,
+                          'extra_specs': {}}})
+
     #
     # VolumeAccess
     #

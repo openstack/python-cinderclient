@@ -1004,7 +1004,13 @@ def do_group_type_show(cs, args):
 @utils.service_type('volumev3')
 def do_type_update(cs, args):
     """Updates volume type name, description, and/or is_public."""
-    is_public = strutils.bool_from_string(args.is_public, strict=True)
+    is_public = args.is_public
+    if args.name is None and args.description is None and is_public is None:
+        raise exceptions.CommandError('Specify a new type name, description, '
+                                      'is_public or a combination thereof.')
+
+    if is_public is not None:
+        is_public = strutils.bool_from_string(args.is_public, strict=True)
     vtype = cs.volume_types.update(args.id, args.name, args.description,
                                    is_public)
     _print_volume_type_list([vtype])

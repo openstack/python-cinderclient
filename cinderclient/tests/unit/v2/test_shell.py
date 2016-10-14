@@ -744,6 +744,10 @@ class ShellTest(utils.TestCase):
                           '--description=test_type-1-desc '
                           '--is-public=invalid_bool 1')
 
+    def test_type_update_without_args(self):
+        self.assertRaises(exceptions.CommandError, self.run_command,
+                          'type-update 1')
+
     def test_type_access_list(self):
         self.run_command('type-access-list --volume-type 3')
         self.assert_called('GET', '/types/3/os-volume-type-access')

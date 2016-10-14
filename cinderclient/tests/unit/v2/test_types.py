@@ -67,6 +67,27 @@ class TypesTest(utils.TestCase):
         self.assertIsInstance(t, volume_types.VolumeType)
         self._assert_request_id(t)
 
+    def test_update_name(self):
+        """Test volume_type update shell command
+
+        Verify that only name is updated and the description and
+        is_public properties remains unchanged.
+        """
+        # create volume_type with is_public True
+        t = cs.volume_types.create('test-type-3', 'test_type-3-desc', True)
+        self.assertTrue(t.is_public)
+        # update name only
+        t1 = cs.volume_types.update(t.id, 'test-type-2')
+        cs.assert_called('PUT',
+                         '/types/3',
+                         {'volume_type': {'name': 'test-type-2',
+                                          'description': None}})
+        # verify that name is updated and the description
+        # and is_public are the same.
+        self.assertEqual('test-type-2', t1.name)
+        self.assertEqual('test_type-3-desc', t1.description)
+        self.assertTrue(t1.is_public)
+
     def test_get(self):
         t = cs.volume_types.get('1')
         cs.assert_called('GET', '/types/1')
