@@ -49,6 +49,22 @@ class Volume(volumes.Volume):
         """Revert a volume to a snapshot."""
         self.manager.revert_to_snapshot(self, snapshot)
 
+    def migrate_volume(self, host, force_host_copy, lock_volume, cluster=None):
+        """Migrate the volume to a new host."""
+        return self.manager.migrate_volume(self, host, force_host_copy,
+                                           lock_volume, cluster)
+
+    def manage(self, host, ref, name=None, description=None,
+               volume_type=None, availability_zone=None, metadata=None,
+               bootable=False, cluster=None):
+        """Manage an existing volume."""
+        return self.manager.manage(host=host, ref=ref, name=name,
+                                   description=description,
+                                   volume_type=volume_type,
+                                   availability_zone=availability_zone,
+                                   metadata=metadata, bootable=bootable,
+                                   cluster=cluster)
+
 
 class VolumeManager(volumes.VolumeManager):
     resource_class = Volume
@@ -193,6 +209,46 @@ class VolumeManager(volumes.VolumeManager):
                              'disk_format': disk_format,
                              'visibility': visibility,
                              'protected': protected})
+
+    def migrate_volume(self, volume, host, force_host_copy, lock_volume,
+                       cluster=None):
+        """Migrate volume to new backend.
+
+        The new backend is defined by the host or the cluster (not both).
+
+        :param volume: The :class:`Volume` to migrate
+        :param host: The destination host
+        :param force_host_copy: Skip driver optimizations
+        :param lock_volume: Lock the volume and guarantee the migration
+                            to finish
+        :param cluster: The cluster
+        """
+        body = {'host': host, 'force_host_copy': force_host_copy,
+                'lock_volume': lock_volume}
+
+        if self.api_version.matches('3.16'):
+            if cluster:
+                body['cluster'] = cluster
+                del body['host']
+
+        return self._action('os-migrate_volume', volume, body)
+
+    def manage(self, host, ref, name=None, description=None,
+               volume_type=None, availability_zone=None, metadata=None,
+               bootable=False, cluster=None):
+        """Manage an existing volume."""
+        body = {'volume': {'host': host,
+                           'ref': ref,
+                           'name': name,
+                           'description': description,
+                           'volume_type': volume_type,
+                           'availability_zone': availability_zone,
+                           'metadata': metadata,
+                           'bootable': bootable
+                           }}
+        if self.api_version.matches('3.16') and cluster:
+            body['cluster'] = cluster
+        return self._create('/os-volume-manage', body, 'volume')
 
     @api_versions.wraps("3.8")
     def list_manageable(self, host, detailed=True, marker=None, limit=None,
