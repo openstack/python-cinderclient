@@ -1181,7 +1181,6 @@ def do_message_delete(cs, args):
         raise exceptions.CommandError("Unable to delete any of the specified "
                                       "messages.")
 
-
 @utils.arg('--all-tenants',
            dest='all_tenants',
            metavar='<0|1>',
@@ -1276,3 +1275,205 @@ def do_snapshot_list(cs, args):
     utils.print_list(snapshots,
                      ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
                      sortby_index=sortby_index)
+
+@api_versions.wraps('3.27')
+@utils.arg('--all-tenants',
+           dest='all_tenants',
+           metavar='<0|1>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=0,
+           help='Shows details for all tenants. Admin only.')
+@utils.arg('--volume-id',
+           metavar='<volume-id>',
+           default=None,
+           help='Filters results by a volume ID. Default=None.')
+@utils.arg('--status',
+           metavar='<status>',
+           default=None,
+           help='Filters results by a status. Default=None.')
+@utils.arg('--marker',
+           metavar='<marker>',
+           default=None,
+           help='Begin returning attachments that appear later in '
+                'attachment list than that represented by this id. '
+                'Default=None.')
+@utils.arg('--limit',
+           metavar='<limit>',
+           default=None,
+           help='Maximum number of attachemnts to return. Default=None.')
+@utils.arg('--sort',
+           metavar='<key>[:<direction>]',
+           default=None,
+           help=(('Comma-separated list of sort keys and directions in the '
+                  'form of <key>[:<asc|desc>]. '
+                  'Valid keys: %s. '
+                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
+@utils.arg('--tenant',
+           type=str,
+           dest='tenant',
+           nargs='?',
+           metavar='<tenant>',
+           help='Display information from single tenant (Admin only).')
+def do_attachment_list(cs, args):
+    """Lists all attachments."""
+    search_opts = {
+        'all_tenants': args.all_tenants,
+        'status': args.status,
+        'volume_id': args.volume_id,
+    }
+
+    attachments = cs.attachments.list(search_opts=search_opts,
+                                      marker=args.marker,
+                                      limit=args.limit,
+                                      sort=args.sort)
+    columns = ['ID', 'Volume ID', 'Status', 'Instance']
+    if args.sort:
+        sortby_index = None
+    else:
+        sortby_index = 0
+    utils.print_list(attachments, columns, sortby_index=sortby_index)
+
+
+@api_versions.wraps('3.27')
+@utils.arg('attachment',
+           metavar='<attachment>',
+           help='ID of attachment.')
+def do_attachment_show(cs, args):
+    """Show detailed information for attachment."""
+    attachment = cs.attachments.show(args.attachment)
+    attachment_dict = attachment.to_dict()
+    connection_dict = attachment_dict.pop('connection_info', {})
+    utils.print_dict(attachment_dict)
+
+    # TODO(jdg): Need to add checks here like admin/policy for displaying the
+    # connection_info, this is still experimental so we'll leave it enabled for
+    # now
+    if connection_dict:
+        utils.print_dict(connection_dict)
+
+
+@api_versions.wraps('3.27')
+@utils.arg('volume',
+           metavar='<volume>',
+           help='Name or ID of volume or volumes to attach.')
+@utils.arg('--instance',
+           metavar='<instance>',
+           default=None,
+           help='UUID of Instance attaching to. Default=None.')
+@utils.arg('--connect',
+           metavar='<connect>',
+           default=False,
+           help='Make an active connection using provided connector info '
+                '(True or False).')
+@utils.arg('--initiator',
+           metavar='<initiator>',
+           default=None,
+           help='iqn of the initiator attaching to.  Default=None.')
+@utils.arg('--ip',
+           metavar='<ip>',
+           default=None,
+           help='ip of the system attaching to.  Default=None.')
+@utils.arg('--host',
+           metavar='<host>',
+           default=None,
+           help='Name of the host attaching to. Default=None.')
+@utils.arg('--platform',
+           metavar='<platform>',
+           default='x86_64',
+           help='Platform type. Default=x86_64.')
+@utils.arg('--ostype',
+           metavar='<ostype>',
+           default='linux2',
+           help='OS type. Default=linux2.')
+@utils.arg('--multipath',
+           metavar='<multipath>',
+           default=False,
+           help='OS type. Default=False.')
+@utils.arg('--mountpoint',
+           metavar='<mountpoint>',
+           default=None,
+           help='Mountpoint volume will be attached at. Default=None.')
+def do_attachment_create(cs, args):
+    """Create an attachment for a cinder volume."""
+
+    connector = {}
+    if strutils.bool_from_string(args.connect, strict=True):
+        # FIXME(jdg): Add in all the options when they're finalized
+        connector = {'initiator': args.initiator,
+                     'ip': args.ip,
+                     'platform': args.platform,
+                     'host': args.host,
+                     'os_type': args.ostype,
+                     'multipath': args.multipath}
+    attachment = cs.attachments.create(args.volume,
+                                       connector,
+                                       args.instance)
+    connector_dict = attachment.pop('connection_info', None)
+    utils.print_dict(attachment)
+    if connector_dict:
+        utils.print_dict(connector_dict)
+
+
+@api_versions.wraps('3.27')
+@utils.arg('attachment',
+           metavar='<attachment>',
+           help='ID of attachment.')
+@utils.arg('--initiator',
+           metavar='<initiator>',
+           default=None,
+           help='iqn of the initiator attaching to.  Default=None.')
+@utils.arg('--ip',
+           metavar='<ip>',
+           default=None,
+           help='ip of the system attaching to.  Default=None.')
+@utils.arg('--host',
+           metavar='<host>',
+           default=None,
+           help='Name of the host attaching to. Default=None.')
+@utils.arg('--platform',
+           metavar='<platform>',
+           default='x86_64',
+           help='Platform type. Default=x86_64.')
+@utils.arg('--ostype',
+           metavar='<ostype>',
+           default='linux2',
+           help='OS type. Default=linux2.')
+@utils.arg('--multipath',
+           metavar='<multipath>',
+           default=False,
+           help='OS type. Default=False.')
+@utils.arg('--mountpoint',
+           metavar='<mountpoint>',
+           default=None,
+           help='Mountpoint volume will be attached at. Default=None.')
+def do_attachment_update(cs, args):
+    """Update an attachment for a cinder volume.
+    This call is designed to be more of an attachment completion than anything
+    else.  It expects the value of a connector object to notify the driver that
+    the volume is going to be connected and where it's being connected to.
+    """
+    connector = {'initiator': args.initiator,
+                 'ip': args.ip,
+                 'platform': args.platform,
+                 'host': args.host,
+                 'os_type': args.ostype,
+                 'multipath': args.multipath}
+    attachment = cs.attachments.update(args.attachment,
+                                       connector)
+    attachment_dict = attachment.to_dict()
+    connector_dict = attachment_dict.pop('connection_info', None)
+    utils.print_dict(attachment_dict)
+    if connector_dict:
+        utils.print_dict(connector_dict)
+
+
+@api_versions.wraps('3.27')
+@utils.arg('attachment',
+           metavar='<attachment>', nargs='+',
+           help='ID of attachment or attachments to delete.')
+def do_attachment_delete(cs, args):
+    """Delete an attachment for a cinder volume."""
+    for attachment in args.attachment:
+        cs.attachments.delete(attachment)

@@ -17,6 +17,7 @@ import logging
 
 from cinderclient import client
 from cinderclient import api_versions
+from cinderclient.v3 import attachments
 from cinderclient.v3 import availability_zones
 from cinderclient.v3 import cgsnapshots
 from cinderclient.v3 import clusters
@@ -71,7 +72,6 @@ class Client(object):
         self.limits = limits.LimitsManager(self)
         self.api_version = api_version or api_versions.APIVersion(self.version)
 
-        # extensions
         self.volumes = volumes.VolumeManager(self)
         self.volume_snapshots = volume_snapshots.SnapshotManager(self)
         self.volume_types = volume_types.VolumeTypeManager(self)
@@ -98,6 +98,8 @@ class Client(object):
             availability_zones.AvailabilityZoneManager(self)
         self.pools = pools.PoolManager(self)
         self.capabilities = capabilities.CapabilitiesManager(self)
+        self.attachments = \
+            attachments.VolumeAttachmentManager(self)
 
         # Add in any extensions...
         if extensions:
