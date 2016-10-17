@@ -1090,10 +1090,20 @@ def do_manage(cs, args):
 
 
 @api_versions.wraps('3.8')
-@utils.arg('host',
-           metavar='<host>',
-           help='Cinder host on which to list manageable volumes; '
-                'takes the form: host@backend-name#pool')
+# NOTE(geguileo): host is positional but optional in order to maintain backward
+# compatibility even with mutually exclusive arguments.  If version is < 3.16
+# then only host positional argument will be possible, and since the
+# exclusive_arg group has required=True it will be required even if it's
+# optional.
+@utils.exclusive_arg('source', 'host', required=True, nargs='?',
+                     metavar='<host>',
+                     help='Cinder host on which to list manageable volumes; '
+                          'takes the form: host@backend-name#pool')
+@utils.exclusive_arg('source', '--cluster', required=True,
+                     metavar='CLUSTER',
+                     help='Cinder cluster on which to list manageable '
+                     'volumes; takes the form: cluster@backend-name#pool',
+                     start_version='3.17')
 @utils.arg('--detailed',
            metavar='<detailed>',
            default=True,
@@ -1125,9 +1135,11 @@ def do_manageable_list(cs, args):
     """Lists all manageable volumes."""
     # pylint: disable=function-redefined
     detailed = strutils.bool_from_string(args.detailed)
+    cluster = getattr(args, 'cluster', None)
     volumes = cs.volumes.list_manageable(host=args.host, detailed=detailed,
                                          marker=args.marker, limit=args.limit,
-                                         offset=args.offset, sort=args.sort)
+                                         offset=args.offset, sort=args.sort,
+                                         cluster=cluster)
     columns = ['reference', 'size', 'safe_to_manage']
     if detailed:
         columns.extend(['reason_not_safe', 'cinder_id', 'extra_info'])
@@ -1552,10 +1564,19 @@ def do_service_list(cs, args):
 
 
 @api_versions.wraps('3.8')
-@utils.arg('host',
-           metavar='<host>',
-           help='Cinder host on which to list manageable snapshots; '
-                'takes the form: host@backend-name#pool')
+# NOTE(geguileo): host is positional but optional in order to maintain backward
+# compatibility even with mutually exclusive arguments.  If version is < 3.16
+# then only host positional argument will be possible, and since the
+# exclusive_arg group has required=True it will be required even if it's
+# optional.
+@utils.exclusive_arg('source', 'host', required=True, nargs='?',
+                     metavar='<host>',
+                     help='Cinder host on which to list manageable snapshots; '
+                     'takes the form: host@backend-name#pool')
+@utils.exclusive_arg('source', '--cluster', required=True,
+                     help='Cinder cluster on which to list manageable '
+                     'snapshots; takes the form: cluster@backend-name#pool',
+                     start_version='3.17')
 @utils.arg('--detailed',
            metavar='<detailed>',
            default=True,
@@ -1587,12 +1608,14 @@ def do_snapshot_manageable_list(cs, args):
     """Lists all manageable snapshots."""
     # pylint: disable=function-redefined
     detailed = strutils.bool_from_string(args.detailed)
+    cluster = getattr(args, 'cluster', None)
     snapshots = cs.volume_snapshots.list_manageable(host=args.host,
                                                     detailed=detailed,
                                                     marker=args.marker,
                                                     limit=args.limit,
                                                     offset=args.offset,
-                                                    sort=args.sort)
+                                                    sort=args.sort,
+                                                    cluster=cluster)
     columns = ['reference', 'size', 'safe_to_manage', 'source_reference']
     if detailed:
         columns.extend(['reason_not_safe', 'cinder_id', 'extra_info'])

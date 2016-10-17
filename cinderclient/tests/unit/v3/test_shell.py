@@ -643,6 +643,11 @@ class ShellTest(utils.TestCase):
                          'manageable-list fakehost --detailed False')
         self.assert_called('GET', '/manageable_volumes?host=fakehost')
 
+    def test_volume_manageable_list_cluster(self):
+        self.run_command('--os-volume-api-version 3.17 '
+                         'manageable-list --cluster dest')
+        self.assert_called('GET', '/manageable_volumes/detail?cluster=dest')
+
     def test_snapshot_manageable_list(self):
         self.run_command('--os-volume-api-version 3.8 '
                          'snapshot-manageable-list fakehost')
@@ -657,6 +662,36 @@ class ShellTest(utils.TestCase):
         self.run_command('--os-volume-api-version 3.8 '
                          'snapshot-manageable-list fakehost --detailed False')
         self.assert_called('GET', '/manageable_snapshots?host=fakehost')
+
+    def test_snapshot_manageable_list_cluster(self):
+        self.run_command('--os-volume-api-version 3.17 '
+                         'snapshot-manageable-list --cluster dest')
+        self.assert_called('GET', '/manageable_snapshots/detail?cluster=dest')
+
+    @ddt.data('', 'snapshot-')
+    def test_manageable_list_cluster_before_3_17(self, prefix):
+        self.assertRaises(exceptions.UnsupportedAttribute,
+                          self.run_command,
+                          '--os-volume-api-version 3.16 '
+                         '%smanageable-list --cluster dest' % prefix)
+
+    @mock.patch('cinderclient.shell.CinderClientArgumentParser.error')
+    @ddt.data('', 'snapshot-')
+    def test_manageable_list_mutual_exclusion(self, prefix, error_mock):
+        error_mock.side_effect = SystemExit
+        self.assertRaises(SystemExit,
+                          self.run_command,
+                          '--os-volume-api-version 3.17 '
+                         '%smanageable-list fakehost --cluster dest' % prefix)
+
+    @mock.patch('cinderclient.shell.CinderClientArgumentParser.error')
+    @ddt.data('', 'snapshot-')
+    def test_manageable_list_missing_required(self, prefix, error_mock):
+        error_mock.side_effect = SystemExit
+        self.assertRaises(SystemExit,
+                          self.run_command,
+                          '--os-volume-api-version 3.17 '
+                         '%smanageable-list' % prefix)
 
     def test_list_messages(self):
         self.run_command('--os-volume-api-version 3.3 message-list')
