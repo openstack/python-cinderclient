@@ -327,6 +327,9 @@ def do_show(cs, args):
     volume = utils.find_volume(cs, args.volume)
     info.update(volume._info)
 
+    if 'readonly' in info['metadata']:
+        info['readonly'] = info['metadata']['readonly']
+
     info.pop('links', None)
     utils.print_dict(info,
                      formatters=['metadata', 'volume_image_metadata'])
@@ -488,6 +491,9 @@ def do_create(cs, args):
     info = dict()
     volume = cs.volumes.get(volume.id)
     info.update(volume._info)
+
+    if 'readonly' in info['metadata']:
+        info['readonly'] = info['metadata']['readonly']
 
     info.pop('links', None)
     utils.print_dict(info)
