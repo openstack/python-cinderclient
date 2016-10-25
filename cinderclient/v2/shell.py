@@ -966,13 +966,9 @@ def do_endpoints(cs, args):
 
 def do_credentials(cs, args):
     """Shows user credentials returned from auth."""
-    catalog = cs.client.service_catalog.catalog
-
-    # formatters defines field to be converted from unicode to string
-    utils.print_dict(catalog['user'], "User Credentials",
-                     formatters=['domain', 'roles'])
-    utils.print_dict(catalog['token'], "Token",
-                     formatters=['audit_ids', 'tenant'])
+    warnings.warn(
+        "``cinder credentials`` is deprecated, use ``openstack token issue`` "
+        "indead.")
 
 
 @utils.arg('tenant',
