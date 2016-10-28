@@ -30,8 +30,11 @@ See also :doc:`/man/cinder`.
 Release Notes
 =============
 
-MASTER
------
+All python-cinderclient release notes can now be found on the `release notes`_ page.
+
+.. _`release notes`: http://docs.openstack.org/releasenotes/python-cinderclient/
+
+The following are kept for historical purposes.
 
 1.4.0
 -----
