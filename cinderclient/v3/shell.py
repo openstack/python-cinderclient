@@ -938,7 +938,10 @@ def _print_group_type_list(gtypes):
 
 @utils.service_type('volumev3')
 def do_type_list(cs, args):
-    """Lists available 'volume types'. (Admin only will see private types)"""
+    """Lists available 'volume types'.
+
+    (Only admin and tenant users will see private types)
+    """
     vtypes = cs.volume_types.list()
     _print_volume_type_list(vtypes)
 
