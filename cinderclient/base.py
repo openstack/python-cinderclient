@@ -26,8 +26,8 @@ import os
 import six
 from six.moves.urllib import parse
 
+from cinderclient.apiclient import base as common_base
 from cinderclient import exceptions
-from cinderclient.openstack.common.apiclient import base as common_base
 from cinderclient import utils
 
 

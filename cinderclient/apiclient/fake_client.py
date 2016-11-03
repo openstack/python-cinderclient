@@ -30,7 +30,7 @@ import requests
 import six
 from six.moves.urllib import parse
 
-from cinderclient.openstack.common.apiclient import client
+from cinderclient.apiclient import client
 
 
 def assert_has_keys(dct, required=None, optional=None):

@@ -14,10 +14,10 @@
 from requests import Response
 
 from cinderclient import api_versions
+from cinderclient.apiclient import base as common_base
 from cinderclient import base
 from cinderclient.v3 import client
 from cinderclient import exceptions
-from cinderclient.openstack.common.apiclient import base as common_base
 from cinderclient.v1 import volumes
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit import test_utils

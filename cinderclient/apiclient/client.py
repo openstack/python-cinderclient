@@ -36,7 +36,7 @@ except ImportError:
 import hashlib
 import requests
 
-from cinderclient.openstack.common.apiclient import exceptions
+from cinderclient.apiclient import exceptions
 from oslo_utils import encodeutils
 from oslo_utils import importutils
 
@@ -63,7 +63,7 @@ class HTTPClient(object):
       into terminal and send the same request with curl.
     """
 
-    user_agent = "cinderclient.openstack.common.apiclient"
+    user_agent = "cinderclient.apiclient"
 
     def __init__(self,
                  auth_plugin,

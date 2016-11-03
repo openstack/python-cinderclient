@@ -13,8 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from cinderclient.apiclient import base as common_base
 from cinderclient import base
-from cinderclient.openstack.common.apiclient import base as common_base
 from cinderclient import utils
 
 

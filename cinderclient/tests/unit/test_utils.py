@@ -18,10 +18,10 @@ import mock
 from six import moves
 
 from cinderclient import api_versions
+from cinderclient.apiclient import base as common_base
 from cinderclient import exceptions
 from cinderclient import utils
 from cinderclient import base
-from cinderclient.openstack.common.apiclient import base as common_base
 from cinderclient.tests.unit import utils as test_utils
 from cinderclient.tests.unit.v2 import fakes
 

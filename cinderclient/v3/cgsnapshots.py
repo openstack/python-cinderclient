@@ -18,8 +18,8 @@
 import six
 from six.moves.urllib.parse import urlencode
 
+from cinderclient.apiclient import base as common_base
 from cinderclient import base
-from cinderclient.openstack.common.apiclient import base as common_base
 
 
 class Cgsnapshot(base.Resource):

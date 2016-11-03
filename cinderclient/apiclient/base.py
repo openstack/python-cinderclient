@@ -30,7 +30,7 @@ from requests import Response
 import six
 from six.moves.urllib import parse
 
-from cinderclient.openstack.common.apiclient import exceptions
+from cinderclient.apiclient import exceptions
 from oslo_utils import strutils
 
 

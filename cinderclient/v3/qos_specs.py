@@ -19,8 +19,8 @@
 QoS Specs interface.
 """
 
+from cinderclient.apiclient import base as common_base
 from cinderclient import base
-from cinderclient.openstack.common.apiclient import base as common_base
 
 
 class QoSSpecs(base.Resource):
