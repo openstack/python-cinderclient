@@ -132,7 +132,7 @@ The following are kept for historical purposes.
 * --sort option available instead of --sort-key and --sort-dir. E.q. --sort
   <key>[:<direction>].
 * Volume type name can now be updated via subcommand type-update.
-* bash compeletion gives subcommands when using 'cinder help'.
+* bash completion gives subcommands when using 'cinder help'.
 * Version discovery is now available. You no longer need a volumev2 service
   type in your keystone catalog.
 * Filter by tenant in list subcommand.
