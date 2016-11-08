@@ -277,10 +277,7 @@ class HTTPClient(object):
             string_parts.append(header)
 
         if 'data' in kwargs:
-            if "password" in kwargs['data']:
-                data = strutils.mask_password(kwargs['data'])
-            else:
-                data = kwargs['data']
+            data = strutils.mask_password(kwargs['data'])
             string_parts.append(" -d '%s'" % (data))
         self._logger.debug("\nREQ: %s\n" % "".join(string_parts))
 
@@ -291,7 +288,7 @@ class HTTPClient(object):
             "RESP: [%s] %s\nRESP BODY: %s\n",
             resp.status_code,
             resp.headers,
-            resp.text)
+            strutils.mask_password(resp.text))
 
         # if service name is None then use service_type for logging
         service = self.service_name or self.service_type
