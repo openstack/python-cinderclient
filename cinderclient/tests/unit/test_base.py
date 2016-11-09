@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import mock
 from requests import Response
+import six
 
 from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
 from cinderclient import base
 from cinderclient.v3 import client
 from cinderclient import exceptions
-from cinderclient.v1 import volumes
+from cinderclient.v3 import volumes
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit import test_utils
 from cinderclient.tests.unit.v1 import fakes
@@ -98,6 +101,20 @@ class BaseTest(utils.TestCase):
         manager = test_utils.FakeManagerWithApi(api)
         r1 = base.Resource(manager, {'id': 1})
         self.assertEqual(version, r1.api_version)
+
+    @mock.patch('cinderclient.utils.unicode_key_value_to_string',
+                side_effect=lambda x: x)
+    def test_build_list_url_failed(self, fake_encode):
+        # NOTE(mdovgal): This test is reasonable only for py27 version,
+        #                due to issue with parse.urlencode method only in py27
+        if six.PY2:
+            arguments = dict(resource_type = 'volumes',
+                             search_opts = {'all_tenants': 1,
+                                            'name': u'ффф'})
+            manager = base.Manager(None)
+            self.assertRaises(UnicodeEncodeError,
+                              manager._build_list_url,
+                              **arguments)
 
 
 class ListWithMetaTest(utils.TestCase):
