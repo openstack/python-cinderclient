@@ -769,13 +769,14 @@ class OpenStackCinderShell(object):
         if profile:
             osprofiler_profiler.init(options.profile)
 
-        args.func(self.cs, args)
-
-        if profile:
-            trace_id = osprofiler_profiler.get().get_base_id()
-            print("Trace ID: %s" % trace_id)
-            print("To display trace use next command:\n"
-                  "osprofiler trace show --html %s " % trace_id)
+        try:
+            args.func(self.cs, args)
+        finally:
+            if profile:
+                trace_id = osprofiler_profiler.get().get_base_id()
+                print("Trace ID: %s" % trace_id)
+                print("To display trace use next command:\n"
+                      "osprofiler trace show --html %s " % trace_id)
 
     def _run_extension_hooks(self, hook_type, *args, **kwargs):
         """Runs hooks for all registered extensions."""
