@@ -178,12 +178,9 @@ class VolumesTest(utils.TestCase):
         self._assert_request_id(vol)
 
     def test_delete_metadata(self):
-        volume = Volume(self, {'id': '1234', 'metadata': {
-                        'k1': 'v1', 'k2': 'v2', 'k3': 'v3'}})
-        keys = ['k1', 'k3']
-        vol = cs.volumes.delete_metadata(volume, keys)
-        cs.assert_called('PUT', '/volumes/1234/metadata',
-                         {'metadata': {'k2': 'v2'}})
+        keys = ['key1']
+        vol = cs.volumes.delete_metadata(1234, keys)
+        cs.assert_called('DELETE', '/volumes/1234/metadata/key1')
         self._assert_request_id(vol)
 
     def test_extend(self):
