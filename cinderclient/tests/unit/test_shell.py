@@ -108,7 +108,7 @@ class ShellTest(utils.TestCase):
         _shell = shell.OpenStackCinderShell()
         sess = session.Session()
 
-        os_auth_url = "https://WrongDiscoveryResponse.discovery.com:35357/v2.0"
+        os_auth_url = "https://wrongdiscoveryresponse.discovery.com:35357/v2.0"
         self.register_keystone_auth_fixture(mocker, os_auth_url)
 
         self.assertRaises(DiscoveryFailure,
