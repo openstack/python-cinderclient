@@ -247,7 +247,7 @@ def keystone_request_callback(request, context):
         context.headers["X-Subject-Token"] = token_id
         context.status_code = 201
         return token_data
-    elif "WrongDiscoveryResponse.discovery.com" in request.url:
+    elif "wrongdiscoveryresponse.discovery.com" in request.url:
         return str(WRONG_VERSION_RESPONSE)
     else:
         context.status_code = 500
