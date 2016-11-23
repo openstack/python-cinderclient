@@ -13,6 +13,21 @@ In order to use the python api directly, you must first obtain an auth token and
     [<Volume: ce06d0a8-5c1b-4e2c-81d2-39eca6bbfb70>]
     >>>myvol.delete
 
+Alternatively, you can create a client instance using the keystoneauth session API::
+
+    >>> from keystoneauth1 import loading
+    >>> from keystoneauth1 import session
+    >>> from cinderclient import client
+    >>> loader = loading.get_plugin_loader('password')
+    >>> auth = loader.load_from_options(auth_url=AUTH_URL,
+    ...                                 username=USERNAME,
+    ...                                 password=PASSWORD,
+    ...                                 project_id=PROJECT_ID)
+    >>> sess = session.Session(auth=auth)
+    >>> cinder = client.Client(VERSION, session=sess)
+    >>> cinder.volumes.list()
+    []
+
 Command-line Tool
 =================
 In order to use the CLI, you must provide your OpenStack username, password, tenant, and auth endpoint. Use the corresponding configuration options (``--os-username``, ``--os-password``, ``--os-tenant-id``, and ``--os-auth-url``) or set them in environment variables::
