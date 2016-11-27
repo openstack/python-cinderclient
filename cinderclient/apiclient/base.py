@@ -509,7 +509,7 @@ class Resource(RequestIdMixin):
 
             raise AttributeError(k)
         else:
-            if k in self.__.dict__:
+            if k in self.__dict__:
                 return self.__dict__[k]
             return self._info[k]
 
