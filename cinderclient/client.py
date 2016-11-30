@@ -205,7 +205,8 @@ class HTTPClient(object):
                  bypass_url=None, retries=None,
                  http_log_debug=False, cacert=None,
                  auth_system='keystone', auth_plugin=None, api_version=None,
-                 logger=None):
+                 logger=None, user_domain_name='Default',
+                 project_domain_name='Default'):
         self.user = user
         self.password = password
         self.projectid = projectid
@@ -236,6 +237,8 @@ class HTTPClient(object):
         self.proxy_token = proxy_token
         self.proxy_tenant_id = proxy_tenant_id
         self.timeout = timeout
+        self.user_domain_name = user_domain_name
+        self.project_domain_name = project_domain_name
 
         if insecure:
             self.verify_cert = False
@@ -419,8 +422,8 @@ class HTTPClient(object):
         We may get redirected to another site, fail or actually get
         back a service catalog with a token and our endpoints.
         """
-
-        if resp.status_code == 200:  # content must always present
+        # content must always present
+        if resp.status_code == 200 or resp.status_code == 201:
             try:
                 self.auth_url = url
                 self.auth_ref = access.create(resp=resp, body=body)
@@ -497,10 +500,10 @@ class HTTPClient(object):
                                          path, query, frag))
 
         auth_url = self.auth_url
-        if self.version == "v2.0":
+        if self.version == "v2.0" or self.version == "v3":
             while auth_url:
                 if not self.auth_system or self.auth_system == 'keystone':
-                    auth_url = self._v2_auth(auth_url)
+                    auth_url = self._v2_or_v3_auth(auth_url)
                 else:
                     auth_url = self._plugin_auth(auth_url)
 
@@ -526,7 +529,7 @@ class HTTPClient(object):
             except exceptions.AuthorizationFailure:
                 if auth_url.find('v2.0') < 0:
                     auth_url = auth_url + '/v2.0'
-                self._v2_auth(auth_url)
+                self._v2_or_v3_auth(auth_url)
 
         if self.bypass_url:
             self.set_management_url(self.bypass_url)
@@ -559,23 +562,43 @@ class HTTPClient(object):
     def _plugin_auth(self, auth_url):
         return self.auth_plugin.authenticate(self, auth_url)
 
-    def _v2_auth(self, url):
+    def _v2_or_v3_auth(self, url):
         """Authenticate against a v2.0 auth service."""
-        body = {"auth": {
-            "passwordCredentials": {"username": self.user,
-                                    "password": self.password}}}
+        if self.version == "v3":
+            body = {
+                "auth": {
+                    "identity": {
+                        "methods": ["password"],
+                        "password": {"user": {
+                            "domain": {"name": self.user_domain_name},
+                            "name": self.user,
+                            "password": self.password}}},
+                }
+            }
+            scope = {"project": {"domain": {"name": self.project_domain_name}}}
+            if self.projectid:
+                scope['project']['name'] = self.projectid
+            elif self.tenant_id:
+                scope['project']['id'] = self.tenant_id
 
-        if self.projectid:
-            body['auth']['tenantName'] = self.projectid
-        elif self.tenant_id:
-            body['auth']['tenantId'] = self.tenant_id
+            body["auth"]["scope"] = scope
+        else:
+            body = {"auth": {
+                "passwordCredentials": {"username": self.user,
+                                        "password": self.password}}}
 
+            if self.projectid:
+                body['auth']['tenantName'] = self.projectid
+            elif self.tenant_id:
+                body['auth']['tenantId'] = self.tenant_id
         self._authenticate(url, body)
 
     def _authenticate(self, url, body):
         """Authenticate and extract the service catalog."""
-        token_url = url + "/tokens"
-
+        if self.version == 'v3':
+            token_url = url + "/auth/tokens"
+        else:
+            token_url = url + "/tokens"
         # Make sure we follow redirects when trying to reach Keystone
         resp, body = self.request(
             token_url,
