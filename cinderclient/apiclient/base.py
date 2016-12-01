@@ -293,7 +293,7 @@ class CrudManager(BaseManager):
 
     def _filter_kwargs(self, kwargs):
         """Drop null values and handle ids."""
-        for key, ref in six.iteritems(kwargs.copy()):
+        for key, ref in kwargs.copy().items():
             if ref is None:
                 kwargs.pop(key)
             else:
@@ -489,7 +489,7 @@ class Resource(RequestIdMixin):
         return None
 
     def _add_details(self, info):
-        for (k, v) in six.iteritems(info):
+        for (k, v) in info.items():
             try:
                 try:
                     setattr(self, k, v)
