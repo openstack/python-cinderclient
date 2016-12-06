@@ -24,10 +24,7 @@ from cinderclient import exceptions
 from cinderclient import utils
 from cinderclient._i18n import _
 
-logging.basicConfig()
 LOG = logging.getLogger(__name__)
-if not LOG.handlers:
-    LOG.addHandler(logging.StreamHandler())
 
 
 # key is a deprecated version and value is an alternative version.
