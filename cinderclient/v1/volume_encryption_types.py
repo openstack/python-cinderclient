@@ -40,7 +40,8 @@ class VolumeEncryptionTypeManager(base.ManagerWithFind):
         """
         List all volume encryption types.
 
-        :param volume_types: a list of volume types
+        :param search_opts: Search options to filter out volume
+                            encryption types
         :return: a list of :class: VolumeEncryptionType instances
         """
         # Since the encryption type is a volume type extension, we cannot get
