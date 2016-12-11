@@ -242,9 +242,14 @@ def from_response(response, body):
         message = "n/a"
         details = "n/a"
         if hasattr(body, 'keys'):
-            error = body[list(body)[0]]
-            message = error.get('message', message)
-            details = error.get('details', details)
+            # Only in webob>=1.6.0
+            if 'message' in body:
+                message = body.get('message')
+                details = body.get('details')
+            else:
+                error = body[list(body)[0]]
+                message = error.get('message', message)
+                details = error.get('details', details)
         return cls(code=response.status_code, message=message, details=details,
                    request_id=request_id, response=response)
     else:
