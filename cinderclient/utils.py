@@ -211,7 +211,7 @@ def print_dict(d, property="Property", formatters=None):
     pt.align = 'l'
     formatters = formatters or {}
 
-    for r in six.iteritems(d):
+    for r in d.items():
         r = list(r)
 
         if r[0] in formatters:

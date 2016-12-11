@@ -15,8 +15,6 @@
 
 """Pools interface (v3 extension)"""
 
-import six
-
 from cinderclient import base
 
 
@@ -45,7 +43,7 @@ class PoolManager(base.Manager):
             # be attributes of the pool itself.
             for pool in pools:
                 if hasattr(pool, 'capabilities'):
-                    for k, v in six.iteritems(pool.capabilities):
+                    for k, v in pool.capabilities.items():
                         setattr(pool, k, v)
 
                     # Remove the capabilities dictionary since all of its
