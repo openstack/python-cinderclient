@@ -71,6 +71,18 @@ class ShellTest(utils.TestCase):
         # NOTE(jdg): we default to detail currently
         self.assert_called('GET', '/volumes/detail')
 
+    def test_list_with_group_id_before_3_10(self):
+        self.assertRaises(exceptions.UnsupportedAttribute,
+                          self.run_command,
+                          'list --group_id fake_id')
+
+    @ddt.data("3.10", "3.11")
+    def test_list_with_group_id_after_3_10(self, version):
+        command = ('--os-volume-api-version %s list --group_id fake_id' %
+                   version)
+        self.run_command(command)
+        self.assert_called('GET', '/volumes/detail?group_id=fake_id')
+
     def test_list_availability_zone(self):
         self.run_command('availability-zone-list')
         self.assert_called('GET', '/os-availability-zone')
