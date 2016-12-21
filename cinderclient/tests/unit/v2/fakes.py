@@ -369,7 +369,7 @@ class FakeHTTPClient(base_client.HTTPClient):
         # add fake request-id header
         headers['x-openstack-request-id'] = REQUEST_ID
         if self.version_header:
-            headers['OpenStack-API-version'] = version_header
+            headers['OpenStack-API-version'] = self.version_header
         r = utils.TestResponse({
             "status_code": status,
             "text": body,
