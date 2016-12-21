@@ -116,9 +116,9 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
             },
         ]
         if host:
-            services = list(filter(lambda i: i['host'] == host, services))
+            services = [i for i in services if i['host'] == host]
         if binary:
-            services = list(filter(lambda i: i['binary'] == binary, services))
+            services = [i for i in services if i['binary'] == binary]
         if not self.api_version.matches('3.7'):
             for svc in services:
                 del svc['cluster']

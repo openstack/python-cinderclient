@@ -952,8 +952,8 @@ def main():
         if sys.version_info >= (3, 0):
             OpenStackCinderShell().main(sys.argv[1:])
         else:
-            OpenStackCinderShell().main(map(encodeutils.safe_decode,
-                                            sys.argv[1:]))
+            OpenStackCinderShell().main([encodeutils.safe_decode(item)
+                                        for item in sys.argv[1:]])
     except KeyboardInterrupt:
         print("... terminating cinder client", file=sys.stderr)
         sys.exit(130)
