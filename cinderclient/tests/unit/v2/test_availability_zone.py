@@ -46,8 +46,8 @@ class AvailabilityZoneTest(utils.FixturedTestCase):
         l0 = [six.u('zone-1'), six.u('available')]
         l1 = [six.u('zone-2'), six.u('not available')]
 
-        z0 = shell._treeizeAvailabilityZone(zones[0])
-        z1 = shell._treeizeAvailabilityZone(zones[1])
+        z0 = shell.treeizeAvailabilityZone(zones[0])
+        z1 = shell.treeizeAvailabilityZone(zones[1])
 
         self.assertEqual((1, 1), (len(z0), len(z1)))
 
@@ -75,9 +75,9 @@ class AvailabilityZoneTest(utils.FixturedTestCase):
               six.u('enabled :-) 2012-12-26 14:45:24')]
         l6 = [six.u('zone-2'), six.u('not available')]
 
-        z0 = shell._treeizeAvailabilityZone(zones[0])
-        z1 = shell._treeizeAvailabilityZone(zones[1])
-        z2 = shell._treeizeAvailabilityZone(zones[2])
+        z0 = shell.treeizeAvailabilityZone(zones[0])
+        z1 = shell.treeizeAvailabilityZone(zones[1])
+        z2 = shell.treeizeAvailabilityZone(zones[2])
 
         self.assertEqual((3, 3, 1), (len(z0), len(z1), len(z2)))
 

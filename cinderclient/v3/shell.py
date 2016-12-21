@@ -17,155 +17,20 @@
 from __future__ import print_function
 
 import argparse
-import copy
 import os
-import sys
-import time
-import warnings
 
+from oslo_utils import strutils
 import six
 
 from cinderclient import api_versions
 from cinderclient import base
 from cinderclient import exceptions
+from cinderclient import shell_utils
 from cinderclient import utils
-from cinderclient.v3 import availability_zones
-from oslo_utils import strutils
 
+from cinderclient.v2.shell import *  # flake8: noqa
 
-def _poll_for_status(poll_fn, obj_id, action, final_ok_states,
-                     poll_period=5, show_progress=True):
-    """Blocks while an action occurs. Periodically shows progress."""
-    def print_progress(progress):
-        if show_progress:
-            msg = ('\rInstance %(action)s... %(progress)s%% complete'
-                   % dict(action=action, progress=progress))
-        else:
-            msg = '\rInstance %(action)s...' % dict(action=action)
-
-        sys.stdout.write(msg)
-        sys.stdout.flush()
-
-    print()
-    while True:
-        obj = poll_fn(obj_id)
-        status = obj.status.lower()
-        progress = getattr(obj, 'progress', None) or 0
-        if status in final_ok_states:
-            print_progress(100)
-            print("\nFinished")
-            break
-        elif status == "error":
-            print("\nError %(action)s instance" % {'action': action})
-            break
-        else:
-            print_progress(progress)
-            time.sleep(poll_period)
-
-
-def _find_volume_snapshot(cs, snapshot):
-    """Gets a volume snapshot by name or ID."""
-    return utils.find_resource(cs.volume_snapshots, snapshot)
-
-
-def _find_vtype(cs, vtype):
-    """Gets a volume type by name or ID."""
-    return utils.find_resource(cs.volume_types, vtype)
-
-
-def _find_gtype(cs, gtype):
-    """Gets a group type by name or ID."""
-    return utils.find_resource(cs.group_types, gtype)
-
-
-def _find_backup(cs, backup):
-    """Gets a backup by name or ID."""
-    return utils.find_resource(cs.backups, backup)
-
-
-def _find_consistencygroup(cs, consistencygroup):
-    """Gets a consistencygroup by name or ID."""
-    return utils.find_resource(cs.consistencygroups, consistencygroup)
-
-
-def _find_group(cs, group):
-    """Gets a group by name or ID."""
-    return utils.find_resource(cs.groups, group)
-
-
-def _find_cgsnapshot(cs, cgsnapshot):
-    """Gets a cgsnapshot by name or ID."""
-    return utils.find_resource(cs.cgsnapshots, cgsnapshot)
-
-
-def _find_group_snapshot(cs, group_snapshot):
-    """Gets a group_snapshot by name or ID."""
-    return utils.find_resource(cs.group_snapshots, group_snapshot)
-
-
-def _find_transfer(cs, transfer):
-    """Gets a transfer by name or ID."""
-    return utils.find_resource(cs.transfers, transfer)
-
-
-def _find_qos_specs(cs, qos_specs):
-    """Gets a qos specs by ID."""
-    return utils.find_resource(cs.qos_specs, qos_specs)
-
-
-def _find_message(cs, message):
-    """Gets a message by ID."""
-    return utils.find_resource(cs.messages, message)
-
-
-def _print_volume_snapshot(snapshot):
-    utils.print_dict(snapshot._info)
-
-
-def _print_volume_image(image):
-    utils.print_dict(image[1]['os-volume_upload_image'])
-
-
-def _translate_keys(collection, convert):
-    for item in collection:
-        keys = item.__dict__
-        for from_key, to_key in convert:
-            if from_key in keys and to_key not in keys:
-                setattr(item, to_key, item._info[from_key])
-
-
-def _translate_volume_keys(collection):
-    convert = [('volumeType', 'volume_type'),
-               ('os-vol-tenant-attr:tenant_id', 'tenant_id')]
-    _translate_keys(collection, convert)
-
-
-def _translate_volume_snapshot_keys(collection):
-    convert = [('volumeId', 'volume_id')]
-    _translate_keys(collection, convert)
-
-
-def _translate_availability_zone_keys(collection):
-    convert = [('zoneName', 'name'), ('zoneState', 'status')]
-    _translate_keys(collection, convert)
-
-
-def _extract_metadata(args, type='user_metadata'):
-    metadata = {}
-    if type == 'image_metadata':
-        args_metadata = args.image_metadata
-    else:
-        args_metadata = args.metadata
-    for metadatum in args_metadata:
-        # unset doesn't require a val, so we have the if/else
-        if '=' in metadatum:
-            (key, value) = metadatum.split('=', 1)
-        else:
-            key = metadatum
-            value = None
-
-        metadata[key] = value
-    return metadata
+utils.retype_method('volumev2', 'volumev3', globals())
 
 
 @utils.arg('--all-tenants',
@@ -270,8 +135,10 @@ def do_list(cs, args):
         'status': args.status,
         'bootable': args.bootable,
         'migration_status': args.migration_status,
-        'metadata': _extract_metadata(args) if args.metadata else None,
-        'glance_metadata': _extract_metadata(args, type='image_metadata')
+        'metadata': shell_utils.extract_metadata(args)
+        if args.metadata else None,
+        'glance_metadata': shell.utils.extract_metadata(args,
+                                                        type='image_metadata')
         if args.image_metadata else None,
     }
 
@@ -292,7 +159,7 @@ def do_list(cs, args):
     volumes = cs.volumes.list(search_opts=search_opts, marker=args.marker,
                               limit=args.limit, sort_key=args.sort_key,
                               sort_dir=args.sort_dir, sort=args.sort)
-    _translate_volume_keys(volumes)
+    shell_utils.translate_volume_keys(volumes)
 
     # Create a list of servers to which the volume is attached
     for vol in volumes:
@@ -315,34 +182,6 @@ def do_list(cs, args):
         sortby_index = 0
     utils.print_list(volumes, key_list, exclude_unavailable=True,
                      sortby_index=sortby_index)
-
-
-@utils.arg('volume',
-           metavar='<volume>',
-           help='Name or ID of volume.')
-@utils.service_type('volumev3')
-def do_show(cs, args):
-    """Shows volume details."""
-    info = dict()
-    volume = utils.find_volume(cs, args.volume)
-    info.update(volume._info)
-
-    if 'readonly' in info['metadata']:
-        info['readonly'] = info['metadata']['readonly']
-
-    info.pop('links', None)
-    utils.print_dict(info,
-                     formatters=['metadata', 'volume_image_metadata',
-                                 'attachments'])
-
-
-class CheckSizeArgForCreate(argparse.Action):
-    def __call__(self, parser, args, values, option_string=None):
-        if ((args.snapshot_id or args.source_volid or args.source_replica)
-                is None and values is None):
-            parser.error('Size is a required parameter if snapshot '
-                         'or source volume is not specified.')
-        setattr(args, self.dest, values)
 
 
 @utils.service_type('volumev3')
@@ -450,7 +289,7 @@ def do_create(cs, args):
 
     volume_metadata = None
     if args.metadata is not None:
-        volume_metadata = _extract_metadata(args)
+        volume_metadata = shell_utils.extract_metadata(args)
 
     # NOTE(N.S.): take this piece from novaclient
     hints = {}
@@ -474,6 +313,7 @@ def do_create(cs, args):
         group_id = args.group_id
     except AttributeError:
         group_id = None
+
     volume = cs.volumes.create(args.size,
                                args.consisgroup_id,
                                group_id,
@@ -498,132 +338,6 @@ def do_create(cs, args):
 
     info.pop('links', None)
     utils.print_dict(info)
-
-
-@utils.arg('--cascade',
-           action='store_true',
-           default=False,
-           help='Remove any snapshots along with volume. Default=False.')
-@utils.arg('volume',
-           metavar='<volume>', nargs='+',
-           help='Name or ID of volume or volumes to delete.')
-@utils.service_type('volumev3')
-def do_delete(cs, args):
-    """Removes one or more volumes."""
-    failure_count = 0
-    for volume in args.volume:
-        try:
-            utils.find_volume(cs, volume).delete(cascade=args.cascade)
-            print("Request to delete volume %s has been accepted." % (volume))
-        except Exception as e:
-            failure_count += 1
-            print("Delete for volume %s failed: %s" % (volume, e))
-    if failure_count == len(args.volume):
-        raise exceptions.CommandError("Unable to delete any of the specified "
-                                      "volumes.")
-
-
-@utils.arg('volume',
-           metavar='<volume>', nargs='+',
-           help='Name or ID of volume or volumes to delete.')
-@utils.service_type('volumev3')
-def do_force_delete(cs, args):
-    """Attempts force-delete of volume, regardless of state."""
-    failure_count = 0
-    for volume in args.volume:
-        try:
-            utils.find_volume(cs, volume).force_delete()
-        except Exception as e:
-            failure_count += 1
-            print("Delete for volume %s failed: %s" % (volume, e))
-    if failure_count == len(args.volume):
-        raise exceptions.CommandError("Unable to force delete any of the "
-                                      "specified volumes.")
-
-
-@utils.arg('volume', metavar='<volume>', nargs='+',
-           help='Name or ID of volume to modify.')
-@utils.arg('--state', metavar='<state>', default=None,
-           help=('The state to assign to the volume. Valid values are '
-                 '"available", "error", "creating", "deleting", "in-use", '
-                 '"attaching", "detaching", "error_deleting" and '
-                 '"maintenance". '
-                 'NOTE: This command simply changes the state of the '
-                 'Volume in the DataBase with no regard to actual status, '
-                 'exercise caution when using. Default=None, that means the '
-                 'state is unchanged.'))
-@utils.arg('--attach-status', metavar='<attach-status>', default=None,
-           help=('The attach status to assign to the volume in the DataBase, '
-                 'with no regard to the actual status. Valid values are '
-                 '"attached" and "detached". Default=None, that means the '
-                 'status is unchanged.'))
-@utils.arg('--reset-migration-status',
-           action='store_true',
-           help=('Clears the migration status of the volume in the DataBase '
-                 'that indicates the volume is source or destination of '
-                 'volume migration, with no regard to the actual status.'))
-@utils.service_type('volumev3')
-def do_reset_state(cs, args):
-    """Explicitly updates the volume state in the Cinder database.
-
-    Note that this does not affect whether the volume is actually attached to
-    the Nova compute host or instance and can result in an unusable volume.
-    Being a database change only, this has no impact on the true state of the
-    volume and may not match the actual state. This can render a volume
-    unusable in the case of change to the 'available' state.
-    """
-    failure_flag = False
-    migration_status = 'none' if args.reset_migration_status else None
-    if not (args.state or args.attach_status or migration_status):
-        # Nothing specified, default to resetting state
-        args.state = 'available'
-
-    for volume in args.volume:
-        try:
-            utils.find_volume(cs, volume).reset_state(args.state,
-                                                      args.attach_status,
-                                                      migration_status)
-        except Exception as e:
-            failure_flag = True
-            msg = "Reset state for volume %s failed: %s" % (volume, e)
-            print(msg)
-
-    if failure_flag:
-        msg = "Unable to reset the state for the specified volume(s)."
-        raise exceptions.CommandError(msg)
-
-
-@utils.arg('volume',
-           metavar='<volume>',
-           help='Name or ID of volume to rename.')
-@utils.arg('name',
-           nargs='?',
-           metavar='<name>',
-           help='New name for volume.')
-@utils.arg('--description', metavar='<description>',
-           help='Volume description. Default=None.',
-           default=None)
-@utils.arg('--display-description',
-           help=argparse.SUPPRESS)
-@utils.arg('--display_description',
-           help=argparse.SUPPRESS)
-@utils.service_type('volumev3')
-def do_rename(cs, args):
-    """Renames a volume."""
-    kwargs = {}
-
-    if args.name is not None:
-        kwargs['name'] = args.name
-    if args.display_description is not None:
-        kwargs['description'] = args.display_description
-    elif args.description is not None:
-        kwargs['description'] = args.description
-
-    if not any(kwargs):
-        msg = 'Must supply either name or description.'
-        raise exceptions.ClientException(code=1, message=msg)
-
-    utils.find_volume(cs, args.volume).update(**kwargs)
 
 
 @utils.arg('volume',
@@ -651,7 +365,7 @@ def do_rename(cs, args):
 def do_metadata(cs, args):
     """Sets or deletes volume metadata."""
     volume = utils.find_volume(cs, args.volume)
-    metadata = _extract_metadata(args)
+    metadata = shell_utils.extract_metadata(args)
 
     if args.action == 'set':
         cs.volumes.set_metadata(volume, metadata)
@@ -661,305 +375,12 @@ def do_metadata(cs, args):
                                    reverse=True))
 
 
-@utils.arg('volume',
-           metavar='<volume>',
-           help='Name or ID of volume for which to update metadata.')
-@utils.arg('action',
-           metavar='<action>',
-           choices=['set', 'unset'],
-           help="The action. Valid values are 'set' or 'unset.'")
-@utils.arg('metadata',
-           metavar='<key=value>',
-           nargs='+',
-           default=[],
-           help='Metadata key and value pair to set or unset. '
-           'For unset, specify only the key.')
-@utils.service_type('volumev3')
-def do_image_metadata(cs, args):
-    """Sets or deletes volume image metadata."""
-    volume = utils.find_volume(cs, args.volume)
-    metadata = _extract_metadata(args)
-
-    if args.action == 'set':
-        cs.volumes.set_image_metadata(volume, metadata)
-    elif args.action == 'unset':
-        cs.volumes.delete_image_metadata(volume, sorted(metadata.keys(),
-                                         reverse=True))
-
-
-@utils.arg('--all-tenants',
-           dest='all_tenants',
-           metavar='<0|1>',
-           nargs='?',
-           type=int,
-           const=1,
-           default=0,
-           help='Shows details for all tenants. Admin only.')
-@utils.arg('--all_tenants',
-           nargs='?',
-           type=int,
-           const=1,
-           help=argparse.SUPPRESS)
-@utils.arg('--name',
-           metavar='<name>',
-           default=None,
-           help='Filters results by a name. Default=None.')
-@utils.arg('--display-name',
-           help=argparse.SUPPRESS)
-@utils.arg('--display_name',
-           help=argparse.SUPPRESS)
-@utils.arg('--status',
-           metavar='<status>',
-           default=None,
-           help='Filters results by a status. Default=None.')
-@utils.arg('--volume-id',
-           metavar='<volume-id>',
-           default=None,
-           help='Filters results by a volume ID. Default=None.')
-@utils.arg('--volume_id',
-           help=argparse.SUPPRESS)
-@utils.arg('--marker',
-           metavar='<marker>',
-           default=None,
-           help='Begin returning snapshots that appear later in the snapshot '
-                'list than that represented by this id. '
-                'Default=None.')
-@utils.arg('--limit',
-           metavar='<limit>',
-           default=None,
-           help='Maximum number of snapshots to return. Default=None.')
-@utils.arg('--sort',
-           metavar='<key>[:<direction>]',
-           default=None,
-           help=(('Comma-separated list of sort keys and directions in the '
-                  'form of <key>[:<asc|desc>]. '
-                  'Valid keys: %s. '
-                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
-@utils.arg('--tenant',
-           type=str,
-           dest='tenant',
-           nargs='?',
-           metavar='<tenant>',
-           help='Display information from single tenant (Admin only).')
-@utils.service_type('volumev3')
-def do_snapshot_list(cs, args):
-    """Lists all snapshots."""
-    all_tenants = (1 if args.tenant else
-                   int(os.environ.get("ALL_TENANTS", args.all_tenants)))
-
-    if args.display_name is not None:
-        args.name = args.display_name
-
-    search_opts = {
-        'all_tenants': all_tenants,
-        'name': args.name,
-        'status': args.status,
-        'volume_id': args.volume_id,
-        'project_id': args.tenant,
-    }
-
-    snapshots = cs.volume_snapshots.list(search_opts=search_opts,
-                                         marker=args.marker,
-                                         limit=args.limit,
-                                         sort=args.sort)
-    _translate_volume_snapshot_keys(snapshots)
-    if args.sort:
-        sortby_index = None
-    else:
-        sortby_index = 0
-
-    utils.print_list(snapshots,
-                     ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
-                     sortby_index=sortby_index)
-
-
-@utils.arg('snapshot',
-           metavar='<snapshot>',
-           help='Name or ID of snapshot.')
-@utils.service_type('volumev3')
-def do_snapshot_show(cs, args):
-    """Shows snapshot details."""
-    snapshot = _find_volume_snapshot(cs, args.snapshot)
-    _print_volume_snapshot(snapshot)
-
-
-@utils.arg('volume',
-           metavar='<volume>',
-           help='Name or ID of volume to snapshot.')
-@utils.arg('--force',
-           metavar='<True|False>',
-           const=True,
-           nargs='?',
-           default=False,
-           help='Allows or disallows snapshot of '
-           'a volume when the volume is attached to an instance. '
-           'If set to True, ignores the current status of the '
-           'volume when attempting to snapshot it rather '
-           'than forcing it to be available. '
-           'Default=False.')
-@utils.arg('--name',
-           metavar='<name>',
-           default=None,
-           help='Snapshot name. Default=None.')
-@utils.arg('--display-name',
-           help=argparse.SUPPRESS)
-@utils.arg('--display_name',
-           help=argparse.SUPPRESS)
-@utils.arg('--description',
-           metavar='<description>',
-           default=None,
-           help='Snapshot description. Default=None.')
-@utils.arg('--display-description',
-           help=argparse.SUPPRESS)
-@utils.arg('--display_description',
-           help=argparse.SUPPRESS)
-@utils.arg('--metadata',
-           type=str,
-           nargs='*',
-           metavar='<key=value>',
-           default=None,
-           help='Snapshot metadata key and value pairs. Default=None.')
-@utils.service_type('volumev3')
-def do_snapshot_create(cs, args):
-    """Creates a snapshot."""
-    if args.display_name is not None:
-        args.name = args.display_name
-
-    if args.display_description is not None:
-        args.description = args.display_description
-
-    snapshot_metadata = None
-    if args.metadata is not None:
-        snapshot_metadata = _extract_metadata(args)
-
-    volume = utils.find_volume(cs, args.volume)
-    snapshot = cs.volume_snapshots.create(volume.id,
-                                          args.force,
-                                          args.name,
-                                          args.description,
-                                          metadata=snapshot_metadata)
-    _print_volume_snapshot(snapshot)
-
-
-@utils.arg('snapshot',
-           metavar='<snapshot>', nargs='+',
-           help='Name or ID of the snapshot(s) to delete.')
-@utils.arg('--force',
-           action="store_true",
-           help='Allows deleting snapshot of a volume '
-           'when its status is other than "available" or "error". '
-           'Default=False.')
-@utils.service_type('volumev3')
-def do_snapshot_delete(cs, args):
-    """Removes one or more snapshots."""
-    failure_count = 0
-
-    for snapshot in args.snapshot:
-        try:
-            _find_volume_snapshot(cs, snapshot).delete(args.force)
-        except Exception as e:
-            failure_count += 1
-            print("Delete for snapshot %s failed: %s" % (snapshot, e))
-    if failure_count == len(args.snapshot):
-        raise exceptions.CommandError("Unable to delete any of the specified "
-                                      "snapshots.")
-
-
-@utils.arg('snapshot', metavar='<snapshot>',
-           help='Name or ID of snapshot.')
-@utils.arg('name', nargs='?', metavar='<name>',
-           help='New name for snapshot.')
-@utils.arg('--description', metavar='<description>',
-           default=None,
-           help='Snapshot description. Default=None.')
-@utils.arg('--display-description',
-           help=argparse.SUPPRESS)
-@utils.arg('--display_description',
-           help=argparse.SUPPRESS)
-@utils.service_type('volumev3')
-def do_snapshot_rename(cs, args):
-    """Renames a snapshot."""
-    kwargs = {}
-
-    if args.name is not None:
-        kwargs['name'] = args.name
-
-    if args.description is not None:
-        kwargs['description'] = args.description
-    elif args.display_description is not None:
-        kwargs['description'] = args.display_description
-
-    if not any(kwargs):
-        msg = 'Must supply either name or description.'
-        raise exceptions.ClientException(code=1, message=msg)
-
-    _find_volume_snapshot(cs, args.snapshot).update(**kwargs)
-
-
-@utils.arg('snapshot', metavar='<snapshot>', nargs='+',
-           help='Name or ID of snapshot to modify.')
-@utils.arg('--state', metavar='<state>',
-           default='available',
-           help=('The state to assign to the snapshot. Valid values are '
-                 '"available", "error", "creating", "deleting", and '
-                 '"error_deleting". NOTE: This command simply changes '
-                 'the state of the Snapshot in the DataBase with no regard '
-                 'to actual status, exercise caution when using. '
-                 'Default=available.'))
-@utils.service_type('volumev3')
-def do_snapshot_reset_state(cs, args):
-    """Explicitly updates the snapshot state."""
-    failure_count = 0
-
-    single = (len(args.snapshot) == 1)
-
-    for snapshot in args.snapshot:
-        try:
-            _find_volume_snapshot(cs, snapshot).reset_state(args.state)
-        except Exception as e:
-            failure_count += 1
-            msg = "Reset state for snapshot %s failed: %s" % (snapshot, e)
-            if not single:
-                print(msg)
-
-    if failure_count == len(args.snapshot):
-        if not single:
-            msg = ("Unable to reset the state for any of the specified "
-                   "snapshots.")
-        raise exceptions.CommandError(msg)
-
-
-def _print_volume_type_list(vtypes):
-    utils.print_list(vtypes, ['ID', 'Name', 'Description', 'Is_Public'])
-
-
-def _print_group_type_list(gtypes):
-    utils.print_list(gtypes, ['ID', 'Name', 'Description'])
-
-
-@utils.service_type('volumev3')
-def do_type_list(cs, args):
-    """Lists available 'volume types'.
-
-    (Only admin and tenant users will see private types)
-    """
-    vtypes = cs.volume_types.list()
-    _print_volume_type_list(vtypes)
-
-
 @utils.service_type('volumev3')
 @api_versions.wraps('3.11')
 def do_group_type_list(cs, args):
     """Lists available 'group types'. (Admin only will see private types)"""
     gtypes = cs.group_types.list()
-    _print_group_type_list(gtypes)
-
-
-@utils.service_type('volumev3')
-def do_type_default(cs, args):
-    """List the default volume type."""
-    vtype = cs.volume_types.default()
-    _print_volume_type_list([vtype])
+    shell_utils.print_group_type_list(gtypes)
 
 
 @utils.service_type('volumev3')
@@ -967,21 +388,7 @@ def do_type_default(cs, args):
 def do_group_type_default(cs, args):
     """List the default group type."""
     gtype = cs.group_types.default()
-    _print_group_type_list([gtype])
-
-
-@utils.arg('volume_type',
-           metavar='<volume_type>',
-           help='Name or ID of the volume type.')
-@utils.service_type('volumev3')
-def do_type_show(cs, args):
-    """Show volume type details."""
-    vtype = _find_vtype(cs, args.volume_type)
-    info = dict()
-    info.update(vtype._info)
-
-    info.pop('links', None)
-    utils.print_dict(info, formatters=['extra_specs'])
+    shell_utils.print_group_type_list([gtype])
 
 
 @utils.service_type('volumev3')
@@ -991,39 +398,12 @@ def do_type_show(cs, args):
            help='Name or ID of the group type.')
 def do_group_type_show(cs, args):
     """Show group type details."""
-    gtype = _find_gtype(cs, args.group_type)
+    gtype = shell_utils.find_gtype(cs, args.group_type)
     info = dict()
     info.update(gtype._info)
 
     info.pop('links', None)
     utils.print_dict(info, formatters=['group_specs'])
-
-
-@utils.arg('id',
-           metavar='<id>',
-           help='ID of the volume type.')
-@utils.arg('--name',
-           metavar='<name>',
-           help='Name of the volume type.')
-@utils.arg('--description',
-           metavar='<description>',
-           help='Description of the volume type.')
-@utils.arg('--is-public',
-           metavar='<is-public>',
-           help='Make type accessible to the public or not.')
-@utils.service_type('volumev3')
-def do_type_update(cs, args):
-    """Updates volume type name, description, and/or is_public."""
-    is_public = args.is_public
-    if args.name is None and args.description is None and is_public is None:
-        raise exceptions.CommandError('Specify a new type name, description, '
-                                      'is_public or a combination thereof.')
-
-    if is_public is not None:
-        is_public = strutils.bool_from_string(args.is_public, strict=True)
-    vtype = cs.volume_types.update(args.id, args.name, args.description,
-                                   is_public)
-    _print_volume_type_list([vtype])
 
 
 @utils.service_type('volumev3')
@@ -1045,14 +425,7 @@ def do_group_type_update(cs, args):
     is_public = strutils.bool_from_string(args.is_public)
     gtype = cs.group_types.update(args.id, args.name, args.description,
                                   is_public)
-    _print_group_type_list([gtype])
-
-
-@utils.service_type('volumev3')
-def do_extra_specs_list(cs, args):
-    """Lists current volume types and extra specs."""
-    vtypes = cs.volume_types.list()
-    utils.print_list(vtypes, ['ID', 'Name', 'extra_specs'])
+    shell_utils.print_group_type_list([gtype])
 
 
 @utils.service_type('volumev3')
@@ -1061,24 +434,6 @@ def do_group_specs_list(cs, args):
     """Lists current group types and specs."""
     gtypes = cs.group_types.list()
     utils.print_list(gtypes, ['ID', 'Name', 'group_specs'])
-
-
-@utils.arg('name',
-           metavar='<name>',
-           help='Name of new volume type.')
-@utils.arg('--description',
-           metavar='<description>',
-           help='Description of new volume type.')
-@utils.arg('--is-public',
-           metavar='<is-public>',
-           default=True,
-           help='Make type accessible to the public (default true).')
-@utils.service_type('volumev3')
-def do_type_create(cs, args):
-    """Creates a volume type."""
-    is_public = strutils.bool_from_string(args.is_public, strict=True)
-    vtype = cs.volume_types.create(args.name, args.description, is_public)
-    _print_volume_type_list([vtype])
 
 
 @utils.service_type('volumev3')
@@ -1097,28 +452,7 @@ def do_group_type_create(cs, args):
     """Creates a group type."""
     is_public = strutils.bool_from_string(args.is_public)
     gtype = cs.group_types.create(args.name, args.description, is_public)
-    _print_group_type_list([gtype])
-
-
-@utils.arg('vol_type',
-           metavar='<vol_type>', nargs='+',
-           help='Name or ID of volume type or types to delete.')
-@utils.service_type('volumev3')
-def do_type_delete(cs, args):
-    """Deletes volume type or types."""
-    failure_count = 0
-    for vol_type in args.vol_type:
-        try:
-            vtype = _find_volume_type(cs, vol_type)
-            cs.volume_types.delete(vtype)
-            print("Request to delete volume type %s has been accepted."
-                  % (vol_type))
-        except Exception as e:
-            failure_count += 1
-            print("Delete for volume type %s failed: %s" % (vol_type, e))
-    if failure_count == len(args.vol_type):
-        raise exceptions.CommandError("Unable to delete any of the "
-                                      "specified types.")
+    shell_utils.print_group_type_list([gtype])
 
 
 @utils.service_type('volumev3')
@@ -1131,7 +465,7 @@ def do_group_type_delete(cs, args):
     failure_count = 0
     for group_type in args.group_type:
         try:
-            gtype = _find_group_type(cs, group_type)
+            gtype = shell_utils.find_group_type(cs, group_type)
             cs.group_types.delete(gtype)
             print("Request to delete group type %s has been accepted."
                   % (group_type))
@@ -1141,31 +475,6 @@ def do_group_type_delete(cs, args):
     if failure_count == len(args.group_type):
         raise exceptions.CommandError("Unable to delete any of the "
                                       "specified types.")
-
-
-@utils.arg('vtype',
-           metavar='<vtype>',
-           help='Name or ID of volume type.')
-@utils.arg('action',
-           metavar='<action>',
-           choices=['set', 'unset'],
-           help='The action. Valid values are "set" or "unset."')
-@utils.arg('metadata',
-           metavar='<key=value>',
-           nargs='+',
-           default=[],
-           help='The extra specs key and value pair to set or unset. '
-                'For unset, specify only the key.')
-@utils.service_type('volumev3')
-def do_type_key(cs, args):
-    """Sets or unsets extra_spec for a volume type."""
-    vtype = _find_volume_type(cs, args.vtype)
-    keypair = _extract_metadata(args)
-
-    if args.action == 'set':
-        vtype.set_keys(keypair)
-    elif args.action == 'unset':
-        vtype.unset_keys(list(keypair))
 
 
 @utils.service_type('volumev3')
@@ -1185,153 +494,13 @@ def do_type_key(cs, args):
                 'For unset, specify only the key.')
 def do_group_type_key(cs, args):
     """Sets or unsets group_spec for a group type."""
-    gtype = _find_group_type(cs, args.gtype)
-    keypair = _extract_metadata(args)
+    gtype = shell_utils.find_group_type(cs, args.gtype)
+    keypair = shell_utils.extract_metadata(args)
 
     if args.action == 'set':
         gtype.set_keys(keypair)
     elif args.action == 'unset':
         gtype.unset_keys(list(keypair))
-
-
-@utils.arg('--volume-type', metavar='<volume_type>', required=True,
-           help='Filter results by volume type name or ID.')
-@utils.service_type('volumev3')
-def do_type_access_list(cs, args):
-    """Print access information about the given volume type."""
-    volume_type = _find_volume_type(cs, args.volume_type)
-    if volume_type.is_public:
-        raise exceptions.CommandError("Failed to get access list "
-                                      "for public volume type.")
-    access_list = cs.volume_type_access.list(volume_type)
-
-    columns = ['Volume_type_ID', 'Project_ID']
-    utils.print_list(access_list, columns)
-
-
-@utils.arg('--volume-type', metavar='<volume_type>', required=True,
-           help='Volume type name or ID to add access for the given project.')
-@utils.arg('--project-id', metavar='<project_id>', required=True,
-           help='Project ID to add volume type access for.')
-@utils.service_type('volumev3')
-def do_type_access_add(cs, args):
-    """Adds volume type access for the given project."""
-    vtype = _find_volume_type(cs, args.volume_type)
-    cs.volume_type_access.add_project_access(vtype, args.project_id)
-
-
-@utils.arg('--volume-type', metavar='<volume_type>', required=True,
-           help=('Volume type name or ID to remove access '
-                 'for the given project.'))
-@utils.arg('--project-id', metavar='<project_id>', required=True,
-           help='Project ID to remove volume type access for.')
-@utils.service_type('volumev3')
-def do_type_access_remove(cs, args):
-    """Removes volume type access for the given project."""
-    vtype = _find_volume_type(cs, args.volume_type)
-    cs.volume_type_access.remove_project_access(
-        vtype, args.project_id)
-
-
-@utils.service_type('volumev3')
-def do_endpoints(cs, args):
-    """Discovers endpoints registered by authentication service."""
-    warnings.warn(
-        "``cinder endpoints`` is deprecated, use ``openstack catalog list`` "
-        "instead. The ``cinder endpoints`` command may be removed in the P "
-        "release or next major release of cinderclient (v2.0.0 or greater).")
-    catalog = cs.client.service_catalog.catalog
-    for e in catalog:
-        utils.print_dict(e['endpoints'][0], e['name'])
-
-
-@utils.service_type('volumev3')
-def do_credentials(cs, args):
-    """Shows user credentials returned from auth."""
-    catalog = cs.client.service_catalog.catalog
-
-    # formatters defines field to be converted from unicode to string
-    utils.print_dict(catalog['user'], "User Credentials",
-                     formatters=['domain', 'roles'])
-    utils.print_dict(catalog['token'], "Token",
-                     formatters=['audit_ids', 'tenant'])
-
-_quota_resources = ['volumes', 'snapshots', 'gigabytes',
-                    'backups', 'backup_gigabytes',
-                    'consistencygroups', 'per_volume_gigabytes',
-                    'groups', ]
-_quota_infos = ['Type', 'In_use', 'Reserved', 'Limit']
-
-
-def _quota_show(quotas):
-    quota_dict = {}
-    for resource in quotas._info:
-        good_name = False
-        for name in _quota_resources:
-            if resource.startswith(name):
-                good_name = True
-        if not good_name:
-            continue
-        quota_dict[resource] = getattr(quotas, resource, None)
-    utils.print_dict(quota_dict)
-
-
-def _quota_usage_show(quotas):
-    quota_list = []
-    for resource in quotas._info.keys():
-        good_name = False
-        for name in _quota_resources:
-            if resource.startswith(name):
-                good_name = True
-        if not good_name:
-            continue
-        quota_info = getattr(quotas, resource, None)
-        quota_info['Type'] = resource
-        quota_info = dict((k.capitalize(), v) for k, v in quota_info.items())
-        quota_list.append(quota_info)
-    utils.print_list(quota_list, _quota_infos)
-
-
-def _quota_update(manager, identifier, args):
-    updates = {}
-    for resource in _quota_resources:
-        val = getattr(args, resource, None)
-        if val is not None:
-            if args.volume_type:
-                resource = resource + '_%s' % args.volume_type
-            updates[resource] = val
-
-    if updates:
-        _quota_show(manager.update(identifier, **updates))
-
-
-@utils.arg('tenant',
-           metavar='<tenant_id>',
-           help='ID of tenant for which to list quotas.')
-@utils.service_type('volumev3')
-def do_quota_show(cs, args):
-    """Lists quotas for a tenant."""
-
-    _quota_show(cs.quotas.get(args.tenant))
-
-
-@utils.arg('tenant', metavar='<tenant_id>',
-           help='ID of tenant for which to list quota usage.')
-@utils.service_type('volumev3')
-def do_quota_usage(cs, args):
-    """Lists quota usage for a tenant."""
-
-    _quota_usage_show(cs.quotas.get(args.tenant, usage=True))
-
-
-@utils.arg('tenant',
-           metavar='<tenant_id>',
-           help='ID of tenant for which to list quota defaults.')
-@utils.service_type('volumev3')
-def do_quota_defaults(cs, args):
-    """Lists default quotas for a tenant."""
-
-    _quota_show(cs.quotas.defaults(args.tenant))
 
 
 @utils.arg('tenant',
@@ -1378,88 +547,7 @@ def do_quota_defaults(cs, args):
 def do_quota_update(cs, args):
     """Updates quotas for a tenant."""
 
-    _quota_update(cs.quotas, args.tenant, args)
-
-
-@utils.arg('tenant', metavar='<tenant_id>',
-           help='UUID of tenant to delete the quotas for.')
-@utils.service_type('volumev3')
-def do_quota_delete(cs, args):
-    """Delete the quotas for a tenant."""
-
-    cs.quotas.delete(args.tenant)
-
-
-@utils.arg('class_name',
-           metavar='<class>',
-           help='Name of quota class for which to list quotas.')
-@utils.service_type('volumev3')
-def do_quota_class_show(cs, args):
-    """Lists quotas for a quota class."""
-
-    _quota_show(cs.quota_classes.get(args.class_name))
-
-
-@utils.arg('class_name',
-           metavar='<class_name>',
-           help='Name of quota class for which to set quotas.')
-@utils.arg('--volumes',
-           metavar='<volumes>',
-           type=int, default=None,
-           help='The new "volumes" quota value. Default=None.')
-@utils.arg('--snapshots',
-           metavar='<snapshots>',
-           type=int, default=None,
-           help='The new "snapshots" quota value. Default=None.')
-@utils.arg('--gigabytes',
-           metavar='<gigabytes>',
-           type=int, default=None,
-           help='The new "gigabytes" quota value. Default=None.')
-@utils.arg('--volume-type',
-           metavar='<volume_type_name>',
-           default=None,
-           help='Volume type. Default=None.')
-@utils.service_type('volumev3')
-def do_quota_class_update(cs, args):
-    """Updates quotas for a quota class."""
-
-    _quota_update(cs.quota_classes, args.class_name, args)
-
-
-@utils.arg('tenant',
-           metavar='<tenant_id>',
-           nargs='?',
-           default=None,
-           help='Display information for a single tenant (Admin only).')
-@utils.service_type('volumev3')
-def do_absolute_limits(cs, args):
-    """Lists absolute limits for a user."""
-    limits = cs.limits.get(args.tenant).absolute
-    columns = ['Name', 'Value']
-    utils.print_list(limits, columns)
-
-
-@utils.arg('tenant',
-           metavar='<tenant_id>',
-           nargs='?',
-           default=None,
-           help='Display information for a single tenant (Admin only).')
-@utils.service_type('volumev3')
-def do_rate_limits(cs, args):
-    """Lists rate limits for a user."""
-    limits = cs.limits.get(args.tenant).rate
-    columns = ['Verb', 'URI', 'Value', 'Remain', 'Unit', 'Next_Available']
-    utils.print_list(limits, columns)
-
-
-def _find_volume_type(cs, vtype):
-    """Gets a volume type by name or ID."""
-    return utils.find_resource(cs.volume_types, vtype)
-
-
-def _find_group_type(cs, gtype):
-    """Gets a group type by name or ID."""
-    return utils.find_resource(cs.group_types, gtype)
+    shell_utils.quota_update(cs.quotas, args.tenant, args)
 
 
 @utils.arg('volume',
@@ -1509,324 +597,19 @@ def do_upload_to_image(cs, args):
     """Uploads volume to Image Service as an image."""
     volume = utils.find_volume(cs, args.volume)
     if cs.api_version >= api_versions.APIVersion("3.1"):
-        _print_volume_image(volume.upload_to_image(args.force,
-                                                   args.image_name,
-                                                   args.container_format,
-                                                   args.disk_format,
-                                                   args.visibility,
-                                                   args.protected))
+        shell_utils.print_volume_image(
+            volume.upload_to_image(args.force,
+                                   args.image_name,
+                                   args.container_format,
+                                   args.disk_format,
+                                   args.visibility,
+                                   args.protected))
     else:
-        _print_volume_image(volume.upload_to_image(args.force,
-                                                   args.image_name,
-                                                   args.container_format,
-                                                   args.disk_format))
-
-
-@utils.arg('volume', metavar='<volume>', help='ID of volume to migrate.')
-@utils.arg('host', metavar='<host>', help='Destination host. Takes the form: '
-                                          'host@backend-name#pool')
-@utils.arg('--force-host-copy', metavar='<True|False>',
-           choices=['True', 'False'],
-           required=False,
-           const=True,
-           nargs='?',
-           default=False,
-           help='Enables or disables generic host-based '
-           'force-migration, which bypasses driver '
-           'optimizations. Default=False.')
-@utils.arg('--lock-volume', metavar='<True|False>',
-           choices=['True', 'False'],
-           required=False,
-           const=True,
-           nargs='?',
-           default=False,
-           help='Enables or disables the termination of volume migration '
-           'caused by other commands. This option applies to the '
-           'available volume. True means it locks the volume '
-           'state and does not allow the migration to be aborted. The '
-           'volume status will be in maintenance during the '
-           'migration. False means it allows the volume migration '
-           'to be aborted. The volume status is still in the original '
-           'status. Default=False.')
-@utils.service_type('volumev3')
-def do_migrate(cs, args):
-    """Migrates volume to a new host."""
-    volume = utils.find_volume(cs, args.volume)
-    try:
-        volume.migrate_volume(args.host, args.force_host_copy,
-                              args.lock_volume)
-        print("Request to migrate volume %s has been accepted." % (volume.id))
-    except Exception as e:
-        print("Migration for volume %s failed: %s." % (volume.id,
-                                                       six.text_type(e)))
-
-
-@utils.arg('volume', metavar='<volume>',
-           help='Name or ID of volume for which to modify type.')
-@utils.arg('new_type', metavar='<volume-type>', help='New volume type.')
-@utils.arg('--migration-policy', metavar='<never|on-demand>', required=False,
-           choices=['never', 'on-demand'], default='never',
-           help='Migration policy during retype of volume.')
-@utils.service_type('volumev3')
-def do_retype(cs, args):
-    """Changes the volume type for a volume."""
-    volume = utils.find_volume(cs, args.volume)
-    volume.retype(args.new_type, args.migration_policy)
-
-
-@utils.arg('volume', metavar='<volume>',
-           help='Name or ID of volume to backup.')
-@utils.arg('--container', metavar='<container>',
-           default=None,
-           help='Backup container name. Default=None.')
-@utils.arg('--display-name',
-           help=argparse.SUPPRESS)
-@utils.arg('--name', metavar='<name>',
-           default=None,
-           help='Backup name. Default=None.')
-@utils.arg('--display-description',
-           help=argparse.SUPPRESS)
-@utils.arg('--description',
-           metavar='<description>',
-           default=None,
-           help='Backup description. Default=None.')
-@utils.arg('--incremental',
-           action='store_true',
-           help='Incremental backup. Default=False.',
-           default=False)
-@utils.arg('--force',
-           action='store_true',
-           help='Allows or disallows backup of a volume '
-           'when the volume is attached to an instance. '
-           'If set to True, backs up the volume whether '
-           'its status is "available" or "in-use". The backup '
-           'of an "in-use" volume means your data is crash '
-           'consistent. Default=False.',
-           default=False)
-@utils.arg('--snapshot-id',
-           metavar='<snapshot-id>',
-           default=None,
-           help='ID of snapshot to backup. Default=None.')
-@utils.service_type('volumev3')
-def do_backup_create(cs, args):
-    """Creates a volume backup."""
-    if args.display_name is not None:
-        args.name = args.display_name
-
-    if args.display_description is not None:
-        args.description = args.display_description
-
-    volume = utils.find_volume(cs, args.volume)
-    backup = cs.backups.create(volume.id,
-                               args.container,
-                               args.name,
-                               args.description,
-                               args.incremental,
-                               args.force,
-                               args.snapshot_id)
-
-    info = {"volume_id": volume.id}
-    info.update(backup._info)
-
-    if 'links' in info:
-        info.pop('links')
-
-    utils.print_dict(info)
-
-
-@utils.arg('backup', metavar='<backup>', help='Name or ID of backup.')
-@utils.service_type('volumev3')
-def do_backup_show(cs, args):
-    """Shows backup details."""
-    backup = _find_backup(cs, args.backup)
-    info = dict()
-    info.update(backup._info)
-
-    info.pop('links', None)
-    utils.print_dict(info)
-
-
-@utils.arg('--all-tenants',
-           metavar='<all_tenants>',
-           nargs='?',
-           type=int,
-           const=1,
-           default=0,
-           help='Shows details for all tenants. Admin only.')
-@utils.arg('--all_tenants',
-           nargs='?',
-           type=int,
-           const=1,
-           help=argparse.SUPPRESS)
-@utils.arg('--name',
-           metavar='<name>',
-           default=None,
-           help='Filters results by a name. Default=None.')
-@utils.arg('--status',
-           metavar='<status>',
-           default=None,
-           help='Filters results by a status. Default=None.')
-@utils.arg('--volume-id',
-           metavar='<volume-id>',
-           default=None,
-           help='Filters results by a volume ID. Default=None.')
-@utils.arg('--volume_id',
-           help=argparse.SUPPRESS)
-@utils.arg('--marker',
-           metavar='<marker>',
-           default=None,
-           help='Begin returning backups that appear later in the backup '
-                'list than that represented by this id. '
-                'Default=None.')
-@utils.arg('--limit',
-           metavar='<limit>',
-           default=None,
-           help='Maximum number of backups to return. Default=None.')
-@utils.arg('--sort',
-           metavar='<key>[:<direction>]',
-           default=None,
-           help=(('Comma-separated list of sort keys and directions in the '
-                  'form of <key>[:<asc|desc>]. '
-                  'Valid keys: %s. '
-                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
-@utils.service_type('volumev3')
-def do_backup_list(cs, args):
-    """Lists all backups."""
-
-    search_opts = {
-        'all_tenants': args.all_tenants,
-        'name': args.name,
-        'status': args.status,
-        'volume_id': args.volume_id,
-    }
-
-    backups = cs.backups.list(search_opts=search_opts,
-                              marker=args.marker,
-                              limit=args.limit,
-                              sort=args.sort)
-    _translate_volume_snapshot_keys(backups)
-    columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'Object Count',
-               'Container']
-    if args.sort:
-        sortby_index = None
-    else:
-        sortby_index = 0
-    utils.print_list(backups, columns, sortby_index=sortby_index)
-
-
-@utils.arg('--force',
-           action="store_true",
-           help='Allows deleting backup of a volume '
-           'when its status is other than "available" or "error". '
-           'Default=False.')
-@utils.arg('backup', metavar='<backup>', nargs='+',
-           help='Name or ID of backup(s) to delete.')
-@utils.service_type('volumev3')
-def do_backup_delete(cs, args):
-    """Removes one or more backups."""
-    failure_count = 0
-    for backup in args.backup:
-        try:
-            _find_backup(cs, backup).delete(args.force)
-            print("Request to delete backup %s has been accepted." % (backup))
-        except Exception as e:
-            failure_count += 1
-            print("Delete for backup %s failed: %s" % (backup, e))
-    if failure_count == len(args.backup):
-        raise exceptions.CommandError("Unable to delete any of the specified "
-                                      "backups.")
-
-
-@utils.arg('backup', metavar='<backup>',
-           help='Name or ID of backup to restore.')
-@utils.arg('--volume-id', metavar='<volume>',
-           default=None,
-           help=argparse.SUPPRESS)
-@utils.arg('--volume', metavar='<volume>',
-           default=None,
-           help='Name or ID of existing volume to which to restore. '
-           'This is mutually exclusive with --name and takes priority. '
-           'Default=None.')
-@utils.arg('--name', metavar='<name>',
-           default=None,
-           help='Use the name for new volume creation to restore. '
-           'This is mutually exclusive with --volume (or the deprecated '
-           '--volume-id) and --volume (or --volume-id) takes priority. '
-           'Default=None.')
-@utils.service_type('volumev3')
-def do_backup_restore(cs, args):
-    """Restores a backup."""
-    vol = args.volume or args.volume_id
-    if vol:
-        volume_id = utils.find_volume(cs, vol).id
-        if args.name:
-            args.name = None
-            print('Mutually exclusive options are specified simultaneously: '
-                  '"--volume (or the deprecated --volume-id) and --name". '
-                  'The --volume (or --volume-id) option takes priority.')
-    else:
-        volume_id = None
-
-    backup = _find_backup(cs, args.backup)
-    restore = cs.restores.restore(backup.id, volume_id, args.name)
-
-    info = {"backup_id": backup.id}
-    info.update(restore._info)
-
-    info.pop('links', None)
-
-    utils.print_dict(info)
-
-
-@utils.arg('backup', metavar='<backup>',
-           help='ID of the backup to export.')
-@utils.service_type('volumev3')
-def do_backup_export(cs, args):
-    """Export backup metadata record."""
-    info = cs.backups.export_record(args.backup)
-    utils.print_dict(info)
-
-
-@utils.arg('backup_service', metavar='<backup_service>',
-           help='Backup service to use for importing the backup.')
-@utils.arg('backup_url', metavar='<backup_url>',
-           help='Backup URL for importing the backup metadata.')
-@utils.service_type('volumev3')
-def do_backup_import(cs, args):
-    """Import backup metadata record."""
-    info = cs.backups.import_record(args.backup_service, args.backup_url)
-    info.pop('links', None)
-
-    utils.print_dict(info)
-
-
-@utils.arg('backup', metavar='<backup>', nargs='+',
-           help='Name or ID of the backup to modify.')
-@utils.arg('--state', metavar='<state>',
-           default='available',
-           help='The state to assign to the backup. Valid values are '
-                '"available", "error". Default=available.')
-@utils.service_type('volumev3')
-def do_backup_reset_state(cs, args):
-    """Explicitly updates the backup state."""
-    failure_count = 0
-
-    single = (len(args.backup) == 1)
-
-    for backup in args.backup:
-        try:
-            _find_backup(cs, backup).reset_state(args.state)
-        except Exception as e:
-            failure_count += 1
-            msg = "Reset state for backup %s failed: %s" % (backup, e)
-            if not single:
-                print(msg)
-
-    if failure_count == len(args.backup):
-        if not single:
-            msg = ("Unable to reset the state for any of the specified "
-                   "backups.")
-        raise exceptions.CommandError(msg)
+        shell_utils.print_volume_image(
+            volume.upload_to_image(args.force,
+                                   args.image_name,
+                                   args.container_format,
+                                   args.disk_format))
 
 
 @utils.service_type('volumev3')
@@ -1851,31 +634,7 @@ def do_backup_update(cs, args):
         msg = 'Must supply either name or description.'
         raise exceptions.ClientException(code=1, message=msg)
 
-    _find_backup(cs, args.backup).update(**kwargs)
-
-
-@utils.arg('volume', metavar='<volume>',
-           help='Name or ID of volume to transfer.')
-@utils.arg('--name',
-           metavar='<name>',
-           default=None,
-           help='Transfer name. Default=None.')
-@utils.arg('--display-name',
-           help=argparse.SUPPRESS)
-@utils.service_type('volumev3')
-def do_transfer_create(cs, args):
-    """Creates a volume transfer."""
-    if args.display_name is not None:
-        args.name = args.display_name
-
-    volume = utils.find_volume(cs, args.volume)
-    transfer = cs.transfers.create(volume.id,
-                                   args.name)
-    info = dict()
-    info.update(transfer._info)
-
-    info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.find_backup(cs, args.backup).update(**kwargs)
 
 
 @utils.service_type('volumev3')
@@ -1952,673 +711,6 @@ def do_cluster_disable(cs, args):
     utils.print_dict(cluster.to_dict())
 
 
-@utils.arg('transfer', metavar='<transfer>',
-           help='Name or ID of transfer to delete.')
-@utils.service_type('volumev3')
-def do_transfer_delete(cs, args):
-    """Undoes a transfer."""
-    transfer = _find_transfer(cs, args.transfer)
-    transfer.delete()
-
-
-@utils.arg('transfer', metavar='<transfer>',
-           help='ID of transfer to accept.')
-@utils.arg('auth_key', metavar='<auth_key>',
-           help='Authentication key of transfer to accept.')
-@utils.service_type('volumev3')
-def do_transfer_accept(cs, args):
-    """Accepts a volume transfer."""
-    transfer = cs.transfers.accept(args.transfer, args.auth_key)
-    info = dict()
-    info.update(transfer._info)
-
-    info.pop('links', None)
-    utils.print_dict(info)
-
-
-@utils.arg('--all-tenants',
-           dest='all_tenants',
-           metavar='<0|1>',
-           nargs='?',
-           type=int,
-           const=1,
-           default=0,
-           help='Shows details for all tenants. Admin only.')
-@utils.arg('--all_tenants',
-           nargs='?',
-           type=int,
-           const=1,
-           help=argparse.SUPPRESS)
-@utils.service_type('volumev3')
-def do_transfer_list(cs, args):
-    """Lists all transfers."""
-    all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
-    search_opts = {
-        'all_tenants': all_tenants,
-    }
-    transfers = cs.transfers.list(search_opts=search_opts)
-    columns = ['ID', 'Volume ID', 'Name']
-    utils.print_list(transfers, columns)
-
-
-@utils.arg('transfer', metavar='<transfer>',
-           help='Name or ID of transfer to accept.')
-@utils.service_type('volumev3')
-def do_transfer_show(cs, args):
-    """Shows transfer details."""
-    transfer = _find_transfer(cs, args.transfer)
-    info = dict()
-    info.update(transfer._info)
-
-    info.pop('links', None)
-    utils.print_dict(info)
-
-
-@utils.arg('volume', metavar='<volume>',
-           help='Name or ID of volume to extend.')
-@utils.arg('new_size',
-           metavar='<new_size>',
-           type=int,
-           help='New size of volume, in GiBs.')
-@utils.service_type('volumev3')
-def do_extend(cs, args):
-    """Attempts to extend size of an existing volume."""
-    volume = utils.find_volume(cs, args.volume)
-    cs.volumes.extend(volume, args.new_size)
-
-
-@utils.arg('--host', metavar='<hostname>', default=None,
-           help='Host name. Default=None.')
-@utils.arg('--binary', metavar='<binary>', default=None,
-           help='Service binary. Default=None.')
-@utils.arg('--withreplication',
-           metavar='<True|False>',
-           const=True,
-           nargs='?',
-           default=False,
-           help='Enables or disables display of '
-                'Replication info for c-vol services. Default=False.')
-@utils.service_type('volumev3')
-def do_service_list(cs, args):
-    """Lists all services. Filter by host and service binary."""
-    replication = strutils.bool_from_string(args.withreplication,
-                                            strict=True)
-    result = cs.services.list(host=args.host, binary=args.binary)
-    columns = ["Binary", "Host", "Zone", "Status", "State", "Updated_at"]
-    if cs.api_version.matches('3.7'):
-        columns.append('Cluster')
-    if replication:
-        columns.extend(["Replication Status", "Active Backend ID", "Frozen"])
-    # NOTE(jay-lau-513): we check if the response has disabled_reason
-    # so as not to add the column when the extended ext is not enabled.
-    if result and hasattr(result[0], 'disabled_reason'):
-        columns.append("Disabled Reason")
-    utils.print_list(result, columns)
-
-
-@utils.arg('host', metavar='<hostname>', help='Host name.')
-@utils.arg('binary', metavar='<binary>', help='Service binary.')
-@utils.service_type('volumev3')
-def do_service_enable(cs, args):
-    """Enables the service."""
-    result = cs.services.enable(args.host, args.binary)
-    columns = ["Host", "Binary", "Status"]
-    utils.print_list([result], columns)
-
-
-@utils.arg('host', metavar='<hostname>', help='Host name.')
-@utils.arg('binary', metavar='<binary>', help='Service binary.')
-@utils.arg('--reason', metavar='<reason>',
-           help='Reason for disabling service.')
-@utils.service_type('volumev3')
-def do_service_disable(cs, args):
-    """Disables the service."""
-    columns = ["Host", "Binary", "Status"]
-    if args.reason:
-        columns.append('Disabled Reason')
-        result = cs.services.disable_log_reason(args.host, args.binary,
-                                                args.reason)
-    else:
-        result = cs.services.disable(args.host, args.binary)
-    utils.print_list([result], columns)
-
-
-@utils.service_type('volumev3')
-def _treeizeAvailabilityZone(zone):
-    """Builds a tree view for availability zones."""
-    AvailabilityZone = availability_zones.AvailabilityZone
-
-    az = AvailabilityZone(zone.manager,
-                          copy.deepcopy(zone._info), zone._loaded)
-    result = []
-
-    # Zone tree view item
-    az.zoneName = zone.zoneName
-    az.zoneState = ('available'
-                    if zone.zoneState['available'] else 'not available')
-    az._info['zoneName'] = az.zoneName
-    az._info['zoneState'] = az.zoneState
-    result.append(az)
-
-    if getattr(zone, "hosts", None) and zone.hosts is not None:
-        for (host, services) in zone.hosts.items():
-            # Host tree view item
-            az = AvailabilityZone(zone.manager,
-                                  copy.deepcopy(zone._info), zone._loaded)
-            az.zoneName = '|- %s' % host
-            az.zoneState = ''
-            az._info['zoneName'] = az.zoneName
-            az._info['zoneState'] = az.zoneState
-            result.append(az)
-
-            for (svc, state) in services.items():
-                # Service tree view item
-                az = AvailabilityZone(zone.manager,
-                                      copy.deepcopy(zone._info), zone._loaded)
-                az.zoneName = '| |- %s' % svc
-                az.zoneState = '%s %s %s' % (
-                               'enabled' if state['active'] else 'disabled',
-                               ':-)' if state['available'] else 'XXX',
-                               state['updated_at'])
-                az._info['zoneName'] = az.zoneName
-                az._info['zoneState'] = az.zoneState
-                result.append(az)
-    return result
-
-
-@utils.service_type('volumev3')
-def do_availability_zone_list(cs, _args):
-    """Lists all availability zones."""
-    try:
-        availability_zones = cs.availability_zones.list()
-    except exceptions.Forbidden:  # policy doesn't allow probably
-        try:
-            availability_zones = cs.availability_zones.list(detailed=False)
-        except Exception:
-            raise
-
-    result = []
-    for zone in availability_zones:
-        result += _treeizeAvailabilityZone(zone)
-    _translate_availability_zone_keys(result)
-    utils.print_list(result, ['Name', 'Status'])
-
-
-def _print_volume_encryption_type_list(encryption_types):
-    """
-    Lists volume encryption types.
-
-    :param encryption_types: a list of :class: VolumeEncryptionType instances
-    """
-    utils.print_list(encryption_types, ['Volume Type ID', 'Provider',
-                                        'Cipher', 'Key Size',
-                                        'Control Location'])
-
-
-@utils.service_type('volumev3')
-def do_encryption_type_list(cs, args):
-    """Shows encryption type details for volume types. Admin only."""
-    result = cs.volume_encryption_types.list()
-    utils.print_list(result, ['Volume Type ID', 'Provider', 'Cipher',
-                              'Key Size', 'Control Location'])
-
-
-@utils.arg('volume_type',
-           metavar='<volume_type>',
-           type=str,
-           help='Name or ID of volume type.')
-@utils.service_type('volumev3')
-def do_encryption_type_show(cs, args):
-    """Shows encryption type details for a volume type. Admin only."""
-    volume_type = _find_volume_type(cs, args.volume_type)
-
-    result = cs.volume_encryption_types.get(volume_type)
-
-    # Display result or an empty table if no result
-    if hasattr(result, 'volume_type_id'):
-        _print_volume_encryption_type_list([result])
-    else:
-        _print_volume_encryption_type_list([])
-
-
-@utils.arg('volume_type',
-           metavar='<volume_type>',
-           type=str,
-           help='Name or ID of volume type.')
-@utils.arg('provider',
-           metavar='<provider>',
-           type=str,
-           help='The class that provides encryption support. '
-                'For example, LuksEncryptor.')
-@utils.arg('--cipher',
-           metavar='<cipher>',
-           type=str,
-           required=False,
-           default=None,
-           help='The encryption algorithm or mode. '
-                'For example, aes-xts-plain64. Default=None.')
-@utils.arg('--key_size',
-           metavar='<key_size>',
-           type=int,
-           required=False,
-           default=None,
-           help='Size of encryption key, in bits. '
-                'For example, 128 or 256. Default=None.')
-@utils.arg('--control_location',
-           metavar='<control_location>',
-           choices=['front-end', 'back-end'],
-           type=str,
-           required=False,
-           default='front-end',
-           help='Notional service where encryption is performed. '
-                'Valid values are "front-end" or "back-end." '
-                'For example, front-end=Nova. Default is "front-end."')
-@utils.service_type('volumev3')
-def do_encryption_type_create(cs, args):
-    """Creates encryption type for a volume type. Admin only."""
-    volume_type = _find_volume_type(cs, args.volume_type)
-
-    body = {
-        'provider': args.provider,
-        'cipher': args.cipher,
-        'key_size': args.key_size,
-        'control_location': args.control_location
-    }
-
-    result = cs.volume_encryption_types.create(volume_type, body)
-    _print_volume_encryption_type_list([result])
-
-
-@utils.arg('volume_type',
-           metavar='<volume-type>',
-           type=str,
-           help="Name or ID of the volume type")
-@utils.arg('--provider',
-           metavar='<provider>',
-           type=str,
-           required=False,
-           default=argparse.SUPPRESS,
-           help="Class providing encryption support (e.g. LuksEncryptor) "
-           "(Optional)")
-@utils.arg('--cipher',
-           metavar='<cipher>',
-           type=str,
-           nargs='?',
-           required=False,
-           default=argparse.SUPPRESS,
-           const=None,
-           help="Encryption algorithm/mode to use (e.g., aes-xts-plain64). "
-           "Provide parameter without value to set to provider default. "
-           "(Optional)")
-@utils.arg('--key-size',
-           dest='key_size',
-           metavar='<key-size>',
-           type=int,
-           nargs='?',
-           required=False,
-           default=argparse.SUPPRESS,
-           const=None,
-           help="Size of the encryption key, in bits (e.g., 128, 256). "
-           "Provide parameter without value to set to provider default. "
-           "(Optional)")
-@utils.arg('--control-location',
-           dest='control_location',
-           metavar='<control-location>',
-           choices=['front-end', 'back-end'],
-           type=str,
-           required=False,
-           default=argparse.SUPPRESS,
-           help="Notional service where encryption is performed (e.g., "
-           "front-end=Nova). Values: 'front-end', 'back-end' (Optional)")
-@utils.service_type('volumev3')
-def do_encryption_type_update(cs, args):
-    """Update encryption type information for a volume type (Admin Only)."""
-    volume_type = _find_volume_type(cs, args.volume_type)
-
-    # An argument should only be pulled if the user specified the parameter.
-    body = {}
-    for attr in ['provider', 'cipher', 'key_size', 'control_location']:
-        if hasattr(args, attr):
-            body[attr] = getattr(args, attr)
-
-    cs.volume_encryption_types.update(volume_type, body)
-    result = cs.volume_encryption_types.get(volume_type)
-    _print_volume_encryption_type_list([result])
-
-
-@utils.arg('volume_type',
-           metavar='<volume_type>',
-           type=str,
-           help='Name or ID of volume type.')
-@utils.service_type('volumev3')
-def do_encryption_type_delete(cs, args):
-    """Deletes encryption type for a volume type. Admin only."""
-    volume_type = _find_volume_type(cs, args.volume_type)
-    cs.volume_encryption_types.delete(volume_type)
-
-
-def _print_qos_specs(qos_specs):
-
-    # formatters defines field to be converted from unicode to string
-    utils.print_dict(qos_specs._info, formatters=['specs'])
-
-
-def _print_qos_specs_list(q_specs):
-    utils.print_list(q_specs, ['ID', 'Name', 'Consumer', 'specs'])
-
-
-def _print_qos_specs_and_associations_list(q_specs):
-    utils.print_list(q_specs, ['ID', 'Name', 'Consumer', 'specs'])
-
-
-def _print_associations_list(associations):
-    utils.print_list(associations, ['Association_Type', 'Name', 'ID'])
-
-
-@utils.arg('name',
-           metavar='<name>',
-           help='Name of new QoS specifications.')
-@utils.arg('metadata',
-           metavar='<key=value>',
-           nargs='+',
-           default=[],
-           help='QoS specifications.')
-@utils.service_type('volumev3')
-def do_qos_create(cs, args):
-    """Creates a qos specs."""
-    keypair = None
-    if args.metadata is not None:
-        keypair = _extract_metadata(args)
-    qos_specs = cs.qos_specs.create(args.name, keypair)
-    _print_qos_specs(qos_specs)
-
-
-@utils.service_type('volumev3')
-def do_qos_list(cs, args):
-    """Lists qos specs."""
-    qos_specs = cs.qos_specs.list()
-    _print_qos_specs_list(qos_specs)
-
-
-@utils.arg('qos_specs', metavar='<qos_specs>',
-           help='ID of QoS specifications to show.')
-@utils.service_type('volumev3')
-def do_qos_show(cs, args):
-    """Shows qos specs details."""
-    qos_specs = _find_qos_specs(cs, args.qos_specs)
-    _print_qos_specs(qos_specs)
-
-
-@utils.arg('qos_specs', metavar='<qos_specs>',
-           help='ID of QoS specifications to delete.')
-@utils.arg('--force',
-           metavar='<True|False>',
-           const=True,
-           nargs='?',
-           default=False,
-           help='Enables or disables deletion of in-use '
-                'QoS specifications. Default=False.')
-@utils.service_type('volumev3')
-def do_qos_delete(cs, args):
-    """Deletes a specified qos specs."""
-    force = strutils.bool_from_string(args.force,
-                                      strict=True)
-    qos_specs = _find_qos_specs(cs, args.qos_specs)
-    cs.qos_specs.delete(qos_specs, force)
-
-
-@utils.arg('qos_specs', metavar='<qos_specs>',
-           help='ID of QoS specifications.')
-@utils.arg('vol_type_id', metavar='<volume_type_id>',
-           help='ID of volume type with which to associate '
-                'QoS specifications.')
-@utils.service_type('volumev3')
-def do_qos_associate(cs, args):
-    """Associates qos specs with specified volume type."""
-    cs.qos_specs.associate(args.qos_specs, args.vol_type_id)
-
-
-@utils.arg('qos_specs', metavar='<qos_specs>',
-           help='ID of QoS specifications.')
-@utils.arg('vol_type_id', metavar='<volume_type_id>',
-           help='ID of volume type with which to associate '
-                'QoS specifications.')
-@utils.service_type('volumev3')
-def do_qos_disassociate(cs, args):
-    """Disassociates qos specs from specified volume type."""
-    cs.qos_specs.disassociate(args.qos_specs, args.vol_type_id)
-
-
-@utils.arg('qos_specs', metavar='<qos_specs>',
-           help='ID of QoS specifications on which to operate.')
-@utils.service_type('volumev3')
-def do_qos_disassociate_all(cs, args):
-    """Disassociates qos specs from all its associations."""
-    cs.qos_specs.disassociate_all(args.qos_specs)
-
-
-@utils.arg('qos_specs', metavar='<qos_specs>',
-           help='ID of QoS specifications.')
-@utils.arg('action',
-           metavar='<action>',
-           choices=['set', 'unset'],
-           help='The action. Valid values are "set" or "unset."')
-@utils.arg('metadata', metavar='key=value',
-           nargs='+',
-           default=[],
-           help='Metadata key and value pair to set or unset. '
-                'For unset, specify only the key.')
-@utils.service_type('volumev3')
-def do_qos_key(cs, args):
-    """Sets or unsets specifications for a qos spec."""
-    keypair = _extract_metadata(args)
-
-    if args.action == 'set':
-        cs.qos_specs.set_keys(args.qos_specs, keypair)
-    elif args.action == 'unset':
-        cs.qos_specs.unset_keys(args.qos_specs, list(keypair))
-
-
-@utils.arg('qos_specs', metavar='<qos_specs>',
-           help='ID of QoS specifications.')
-@utils.service_type('volumev3')
-def do_qos_get_association(cs, args):
-    """Lists all associations for specified qos specs."""
-    associations = cs.qos_specs.get_associations(args.qos_specs)
-    _print_associations_list(associations)
-
-
-@utils.arg('snapshot',
-           metavar='<snapshot>',
-           help='ID of snapshot for which to update metadata.')
-@utils.arg('action',
-           metavar='<action>',
-           choices=['set', 'unset'],
-           help='The action. Valid values are "set" or "unset."')
-@utils.arg('metadata',
-           metavar='<key=value>',
-           nargs='+',
-           default=[],
-           help='Metadata key and value pair to set or unset. '
-                'For unset, specify only the key.')
-@utils.service_type('volumev3')
-def do_snapshot_metadata(cs, args):
-    """Sets or deletes snapshot metadata."""
-    snapshot = _find_volume_snapshot(cs, args.snapshot)
-    metadata = _extract_metadata(args)
-
-    if args.action == 'set':
-        metadata = snapshot.set_metadata(metadata)
-        utils.print_dict(metadata._info)
-    elif args.action == 'unset':
-        snapshot.delete_metadata(list(metadata.keys()))
-
-
-@utils.arg('snapshot', metavar='<snapshot>',
-           help='ID of snapshot.')
-@utils.service_type('volumev3')
-def do_snapshot_metadata_show(cs, args):
-    """Shows snapshot metadata."""
-    snapshot = _find_volume_snapshot(cs, args.snapshot)
-    utils.print_dict(snapshot._info['metadata'], 'Metadata-property')
-
-
-@utils.arg('volume', metavar='<volume>',
-           help='ID of volume.')
-@utils.service_type('volumev3')
-def do_metadata_show(cs, args):
-    """Shows volume metadata."""
-    volume = utils.find_volume(cs, args.volume)
-    utils.print_dict(volume._info['metadata'], 'Metadata-property')
-
-
-@utils.arg('volume', metavar='<volume>',
-           help='ID of volume.')
-@utils.service_type('volumev3')
-def do_image_metadata_show(cs, args):
-    """Shows volume image metadata."""
-    volume = utils.find_volume(cs, args.volume)
-    resp, body = volume.show_image_metadata(volume)
-    utils.print_dict(body['metadata'], 'Metadata-property')
-
-
-@utils.arg('volume',
-           metavar='<volume>',
-           help='ID of volume for which to update metadata.')
-@utils.arg('metadata',
-           metavar='<key=value>',
-           nargs='+',
-           default=[],
-           help='Metadata key and value pair or pairs to update.')
-@utils.service_type('volumev3')
-def do_metadata_update_all(cs, args):
-    """Updates volume metadata."""
-    volume = utils.find_volume(cs, args.volume)
-    metadata = _extract_metadata(args)
-    metadata = volume.update_all_metadata(metadata)
-    utils.print_dict(metadata['metadata'], 'Metadata-property')
-
-
-@utils.arg('snapshot',
-           metavar='<snapshot>',
-           help='ID of snapshot for which to update metadata.')
-@utils.arg('metadata',
-           metavar='<key=value>',
-           nargs='+',
-           default=[],
-           help='Metadata key and value pair to update.')
-@utils.service_type('volumev3')
-def do_snapshot_metadata_update_all(cs, args):
-    """Updates snapshot metadata."""
-    snapshot = _find_volume_snapshot(cs, args.snapshot)
-    metadata = _extract_metadata(args)
-    metadata = snapshot.update_all_metadata(metadata)
-    utils.print_dict(metadata)
-
-
-@utils.arg('volume', metavar='<volume>', help='ID of volume to update.')
-@utils.arg('read_only',
-           metavar='<True|true|False|false>',
-           choices=['True', 'true', 'False', 'false'],
-           help='Enables or disables update of volume to '
-                'read-only access mode.')
-@utils.service_type('volumev3')
-def do_readonly_mode_update(cs, args):
-    """Updates volume read-only access-mode flag."""
-    volume = utils.find_volume(cs, args.volume)
-    cs.volumes.update_readonly_flag(volume,
-                                    strutils.bool_from_string(args.read_only,
-                                                              strict=True))
-
-
-@utils.arg('volume', metavar='<volume>', help='ID of the volume to update.')
-@utils.arg('bootable',
-           metavar='<True|true|False|false>',
-           choices=['True', 'true', 'False', 'false'],
-           help='Flag to indicate whether volume is bootable.')
-@utils.service_type('volumev3')
-def do_set_bootable(cs, args):
-    """Update bootable status of a volume."""
-    volume = utils.find_volume(cs, args.volume)
-    cs.volumes.set_bootable(volume,
-                            strutils.bool_from_string(args.bootable,
-                                                      strict=True))
-
-
-@utils.arg('host',
-           metavar='<host>',
-           help='Cinder host on which the existing volume resides; '
-                'takes the form: host@backend-name#pool')
-@utils.arg('identifier',
-           metavar='<identifier>',
-           help='Name or other Identifier for existing volume')
-@utils.arg('--id-type',
-           metavar='<id-type>',
-           default='source-name',
-           help='Type of backend device identifier provided, '
-                'typically source-name or source-id (Default=source-name)')
-@utils.arg('--name',
-           metavar='<name>',
-           help='Volume name (Default=None)')
-@utils.arg('--description',
-           metavar='<description>',
-           help='Volume description (Default=None)')
-@utils.arg('--volume-type',
-           metavar='<volume-type>',
-           help='Volume type (Default=None)')
-@utils.arg('--availability-zone',
-           metavar='<availability-zone>',
-           help='Availability zone for volume (Default=None)')
-@utils.arg('--metadata',
-           type=str,
-           nargs='*',
-           metavar='<key=value>',
-           help='Metadata key=value pairs (Default=None)')
-@utils.arg('--bootable',
-           action='store_true',
-           help='Specifies that the newly created volume should be'
-                ' marked as bootable')
-@utils.service_type('volumev3')
-def do_manage(cs, args):
-    """Manage an existing volume."""
-    volume_metadata = None
-    if args.metadata is not None:
-        volume_metadata = _extract_metadata(args)
-
-    # Build a dictionary of key/value pairs to pass to the API.
-    ref_dict = {args.id_type: args.identifier}
-
-    # The recommended way to specify an existing volume is by ID or name, and
-    # have the Cinder driver look for 'source-name' or 'source-id' elements in
-    # the ref structure.  To make things easier for the user, we have special
-    # --source-name and --source-id CLI options that add the appropriate
-    # element to the ref structure.
-    #
-    # Note how argparse converts hyphens to underscores.  We use hyphens in the
-    # dictionary so that it is consistent with what the user specified on the
-    # CLI.
-
-    if hasattr(args, 'source_name') and args.source_name is not None:
-        ref_dict['source-name'] = args.source_name
-    if hasattr(args, 'source_id') and args.source_id is not None:
-        ref_dict['source-id'] = args.source_id
-
-    volume = cs.volumes.manage(host=args.host,
-                               ref=ref_dict,
-                               name=args.name,
-                               description=args.description,
-                               volume_type=args.volume_type,
-                               availability_zone=args.availability_zone,
-                               metadata=volume_metadata,
-                               bootable=args.bootable)
-
-    info = {}
-    volume = cs.volumes.get(volume.id)
-    info.update(volume._info)
-    info.pop('links', None)
-    utils.print_dict(info)
-
-
 @utils.service_type('volumev3')
 @api_versions.wraps('3.8')
 @utils.arg('host',
@@ -2662,53 +754,6 @@ def do_manageable_list(cs, args):
     utils.print_list(volumes, columns, sortby_index=None)
 
 
-@utils.arg('volume', metavar='<volume>',
-           help='Name or ID of the volume to unmanage.')
-@utils.service_type('volumev3')
-def do_unmanage(cs, args):
-    """Stop managing a volume."""
-    volume = utils.find_volume(cs, args.volume)
-    cs.volumes.unmanage(volume.id)
-
-
-@utils.arg('volume', metavar='<volume>',
-           help='Name or ID of the volume to promote. '
-                'The volume should have the replica volume created with '
-                'source-replica argument.')
-@utils.service_type('volumev3')
-def do_replication_promote(cs, args):
-    """Promote a secondary volume to primary for a relationship."""
-    volume = utils.find_volume(cs, args.volume)
-    cs.volumes.promote(volume.id)
-
-
-@utils.arg('volume', metavar='<volume>',
-           help='Name or ID of the volume to reenable replication. '
-                'The replication-status of the volume should be inactive.')
-@utils.service_type('volumev3')
-def do_replication_reenable(cs, args):
-    """Sync the secondary volume with primary for a relationship."""
-    volume = utils.find_volume(cs, args.volume)
-    cs.volumes.reenable(volume.id)
-
-
-@utils.arg('--all-tenants',
-           dest='all_tenants',
-           metavar='<0|1>',
-           nargs='?',
-           type=int,
-           const=1,
-           default=0,
-           help='Shows details for all tenants. Admin only.')
-@utils.service_type('volumev3')
-def do_consisgroup_list(cs, args):
-    """Lists all consistencygroups."""
-    consistencygroups = cs.consistencygroups.list()
-
-    columns = ['ID', 'Status', 'Name']
-    utils.print_list(consistencygroups, columns)
-
-
 @utils.service_type('volumev3')
 @api_versions.wraps('3.13')
 @utils.arg('--all-tenants',
@@ -2725,66 +770,6 @@ def do_group_list(cs, args):
 
     columns = ['ID', 'Status', 'Name']
     utils.print_list(groups, columns)
-
-
-@utils.service_type('volumev3')
-@utils.arg('consistencygroup',
-           metavar='<consistencygroup>',
-           help='Name or ID of a consistency group.')
-def do_consisgroup_show(cs, args):
-    """Shows details of a consistency group."""
-    info = dict()
-    consistencygroup = _find_consistencygroup(cs, args.consistencygroup)
-    info.update(consistencygroup._info)
-
-    info.pop('links', None)
-    utils.print_dict(info)
-
-
-@utils.arg('group',
-           metavar='<group>',
-           help='Name or ID of a group.')
-@utils.service_type('volumev3')
-def do_group_show(cs, args):
-    """Shows details of a group."""
-    info = dict()
-    group = _find_group(cs, args.group)
-    info.update(group._info)
-
-    info.pop('links', None)
-    utils.print_dict(info)
-
-
-@utils.arg('volumetypes',
-           metavar='<volume-types>',
-           help='Volume types.')
-@utils.arg('--name',
-           metavar='<name>',
-           help='Name of a consistency group.')
-@utils.arg('--description',
-           metavar='<description>',
-           default=None,
-           help='Description of a consistency group. Default=None.')
-@utils.arg('--availability-zone',
-           metavar='<availability-zone>',
-           default=None,
-           help='Availability zone for volume. Default=None.')
-@utils.service_type('volumev3')
-def do_consisgroup_create(cs, args):
-    """Creates a consistency group."""
-
-    consistencygroup = cs.consistencygroups.create(
-        args.volumetypes,
-        args.name,
-        args.description,
-        availability_zone=args.availability_zone)
-
-    info = dict()
-    consistencygroup = cs.consistencygroups.get(consistencygroup.id)
-    info.update(consistencygroup._info)
-
-    info.pop('links', None)
-    utils.print_dict(info)
 
 
 @utils.service_type('volumev3')
@@ -2824,45 +809,6 @@ def do_group_create(cs, args):
     utils.print_dict(info)
 
 
-@utils.arg('--cgsnapshot',
-           metavar='<cgsnapshot>',
-           help='Name or ID of a cgsnapshot. Default=None.')
-@utils.arg('--source-cg',
-           metavar='<source-cg>',
-           help='Name or ID of a source CG. Default=None.')
-@utils.arg('--name',
-           metavar='<name>',
-           help='Name of a consistency group. Default=None.')
-@utils.arg('--description',
-           metavar='<description>',
-           help='Description of a consistency group. Default=None.')
-@utils.service_type('volumev3')
-def do_consisgroup_create_from_src(cs, args):
-    """Creates a consistency group from a cgsnapshot or a source CG."""
-    if not args.cgsnapshot and not args.source_cg:
-        msg = ('Cannot create consistency group because neither '
-               'cgsnapshot nor source CG is provided.')
-        raise exceptions.ClientException(code=1, message=msg)
-    if args.cgsnapshot and args.source_cg:
-        msg = ('Cannot create consistency group because both '
-               'cgsnapshot and source CG are provided.')
-        raise exceptions.ClientException(code=1, message=msg)
-    cgsnapshot = None
-    if args.cgsnapshot:
-        cgsnapshot = _find_cgsnapshot(cs, args.cgsnapshot)
-    source_cg = None
-    if args.source_cg:
-        source_cg = _find_consistencygroup(cs, args.source_cg)
-    info = cs.consistencygroups.create_from_src(
-        cgsnapshot.id if cgsnapshot else None,
-        source_cg.id if source_cg else None,
-        args.name,
-        args.description)
-
-    info.pop('links', None)
-    utils.print_dict(info)
-
-
 @utils.service_type('volumev3')
 @api_versions.wraps('3.14')
 @utils.arg('--group-snapshot',
@@ -2889,10 +835,11 @@ def do_group_create_from_src(cs, args):
         raise exceptions.ClientException(code=1, message=msg)
     group_snapshot = None
     if args.group_snapshot:
-        group_snapshot = _find_group_snapshot(cs, args.group_snapshot)
+        group_snapshot = shell_utils.find_group_snapshot(cs,
+                                                         args.group_snapshot)
     source_group = None
     if args.source_group:
-        source_group = _find_group(cs, args.source_group)
+        source_group = shell_utils.find_group(cs, args.source_group)
     info = cs.groups.create_from_src(
         group_snapshot.id if group_snapshot else None,
         source_group.id if source_group else None,
@@ -2901,34 +848,6 @@ def do_group_create_from_src(cs, args):
 
     info.pop('links', None)
     utils.print_dict(info)
-
-
-@utils.arg('consistencygroup',
-           metavar='<consistencygroup>', nargs='+',
-           help='Name or ID of one or more consistency groups '
-                'to be deleted.')
-@utils.arg('--force',
-           action='store_true',
-           default=False,
-           help='Allows or disallows consistency groups '
-                'to be deleted. If the consistency group is empty, '
-                'it can be deleted without the force flag. '
-                'If the consistency group is not empty, the force '
-                'flag is required for it to be deleted.')
-@utils.service_type('volumev3')
-def do_consisgroup_delete(cs, args):
-    """Removes one or more consistency groups."""
-    failure_count = 0
-    for consistencygroup in args.consistencygroup:
-        try:
-            _find_consistencygroup(cs, consistencygroup).delete(args.force)
-        except Exception as e:
-            failure_count += 1
-            print("Delete for consistency group %s failed: %s" %
-                  (consistencygroup, e))
-    if failure_count == len(args.consistencygroup):
-        raise exceptions.CommandError("Unable to delete any of the specified "
-                                      "consistency groups.")
 
 
 @utils.service_type('volumev3')
@@ -2951,7 +870,7 @@ def do_group_delete(cs, args):
     failure_count = 0
     for group in args.group:
         try:
-            _find_group(cs, group).delete(args.delete_volumes)
+            shell_utils.find_group(cs, group).delete(args.delete_volumes)
         except Exception as e:
             failure_count += 1
             print("Delete for group %s failed: %s" %
@@ -2959,48 +878,6 @@ def do_group_delete(cs, args):
     if failure_count == len(args.group):
         raise exceptions.CommandError("Unable to delete any of the specified "
                                       "groups.")
-
-
-@utils.arg('consistencygroup',
-           metavar='<consistencygroup>',
-           help='Name or ID of a consistency group.')
-@utils.arg('--name', metavar='<name>',
-           help='New name for consistency group. Default=None.')
-@utils.arg('--description', metavar='<description>',
-           help='New description for consistency group. Default=None.')
-@utils.arg('--add-volumes',
-           metavar='<uuid1,uuid2,......>',
-           help='UUID of one or more volumes '
-                'to be added to the consistency group, '
-                'separated by commas. Default=None.')
-@utils.arg('--remove-volumes',
-           metavar='<uuid3,uuid4,......>',
-           help='UUID of one or more volumes '
-                'to be removed from the consistency group, '
-                'separated by commas. Default=None.')
-@utils.service_type('volumev3')
-def do_consisgroup_update(cs, args):
-    """Updates a consistencygroup."""
-    kwargs = {}
-
-    if args.name is not None:
-        kwargs['name'] = args.name
-
-    if args.description is not None:
-        kwargs['description'] = args.description
-
-    if args.add_volumes is not None:
-        kwargs['add_volumes'] = args.add_volumes
-
-    if args.remove_volumes is not None:
-        kwargs['remove_volumes'] = args.remove_volumes
-
-    if not kwargs:
-        msg = ('At least one of the following args must be supplied: '
-               'name, description, add-volumes, remove-volumes.')
-        raise exceptions.ClientException(code=1, message=msg)
-
-    _find_consistencygroup(cs, args.consistencygroup).update(**kwargs)
 
 
 @utils.service_type('volumev3')
@@ -3043,41 +920,7 @@ def do_group_update(cs, args):
                'name, description, add-volumes, remove-volumes.')
         raise exceptions.ClientException(code=1, message=msg)
 
-    _find_group(cs, args.group).update(**kwargs)
-
-
-@utils.arg('--all-tenants',
-           dest='all_tenants',
-           metavar='<0|1>',
-           nargs='?',
-           type=int,
-           const=1,
-           default=0,
-           help='Shows details for all tenants. Admin only.')
-@utils.arg('--status',
-           metavar='<status>',
-           default=None,
-           help='Filters results by a status. Default=None.')
-@utils.arg('--consistencygroup-id',
-           metavar='<consistencygroup_id>',
-           default=None,
-           help='Filters results by a consistency group ID. Default=None.')
-@utils.service_type('volumev3')
-def do_cgsnapshot_list(cs, args):
-    """Lists all cgsnapshots."""
-
-    all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
-
-    search_opts = {
-        'all_tenants': all_tenants,
-        'status': args.status,
-        'consistencygroup_id': args.consistencygroup_id,
-    }
-
-    cgsnapshots = cs.cgsnapshots.list(search_opts=search_opts)
-
-    columns = ['ID', 'Status', 'Name']
-    utils.print_list(cgsnapshots, columns)
+    shell_utils.find_group(cs, args.group).update(**kwargs)
 
 
 @utils.service_type('volumev3')
@@ -3115,20 +958,6 @@ def do_group_snapshot_list(cs, args):
     utils.print_list(group_snapshots, columns)
 
 
-@utils.arg('cgsnapshot',
-           metavar='<cgsnapshot>',
-           help='Name or ID of cgsnapshot.')
-@utils.service_type('volumev3')
-def do_cgsnapshot_show(cs, args):
-    """Shows cgsnapshot details."""
-    info = dict()
-    cgsnapshot = _find_cgsnapshot(cs, args.cgsnapshot)
-    info.update(cgsnapshot._info)
-
-    info.pop('links', None)
-    utils.print_dict(info)
-
-
 @utils.service_type('volumev3')
 @api_versions.wraps('3.14')
 @utils.arg('group_snapshot',
@@ -3137,36 +966,8 @@ def do_cgsnapshot_show(cs, args):
 def do_group_snapshot_show(cs, args):
     """Shows group snapshot details."""
     info = dict()
-    group_snapshot = _find_group_snapshot(cs, args.group_snapshot)
+    group_snapshot = shell_utils.find_group_snapshot(cs, args.group_snapshot)
     info.update(group_snapshot._info)
-
-    info.pop('links', None)
-    utils.print_dict(info)
-
-
-@utils.arg('consistencygroup',
-           metavar='<consistencygroup>',
-           help='Name or ID of a consistency group.')
-@utils.arg('--name',
-           metavar='<name>',
-           default=None,
-           help='Cgsnapshot name. Default=None.')
-@utils.arg('--description',
-           metavar='<description>',
-           default=None,
-           help='Cgsnapshot description. Default=None.')
-@utils.service_type('volumev3')
-def do_cgsnapshot_create(cs, args):
-    """Creates a cgsnapshot."""
-    consistencygroup = _find_consistencygroup(cs, args.consistencygroup)
-    cgsnapshot = cs.cgsnapshots.create(
-        consistencygroup.id,
-        args.name,
-        args.description)
-
-    info = dict()
-    cgsnapshot = cs.cgsnapshots.get(cgsnapshot.id)
-    info.update(cgsnapshot._info)
 
     info.pop('links', None)
     utils.print_dict(info)
@@ -3187,7 +988,7 @@ def do_cgsnapshot_create(cs, args):
            help='Group snapshot description. Default=None.')
 def do_group_snapshot_create(cs, args):
     """Creates a group snapshot."""
-    group = _find_group(cs, args.group)
+    group = shell_utils.find_group(cs, args.group)
     group_snapshot = cs.group_snapshots.create(
         group.id,
         args.name,
@@ -3201,24 +1002,6 @@ def do_group_snapshot_create(cs, args):
     utils.print_dict(info)
 
 
-@utils.arg('cgsnapshot',
-           metavar='<cgsnapshot>', nargs='+',
-           help='Name or ID of one or more cgsnapshots to be deleted.')
-@utils.service_type('volumev3')
-def do_cgsnapshot_delete(cs, args):
-    """Removes one or more cgsnapshots."""
-    failure_count = 0
-    for cgsnapshot in args.cgsnapshot:
-        try:
-            _find_cgsnapshot(cs, cgsnapshot).delete()
-        except Exception as e:
-            failure_count += 1
-            print("Delete for cgsnapshot %s failed: %s" % (cgsnapshot, e))
-    if failure_count == len(args.cgsnapshot):
-        raise exceptions.CommandError("Unable to delete any of the specified "
-                                      "cgsnapshots.")
-
-
 @utils.service_type('volumev3')
 @api_versions.wraps('3.14')
 @utils.arg('group_snapshot',
@@ -3229,7 +1012,7 @@ def do_group_snapshot_delete(cs, args):
     failure_count = 0
     for group_snapshot in args.group_snapshot:
         try:
-            _find_group_snapshot(cs, group_snapshot).delete()
+            shell_utils.find_group_snapshot(cs, group_snapshot).delete()
         except Exception as e:
             failure_count += 1
             print("Delete for group snapshot %s failed: %s" %
@@ -3239,90 +1022,34 @@ def do_group_snapshot_delete(cs, args):
                                       "group snapshots.")
 
 
-@utils.arg('--detail',
-           action='store_true',
-           help='Show detailed information about pools.')
+@api_versions.wraps('3.7')
+@utils.arg('--host', metavar='<hostname>', default=None,
+           help='Host name. Default=None.')
+@utils.arg('--binary', metavar='<binary>', default=None,
+           help='Service binary. Default=None.')
+@utils.arg('--withreplication',
+           metavar='<True|False>',
+           const=True,
+           nargs='?',
+           default=False,
+           help='Enables or disables display of '
+                'Replication info for c-vol services. Default=False.')
 @utils.service_type('volumev3')
-def do_get_pools(cs, args):
-    """Show pool information for backends. Admin only."""
-    pools = cs.volumes.get_pools(args.detail)
-    infos = dict()
-    infos.update(pools._info)
-
-    for info in infos['pools']:
-        backend = dict()
-        backend['name'] = info['name']
-        if args.detail:
-            backend.update(info['capabilities'])
-        utils.print_dict(backend)
-
-
-@utils.arg('host',
-           metavar='<host>',
-           help='Cinder host to show backend volume stats and properties; '
-                'takes the form: host@backend-name')
-@utils.service_type('volumev3')
-def do_get_capabilities(cs, args):
-    """Show backend volume stats and properties. Admin only."""
-
-    capabilities = cs.capabilities.get(args.host)
-    infos = dict()
-    infos.update(capabilities._info)
-
-    prop = infos.pop('properties', None)
-    utils.print_dict(infos, "Volume stats")
-    utils.print_dict(prop, "Backend properties")
-
-
-@utils.arg('volume',
-           metavar='<volume>',
-           help='Cinder volume already exists in volume backend')
-@utils.arg('identifier',
-           metavar='<identifier>',
-           help='Name or other Identifier for existing snapshot')
-@utils.arg('--id-type',
-           metavar='<id-type>',
-           default='source-name',
-           help='Type of backend device identifier provided, '
-                'typically source-name or source-id (Default=source-name)')
-@utils.arg('--name',
-           metavar='<name>',
-           help='Snapshot name (Default=None)')
-@utils.arg('--description',
-           metavar='<description>',
-           help='Snapshot description (Default=None)')
-@utils.arg('--metadata',
-           type=str,
-           nargs='*',
-           metavar='<key=value>',
-           help='Metadata key=value pairs (Default=None)')
-@utils.service_type('volumev3')
-def do_snapshot_manage(cs, args):
-    """Manage an existing snapshot."""
-    snapshot_metadata = None
-    if args.metadata is not None:
-        snapshot_metadata = _extract_metadata(args)
-
-    # Build a dictionary of key/value pairs to pass to the API.
-    ref_dict = {args.id_type: args.identifier}
-
-    if hasattr(args, 'source_name') and args.source_name is not None:
-        ref_dict['source-name'] = args.source_name
-    if hasattr(args, 'source_id') and args.source_id is not None:
-        ref_dict['source-id'] = args.source_id
-
-    volume = utils.find_volume(cs, args.volume)
-    snapshot = cs.volume_snapshots.manage(volume_id=volume.id,
-                                          ref=ref_dict,
-                                          name=args.name,
-                                          description=args.description,
-                                          metadata=snapshot_metadata)
-
-    info = {}
-    snapshot = cs.volume_snapshots.get(snapshot.id)
-    info.update(snapshot._info)
-    info.pop('links', None)
-    utils.print_dict(info)
+def do_service_list(cs, args):
+    """Lists all services. Filter by host and service binary."""
+    replication = strutils.bool_from_string(args.withreplication,
+                                            strict=True)
+    result = cs.services.list(host=args.host, binary=args.binary)
+    columns = ["Binary", "Host", "Zone", "Status", "State", "Updated_at"]
+    if cs.api_version.matches('3.7'):
+        columns.append('Cluster')
+    if replication:
+        columns.extend(["Replication Status", "Active Backend ID", "Frozen"])
+    # NOTE(jay-lau-513): we check if the response has disabled_reason
+    # so as not to add the column when the extended ext is not enabled.
+    if result and hasattr(result[0], 'disabled_reason'):
+        columns.append("Disabled Reason")
+    utils.print_list(result, columns)
 
 
 @utils.service_type('volumev3')
@@ -3369,39 +1096,6 @@ def do_snapshot_manageable_list(cs, args):
     if detailed:
         columns.extend(['reason_not_safe', 'cinder_id', 'extra_info'])
     utils.print_list(snapshots, columns, sortby_index=None)
-
-
-@utils.arg('snapshot', metavar='<snapshot>',
-           help='Name or ID of the snapshot to unmanage.')
-@utils.service_type('volumev3')
-def do_snapshot_unmanage(cs, args):
-    """Stop managing a snapshot."""
-    snapshot = _find_volume_snapshot(cs, args.snapshot)
-    cs.volume_snapshots.unmanage(snapshot.id)
-
-
-@utils.arg('host', metavar='<hostname>', help='Host name.')
-@utils.service_type('volumev3')
-def do_freeze_host(cs, args):
-    """Freeze and disable the specified cinder-volume host."""
-    cs.services.freeze_host(args.host)
-
-
-@utils.arg('host', metavar='<hostname>', help='Host name.')
-@utils.service_type('volumev3')
-def do_thaw_host(cs, args):
-    """Thaw and enable the specified cinder-volume host."""
-    cs.services.thaw_host(args.host)
-
-
-@utils.service_type('volumev3')
-@utils.arg('host', metavar='<hostname>', help='Host name.')
-@utils.arg('--backend_id',
-           metavar='<backend-id>',
-           help='ID of backend to failover to (Default=None)')
-def do_failover_host(cs, args):
-    """Failover a replicating cinder-volume host."""
-    cs.services.failover_host(args.host, args.backend_id)
 
 
 @utils.service_type('volumev3')
@@ -3493,7 +1187,7 @@ def do_message_list(cs, args):
 def do_message_show(cs, args):
     """Shows message details."""
     info = dict()
-    message = _find_message(cs, args.message)
+    message = shell_utils.find_message(cs, args.message)
     info.update(message._info)
     info.pop('links', None)
     utils.print_dict(info)
@@ -3509,7 +1203,7 @@ def do_message_delete(cs, args):
     failure_count = 0
     for message in args.message:
         try:
-            _find_message(cs, message).delete()
+            shell_utils.find_message(cs, message).delete()
         except Exception as e:
             failure_count += 1
             print("Delete for message %s failed: %s" % (message, e))

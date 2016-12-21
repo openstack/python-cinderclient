@@ -455,14 +455,14 @@ class ShellTest(utils.TestCase):
                           'restore_vol')
 
     @ddt.data('backup_name', '1234')
-    @mock.patch('cinderclient.v3.shell._find_backup')
+    @mock.patch('cinderclient.shell_utils.find_backup')
     @mock.patch('cinderclient.utils.print_dict')
     @mock.patch('cinderclient.utils.find_volume')
     def test_do_backup_restore_with_name(self,
-                               value,
-                               mock_find_volume,
-                               mock_print_dict,
-                               mock_find_backup):
+                                         value,
+                                         mock_find_volume,
+                                         mock_print_dict,
+                                         mock_find_backup):
         backup_id = '1234'
         volume_id = '5678'
         name = None
@@ -477,11 +477,11 @@ class ShellTest(utils.TestCase):
                                'restore') as mocked_restore:
             mock_find_volume.return_value = volumes.Volume(self,
                                                            {'id': volume_id},
-                                                           loaded = True)
+                                                           loaded=True)
             mock_find_backup.return_value = volume_backups.VolumeBackup(
                 self,
                 {'id': backup_id},
-                loaded = True)
+                loaded=True)
             test_shell.do_backup_restore(self.cs, args)
             mock_find_backup.assert_called_once_with(
                 self.cs,

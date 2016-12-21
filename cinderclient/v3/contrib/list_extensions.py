@@ -13,28 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient import base
 from cinderclient import utils
-
-
-class ListExtResource(base.Resource):
-    @property
-    def summary(self):
-        descr = self.description.strip()
-        if not descr:
-            return '??'
-        lines = descr.split("\n")
-        if len(lines) == 1:
-            return lines[0]
-        else:
-            return lines[0] + "..."
-
-
-class ListExtManager(base.Manager):
-    resource_class = ListExtResource
-
-    def show_all(self):
-        return self._list("/extensions", 'extensions')
+from cinderclient.v2.contrib.list_extensions import *  # flake8: noqa
 
 
 @utils.service_type('volumev3')
@@ -42,6 +22,4 @@ def do_list_extensions(client, _args):
     """
     Lists all available os-api extensions.
     """
-    extensions = client.list_extensions.show_all()
-    fields = ["Name", "Summary", "Alias", "Updated"]
-    utils.print_list(extensions, fields)
+    return list_extensions(client, _args)
