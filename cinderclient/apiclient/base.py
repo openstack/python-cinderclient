@@ -491,14 +491,13 @@ class Resource(RequestIdMixin):
     def _add_details(self, info):
         for (k, v) in info.items():
             try:
-                try:
-                    setattr(self, k, v)
-                except UnicodeEncodeError:
-                    pass
-                self._info[k] = v
+                setattr(self, k, v)
             except AttributeError:
                 # In this case we already defined the attribute on the class
+                continue
+            except UnicodeEncodeError:
                 pass
+            self._info[k] = v
 
     def __getattr__(self, k):
         if k not in self.__dict__ or k not in self._info:
