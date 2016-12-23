@@ -13,13 +13,4 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient import utils
 from cinderclient.v2.contrib.list_extensions import *  # flake8: noqa
-
-
-@utils.service_type('volumev3')
-def do_list_extensions(client, _args):
-    """
-    Lists all available os-api extensions.
-    """
-    return list_extensions(client, _args)

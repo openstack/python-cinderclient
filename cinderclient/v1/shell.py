@@ -176,7 +176,6 @@ def _extract_metadata(args):
     metavar='<limit>',
     default=None,
     help='Maximum number of volumes to return. OPTIONAL: Default=None.')
-@utils.service_type('volume')
 def do_list(cs, args):
     """Lists all volumes."""
     all_tenants = 1 if args.tenant else \
@@ -205,7 +204,6 @@ def do_list(cs, args):
 
 
 @utils.arg('volume', metavar='<volume>', help='Volume name or ID.')
-@utils.service_type('volume')
 def do_show(cs, args):
     """Shows volume details."""
     volume = utils.find_volume(cs, args.volume)
@@ -286,7 +284,6 @@ def do_show(cs, args):
            default=None,
            help='Metadata key and value pairs. '
                 'Default=None.')
-@utils.service_type('volume')
 def do_create(cs, args):
     """Creates a volume."""
 
@@ -309,7 +306,6 @@ def do_create(cs, args):
 @utils.arg('volume', metavar='<volume>', nargs='+',
            help='Name or ID of volume to delete. '
                 'Separate multiple volumes with a space.')
-@utils.service_type('volume')
 def do_delete(cs, args):
     """Removes one or more volumes."""
     failure_count = 0
@@ -328,7 +324,6 @@ def do_delete(cs, args):
 @utils.arg('volume', metavar='<volume>', nargs='+',
            help='Name or ID of volume to delete. '
                 'Separate multiple volumes with a space.')
-@utils.service_type('volume')
 def do_force_delete(cs, args):
     """Attempts force-delete of volume, regardless of state."""
     failure_count = 0
@@ -353,7 +348,6 @@ def do_force_delete(cs, args):
                  'NOTE: This command simply changes the state of the '
                  'Volume in the DataBase with no regard to actual status, '
                  'exercise caution when using. Default=available.'))
-@utils.service_type('volume')
 def do_reset_state(cs, args):
     """Explicitly updates the volume state."""
     failure_flag = False
@@ -377,7 +371,6 @@ def do_reset_state(cs, args):
            help='New display name for volume.')
 @utils.arg('--display-description', metavar='<display-description>',
            default=None, help='Volume description. Default=None.')
-@utils.service_type('volume')
 def do_rename(cs, args):
     """Renames a volume."""
     kwargs = {}
@@ -407,7 +400,6 @@ def do_rename(cs, args):
            help='The metadata key and pair to set or unset. '
                 'For unset, specify only the key. '
                 'Default=[].')
-@utils.service_type('volume')
 def do_metadata(cs, args):
     """Sets or deletes volume metadata."""
     volume = utils.find_volume(cs, args.volume)
@@ -451,7 +443,6 @@ def do_metadata(cs, args):
     metavar='<volume-id>',
     default=None,
     help='Filters list by a volume ID. Default=None.')
-@utils.service_type('volume')
 def do_snapshot_list(cs, args):
     """Lists all snapshots."""
     all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
@@ -470,7 +461,6 @@ def do_snapshot_list(cs, args):
 
 @utils.arg('snapshot', metavar='<snapshot>',
            help='Name or ID of snapshot.')
-@utils.service_type('volume')
 def do_snapshot_show(cs, args):
     """Shows snapshot details."""
     snapshot = _find_volume_snapshot(cs, args.snapshot)
@@ -505,7 +495,6 @@ def do_snapshot_show(cs, args):
 @utils.arg(
     '--display_description',
     help=argparse.SUPPRESS)
-@utils.service_type('volume')
 def do_snapshot_create(cs, args):
     """Creates a snapshot."""
     volume = utils.find_volume(cs, args.volume)
@@ -519,7 +508,6 @@ def do_snapshot_create(cs, args):
 @utils.arg('snapshot',
            metavar='<snapshot>', nargs='+',
            help='Name or ID of the snapshot(s) to delete.')
-@utils.service_type('volume')
 def do_snapshot_delete(cs, args):
     """Remove one or more snapshots."""
     failure_count = 0
@@ -540,7 +528,6 @@ def do_snapshot_delete(cs, args):
            help='New display name for snapshot.')
 @utils.arg('--display-description', metavar='<display-description>',
            default=None, help='Snapshot description. Default=None.')
-@utils.service_type('volume')
 def do_snapshot_rename(cs, args):
     """Renames a snapshot."""
     kwargs = {}
@@ -565,7 +552,6 @@ def do_snapshot_rename(cs, args):
                  'the state of the Snapshot in the DataBase with no regard '
                  'to actual status, exercise caution when using. '
                  'Default=available.'))
-@utils.service_type('volume')
 def do_snapshot_reset_state(cs, args):
     """Explicitly updates the snapshot state."""
     failure_count = 0
@@ -592,14 +578,12 @@ def _print_volume_type_list(vtypes):
     utils.print_list(vtypes, ['ID', 'Name'])
 
 
-@utils.service_type('volume')
 def do_type_list(cs, args):
     """Lists available 'volume types'."""
     vtypes = cs.volume_types.list()
     _print_volume_type_list(vtypes)
 
 
-@utils.service_type('volume')
 def do_extra_specs_list(cs, args):
     """Lists current volume types and extra specs."""
     vtypes = cs.volume_types.list()
@@ -609,7 +593,6 @@ def do_extra_specs_list(cs, args):
 @utils.arg('name',
            metavar='<name>',
            help='Name for the volume type.')
-@utils.service_type('volume')
 def do_type_create(cs, args):
     """Creates a volume type."""
     vtype = cs.volume_types.create(args.name)
@@ -619,7 +602,6 @@ def do_type_create(cs, args):
 @utils.arg('id',
            metavar='<id>',
            help='ID of volume type to delete.')
-@utils.service_type('volume')
 def do_type_delete(cs, args):
     """Deletes a specified volume type."""
     volume_type = _find_volume_type(cs, args.id)
@@ -639,7 +621,6 @@ def do_type_delete(cs, args):
            default=None,
            help='The extra specs key and value pair to set or unset. '
                 'For unset, specify only the key. Default=None.')
-@utils.service_type('volume')
 def do_type_key(cs, args):
     """Sets or unsets extra_spec for a volume type."""
     vtype = _find_volume_type(cs, args.vtype)
@@ -720,7 +701,6 @@ def _quota_update(manager, identifier, args):
 
 @utils.arg('tenant', metavar='<tenant_id>',
            help='ID of the tenant for which to list quotas.')
-@utils.service_type('volume')
 def do_quota_show(cs, args):
     """Lists quotas for a tenant."""
 
@@ -729,7 +709,6 @@ def do_quota_show(cs, args):
 
 @utils.arg('tenant', metavar='<tenant_id>',
            help='ID of the tenant for which to list quota usage.')
-@utils.service_type('volume')
 def do_quota_usage(cs, args):
     """Lists quota usage for a tenant."""
 
@@ -738,7 +717,6 @@ def do_quota_usage(cs, args):
 
 @utils.arg('tenant', metavar='<tenant_id>',
            help='ID of the tenant for which to list default quotas.')
-@utils.service_type('volume')
 def do_quota_defaults(cs, args):
     """Lists default quotas for a tenant."""
 
@@ -771,7 +749,6 @@ def do_quota_defaults(cs, args):
            metavar='<volume_type_name>',
            default=None,
            help='Volume type. Default=None.')
-@utils.service_type('volume')
 def do_quota_update(cs, args):
     """Updates quotas for a tenant."""
 
@@ -780,7 +757,6 @@ def do_quota_update(cs, args):
 
 @utils.arg('tenant', metavar='<tenant_id>',
            help='UUID of tenant to delete the quotas for.')
-@utils.service_type('volume')
 def do_quota_delete(cs, args):
     """Delete the quotas for a tenant."""
 
@@ -789,7 +765,6 @@ def do_quota_delete(cs, args):
 
 @utils.arg('class_name', metavar='<class>',
            help='Name of quota class for which to list quotas.')
-@utils.service_type('volume')
 def do_quota_class_show(cs, args):
     """Lists quotas for a quota class."""
 
@@ -814,14 +789,12 @@ def do_quota_class_show(cs, args):
            metavar='<volume_type_name>',
            default=None,
            help='Volume type. Default=None.')
-@utils.service_type('volume')
 def do_quota_class_update(cs, args):
     """Updates quotas for a quota class."""
 
     _quota_update(cs.quota_classes, args.class_name, args)
 
 
-@utils.service_type('volume')
 def do_absolute_limits(cs, args):
     """Lists absolute limits for a user."""
     limits = cs.limits.get().absolute
@@ -829,7 +802,6 @@ def do_absolute_limits(cs, args):
     utils.print_list(limits, columns)
 
 
-@utils.service_type('volume')
 def do_rate_limits(cs, args):
     """Lists rate limits for a user."""
     limits = cs.limits.get().rate
@@ -864,7 +836,6 @@ def _find_volume_type(cs, vtype):
 @utils.arg('image_name',
            metavar='<image-name>',
            help='The new image name.')
-@utils.service_type('volume')
 def do_upload_to_image(cs, args):
     """Uploads volume to Image Service as an image."""
     volume = utils.find_volume(cs, args.volume)
@@ -885,7 +856,6 @@ def do_upload_to_image(cs, args):
 @utils.arg('--display-description', metavar='<display-description>',
            default=None,
            help='Backup description. Default=None.')
-@utils.service_type('volume')
 def do_backup_create(cs, args):
     """Creates a volume backup."""
     volume = utils.find_volume(cs, args.volume)
@@ -904,7 +874,6 @@ def do_backup_create(cs, args):
 
 
 @utils.arg('backup', metavar='<backup>', help='Name or ID of backup.')
-@utils.service_type('volume')
 def do_backup_show(cs, args):
     """Show backup details."""
     backup = _find_backup(cs, args.backup)
@@ -917,7 +886,6 @@ def do_backup_show(cs, args):
     utils.print_dict(info)
 
 
-@utils.service_type('volume')
 def do_backup_list(cs, args):
     """Lists all backups."""
     backups = cs.backups.list()
@@ -928,7 +896,6 @@ def do_backup_list(cs, args):
 
 @utils.arg('backup', metavar='<backup>',
            help='Name or ID of backup to delete.')
-@utils.service_type('volume')
 def do_backup_delete(cs, args):
     """Removes a backup."""
     backup = _find_backup(cs, args.backup)
@@ -941,7 +908,6 @@ def do_backup_delete(cs, args):
            default=None,
            help='ID or name of backup volume to '
                 'which to restore. Default=None.')
-@utils.service_type('volume')
 def do_backup_restore(cs, args):
     """Restores a backup."""
     if args.volume_id:
@@ -956,7 +922,6 @@ def do_backup_restore(cs, args):
 @utils.arg('--display-name', metavar='<display-name>',
            default=None,
            help='Transfer name. Default=None.')
-@utils.service_type('volume')
 def do_transfer_create(cs, args):
     """Creates a volume transfer."""
     volume = utils.find_volume(cs, args.volume)
@@ -973,7 +938,6 @@ def do_transfer_create(cs, args):
 
 @utils.arg('transfer', metavar='<transfer>',
            help='Name or ID of transfer to delete.')
-@utils.service_type('volume')
 def do_transfer_delete(cs, args):
     """Undoes a transfer."""
     transfer = _find_transfer(cs, args.transfer)
@@ -984,7 +948,6 @@ def do_transfer_delete(cs, args):
            help='ID of transfer to accept.')
 @utils.arg('auth_key', metavar='<auth_key>',
            help='Authentication key of transfer to accept.')
-@utils.service_type('volume')
 def do_transfer_accept(cs, args):
     """Accepts a volume transfer."""
     transfer = cs.transfers.accept(args.transfer, args.auth_key)
@@ -1012,7 +975,6 @@ def do_transfer_accept(cs, args):
     type=int,
     const=1,
     help=argparse.SUPPRESS)
-@utils.service_type('volume')
 def do_transfer_list(cs, args):
     """Lists all transfers."""
     all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
@@ -1026,7 +988,6 @@ def do_transfer_list(cs, args):
 
 @utils.arg('transfer', metavar='<transfer>',
            help='Name or ID of transfer to accept.')
-@utils.service_type('volume')
 def do_transfer_show(cs, args):
     """Show transfer details."""
     transfer = _find_transfer(cs, args.transfer)
@@ -1045,7 +1006,6 @@ def do_transfer_show(cs, args):
            metavar='<new-size>',
            type=int,
            help='Size of volume, in GiBs.')
-@utils.service_type('volume')
 def do_extend(cs, args):
     """Attempts to extend size of an existing volume."""
     volume = utils.find_volume(cs, args.volume)
@@ -1056,7 +1016,6 @@ def do_extend(cs, args):
            help='Host name. Default=None.')
 @utils.arg('--binary', metavar='<binary>', default=None,
            help='Service binary. Default=None.')
-@utils.service_type('volume')
 def do_service_list(cs, args):
     """Lists all services. Filter by host and service binary."""
     result = cs.services.list(host=args.host, binary=args.binary)
@@ -1070,7 +1029,6 @@ def do_service_list(cs, args):
 
 @utils.arg('host', metavar='<hostname>', help='Host name.')
 @utils.arg('binary', metavar='<binary>', help='Service binary.')
-@utils.service_type('volume')
 def do_service_enable(cs, args):
     """Enables the service."""
     result = cs.services.enable(args.host, args.binary)
@@ -1082,7 +1040,6 @@ def do_service_enable(cs, args):
 @utils.arg('binary', metavar='<binary>', help='Service binary.')
 @utils.arg('--reason', metavar='<reason>',
            help='Reason for disabling service.')
-@utils.service_type('volume')
 def do_service_disable(cs, args):
     """Disables the service."""
     columns = ["Host", "Binary", "Status"]
@@ -1137,7 +1094,6 @@ def _treeizeAvailabilityZone(zone):
     return result
 
 
-@utils.service_type('volume')
 def do_availability_zone_list(cs, _args):
     """Lists all availability zones."""
     try:
@@ -1166,7 +1122,6 @@ def _print_volume_encryption_type_list(encryption_types):
                                         'Control Location'])
 
 
-@utils.service_type('volume')
 def do_encryption_type_list(cs, args):
     """Shows encryption type details for volume types. Admin only."""
     result = cs.volume_encryption_types.list()
@@ -1178,7 +1133,6 @@ def do_encryption_type_list(cs, args):
            metavar='<volume_type>',
            type=str,
            help='Name or ID of volume type.')
-@utils.service_type('volume')
 def do_encryption_type_show(cs, args):
     """Shows encryption type details for volume type. Admin only."""
     volume_type = _find_volume_type(cs, args.volume_type)
@@ -1225,7 +1179,6 @@ def do_encryption_type_show(cs, args):
                 'Valid values are "front-end" or "back-end." '
                 'For example, front-end=Nova. '
                 'Default is "front-end."')
-@utils.service_type('volume')
 def do_encryption_type_create(cs, args):
     """Creates encryption type for a volume type. Admin only."""
     volume_type = _find_volume_type(cs, args.volume_type)
@@ -1245,7 +1198,6 @@ def do_encryption_type_create(cs, args):
            metavar='<volume_type>',
            type=str,
            help='Name or ID of volume type.')
-@utils.service_type('volume')
 def do_encryption_type_delete(cs, args):
     """Deletes encryption type for a volume type. Admin only."""
     volume_type = _find_volume_type(cs, args.volume_type)
@@ -1260,7 +1212,6 @@ def do_encryption_type_delete(cs, args):
            help='Enables or disables generic host-based '
                 'force-migration, which bypasses driver '
                 'optimizations. Default=False.')
-@utils.service_type('volume')
 def do_migrate(cs, args):
     """Migrates volume to a new host."""
     volume = utils.find_volume(cs, args.volume)
@@ -1292,7 +1243,6 @@ def _print_associations_list(associations):
            nargs='+',
            default=[],
            help='Specifications for QoS.')
-@utils.service_type('volume')
 def do_qos_create(cs, args):
     """Creates a qos specs."""
     keypair = None
@@ -1302,7 +1252,6 @@ def do_qos_create(cs, args):
     _print_qos_specs(qos_specs)
 
 
-@utils.service_type('volume')
 def do_qos_list(cs, args):
     """Lists qos specs."""
     qos_specs = cs.qos_specs.list()
@@ -1311,7 +1260,6 @@ def do_qos_list(cs, args):
 
 @utils.arg('qos_specs', metavar='<qos_specs>',
            help='ID of QoS specifications.')
-@utils.service_type('volume')
 def do_qos_show(cs, args):
     """Shows a specified qos specs."""
     qos_specs = _find_qos_specs(cs, args.qos_specs)
@@ -1325,7 +1273,6 @@ def do_qos_show(cs, args):
            default=False,
            help='Enables or disables deletion of in-use '
                 'QoS specifications. Default=False.')
-@utils.service_type('volume')
 def do_qos_delete(cs, args):
     """Deletes a specified qos specs."""
     force = strutils.bool_from_string(args.force, strict=True)
@@ -1337,7 +1284,6 @@ def do_qos_delete(cs, args):
            help='ID of QoS specifications.')
 @utils.arg('vol_type_id', metavar='<volume_type_id>',
            help='ID of volume type.')
-@utils.service_type('volume')
 def do_qos_associate(cs, args):
     """Associates qos specs with specified volume type."""
     cs.qos_specs.associate(args.qos_specs, args.vol_type_id)
@@ -1347,7 +1293,6 @@ def do_qos_associate(cs, args):
            help='ID of QoS specifications.')
 @utils.arg('vol_type_id', metavar='<volume_type_id>',
            help='ID of volume type.')
-@utils.service_type('volume')
 def do_qos_disassociate(cs, args):
     """Disassociates qos specs from specified volume type."""
     cs.qos_specs.disassociate(args.qos_specs, args.vol_type_id)
@@ -1355,7 +1300,6 @@ def do_qos_disassociate(cs, args):
 
 @utils.arg('qos_specs', metavar='<qos_specs>',
            help='ID of QoS specifications.')
-@utils.service_type('volume')
 def do_qos_disassociate_all(cs, args):
     """Disassociates qos specs from all associations."""
     cs.qos_specs.disassociate_all(args.qos_specs)
@@ -1384,7 +1328,6 @@ def do_qos_key(cs, args):
 
 @utils.arg('qos_specs', metavar='<qos_specs>',
            help='ID of QoS specifications.')
-@utils.service_type('volume')
 def do_qos_get_association(cs, args):
     """Gets all associations for specified qos specs."""
     associations = cs.qos_specs.get_associations(args.qos_specs)
@@ -1404,7 +1347,6 @@ def do_qos_get_association(cs, args):
            default=[],
            help='The metadata key and value pair to set or unset. '
                 'For unset, specify only the key.')
-@utils.service_type('volume')
 def do_snapshot_metadata(cs, args):
     """Sets or deletes snapshot metadata."""
     snapshot = _find_volume_snapshot(cs, args.snapshot)
@@ -1419,7 +1361,6 @@ def do_snapshot_metadata(cs, args):
 
 @utils.arg('snapshot', metavar='<snapshot>',
            help='ID of snapshot.')
-@utils.service_type('volume')
 def do_snapshot_metadata_show(cs, args):
     """Shows snapshot metadata."""
     snapshot = _find_volume_snapshot(cs, args.snapshot)
@@ -1428,7 +1369,6 @@ def do_snapshot_metadata_show(cs, args):
 
 @utils.arg('volume', metavar='<volume>',
            help='ID of volume.')
-@utils.service_type('volume')
 def do_metadata_show(cs, args):
     """Shows volume metadata."""
     volume = utils.find_volume(cs, args.volume)
@@ -1444,7 +1384,6 @@ def do_metadata_show(cs, args):
            default=[],
            help='Metadata key and value pair or pairs to update. '
                 'Default=[].')
-@utils.service_type('volume')
 def do_metadata_update_all(cs, args):
     """Updates volume metadata."""
     volume = utils.find_volume(cs, args.volume)
@@ -1462,7 +1401,6 @@ def do_metadata_update_all(cs, args):
            default=[],
            help='Metadata key and value pair or pairs to update. '
                 'Default=[].')
-@utils.service_type('volume')
 def do_snapshot_metadata_update_all(cs, args):
     """Updates snapshot metadata."""
     snapshot = _find_volume_snapshot(cs, args.snapshot)
@@ -1477,7 +1415,6 @@ def do_snapshot_metadata_update_all(cs, args):
            choices=['True', 'true', 'False', 'false'],
            help='Enables or disables update of volume to '
                 'read-only access mode.')
-@utils.service_type('volume')
 def do_readonly_mode_update(cs, args):
     """Updates volume read-only access-mode flag."""
     volume = utils.find_volume(cs, args.volume)
@@ -1491,7 +1428,6 @@ def do_readonly_mode_update(cs, args):
            metavar='<True|true|False|false>',
            choices=['True', 'true', 'False', 'false'],
            help='Flag to indicate whether volume is bootable.')
-@utils.service_type('volume')
 def do_set_bootable(cs, args):
     """Update bootable status of a volume."""
     volume = utils.find_volume(cs, args.volume)

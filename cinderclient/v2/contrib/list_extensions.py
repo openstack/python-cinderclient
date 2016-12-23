@@ -46,6 +46,5 @@ def list_extensions(client, _args):
     utils.print_list(extensions, fields)
 
 
-@utils.service_type('volumev2')
 def do_list_extensions(client, _args):
     return list_extensions(client, _args)

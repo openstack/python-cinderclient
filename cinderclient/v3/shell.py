@@ -30,8 +30,6 @@ from cinderclient import utils
 
 from cinderclient.v2.shell import *  # flake8: noqa
 
-utils.retype_method('volumev2', 'volumev3', globals())
-
 
 @utils.arg('--all-tenants',
            dest='all_tenants',
@@ -119,7 +117,6 @@ utils.retype_method('volumev2', 'volumev3', globals())
            nargs='?',
            metavar='<tenant>',
            help='Display information from single tenant (Admin only).')
-@utils.service_type('volumev3')
 def do_list(cs, args):
     """Lists all volumes."""
     # NOTE(thingee): Backwards-compatibility with v1 args
@@ -184,7 +181,6 @@ def do_list(cs, args):
                      sortby_index=sortby_index)
 
 
-@utils.service_type('volumev3')
 @utils.arg('size',
            metavar='<size>',
            nargs='?',
@@ -361,7 +357,6 @@ def do_create(cs, args):
            start_version='3.15',
            help='Metadata key and value pair to set or unset. '
                 'For unset, specify only the key(s): <key key>')
-@utils.service_type('volumev3')
 def do_metadata(cs, args):
     """Sets or deletes volume metadata."""
     volume = utils.find_volume(cs, args.volume)
@@ -375,7 +370,6 @@ def do_metadata(cs, args):
                                    reverse=True))
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.11')
 def do_group_type_list(cs, args):
     """Lists available 'group types'. (Admin only will see private types)"""
@@ -383,7 +377,6 @@ def do_group_type_list(cs, args):
     shell_utils.print_group_type_list(gtypes)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.11')
 def do_group_type_default(cs, args):
     """List the default group type."""
@@ -391,7 +384,6 @@ def do_group_type_default(cs, args):
     shell_utils.print_group_type_list([gtype])
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.11')
 @utils.arg('group_type',
            metavar='<group_type>',
@@ -406,7 +398,6 @@ def do_group_type_show(cs, args):
     utils.print_dict(info, formatters=['group_specs'])
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.11')
 @utils.arg('id',
            metavar='<id>',
@@ -428,7 +419,6 @@ def do_group_type_update(cs, args):
     shell_utils.print_group_type_list([gtype])
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.11')
 def do_group_specs_list(cs, args):
     """Lists current group types and specs."""
@@ -436,7 +426,6 @@ def do_group_specs_list(cs, args):
     utils.print_list(gtypes, ['ID', 'Name', 'group_specs'])
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.11')
 @utils.arg('name',
            metavar='<name>',
@@ -455,7 +444,6 @@ def do_group_type_create(cs, args):
     shell_utils.print_group_type_list([gtype])
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.11')
 @utils.arg('group_type',
            metavar='<group_type>', nargs='+',
@@ -477,7 +465,6 @@ def do_group_type_delete(cs, args):
                                       "specified types.")
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.11')
 @utils.arg('gtype',
            metavar='<gtype>',
@@ -543,7 +530,6 @@ def do_group_type_key(cs, args):
            metavar='<per_volume_gigabytes>',
            type=int, default=None,
            help='Set max volume size limit. Default=None.')
-@utils.service_type('volumev3')
 def do_quota_update(cs, args):
     """Updates quotas for a tenant."""
 
@@ -592,7 +578,6 @@ def do_quota_update(cs, args):
            help='Prevents image from being deleted. Default=False.',
            default=False,
            start_version='3.1')
-@utils.service_type('volumev3')
 def do_upload_to_image(cs, args):
     """Uploads volume to Image Service as an image."""
     volume = utils.find_volume(cs, args.volume)
@@ -612,7 +597,6 @@ def do_upload_to_image(cs, args):
                                    args.disk_format))
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.9')
 @utils.arg('backup', metavar='<backup>',
            help='Name or ID of backup to rename.')
@@ -637,7 +621,6 @@ def do_backup_update(cs, args):
     shell_utils.find_backup(cs, args.backup).update(**kwargs)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.7')
 @utils.arg('--name', metavar='<name>', default=None,
            help='Filter by cluster name, without backend will list all '
@@ -672,7 +655,6 @@ def do_cluster_list(cs, args):
     utils.print_list(clusters, columns)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.7')
 @utils.arg('binary', metavar='<binary>', nargs='?', default='cinder-volume',
            help='Binary to filter by.  Default: cinder-volume.')
@@ -684,7 +666,6 @@ def do_cluster_show(cs, args):
     utils.print_dict(cluster.to_dict())
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.7')
 @utils.arg('binary', metavar='<binary>', nargs='?', default='cinder-volume',
            help='Binary to filter by.  Default: cinder-volume.')
@@ -696,7 +677,6 @@ def do_cluster_enable(cs, args):
     utils.print_dict(cluster.to_dict())
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.7')
 @utils.arg('binary', metavar='<binary>', nargs='?', default='cinder-volume',
            help='Binary to filter by.  Default: cinder-volume.')
@@ -711,7 +691,6 @@ def do_cluster_disable(cs, args):
     utils.print_dict(cluster.to_dict())
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.8')
 @utils.arg('host',
            metavar='<host>',
@@ -754,7 +733,6 @@ def do_manageable_list(cs, args):
     utils.print_list(volumes, columns, sortby_index=None)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.13')
 @utils.arg('--all-tenants',
            dest='all_tenants',
@@ -772,7 +750,6 @@ def do_group_list(cs, args):
     utils.print_list(groups, columns)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.13')
 @utils.arg('grouptype',
            metavar='<group-type>',
@@ -809,7 +786,6 @@ def do_group_create(cs, args):
     utils.print_dict(info)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.14')
 @utils.arg('--group-snapshot',
            metavar='<group-snapshot>',
@@ -850,7 +826,6 @@ def do_group_create_from_src(cs, args):
     utils.print_dict(info)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.13')
 @utils.arg('group',
            metavar='<group>', nargs='+',
@@ -880,7 +855,6 @@ def do_group_delete(cs, args):
                                       "groups.")
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.13')
 @utils.arg('group',
            metavar='<group>',
@@ -923,7 +897,6 @@ def do_group_update(cs, args):
     shell_utils.find_group(cs, args.group).update(**kwargs)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.14')
 @utils.arg('--all-tenants',
            dest='all_tenants',
@@ -958,7 +931,6 @@ def do_group_snapshot_list(cs, args):
     utils.print_list(group_snapshots, columns)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.14')
 @utils.arg('group_snapshot',
            metavar='<group_snapshot>',
@@ -973,7 +945,6 @@ def do_group_snapshot_show(cs, args):
     utils.print_dict(info)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.14')
 @utils.arg('group',
            metavar='<group>',
@@ -1002,7 +973,6 @@ def do_group_snapshot_create(cs, args):
     utils.print_dict(info)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.14')
 @utils.arg('group_snapshot',
            metavar='<group_snapshot>', nargs='+',
@@ -1034,7 +1004,6 @@ def do_group_snapshot_delete(cs, args):
            default=False,
            help='Enables or disables display of '
                 'Replication info for c-vol services. Default=False.')
-@utils.service_type('volumev3')
 def do_service_list(cs, args):
     """Lists all services. Filter by host and service binary."""
     replication = strutils.bool_from_string(args.withreplication,
@@ -1052,7 +1021,6 @@ def do_service_list(cs, args):
     utils.print_list(result, columns)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps('3.8')
 @utils.arg('host',
            metavar='<host>',
@@ -1098,7 +1066,6 @@ def do_snapshot_manageable_list(cs, args):
     utils.print_list(snapshots, columns, sortby_index=None)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps("3.0")
 def do_api_version(cs, args):
     """Display the server API version information."""
@@ -1107,7 +1074,6 @@ def do_api_version(cs, args):
     utils.print_list(response, columns)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps("3.3")
 @utils.arg('--marker',
            metavar='<marker>',
@@ -1179,7 +1145,6 @@ def do_message_list(cs, args):
     utils.print_list(messages, columns, sortby_index=sortby_index)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps("3.3")
 @utils.arg('message',
            metavar='<message>',
@@ -1193,7 +1158,6 @@ def do_message_show(cs, args):
     utils.print_dict(info)
 
 
-@utils.service_type('volumev3')
 @api_versions.wraps("3.3")
 @utils.arg('message',
            metavar='<message>', nargs='+',
@@ -1273,7 +1237,6 @@ def do_message_delete(cs, args):
            start_version='3.22',
            help='Filters results by a metadata key and value pair. Require '
                 'volume api version >=3.22. Default=None.')
-@utils.service_type('volumev3')
 def do_snapshot_list(cs, args):
     """Lists all snapshots."""
     all_tenants = (1 if args.tenant else
