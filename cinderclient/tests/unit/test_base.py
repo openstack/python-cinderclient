@@ -48,6 +48,16 @@ class BaseTest(utils.TestCase):
         self.assertEqual("<Resource baz=spam, foo=bar>", repr(r))
         self.assertNotIn("x_openstack_request_ids", repr(r))
 
+    def test_add_non_ascii_attr_to_resource(self):
+        info = {'gigabytes_тест': -1,
+                'volumes_тест': -1,
+                'id': 'admin'}
+
+        res = base.Resource(None, info)
+
+        for key, value in info.items():
+            self.assertEqual(value, getattr(res, key, None))
+
     def test_getid(self):
         self.assertEqual(4, base.getid(4))
 
