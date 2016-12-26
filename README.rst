@@ -103,7 +103,7 @@ You'll find complete documentation on the shell by running
                   [--service-name <service-name>]
                   [--volume-service-name <volume-service-name>]
                   [--endpoint-type <endpoint-type>]
-                  [--os-volume-api-version <compute-api-ver>]
+                  [--os-volume-api-version <volume-api-ver>]
                   [--os-cacert <ca-certificate>] [--retries <retries>]
                   <subcommand> ...
 
@@ -163,8 +163,8 @@ You'll find complete documentation on the shell by running
                             Defaults to env[CINDER_VOLUME_SERVICE_NAME]
       --endpoint-type <endpoint-type>
                             Defaults to env[CINDER_ENDPOINT_TYPE] or publicURL.
-      --os-volume-api-version <compute-api-ver>
-                            Accepts 1,defaults to env[OS_VOLUME_API_VERSION].
+      --os-volume-api-version <volume-api-ver>
+                            Defaults to env[OS_VOLUME_API_VERSION].
       --os-cacert <ca-certificate>
                             Specify a CA bundle file to use in verifying a TLS
                             (https) server certificate. Defaults to env[OS_CACERT]
