@@ -26,6 +26,8 @@ from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 from cinderclient.tests.unit.fixture_data import keystone_client
 
+from six.moves.urllib import parse
+
 
 @ddt.ddt
 @mock.patch.object(client, 'Client', fakes.FakeClient)
@@ -343,6 +345,13 @@ class ShellTest(utils.TestCase):
     def test_list_messages(self):
         self.run_command('--os-volume-api-version 3.3 message-list')
         self.assert_called('GET', '/messages')
+
+    def test_snapshot_list_with_metadata(self):
+        self.run_command('--os-volume-api-version 3.22 '
+                         'snapshot-list --metadata key1=val1')
+        expected = ("/snapshots/detail?metadata=%s"
+                    % parse.quote_plus("{'key1': 'val1'}"))
+        self.assert_called('GET', expected)
 
     @ddt.data(('resource_type',), ('event_id',), ('resource_uuid',),
               ('level', 'message_level'), ('request_id',))

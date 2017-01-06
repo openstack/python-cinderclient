@@ -20,6 +20,8 @@ from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 from cinderclient.v3 import volumes
 
+from six.moves.urllib import parse
+
 cs = fakes.FakeClient()
 
 
@@ -84,3 +86,10 @@ class VolumesTest(utils.TestCase):
         cs = fakes.FakeClient(api_versions.APIVersion('3.8'))
         cs.volume_snapshots.list_manageable('host1', detailed=True)
         cs.assert_called('GET', '/manageable_snapshots/detail?host=host1')
+
+    def test_snapshot_list_with_metadata(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.22'))
+        cs.volume_snapshots.list(search_opts={'metadata': {'key1': 'val1'}})
+        expected = ("/snapshots/detail?metadata=%s"
+                    % parse.quote_plus("{'key1': 'val1'}"))
+        cs.assert_called('GET', expected)
