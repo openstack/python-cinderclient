@@ -719,7 +719,7 @@ def Client(version, *args, **kwargs):
 
         >>> from cinderclient import client
         >>> cinder = client.Client(VERSION, USERNAME, PASSWORD,
-        ...                      PROJECT_ID, AUTH_URL)
+        ...                      PROJECT_NAME, AUTH_URL)
 
     Here ``VERSION`` can be a string or
     ``cinderclient.api_versions.APIVersion`` obj. If you prefer string value,
