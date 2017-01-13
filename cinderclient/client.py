@@ -40,6 +40,7 @@ from cinderclient import api_versions
 from cinderclient import exceptions
 import cinderclient.extension
 from cinderclient._i18n import _
+from cinderclient._i18n import _LW
 from oslo_utils import encodeutils
 from oslo_utils import importutils
 from oslo_utils import strutils
@@ -70,6 +71,30 @@ SERVICE_TYPES = {'1': V1_SERVICE_TYPE,
 # the service catalog when doing discovery lookups
 for svc in ('volume', 'volumev2', 'volumev3'):
     discover.add_catalog_discover_hack(svc, re.compile('/v[12]/\w+/?$'), '/')
+
+
+def get_server_version(url):
+    """Queries the server via the naked endpoint and gets version info.
+
+    :param url: url of the cinder endpoint
+    :returns: APIVersion object for min and max version supported by
+              the server
+    """
+
+    logger = logging.getLogger(__name__)
+    try:
+        scheme, netloc, path, query, frag = urlparse.urlsplit(url)
+        response = requests.get(scheme + '://' + netloc)
+        data = json.loads(response.text)
+        versions = data['versions']
+        for version in versions:
+            if '3.' in version['version']:
+                return (api_versions.APIVersion(version['min_version']),
+                        api_versions.APIVersion(version['version']))
+    except exceptions.ClientException as e:
+        logger.warning(_LW("Error in server version query:%s\n"
+                 "Returning APIVersion 2.0") % six.text_type(e.message))
+        return api_versions.APIVersion("2.0"), api_versions.APIVersion("2.0")
 
 
 def get_volume_api_from_url(url):
