@@ -1210,3 +1210,94 @@ def do_message_delete(cs, args):
     if failure_count == len(args.message):
         raise exceptions.CommandError("Unable to delete any of the specified "
                                       "messages.")
+
+
+@utils.arg('--all-tenants',
+           dest='all_tenants',
+           metavar='<0|1>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=0,
+           help='Shows details for all tenants. Admin only.')
+@utils.arg('--all_tenants',
+           nargs='?',
+           type=int,
+           const=1,
+           help=argparse.SUPPRESS)
+@utils.arg('--name',
+           metavar='<name>',
+           default=None,
+           help='Filters results by a name. Default=None.')
+@utils.arg('--display-name',
+           help=argparse.SUPPRESS)
+@utils.arg('--display_name',
+           help=argparse.SUPPRESS)
+@utils.arg('--status',
+           metavar='<status>',
+           default=None,
+           help='Filters results by a status. Default=None.')
+@utils.arg('--volume-id',
+           metavar='<volume-id>',
+           default=None,
+           help='Filters results by a volume ID. Default=None.')
+@utils.arg('--volume_id',
+           help=argparse.SUPPRESS)
+@utils.arg('--marker',
+           metavar='<marker>',
+           default=None,
+           help='Begin returning snapshots that appear later in the snapshot '
+                'list than that represented by this id. '
+                'Default=None.')
+@utils.arg('--limit',
+           metavar='<limit>',
+           default=None,
+           help='Maximum number of snapshots to return. Default=None.')
+@utils.arg('--sort',
+           metavar='<key>[:<direction>]',
+           default=None,
+           help=(('Comma-separated list of sort keys and directions in the '
+                  'form of <key>[:<asc|desc>]. '
+                  'Valid keys: %s. '
+                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
+@utils.arg('--tenant',
+           type=str,
+           dest='tenant',
+           nargs='?',
+           metavar='<tenant>',
+           help='Display information from single tenant (Admin only).')
+@utils.arg('--metadata',
+           nargs='*',
+           metavar='<key=value>',
+           default=None,
+           start_version='3.22',
+           help='Filters results by a metadata key and value pair. Require '
+                'volume api version >=3.22. Default=None.')
+@utils.service_type('volumev3')
+def do_snapshot_list(cs, args):
+    """Lists all snapshots."""
+    all_tenants = (1 if args.tenant else
+                   int(os.environ.get("ALL_TENANTS", args.all_tenants)))
+
+    if args.display_name is not None:
+        args.name = args.display_name
+
+    search_opts = {
+        'all_tenants': all_tenants,
+        'name': args.name,
+        'status': args.status,
+        'volume_id': args.volume_id,
+        'project_id': args.tenant,
+        'metadata': shell_utils.extract_metadata(args)
+        if args.metadata else None,
+    }
+
+    snapshots = cs.volume_snapshots.list(search_opts=search_opts,
+                                         marker=args.marker,
+                                         limit=args.limit,
+                                         sort=args.sort)
+    shell_utils.translate_volume_snapshot_keys(snapshots)
+    sortby_index = None if args.sort else 0
+    utils.print_list(snapshots,
+                     ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
+                     sortby_index=sortby_index)
