@@ -2191,7 +2191,7 @@ def do_replication_reenable(cs, args):
            help='Shows details for all tenants. Admin only.')
 @utils.service_type('volumev2')
 def do_consisgroup_list(cs, args):
-    """Lists all consistencygroups."""
+    """Lists all consistency groups."""
     consistencygroups = cs.consistencygroups.list()
 
     columns = ['ID', 'Status', 'Name']
@@ -2346,7 +2346,7 @@ def do_consisgroup_delete(cs, args):
                 'separated by commas. Default=None.')
 @utils.service_type('volumev2')
 def do_consisgroup_update(cs, args):
-    """Updates a consistencygroup."""
+    """Updates a consistency group."""
     kwargs = {}
 
     if args.name is not None:

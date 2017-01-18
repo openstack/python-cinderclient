@@ -43,7 +43,7 @@ class CgsnapshotManager(base.ManagerWithFind):
                project_id=None):
         """Creates a cgsnapshot.
 
-        :param consistencygroup: Name or uuid of a consistencygroup
+        :param consistencygroup: Name or uuid of a consistency group
         :param name: Name of the cgsnapshot
         :param description: Description of the cgsnapshot
         :param user_id: User id derived from context

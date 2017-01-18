@@ -26,11 +26,11 @@ class Consistencygroup(base.Resource):
         return "<Consistencygroup: %s>" % self.id
 
     def delete(self, force='False'):
-        """Delete this consistencygroup."""
+        """Delete this consistency group."""
         return self.manager.delete(self, force)
 
     def update(self, **kwargs):
-        """Update the name or description for this consistencygroup."""
+        """Update the name or description for this consistency group."""
         return self.manager.update(self, **kwargs)
 
 
@@ -41,7 +41,7 @@ class ConsistencygroupManager(base.ManagerWithFind):
     def create(self, volume_types, name=None,
                description=None, user_id=None,
                project_id=None, availability_zone=None):
-        """Creates a consistencygroup.
+        """Creates a consistency group.
 
         :param name: Name of the ConsistencyGroup
         :param description: Description of the ConsistencyGroup
@@ -66,7 +66,7 @@ class ConsistencygroupManager(base.ManagerWithFind):
     def create_from_src(self, cgsnapshot_id, source_cgid, name=None,
                         description=None, user_id=None,
                         project_id=None):
-        """Creates a consistencygroup from a cgsnapshot or a source CG.
+        """Creates a consistency group from a cgsnapshot or a source CG.
 
         :param cgsnapshot_id: UUID of a CGSnapshot
         :param source_cgid: UUID of a source CG
@@ -92,16 +92,16 @@ class ConsistencygroupManager(base.ManagerWithFind):
         return common_base.DictWithMeta(body['consistencygroup'], resp)
 
     def get(self, group_id):
-        """Get a consistencygroup.
+        """Get a consistency group.
 
-        :param group_id: The ID of the consistencygroup to get.
+        :param group_id: The ID of the consistency group to get.
         :rtype: :class:`Consistencygroup`
         """
         return self._get("/consistencygroups/%s" % group_id,
                          "consistencygroup")
 
     def list(self, detailed=True, search_opts=None):
-        """Lists all consistencygroups.
+        """Lists all consistency groups.
 
         :rtype: list of :class:`Consistencygroup`
         """
@@ -116,7 +116,7 @@ class ConsistencygroupManager(base.ManagerWithFind):
                           "consistencygroups")
 
     def delete(self, consistencygroup, force=False):
-        """Delete a consistencygroup.
+        """Delete a consistency group.
 
         :param Consistencygroup: The :class:`Consistencygroup` to delete.
         """
@@ -127,7 +127,7 @@ class ConsistencygroupManager(base.ManagerWithFind):
         return common_base.TupleWithMeta((resp, body), resp)
 
     def update(self, consistencygroup, **kwargs):
-        """Update the name or description for a consistencygroup.
+        """Update the name or description for a consistency group.
 
         :param Consistencygroup: The :class:`Consistencygroup` to update.
         """
@@ -140,7 +140,7 @@ class ConsistencygroupManager(base.ManagerWithFind):
                             base.getid(consistencygroup), body)
 
     def _action(self, action, consistencygroup, info=None, **kwargs):
-        """Perform a consistencygroup "action."
+        """Perform a consistency group "action."
         """
         body = {action: info}
         self.run_hooks('modify_body_for_action', body, **kwargs)
