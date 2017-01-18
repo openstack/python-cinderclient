@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import mock
 import requests
 
@@ -24,6 +25,12 @@ fake_response = utils.TestResponse({
     "text": '{"hi": "there"}',
 })
 mock_request = mock.Mock(return_value=(fake_response))
+
+fake_201_response = utils.TestResponse({
+    "status_code": 201,
+    "text": '{"hi": "there"}',
+})
+mock_201_request = mock.Mock(return_value=(fake_201_response))
 
 refused_response = utils.TestResponse({
     "status_code": 400,
@@ -290,6 +297,47 @@ class ClientTest(utils.TestCase):
         def test_auth_call():
             self.assertRaises(exceptions.AuthorizationFailure,
                               cl.authenticate)
+
+        test_auth_call()
+
+    def test_auth_with_keystone_v3(self):
+        cl = get_authed_client()
+        cl.auth_url = 'http://example.com:5000/v3'
+
+        @mock.patch.object(cl, "_extract_service_catalog", mock.Mock())
+        @mock.patch.object(requests, "request", mock_201_request)
+        def test_auth_call():
+            cl.authenticate()
+            headers = {
+                "Content-Type": "application/json",
+                'Accept': 'application/json',
+                "User-Agent": cl.USER_AGENT
+            }
+            data = {
+                "auth": {
+                    "scope": {
+                        "project": {
+                            "domain": {"name": "Default"},
+                            "name": "project_id"
+                        }
+                    },
+                    "identity": {
+                        "methods": ["password"],
+                        "password": {
+                            "user": {"domain": {"name": "Default"},
+                                     "password": "password", "name": "username"
+                                     }
+                        }
+                    }
+                }
+            }
+            mock_201_request.assert_called_with(
+                "POST",
+                "http://example.com:5000/v3/auth/tokens",
+                headers=headers,
+                allow_redirects=True,
+                data=json.dumps(data),
+                **self.TEST_REQUEST_BASE)
 
         test_auth_call()
 

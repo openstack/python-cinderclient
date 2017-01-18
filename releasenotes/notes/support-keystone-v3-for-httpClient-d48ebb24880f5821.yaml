@@ -1,0 +1,4 @@
+---
+features:
+  - |
+      Support Keystone V3 authentication for httpClient.
