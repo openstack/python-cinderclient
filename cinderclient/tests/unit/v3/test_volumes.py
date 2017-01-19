@@ -93,3 +93,10 @@ class VolumesTest(utils.TestCase):
         expected = ("/snapshots/detail?metadata=%s"
                     % parse.quote_plus("{'key1': 'val1'}"))
         cs.assert_called('GET', expected)
+
+    def test_list_with_image_metadata(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.0'))
+        cs.volumes.list(search_opts={'glance_metadata': {'key1': 'val1'}})
+        expected = ("/volumes/detail?glance_metadata=%s"
+                    % parse.quote_plus("{'key1': 'val1'}"))
+        cs.assert_called('GET', expected)

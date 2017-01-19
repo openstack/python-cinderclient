@@ -137,7 +137,7 @@ def do_list(cs, args):
         'migration_status': args.migration_status,
         'metadata': shell_utils.extract_metadata(args)
         if args.metadata else None,
-        'glance_metadata': shell.utils.extract_metadata(args,
+        'glance_metadata': shell_utils.extract_metadata(args,
                                                         type='image_metadata')
         if args.image_metadata else None,
     }
