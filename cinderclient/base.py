@@ -162,7 +162,7 @@ class Manager(common_base.HookableMixin):
 
         if offset:
             query_params['offset'] = offset
-
+        query_params = utils.unicode_key_value_to_string(query_params)
         # Transform the dict to a sequence of two-element tuples in fixed
         # order, then the encoded string will be consistent in Python 2&3.
         query_string = ""

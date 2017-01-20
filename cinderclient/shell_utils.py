@@ -168,8 +168,9 @@ def print_group_type_list(gtypes):
 
 
 def quota_show(quotas):
+    quotas_info_dict = utils.unicode_key_value_to_string(quotas._info)
     quota_dict = {}
-    for resource in quotas._info:
+    for resource in quotas_info_dict.keys():
         good_name = False
         for name in _quota_resources:
             if resource.startswith(name):
@@ -182,7 +183,8 @@ def quota_show(quotas):
 
 def quota_usage_show(quotas):
     quota_list = []
-    for resource in quotas._info.keys():
+    quotas_info_dict = utils.unicode_key_value_to_string(quotas._info)
+    for resource in quotas_info_dict.keys():
         good_name = False
         for name in _quota_resources:
             if resource.startswith(name):
