@@ -79,7 +79,7 @@ def find_backup(cs, backup):
 
 
 def find_consistencygroup(cs, consistencygroup):
-    """Gets a consistencygroup by name or ID."""
+    """Gets a consistency group by name or ID."""
     return utils.find_resource(cs.consistencygroups, consistencygroup)
 
 
