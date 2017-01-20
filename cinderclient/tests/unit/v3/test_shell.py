@@ -83,6 +83,14 @@ class ShellTest(utils.TestCase):
         self.run_command(command)
         self.assert_called('GET', '/volumes/detail?group_id=fake_id')
 
+    @mock.patch("cinderclient.utils.print_list")
+    def test_list_duplicate_fields(self, mock_print):
+        self.run_command('list --field Status,id,Size,status')
+        self.assert_called('GET', '/volumes/detail')
+        key_list = ['ID', 'Status', 'Size']
+        mock_print.assert_called_once_with(mock.ANY, key_list,
+            exclude_unavailable=True, sortby_index=0)
+
     def test_list_availability_zone(self):
         self.run_command('availability-zone-list')
         self.assert_called('GET', '/os-availability-zone')
