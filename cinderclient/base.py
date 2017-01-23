@@ -297,7 +297,12 @@ class Manager(common_base.HookableMixin):
             cache = getattr(self, cache_attr, None)
             if cache:
                 cache.close()
-                delattr(self, cache_attr)
+                try:
+                    delattr(self, cache_attr)
+                except AttributeError:
+                    # NOTE(kiall): If this attr is deleted by another
+                    #              operation, don't fail any way.
+                    pass
 
     def write_to_completion_cache(self, cache_type, val):
         cache = getattr(self, "_%s_cache" % cache_type, None)
