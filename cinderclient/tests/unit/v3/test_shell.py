@@ -373,6 +373,13 @@ class ShellTest(utils.TestCase):
         self.run_command('--os-volume-api-version 3.5 message-list --marker=1')
         self.assert_called('GET', '/messages?marker=1')
 
+    def test_list_filter_image_metadata(self):
+        self.run_command('--os-volume-api-version 3.0 '
+                         'list --image_metadata image_name=1234')
+        url = ('/volumes/detail?%s' %
+               parse.urlencode([('glance_metadata', {"image_name": "1234"})]))
+        self.assert_called('GET', url)
+
     def test_show_message(self):
         self.run_command('--os-volume-api-version 3.5 message-show 1234')
         self.assert_called('GET', '/messages/1234')
