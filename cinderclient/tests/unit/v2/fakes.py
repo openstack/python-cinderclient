@@ -1079,9 +1079,9 @@ class FakeHTTPClient(base_client.HTTPClient):
             },
         ]
         if host:
-            services = filter(lambda i: i['host'] == host, services)
+            services = [i for i in services if i['host'] == host]
         if binary:
-            services = filter(lambda i: i['binary'] == binary, services)
+            services = [i for i in services if i['binary'] == binary]
         return (200, {}, {'services': services})
 
     def put_os_services_enable(self, body, **kw):
