@@ -18,7 +18,6 @@ from __future__ import print_function
 import os
 import pkg_resources
 import sys
-import types
 import uuid
 
 import six
@@ -82,27 +81,6 @@ def isunauthenticated(f):
     set to True, False otherwise.
     """
     return getattr(f, 'unauthenticated', False)
-
-
-def service_type(stype):
-    """
-    Adds 'service_type' attribute to decorated function.
-    Usage:
-        @service_type('volume')
-        def mymethod(f):
-            ...
-    """
-    def inner(f):
-        f.service_type = stype
-        return f
-    return inner
-
-
-def get_service_type(f):
-    """
-    Retrieves service type from function
-    """
-    return getattr(f, 'service_type', None)
 
 
 def _print(pt, order):
@@ -298,13 +276,6 @@ def _load_entry_point(ep_name, name=None):
             return ep.load()
         except (ImportError, pkg_resources.UnknownExtra, AttributeError):
             continue
-
-
-def retype_method(old_type, new_type, namespace):
-    for attr in namespace.values():
-        if (isinstance(attr, types.FunctionType) and
-                getattr(attr, 'service_type', None) == old_type):
-            setattr(attr, 'service_type', new_type)
 
 
 def get_function_name(func):
