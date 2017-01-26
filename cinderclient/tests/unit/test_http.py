@@ -331,12 +331,18 @@ class ClientTest(utils.TestCase):
                     }
                 }
             }
+
+            # Check data, we cannot do it on the call because the JSON
+            # dictionary to string can generated different strings.
+            actual_data = mock_201_request.call_args[1]['data']
+            self.assertDictEqual(data, json.loads(actual_data))
+
             mock_201_request.assert_called_with(
                 "POST",
                 "http://example.com:5000/v3/auth/tokens",
                 headers=headers,
                 allow_redirects=True,
-                data=json.dumps(data),
+                data=actual_data,
                 **self.TEST_REQUEST_BASE)
 
         test_auth_call()
