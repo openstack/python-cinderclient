@@ -1245,14 +1245,20 @@ def do_snapshot_list(cs, args):
     if args.display_name is not None:
         args.name = args.display_name
 
+    metadata = None
+    try:
+        if args.metadata:
+            metadata = shell_utils.extract_metadata(args)
+    except AttributeError:
+        pass
+
     search_opts = {
         'all_tenants': all_tenants,
         'name': args.name,
         'status': args.status,
         'volume_id': args.volume_id,
         'project_id': args.tenant,
-        'metadata': shell_utils.extract_metadata(args)
-        if args.metadata else None,
+        'metadata': metadata
     }
 
     snapshots = cs.volume_snapshots.list(search_opts=search_opts,
