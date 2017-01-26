@@ -31,6 +31,11 @@ from cinderclient import utils
 from cinderclient.v2.shell import *  # flake8: noqa
 
 
+@utils.arg('--group_id',
+           metavar='<group_id>',
+           default=None,
+           help='Filters results by a group_id. Default=None.',
+           start_version='3.10')
 @utils.arg('--all-tenants',
            dest='all_tenants',
            metavar='<0|1>',
@@ -137,6 +142,7 @@ def do_list(cs, args):
         'glance_metadata': shell_utils.extract_metadata(args,
                                                         type='image_metadata')
         if args.image_metadata else None,
+        'group_id': getattr(args, 'group_id', None),
     }
 
     # If unavailable/non-existent fields are specified, these fields will
