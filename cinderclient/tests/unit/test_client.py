@@ -24,8 +24,11 @@ import six
 import cinderclient.client
 import cinderclient.v1.client
 import cinderclient.v2.client
+from cinderclient import api_versions
 from cinderclient import exceptions
+from cinderclient import utils
 from cinderclient.tests.unit import utils
+from cinderclient.tests.unit.v3 import fakes
 
 
 class ClientTest(utils.TestCase):
@@ -304,3 +307,28 @@ class ClientTestSensitiveInfo(utils.TestCase):
         output = self.logger.output.split('\n')
         self.assertIn('***', output[1], output)
         self.assertNotIn(auth_password, output[1], output)
+
+
+class GetAPIVersionTestCase(utils.TestCase):
+
+    @mock.patch('cinderclient.client.requests.get')
+    def test_get_server_version(self, mock_request):
+
+        mock_response = utils.TestResponse({
+            "status_code": 200,
+            "text": json.dumps(fakes.fake_request_get())
+        })
+
+        mock_request.return_value = mock_response
+
+        url = "http://192.168.122.127:8776/v3/e5526285ebd741b1819393f772f11fc3"
+
+        min_version, max_version = cinderclient.client.get_server_version(url)
+        self.assertEqual(min_version, api_versions.APIVersion('3.0'))
+        self.assertEqual(max_version, api_versions.APIVersion('3.16'))
+
+        url = "https://192.168.122.127:8776/v3/e55285ebd741b1819393f772f11fc3"
+
+        min_version, max_version = cinderclient.client.get_server_version(url)
+        self.assertEqual(min_version, api_versions.APIVersion('3.0'))
+        self.assertEqual(max_version, api_versions.APIVersion('3.16'))

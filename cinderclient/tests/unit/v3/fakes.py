@@ -460,3 +460,43 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
             'guaranteed_until': "2013-11-12T21:00:00.000000",
         }
         return 200, {}, {'message': message}
+
+
+def fake_request_get():
+    versions = {'versions': [{'id': 'v1.0',
+                              'links': [{'href': 'http://docs.openstack.org/',
+                                         'rel': 'describedby',
+                                         'type': 'text/html'},
+                                        {'href': 'http://192.168.122.197/v1/',
+                                         'rel': 'self'}],
+                              'media-types': [{'base': 'application/json',
+                                               'type': 'application/'}],
+                              'min_version': '',
+                              'status': 'DEPRECATED',
+                              'updated': '2016-05-02T20:25:19Z',
+                              'version': ''},
+                             {'id': 'v2.0',
+                              'links': [{'href': 'http://docs.openstack.org/',
+                                         'rel': 'describedby',
+                                         'type': 'text/html'},
+                                        {'href': 'http://192.168.122.197/v2/',
+                                         'rel': 'self'}],
+                              'media-types': [{'base': 'application/json',
+                                               'type': 'application/'}],
+                              'min_version': '',
+                              'status': 'SUPPORTED',
+                              'updated': '2014-06-28T12:20:21Z',
+                              'version': ''},
+                             {'id': 'v3.0',
+                              'links': [{'href': 'http://docs.openstack.org/',
+                                         'rel': 'describedby',
+                                         'type': 'text/html'},
+                                        {'href': 'http://192.168.122.197/v3/',
+                                         'rel': 'self'}],
+                              'media-types': [{'base': 'application/json',
+                                               'type': 'application/'}],
+                              'min_version': '3.0',
+                              'status': 'CURRENT',
+                              'updated': '2016-02-08T12:20:21Z',
+                              'version': '3.16'}]}
+    return versions
