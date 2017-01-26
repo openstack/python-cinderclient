@@ -97,6 +97,13 @@ def get_server_version(url):
         return api_versions.APIVersion("2.0"), api_versions.APIVersion("2.0")
 
 
+def get_highest_client_server_version(url):
+    min_server, max_server = get_server_version(url)
+    max_server_version = api_versions.APIVersion.get_string(max_server)
+
+    return min(float(max_server_version), float(api_versions.MAX_VERSION))
+
+
 def get_volume_api_from_url(url):
     scheme, netloc, path, query, frag = urlparse.urlsplit(url)
     components = path.split("/")
