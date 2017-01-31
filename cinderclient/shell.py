@@ -25,6 +25,9 @@ import getpass
 import logging
 import sys
 
+import requests
+import six
+
 from keystoneauth1 import discover
 from keystoneauth1 import loading
 from keystoneauth1 import session
@@ -38,13 +41,13 @@ import requests
 import six
 import six.moves.urllib.parse as urlparse
 
+import cinderclient
 from cinderclient import api_versions
 from cinderclient import client
 from cinderclient import exceptions as exc
+from cinderclient import utils
 from cinderclient import _i18n
 from cinderclient._i18n import _
-from cinderclient import utils
-import cinderclient.auth_plugin
 
 
 # Enable i18n lazy translation
@@ -138,12 +141,21 @@ class OpenStackCinderShell(object):
                             help=_('Shows debugging output.'))
 
         parser.add_argument('--os-auth-system',
-                            metavar='<auth-system>',
-                            default=utils.env('OS_AUTH_SYSTEM'),
-                            help=_('Defaults to env[OS_AUTH_SYSTEM].'))
+                            metavar='<os-auth-system>',
+                            dest='os_auth_type',
+                            default=utils.env('OS_AUTH_SYSTEM',
+                            default=utils.env('OS_AUTH_TYPE')),
+                            help=_('DEPRECATED! Use --os-auth-type.'
+                                   'Defaults to env[OS_AUTH_SYSTEM].'))
         parser.add_argument('--os_auth_system',
                             help=argparse.SUPPRESS)
-
+        parser.add_argument('--os-auth-type',
+                            metavar='<os-auth-type>',
+                            dest='os_auth_type',
+                            default=utils.env('OS_AUTH_TYPE'),
+                            help=_('Defaults to env[OS_AUTH_TYPE].'))
+        parser.add_argument('--os_auth_type',
+                            help=argparse.SUPPRESS)
         parser.add_argument('--service-type',
                             metavar='<service-type>',
                             help=_('Service type. '
@@ -200,12 +212,24 @@ class OpenStackCinderShell(object):
 
         parser.add_argument('--bypass-url',
                             metavar='<bypass-url>',
-                            dest='bypass_url',
-                            default=utils.env('CINDERCLIENT_BYPASS_URL'),
-                            help=_("Use this API endpoint instead of the "
+                            dest='os_endpoint',
+                            default=utils.env('CINDERCLIENT_BYPASS_URL',
+                            default=utils.env('CINDER_ENDPOINT')),
+                            help=_("DEPRECATED! Use os_endpoint. "
+                            "Use this API endpoint instead of the "
                             "Service Catalog. Defaults to "
                             "env[CINDERCLIENT_BYPASS_URL]."))
         parser.add_argument('--bypass_url',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-endpoint',
+                            metavar='<os-endpoint>',
+                            dest='os_endpoint',
+                            default=utils.env('CINDER_ENDPOINT'),
+                            help=_("Use this API endpoint instead of the "
+                            "Service Catalog. Defaults to "
+                            "env[CINDER_ENDPOINT]."))
+        parser.add_argument('--os_endpoint',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--retries',
@@ -226,10 +250,6 @@ class OpenStackCinderShell(object):
                                 'on server side.'))
 
         self._append_global_identity_args(parser)
-
-        # The auth-system-plugins might require some extra options
-        cinderclient.auth_plugin.discover_auth_systems()
-        cinderclient.auth_plugin.load_auth_system_opts(parser)
 
         return parser
 
@@ -608,18 +628,23 @@ class OpenStackCinderShell(object):
 
         (os_username, os_password, os_tenant_name, os_auth_url,
          os_region_name, os_tenant_id, endpoint_type,
-         service_type, service_name, volume_service_name, bypass_url,
-         cacert, os_auth_system) = (
+         service_type, service_name, volume_service_name, os_endpoint,
+         cacert, os_auth_type) = (
              args.os_username, args.os_password,
              args.os_tenant_name, args.os_auth_url,
              args.os_region_name, args.os_tenant_id,
              args.os_endpoint_type,
              args.service_type, args.service_name,
              args.volume_service_name,
-             args.bypass_url, args.os_cacert,
-             args.os_auth_system)
-        if os_auth_system and os_auth_system != "keystone":
-            auth_plugin = cinderclient.auth_plugin.load_plugin(os_auth_system)
+             args.os_endpoint, args.os_cacert,
+             args.os_auth_type)
+        auth_session = None
+
+        if os_auth_type and os_auth_type != "keystone":
+            auth_plugin = loading.load_auth_from_argparse_arguments(
+                self.options)
+            auth_session = loading.load_session_from_argparse_arguments(
+                self.options, auth=auth_plugin)
         else:
             auth_plugin = None
 
@@ -637,16 +662,10 @@ class OpenStackCinderShell(object):
                                    self.options.os_project_domain_id)) or
                                  self.options.os_project_id)
 
-        if not utils.isunauthenticated(args.func):
-            if auth_plugin:
-                auth_plugin.parse_opts(args)
-
-            if not auth_plugin or not auth_plugin.opts:
-                if not os_username:
-                    raise exc.CommandError("You must provide a user name "
-                                           "through --os-username or "
-                                           "env[OS_USERNAME].")
-
+        # NOTE(e0ne): if auth_session exists it means auth plugin created
+        # session and we don't need to check for password and other
+        # authentification-related things.
+        if not utils.isunauthenticated(args.func) and not auth_session:
             if not os_password:
                 # No password, If we've got a tty, try prompting for it
                 if hasattr(sys.stdin, 'isatty') and sys.stdin.isatty():
@@ -682,10 +701,6 @@ class OpenStackCinderShell(object):
                 ))
 
             if not os_auth_url:
-                if os_auth_system and os_auth_system != 'keystone':
-                    os_auth_url = auth_plugin.get_auth_url()
-
-            if not os_auth_url:
                 raise exc.CommandError(
                     "You must provide an authentication URL "
                     "through --os-auth-url or env[OS_AUTH_URL].")
@@ -705,13 +720,12 @@ class OpenStackCinderShell(object):
                 "(env[OS_PROJECT_DOMAIN_NAME])"
             ))
 
-        if not os_auth_url:
+        if not os_auth_url and not auth_plugin:
             raise exc.CommandError(
                 "You must provide an authentication URL "
                 "through --os-auth-url or env[OS_AUTH_URL].")
 
-        auth_session = None
-        if not auth_plugin:
+        if not auth_session:
             auth_session = self._get_keystone_session()
 
         insecure = self.options.insecure
@@ -726,11 +740,11 @@ class OpenStackCinderShell(object):
             service_type=service_type,
             service_name=service_name,
             volume_service_name=volume_service_name,
-            bypass_url=bypass_url,
+            bypass_url=os_endpoint,
             retries=options.retries,
             http_log_debug=args.debug,
             insecure=insecure,
-            cacert=cacert, auth_system=os_auth_system,
+            cacert=cacert, auth_system=os_auth_type,
             auth_plugin=auth_plugin,
             session=auth_session,
             logger=self.ks_logger if auth_session else self.client_logger)
