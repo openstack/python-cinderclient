@@ -29,7 +29,7 @@ LOG = logging.getLogger(__name__)
 
 # key is a deprecated version and value is an alternative version.
 DEPRECATED_VERSIONS = {"1": "2"}
-MAX_VERSION = "3.15"
+MAX_VERSION = "3.27"
 
 _SUBSTITUTIONS = {}
 
