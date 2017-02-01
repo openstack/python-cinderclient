@@ -65,7 +65,7 @@ from cinderclient.v2 import availability_zones
            default=None,
            help='Filters results by a migration status. Default=None. '
                 'Admin only.')
-@utils.arg('--image_metadata',
+@utils.arg('--metadata',
            type=str,
            nargs='*',
            metavar='<key=value>',
@@ -125,9 +125,8 @@ def do_list(cs, args):
         'status': args.status,
         'bootable': args.bootable,
         'migration_status': args.migration_status,
-        'glance_metadata': shell_utils.extract_metadata(args,
-                                                        type='image_metadata')
-        if args.image_metadata else None,
+        'metadata': (shell_utils.extract_metadata(args) if args.metadata
+                     else None),
     }
 
     # If unavailable/non-existent fields are specified, these fields will

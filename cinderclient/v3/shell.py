@@ -75,15 +75,15 @@ from cinderclient.v2.shell import *  # flake8: noqa
            nargs='*',
            metavar='<key=value>',
            default=None,
-           help='Filters results by a metadata key and value pair. Require '
-                'volume api version >=3.4. Default=None.')
+           help='Filters results by a metadata key and value pair. '
+                'Default=None.')
 @utils.arg('--image_metadata',
            type=str,
            nargs='*',
            metavar='<key=value>',
            default=None,
-           help='Filters results by a image metadata key and value pair. '
-                'Default=None.')
+           help='Filters results by a image metadata key and value pair. Require '
+                'volume api version >=3.4. Default=None.')
 @utils.arg('--marker',
            metavar='<marker>',
            default=None,
