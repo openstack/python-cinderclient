@@ -37,7 +37,7 @@ def discover_auth_systems():
         try:
             auth_plugin = ep.load()
         except (ImportError, pkg_resources.UnknownExtra, AttributeError) as e:
-            logger.debug("ERROR: Cannot load auth plugin %s" % ep.name)
+            logger.debug("ERROR: Cannot load auth plugin %s", ep.name)
             logger.debug(e, exc_info=1)
         else:
             _discovered_plugins[ep.name] = auth_plugin

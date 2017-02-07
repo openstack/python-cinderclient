@@ -125,9 +125,9 @@ class HTTPClient(object):
                       self._safe_header(element, kwargs['headers'][element]))
             string_parts.append(header)
 
-        _logger.debug("REQ: %s" % " ".join(string_parts))
+        _logger.debug("REQ: %s", " ".join(string_parts))
         if 'data' in kwargs:
-            _logger.debug("REQ BODY: %s\n" % (kwargs['data']))
+            _logger.debug("REQ BODY: %s\n", (kwargs['data']))
 
     def _http_log_resp(self, resp):
         if not self.debug:

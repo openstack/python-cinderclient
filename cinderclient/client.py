@@ -93,7 +93,7 @@ def get_server_version(url):
                         api_versions.APIVersion(version['version']))
     except exceptions.ClientException as e:
         logger.warning(_LW("Error in server version query:%s\n"
-                 "Returning APIVersion 2.0") % six.text_type(e.message))
+                 "Returning APIVersion 2.0"), six.text_type(e.message))
         return api_versions.APIVersion("2.0"), api_versions.APIVersion("2.0")
 
 

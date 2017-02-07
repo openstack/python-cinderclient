@@ -757,12 +757,12 @@ class OpenStackCinderShell(object):
             if api_version_input:
                 logger.warning("Cannot determine the API version from "
                                "the endpoint URL. Falling back to the "
-                               "user-specified version: %s" %
+                               "user-specified version: %s",
                                endpoint_api_version)
             else:
                 logger.warning("Cannot determine the API version from the "
                                "endpoint URL or user input. Falling back "
-                               "to the default API version: %s" %
+                               "to the default API version: %s",
                                endpoint_api_version)
 
         profile = osprofiler_profiler and options.profile
