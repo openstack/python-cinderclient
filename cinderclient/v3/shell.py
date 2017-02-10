@@ -82,6 +82,7 @@ from cinderclient.v2.shell import *  # flake8: noqa
            nargs='*',
            metavar='<key=value>',
            default=None,
+           start_version='3.4',
            help='Filters results by a image metadata key and value pair. Require '
                 'volume api version >=3.4. Default=None.')
 @utils.arg('--marker',
@@ -141,7 +142,7 @@ def do_list(cs, args):
         if args.metadata else None,
         'glance_metadata': shell_utils.extract_metadata(args,
                                                         type='image_metadata')
-        if args.image_metadata else None,
+        if hasattr(args, 'image_metadata') and args.image_metadata else None,
         'group_id': getattr(args, 'group_id', None),
     }
 

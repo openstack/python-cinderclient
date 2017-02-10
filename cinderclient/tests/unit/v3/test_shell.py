@@ -385,8 +385,13 @@ class ShellTest(utils.TestCase):
         self.run_command('--os-volume-api-version 3.5 message-list --marker=1')
         self.assert_called('GET', '/messages?marker=1')
 
+    def test_list_with_image_metadata_before_3_4(self):
+        self.assertRaises(exceptions.UnsupportedAttribute,
+                          self.run_command,
+                          'list --image_metadata image_name=1234')
+
     def test_list_filter_image_metadata(self):
-        self.run_command('--os-volume-api-version 3.0 '
+        self.run_command('--os-volume-api-version 3.4 '
                          'list --image_metadata image_name=1234')
         url = ('/volumes/detail?%s' %
                parse.urlencode([('glance_metadata', {"image_name": "1234"})]))
