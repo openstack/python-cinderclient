@@ -2129,19 +2129,6 @@ def do_consisgroup_show(cs, args):
     utils.print_dict(info)
 
 
-@utils.arg('group',
-           metavar='<group>',
-           help='Name or ID of a group.')
-def do_group_show(cs, args):
-    """Shows details of a group."""
-    info = dict()
-    group = shell_utils.find_group(cs, args.group)
-    info.update(group._info)
-
-    info.pop('links', None)
-    utils.print_dict(info)
-
-
 @utils.arg('volumetypes',
            metavar='<volume-types>',
            help='Volume types.')

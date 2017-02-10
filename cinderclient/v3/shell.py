@@ -763,6 +763,20 @@ def do_group_list(cs, args):
 
 
 @api_versions.wraps('3.13')
+@utils.arg('group',
+           metavar='<group>',
+           help='Name or ID of a group.')
+def do_group_show(cs, args):
+    """Shows details of a group."""
+    info = dict()
+    group = shell_utils.find_group(cs, args.group)
+    info.update(group._info)
+
+    info.pop('links', None)
+    utils.print_dict(info)
+
+
+@api_versions.wraps('3.13')
 @utils.arg('grouptype',
            metavar='<group-type>',
            help='Group type.')
