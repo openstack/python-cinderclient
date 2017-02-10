@@ -85,9 +85,10 @@ def find_consistencygroup(cs, consistencygroup):
     return utils.find_resource(cs.consistencygroups, consistencygroup)
 
 
-def find_group(cs, group):
+def find_group(cs, group, **kwargs):
     """Gets a group by name or ID."""
-    return utils.find_resource(cs.groups, group)
+    kwargs['is_group'] = True
+    return utils.find_resource(cs.groups, group, **kwargs)
 
 
 def find_cgsnapshot(cs, cgsnapshot):

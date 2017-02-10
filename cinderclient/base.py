@@ -403,9 +403,14 @@ class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):
             search_opts['display_name'] = kwargs['display_name']
 
         found = common_base.ListWithMeta([], None)
+        # list_volume is used for group query, it's not resource's property.
+        list_volume = kwargs.pop('list_volume', False)
         searches = kwargs.items()
-
-        listing = self.list(search_opts=search_opts)
+        if list_volume:
+            listing = self.list(search_opts=search_opts,
+                                list_volume=list_volume)
+        else:
+            listing = self.list(search_opts=search_opts)
         found.append_request_ids(listing.request_ids)
         # Not all resources attributes support filters on server side
         # (e.g. 'human_id' doesn't), so when doing findall some client

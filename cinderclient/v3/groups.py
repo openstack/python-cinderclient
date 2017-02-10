@@ -14,6 +14,7 @@
 #    under the License.
 
 """Group interface (v3 extension)."""
+from six.moves.urllib import parse
 
 from cinderclient import api_versions
 from cinderclient import base
@@ -106,20 +107,31 @@ class GroupManager(base.ManagerWithFind):
             "/groups/action", body=body)
         return common_base.DictWithMeta(body['group'], resp)
 
-    def get(self, group_id):
+    def get(self, group_id, **kwargs):
         """Get a group.
 
         :param group_id: The ID of the group to get.
         :rtype: :class:`Group`
         """
-        return self._get("/groups/%s" % group_id,
+        query_params = utils.unicode_key_value_to_string(kwargs)
+
+        query_string = ""
+        if query_params:
+            params = sorted(query_params.items(), key=lambda x: x[0])
+            query_string = "?%s" % parse.urlencode(params)
+
+        return self._get("/groups/%s" % group_id + query_string,
                          "group")
 
-    def list(self, detailed=True, search_opts=None):
+    def list(self, detailed=True, search_opts=None, list_volume=False):
         """Lists all groups.
 
         :rtype: list of :class:`Group`
         """
+        if list_volume:
+            if not search_opts:
+                search_opts = {}
+            search_opts['list_volume'] = True
         query_string = utils.build_query_param(search_opts)
 
         detail = ""

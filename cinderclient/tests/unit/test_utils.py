@@ -53,13 +53,13 @@ class FakeManager(base.ManagerWithFind):
         FakeResource('5678', {'name': '9876'})
     ]
 
-    def get(self, resource_id):
+    def get(self, resource_id, **kwargs):
         for resource in self.resources:
             if resource.id == str(resource_id):
                 return resource
         raise exceptions.NotFound(resource_id)
 
-    def list(self, search_opts):
+    def list(self, search_opts, **kwargs):
         return common_base.ListWithMeta(self.resources, fakes.REQUEST_ID)
 
 
@@ -131,6 +131,18 @@ class FindResourceTestCase(test_utils.TestCase):
         display_manager = FakeDisplayManager(None)
         output = utils.find_resource(display_manager, 'entity_three')
         self.assertEqual(display_manager.get('4242'), output)
+
+    def test_find_by_group_id(self):
+        output = utils.find_resource(self.manager, 1234, is_group=True,
+                                     list_volume=True)
+        self.assertEqual(self.manager.get('1234', list_volume=True), output)
+
+    def test_find_by_group_name(self):
+        display_manager = FakeDisplayManager(None)
+        output = utils.find_resource(display_manager, 'entity_three',
+                                     is_group=True, list_volume=True)
+        self.assertEqual(display_manager.get('4242', list_volume=True),
+                         output)
 
 
 class CaptureStdout(object):

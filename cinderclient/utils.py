@@ -220,11 +220,14 @@ def print_dict(d, property="Property", formatters=None):
     _print(pt, property)
 
 
-def find_resource(manager, name_or_id):
+def find_resource(manager, name_or_id, **kwargs):
     """Helper for the _find_* methods."""
+    is_group = kwargs.pop('is_group', False)
     # first try to get entity as integer id
     try:
         if isinstance(name_or_id, int) or name_or_id.isdigit():
+            if is_group:
+                return manager.get(int(name_or_id), **kwargs)
             return manager.get(int(name_or_id))
     except exceptions.NotFound:
         pass
@@ -232,6 +235,8 @@ def find_resource(manager, name_or_id):
         # now try to get entity as uuid
         try:
             uuid.UUID(name_or_id)
+            if is_group:
+                return manager.get(name_or_id, **kwargs)
             return manager.get(name_or_id)
         except (ValueError, exceptions.NotFound):
             pass
@@ -243,12 +248,18 @@ def find_resource(manager, name_or_id):
         try:
             resource = getattr(manager, 'resource_class', None)
             name_attr = resource.NAME_ATTR if resource else 'name'
+            if is_group:
+                kwargs[name_attr] = name_or_id
+                return manager.find(**kwargs)
             return manager.find(**{name_attr: name_or_id})
         except exceptions.NotFound:
             pass
 
         # finally try to find entity by human_id
         try:
+            if is_group:
+                kwargs['human_id'] = name_or_id
+                return manager.find(**kwargs)
             return manager.find(human_id=name_or_id)
         except exceptions.NotFound:
             msg = "No %s with a name or ID of '%s' exists." % \

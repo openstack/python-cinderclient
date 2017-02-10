@@ -831,13 +831,26 @@ def do_group_list(cs, args):
 
 
 @api_versions.wraps('3.13')
+@utils.arg('--list-volume',
+           dest='list_volume',
+           metavar='<False|True>',
+           nargs='?',
+           type=bool,
+           const=True,
+           default=False,
+           help='Shows volumes included in the group.',
+           start_version='3.25')
 @utils.arg('group',
            metavar='<group>',
            help='Name or ID of a group.')
 def do_group_show(cs, args):
     """Shows details of a group."""
     info = dict()
-    group = shell_utils.find_group(cs, args.group)
+    if getattr(args, 'list_volume', None):
+        group = shell_utils.find_group(cs, args.group,
+                                       list_volume=args.list_volume)
+    else:
+        group = shell_utils.find_group(cs, args.group)
     info.update(group._info)
 
     info.pop('links', None)
