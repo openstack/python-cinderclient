@@ -17,6 +17,7 @@
 from __future__ import print_function
 
 import argparse
+import collections
 import os
 
 from oslo_utils import strutils
@@ -171,7 +172,11 @@ def do_list(cs, args):
         setattr(vol, 'attached_to', ','.join(map(str, servers)))
 
     if field_titles:
-        key_list = ['ID'] + field_titles
+        # Remove duplicate fields
+        key_list = ['ID']
+        unique_titles = [k for k in collections.OrderedDict.fromkeys(
+            [x.title().strip() for x in field_titles]) if k != 'Id']
+        key_list.extend(unique_titles)
     else:
         key_list = ['ID', 'Status', 'Name', 'Size', 'Volume Type',
                     'Bootable', 'Attached to']
