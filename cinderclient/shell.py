@@ -25,29 +25,28 @@ import getpass
 import logging
 import sys
 
-import requests
-import six
-
-from cinderclient import api_versions
-from cinderclient import client
-from cinderclient import exceptions as exc
-from cinderclient import utils
-import cinderclient.auth_plugin
-from cinderclient._i18n import _
-
 from keystoneauth1 import discover
 from keystoneauth1 import loading
 from keystoneauth1 import session
 from keystoneauth1.identity import v2 as v2_auth
 from keystoneauth1.identity import v3 as v3_auth
 from keystoneauth1.exceptions import DiscoveryFailure
-import six.moves.urllib.parse as urlparse
 from oslo_utils import encodeutils
 from oslo_utils import importutils
+osprofiler_profiler = importutils.try_import("osprofiler.profiler")  # noqa
+import requests
+import six
+import six.moves.urllib.parse as urlparse
 
-osprofiler_profiler = importutils.try_import("osprofiler.profiler")
-
+from cinderclient import api_versions
+from cinderclient import client
+from cinderclient import exceptions as exc
 from cinderclient import _i18n
+from cinderclient._i18n import _
+from cinderclient import utils
+import cinderclient.auth_plugin
+
+
 # Enable i18n lazy translation
 _i18n.enable_lazy()
 
@@ -819,10 +818,9 @@ class OpenStackCinderShell(object):
 
         username = self.options.os_username
         password = self.options.os_password
-        tenant_id = (self.options.os_tenant_id
-                     or self.options.os_project_id)
-        tenant_name = (self.options.os_tenant_name
-                       or self.options.os_project_name)
+        tenant_id = self.options.os_tenant_id or self.options.os_project_id
+        tenant_name = (self.options.os_tenant_name or
+                       self.options.os_project_name)
 
         return v2_auth.Password(
             v2_auth_url,
@@ -839,8 +837,8 @@ class OpenStackCinderShell(object):
         user_domain_id = self.options.os_user_domain_id
         password = self.options.os_password
         project_id = self.options.os_project_id or self.options.os_tenant_id
-        project_name = (self.options.os_project_name
-                        or self.options.os_tenant_name)
+        project_name = (self.options.os_project_name or
+                        self.options.os_tenant_name)
         project_domain_name = self.options.os_project_domain_name
         project_domain_id = self.options.os_project_domain_id
 
