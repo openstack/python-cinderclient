@@ -236,6 +236,11 @@ class ShellTest(utils.TestCase):
         self.run_command('--os-volume-api-version 3.13 group-list')
         self.assert_called_anytime('GET', '/groups/detail')
 
+    def test_group_list__with_all_tenant(self):
+        self.run_command(
+            '--os-volume-api-version 3.13 group-list --all-tenants')
+        self.assert_called_anytime('GET', '/groups/detail?all_tenants=1')
+
     def test_group_show(self):
         self.run_command('--os-volume-api-version 3.13 '
                          'group-show 1234')

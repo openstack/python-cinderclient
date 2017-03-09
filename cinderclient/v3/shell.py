@@ -753,11 +753,13 @@ def do_manageable_list(cs, args):
            nargs='?',
            type=int,
            const=1,
-           default=0,
+           default=utils.env('ALL_TENANTS', default=0),
            help='Shows details for all tenants. Admin only.')
 def do_group_list(cs, args):
     """Lists all groups."""
-    groups = cs.groups.list()
+    search_opts = {'all_tenants': args.all_tenants}
+
+    groups = cs.groups.list(search_opts=search_opts)
 
     columns = ['ID', 'Status', 'Name']
     utils.print_list(groups, columns)
