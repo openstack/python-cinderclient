@@ -51,7 +51,7 @@ from cinderclient import _i18n
 # Enable i18n lazy translation
 _i18n.enable_lazy()
 
-DEFAULT_MAJOR_OS_VOLUME_API_VERSION = "2"
+DEFAULT_MAJOR_OS_VOLUME_API_VERSION = "3"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
 V1_SHELL = 'cinderclient.v1.shell'
 V2_SHELL = 'cinderclient.v2.shell'
