@@ -104,6 +104,13 @@ def get_highest_client_server_version(url):
     return min(float(max_server_version), float(api_versions.MAX_VERSION))
 
 
+def get_highest_client_server_version(url):
+    min_server, max_server = get_server_version(url)
+    max_server_version = api_versions.APIVersion.get_string(max_server)
+
+    return min(float(max_server_version), float(api_versions.MAX_VERSION))
+
+
 def get_volume_api_from_url(url):
     scheme, netloc, path, query, frag = urlparse.urlsplit(url)
     components = path.split("/")
@@ -210,7 +217,7 @@ class SessionClient(adapter.LegacyJsonAdapter):
                              'auth plugin.')
 
     def _cs_request_base_url(self, url, method, **kwargs):
-        base_url = self._get_base_url(**kwargs)
+        base_url = self._get_base_url()
         return self._cs_request(
             base_url + url,
             method,

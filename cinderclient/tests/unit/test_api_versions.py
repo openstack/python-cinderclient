@@ -184,3 +184,72 @@ class GetAPIVersionTestCase(utils.TestCase):
         self.assertEqual(mock_apiversion.return_value,
                          api_versions.get_api_version(version))
         mock_apiversion.assert_called_once_with(version)
+
+
+@ddt.ddt
+class DiscoverVersionTestCase(utils.TestCase):
+    def setUp(self):
+        super(DiscoverVersionTestCase, self).setUp()
+        self.orig_max = api_versions.MAX_VERSION
+        self.orig_min = api_versions.MIN_VERSION or None
+        self.addCleanup(self._clear_fake_version)
+        self.fake_client = mock.MagicMock()
+
+    def _clear_fake_version(self):
+        api_versions.MAX_VERSION = self.orig_max
+        api_versions.MIN_VERSION = self.orig_min
+
+    def _mock_returned_server_version(self, server_version,
+                                      server_min_version):
+        version_mock = mock.MagicMock(version=server_version,
+                                      min_version=server_min_version,
+                                      status='CURRENT')
+        val = [version_mock]
+        if not server_version and not server_min_version:
+            val = []
+        self.fake_client.services.server_api_version.return_value = val
+
+    @ddt.data(
+        ("3.1", "3.3", "3.4", "3.7", "3.3", True),   # Server too new
+        ("3.9", "3.10", "3.0", "3.3", "3.10", True),   # Server too old
+        ("3.3", "3.9", "3.7", "3.17", "3.9", False),  # Requested < server
+        ("3.5", "3.8", "3.0", "3.7", "3.8", False, "3.7"),  # downgraded
+        ("3.5", "3.5", "3.0", "3.5", "3.5", False),  # Server & client same
+        ("3.5", "3.5", "3.0", "3.5", "3.5", False, "2.0", []),  # Pre-micro
+        ("3.1", "3.11", "3.4", "3.7", "3.7", False),  # Requested in range
+        ("3.1", "3.11", None, None, "3.7", False),  # Server w/o support
+        ("3.5", "3.5", "3.0", "3.5", "1.0", True)    # Requested too old
+    )
+    @ddt.unpack
+    def test_microversion(self, client_min, client_max, server_min, server_max,
+                          requested_version, exp_range, end_version=None,
+                          ret_val=None):
+        if ret_val is not None:
+            self.fake_client.services.server_api_version.return_value = ret_val
+        else:
+            self._mock_returned_server_version(server_max, server_min)
+
+        api_versions.MAX_VERSION = client_max
+        api_versions.MIN_VERSION = client_min
+
+        if exp_range:
+            self.assertRaisesRegexp(exceptions.UnsupportedVersion,
+                                    ".*range is '%s' to '%s'.*" %
+                                    (server_min, server_max),
+                                    api_versions.discover_version,
+                                    self.fake_client,
+                                    api_versions.APIVersion(requested_version))
+        else:
+            discovered_version = api_versions.discover_version(
+                self.fake_client,
+                api_versions.APIVersion(requested_version))
+
+            version = requested_version
+            if server_min is None and server_max is None:
+                version = api_versions.DEPRECATED_VERSION
+            elif end_version is not None:
+                version = end_version
+            self.assertEqual(version,
+                             discovered_version.get_string())
+            self.assertTrue(
+                self.fake_client.services.server_api_version.called)
