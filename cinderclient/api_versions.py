@@ -244,6 +244,18 @@ def _get_server_version_range(client):
             return APIVersion(version.min_version), APIVersion(version.version)
 
 
+def get_highest_version(client):
+    """Queries the server version info and returns highest supported
+    microversion
+
+    :param client: client object
+    :returns: APIVersion
+    """
+    server_start_version, server_end_version = _get_server_version_range(
+        client)
+    return server_end_version
+
+
 def discover_version(client, requested_version):
     """Checks ``requested_version`` and returns the most recent version
     supported by both the API and the client.
