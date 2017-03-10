@@ -10,6 +10,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import unittest
+
 import six
 import ddt
 
@@ -89,6 +91,7 @@ class CinderVolumeTestsWithParameters(base.ClientTestBase):
                                     format(volume_description))
         self.assertEqual(volume_description, volume['description'])
 
+    @unittest.skip("Skip until multiattach will be supported")
     def test_volume_create_multiattach(self):
         """Test steps:
 
