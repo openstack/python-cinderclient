@@ -23,6 +23,7 @@ import os
 from oslo_utils import strutils
 import six
 
+import cinderclient
 from cinderclient import api_versions
 from cinderclient import base
 from cinderclient import exceptions
@@ -1099,7 +1100,6 @@ def do_api_version(cs, args):
     response = cs.services.server_api_version()
     utils.print_list(response, columns)
 
-
 @api_versions.wraps("3.3")
 @utils.arg('--marker',
            metavar='<marker>',
@@ -1497,3 +1497,21 @@ def do_attachment_delete(cs, args):
     """Delete an attachment for a cinder volume."""
     for attachment in args.attachment:
         cs.attachments.delete(attachment)
+
+@api_versions.wraps('3.0')
+def do_version_list(cs, args):
+    """List all API versions."""
+    result = cs.services.server_api_version()
+    if 'min_version' in dir(result[0]):
+        columns = ["Id", "Status", "Updated", "Min Version", "Version"]
+    else:
+        columns = ["Id", "Status", "Updated"]
+
+    print(("Client supported API versions:"))
+    print(("Minimum version %(v)s") %
+          {'v': api_versions.MIN_VERSION})
+    print(("Maximum version %(v)s") %
+          {'v': api_versions.MAX_VERSION})
+
+    print(("\nServer supported API versions:"))
+    utils.print_list(result, columns)
