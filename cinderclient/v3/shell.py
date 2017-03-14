@@ -1021,7 +1021,7 @@ def do_group_snapshot_delete(cs, args):
                                       "group snapshots.")
 
 
-@api_versions.wraps('3.7')
+@api_versions.wraps('3.0')
 @utils.arg('--host', metavar='<hostname>', default=None,
            help='Host name. Default=None.')
 @utils.arg('--binary', metavar='<binary>', default=None,
@@ -1031,12 +1031,17 @@ def do_group_snapshot_delete(cs, args):
            const=True,
            nargs='?',
            default=False,
+           start_version='3.7',
            help='Enables or disables display of '
                 'Replication info for c-vol services. Default=False.')
 def do_service_list(cs, args):
     """Lists all services. Filter by host and service binary."""
-    replication = strutils.bool_from_string(args.withreplication,
-                                            strict=True)
+    if hasattr(args, 'withreplication'):
+        replication = strutils.bool_from_string(args.withreplication,
+                                                strict=True)
+    else:
+        replication = False
+
     result = cs.services.list(host=args.host, binary=args.binary)
     columns = ["Binary", "Host", "Zone", "Status", "State", "Updated_at"]
     if cs.api_version.matches('3.7'):

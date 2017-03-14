@@ -437,3 +437,14 @@ class ShellTest(utils.TestCase):
         self.run_command('--os-volume-api-version 3.15 '
                          'metadata 1234 unset k1 k3')
         self.assert_called('PUT', '/volumes/1234/metadata', body=expected)
+
+    @ddt.data(("3.0", None), ("3.6", None),
+              ("3.7", True), ("3.7", False), ("3.7", ""))
+    @ddt.unpack
+    def test_service_list_withreplication(self, version, replication):
+        command = ('--os-volume-api-version %s service-list' %
+                   version)
+        if replication is not None:
+            command += ' --withreplication %s' % replication
+        self.run_command(command)
+        self.assert_called('GET', '/os-services')
