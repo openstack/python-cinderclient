@@ -547,6 +547,16 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         }
         return 200, {}, {'message': message}
 
+    def put_os_services_set_log(self, body):
+        return (202, {}, {})
+
+    def put_os_services_get_log(self, body):
+        levels = [{'binary': 'cinder-api', 'host': 'host1',
+                   'levels': {'prefix1': 'DEBUG', 'prefix2': 'INFO'}},
+                  {'binary': 'cinder-volume', 'host': 'host@backend#pool',
+                   'levels': {'prefix3': 'WARNING', 'prefix4': 'ERROR'}}]
+        return (200, {}, {'log_levels': levels})
+
     #
     # resource filters
     #

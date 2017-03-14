@@ -1922,3 +1922,44 @@ def do_version_list(cs, args):
 
     print("\nServer supported API versions:")
     utils.print_list(result, columns)
+
+
+@api_versions.wraps('3.32')
+@utils.arg('level',
+           metavar='<log-level>',
+           choices=('INFO', 'WARNING', 'ERROR', 'DEBUG',
+                    'info', 'warning', 'error', 'debug'),
+           help='Desired log level.')
+@utils.arg('--binary',
+           choices=('', '*', 'cinder-api', 'cinder-volume', 'cinder-scheduler',
+                    'cinder-backup'),
+           default='',
+           help='Binary to change.')
+@utils.arg('--server',
+           default='',
+           help='Host or cluster value for service.')
+@utils.arg('--prefix',
+           default='',
+           help='Prefix for the log. ie: "cinder.volume.drivers.".')
+def do_service_set_log(cs, args):
+    cs.services.set_log_levels(args.level, args.binary, args.server,
+                               args.prefix)
+
+
+@api_versions.wraps('3.32')
+@utils.arg('--binary',
+           choices=('', '*', 'cinder-api', 'cinder-volume', 'cinder-scheduler',
+                    'cinder-backup'),
+           default='',
+           help='Binary to query.')
+@utils.arg('--server',
+           default='',
+           help='Host or cluster value for service.')
+@utils.arg('--prefix',
+           default='',
+           help='Prefix for the log. ie: "sqlalchemy.".')
+def do_service_get_log(cs, args):
+    log_levels = cs.services.get_log_levels(args.binary, args.server,
+                                            args.prefix)
+    columns = ('Binary', 'Host', 'Prefix', 'Level')
+    utils.print_list(log_levels, columns)

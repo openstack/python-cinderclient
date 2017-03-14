@@ -18,6 +18,7 @@ import ddt
 import fixtures
 import mock
 from requests_mock.contrib import fixture as requests_mock_fixture
+import six
 
 from cinderclient import client
 from cinderclient import exceptions
@@ -788,3 +789,78 @@ class ShellTest(utils.TestCase):
         self.run_command(cmd)
         expected = {'list_replication_targets': {}}
         self.assert_called('POST', '/groups/1234/action', body=expected)
+
+    @mock.patch('cinderclient.v3.services.ServiceManager.get_log_levels')
+    def test_service_get_log_before_3_32(self, get_levels_mock):
+        self.assertRaises(SystemExit,
+                          self.run_command, '--os-volume-api-version 3.28 '
+                         'service-get-log')
+        get_levels_mock.assert_not_called()
+
+    @mock.patch('cinderclient.v3.services.ServiceManager.get_log_levels')
+    @mock.patch('cinderclient.utils.print_list')
+    def test_service_get_log_no_params(self, print_mock, get_levels_mock):
+        self.run_command('--os-volume-api-version 3.32 service-get-log')
+        get_levels_mock.assert_called_once_with('', '', '')
+        print_mock.assert_called_once_with(get_levels_mock.return_value,
+                                           ('Binary', 'Host', 'Prefix',
+                                            'Level'))
+
+    @ddt.data('*', 'cinder-api', 'cinder-volume', 'cinder-scheduler',
+              'cinder-backup')
+    @mock.patch('cinderclient.v3.services.ServiceManager.get_log_levels')
+    @mock.patch('cinderclient.utils.print_list')
+    def test_service_get_log(self, binary, print_mock, get_levels_mock):
+        server = 'host1'
+        prefix = 'sqlalchemy'
+
+        self.run_command('--os-volume-api-version 3.32 service-get-log '
+                         '--binary %s --server %s --prefix %s' % (
+                             binary, server, prefix))
+        get_levels_mock.assert_called_once_with(binary, server, prefix)
+        print_mock.assert_called_once_with(get_levels_mock.return_value,
+                                           ('Binary', 'Host', 'Prefix',
+                                            'Level'))
+
+    @mock.patch('cinderclient.v3.services.ServiceManager.set_log_levels')
+    def test_service_set_log_before_3_32(self, set_levels_mock):
+        self.assertRaises(SystemExit,
+                          self.run_command, '--os-volume-api-version 3.28 '
+                         'service-set-log debug')
+        set_levels_mock.assert_not_called()
+
+    @mock.patch('cinderclient.v3.services.ServiceManager.set_log_levels')
+    @mock.patch('cinderclient.shell.CinderClientArgumentParser.error')
+    def test_service_set_log_missing_required(self, error_mock,
+                                              set_levels_mock):
+        error_mock.side_effect = SystemExit
+        self.assertRaises(SystemExit,
+                          self.run_command, '--os-volume-api-version 3.32 '
+                          'service-set-log')
+        set_levels_mock.assert_not_called()
+        # Different error message from argparse library in Python 2 and 3
+        if six.PY3:
+            msg = 'the following arguments are required: <log-level>'
+        else:
+            msg = 'too few arguments'
+        error_mock.assert_called_once_with(msg)
+
+    @ddt.data('debug', 'DEBUG', 'info', 'INFO', 'warning', 'WARNING', 'error',
+              'ERROR')
+    @mock.patch('cinderclient.v3.services.ServiceManager.set_log_levels')
+    def test_service_set_log_min_params(self, level, set_levels_mock):
+        self.run_command('--os-volume-api-version 3.32 '
+                         'service-set-log %s' % level)
+        set_levels_mock.assert_called_once_with(level, '', '', '')
+
+    @ddt.data('*', 'cinder-api', 'cinder-volume', 'cinder-scheduler',
+              'cinder-backup')
+    @mock.patch('cinderclient.v3.services.ServiceManager.set_log_levels')
+    def test_service_set_log_levels(self, binary, set_levels_mock):
+        level = 'debug'
+        server = 'host1'
+        prefix = 'sqlalchemy.'
+        self.run_command('--os-volume-api-version 3.32 '
+                         'service-set-log %s --binary %s --server %s '
+                         '--prefix %s' % (level, binary, server, prefix))
+        set_levels_mock.assert_called_once_with(level, binary, server, prefix)

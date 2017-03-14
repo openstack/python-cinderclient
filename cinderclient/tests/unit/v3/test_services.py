@@ -41,3 +41,45 @@ class ServicesTest(utils.TestCase):
         client = fakes.FakeClient(version_header='3.0')
         svs = client.services.server_api_version()
         [self.assertIsInstance(s, services.Service) for s in svs]
+
+    def test_set_log_levels(self):
+        expected = {'level': 'debug', 'binary': 'cinder-api',
+                    'server': 'host1', 'prefix': 'sqlalchemy.'}
+
+        cs = fakes.FakeClient(version_header='3.32')
+        cs.services.set_log_levels(expected['level'], expected['binary'],
+                                   expected['server'], expected['prefix'])
+
+        cs.assert_called('PUT', '/os-services/set-log', body=expected)
+
+    def test_get_log_levels(self):
+        expected = {'binary': 'cinder-api', 'server': 'host1',
+                    'prefix': 'sqlalchemy.'}
+
+        cs = fakes.FakeClient(version_header='3.32')
+        result = cs.services.get_log_levels(expected['binary'],
+                                            expected['server'],
+                                            expected['prefix'])
+
+        cs.assert_called('PUT', '/os-services/get-log', body=expected)
+        expected = [services.LogLevel(cs.services,
+                                      {'binary': 'cinder-api', 'host': 'host1',
+                                       'prefix': 'prefix1', 'level': 'DEBUG'},
+                                      loaded=True),
+                    services.LogLevel(cs.services,
+                                      {'binary': 'cinder-api', 'host': 'host1',
+                                       'prefix': 'prefix2', 'level': 'INFO'},
+                                      loaded=True),
+                    services.LogLevel(cs.services,
+                                      {'binary': 'cinder-volume',
+                                       'host': 'host@backend#pool',
+                                       'prefix': 'prefix3',
+                                       'level': 'WARNING'},
+                                      loaded=True),
+                    services.LogLevel(cs.services,
+                                      {'binary': 'cinder-volume',
+                                       'host': 'host@backend#pool',
+                                       'prefix': 'prefix4', 'level': 'ERROR'},
+                                      loaded=True)]
+        # Since it will be sorted by the prefix we can compare them directly
+        self.assertListEqual(expected, result)

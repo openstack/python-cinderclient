@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Support microversion 3.32 that allows dynamically changing and querying
+    Cinder services' log levels with ``service-set-log`` and
+    ``service-get-log`` commands.
