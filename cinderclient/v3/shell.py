@@ -733,7 +733,7 @@ def do_cluster_disable(cs, args):
            help=(('Comma-separated list of sort keys and directions in the '
                   'form of <key>[:<asc|desc>]. '
                   'Valid keys: %s. '
-                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
+                  'Default=None.') % ', '.join(base.SORT_MANAGEABLE_KEY_VALUES)))
 def do_manageable_list(cs, args):
     """Lists all manageable volumes."""
     detailed = strutils.bool_from_string(args.detailed)
@@ -1079,7 +1079,7 @@ def do_service_list(cs, args):
            help=(('Comma-separated list of sort keys and directions in the '
                   'form of <key>[:<asc|desc>]. '
                   'Valid keys: %s. '
-                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
+                  'Default=None.') % ', '.join(base.SORT_MANAGEABLE_KEY_VALUES)))
 def do_snapshot_manageable_list(cs, args):
     """Lists all manageable snapshots."""
     detailed = strutils.bool_from_string(args.detailed)
