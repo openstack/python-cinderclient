@@ -35,6 +35,7 @@ from cinderclient import utils
 SORT_DIR_VALUES = ('asc', 'desc')
 SORT_KEY_VALUES = ('id', 'status', 'size', 'availability_zone', 'name',
                    'bootable', 'created_at', 'reference')
+SORT_MANAGEABLE_KEY_VALUES = ('size', 'reference')
 # Mapping of client keys to actual sort keys
 SORT_KEY_MAPPINGS = {'name': 'display_name'}
 # Additional sort keys for resources
