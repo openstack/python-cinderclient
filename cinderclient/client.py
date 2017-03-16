@@ -34,20 +34,18 @@ from keystoneauth1 import access
 from keystoneauth1 import adapter
 from keystoneauth1.identity import base
 from keystoneauth1 import discover
+from oslo_utils import encodeutils
+from oslo_utils import importutils
+from oslo_utils import strutils
+osprofiler_web = importutils.try_import("osprofiler.web")  # noqa
 import requests
+import six.moves.urllib.parse as urlparse
 
 from cinderclient import api_versions
 from cinderclient import exceptions
 import cinderclient.extension
 from cinderclient._i18n import _
 from cinderclient._i18n import _LW
-from oslo_utils import encodeutils
-from oslo_utils import importutils
-from oslo_utils import strutils
-
-osprofiler_web = importutils.try_import("osprofiler.web")
-
-import six.moves.urllib.parse as urlparse
 
 try:
     from eventlet import sleep
