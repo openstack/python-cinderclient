@@ -17,6 +17,7 @@
 
 
 from cinderclient.apiclient import base as common_base
+from cinderclient import api_versions
 from cinderclient import base
 from cinderclient import utils
 
@@ -33,6 +34,10 @@ class GroupSnapshot(base.Resource):
     def update(self, **kwargs):
         """Update the name or description for this group snapshot."""
         return self.manager.update(self, **kwargs)
+
+    def reset_state(self, state):
+        """Reset the group snapshot's state with specified one."""
+        return self.manager.reset_state(self, state)
 
 
 class GroupSnapshotManager(base.ManagerWithFind):
@@ -73,6 +78,16 @@ class GroupSnapshotManager(base.ManagerWithFind):
         """
         return self._get("/group_snapshots/%s" % group_snapshot_id,
                          "group_snapshot")
+
+    @api_versions.wraps('3.19')
+    def reset_state(self, group_snapshot, state):
+        """Update the provided group snapshot with the provided state.
+
+        :param group_snapshot: The :class:`GroupSnapshot` to set the state.
+        :param state: The state of the group snapshot to be set.
+        """
+        body = {'status': state} if state else {}
+        return self._action('reset_status', group_snapshot, body)
 
     def list(self, detailed=True, search_opts=None):
         """Lists all group snapshots.

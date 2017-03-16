@@ -15,6 +15,7 @@
 
 """Group interface (v3 extension)."""
 
+from cinderclient import api_versions
 from cinderclient import base
 from cinderclient.apiclient import base as common_base
 from cinderclient import utils
@@ -32,6 +33,10 @@ class Group(base.Resource):
     def update(self, **kwargs):
         """Update the name or description for this group."""
         return self.manager.update(self, **kwargs)
+
+    def reset_state(self, state):
+        """Reset the group's state with specified one"""
+        return self.manager.reset_state(self, state)
 
 
 class GroupManager(base.ManagerWithFind):
@@ -63,6 +68,16 @@ class GroupManager(base.ManagerWithFind):
                           }}
 
         return self._create('/groups', body, 'group')
+
+    @api_versions.wraps('3.20')
+    def reset_state(self, group, state):
+        """Update the provided group with the provided state.
+
+        :param group: The :class:`Group` to set the state.
+        :param state: The state of the group to be set.
+        """
+        body = {'status': state} if state else {}
+        return self._action('reset_status', group, body)
 
     def create_from_src(self, group_snapshot_id, source_group_id,
                         name=None, description=None, user_id=None,

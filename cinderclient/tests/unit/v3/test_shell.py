@@ -454,6 +454,80 @@ class ShellTest(utils.TestCase):
         self.run_command('--os-volume-api-version 3.3 message-list')
         self.assert_called('GET', '/messages')
 
+    @ddt.data('volume', 'backup', 'snapshot', None)
+    def test_reset_state_entity_not_found(self, entity_type):
+        cmd = 'reset-state 999999'
+        if entity_type is not None:
+            cmd += ' --type %s' % entity_type
+        self.assertRaises(exceptions.CommandError, self.run_command, cmd)
+
+    @ddt.data({'entity_types': [{'name': 'volume', 'version': '3.0',
+                                 'command': 'os-reset_status'},
+                                {'name': 'backup', 'version': '3.0',
+                                 'command': 'os-reset_status'},
+                                {'name': 'snapshot', 'version': '3.0',
+                                 'command': 'os-reset_status'},
+                                {'name': None, 'version': '3.0',
+                                 'command': 'os-reset_status'},
+                                {'name': 'group', 'version': '3.20',
+                                 'command': 'reset_status'},
+                                {'name': 'group-snapshot', 'version': '3.19',
+                                 'command': 'reset_status'}],
+               'r_id': ['1234'],
+               'states': ['available', 'error', None]},
+              {'entity_types': [{'name': 'volume', 'version': '3.0',
+                                 'command': 'os-reset_status'},
+                                {'name': 'backup', 'version': '3.0',
+                                 'command': 'os-reset_status'},
+                                {'name': 'snapshot', 'version': '3.0',
+                                 'command': 'os-reset_status'},
+                                {'name': None, 'version': '3.0',
+                                 'command': 'os-reset_status'},
+                                {'name': 'group', 'version': '3.20',
+                                 'command': 'reset_status'},
+                                {'name': 'group-snapshot', 'version': '3.19',
+                                 'command': 'reset_status'}],
+               'r_id': ['1234', '5678'],
+               'states': ['available', 'error', None]})
+    @ddt.unpack
+    def test_reset_state_normal(self, entity_types, r_id, states):
+        for state in states:
+            for t in entity_types:
+                if state is None:
+                    expected = {t['command']: {}}
+                    cmd = ('--os-volume-api-version '
+                           '%s reset-state %s') % (t['version'],
+                                                   ' '.join(r_id))
+                else:
+                    expected = {t['command']: {'status': state}}
+                    cmd = ('--os-volume-api-version '
+                           '%s reset-state '
+                           '--state %s %s') % (t['version'],
+                                               state, ' '.join(r_id))
+                if t['name'] is not None:
+                    cmd += ' --type %s' % t['name']
+
+                self.run_command(cmd)
+
+                name = t['name'] if t['name'] else 'volume'
+                for re in r_id:
+                    self.assert_called_anytime('POST', '/%ss/%s/action'
+                                               % (name.replace('-', '_'), re),
+                                               body=expected)
+
+    @ddt.data({'command': '--attach-status detached',
+               'expected': {'attach_status': 'detached'}},
+              {'command': '--state in-use --attach-status attached',
+               'expected': {'status': 'in-use',
+                            'attach_status': 'attached'}},
+              {'command': '--reset-migration-status',
+               'expected': {'migration_status': 'none'}})
+    @ddt.unpack
+    def test_reset_state_volume_additional_status(self, command, expected):
+        self.run_command('reset-state %s 1234' % command)
+        expected = {'os-reset_status': expected}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
     def test_snapshot_list_with_metadata(self):
         self.run_command('--os-volume-api-version 3.22 '
                          'snapshot-list --metadata key1=val1')
