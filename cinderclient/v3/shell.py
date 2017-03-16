@@ -849,6 +849,7 @@ def do_backup_update(cs, args):
         raise exceptions.ClientException(code=1, message=msg)
 
     shell_utils.find_backup(cs, args.backup).update(**kwargs)
+    print("Request to update backup '%s' has been accepted." % args.backup)
 
 
 @api_versions.wraps('3.7')
@@ -1170,6 +1171,7 @@ def do_group_update(cs, args):
         raise exceptions.ClientException(code=1, message=msg)
 
     shell_utils.find_group(cs, args.group).update(**kwargs)
+    print("Request to update group '%s' has been accepted." % args.group)
 
 
 @api_versions.wraps('3.14')
