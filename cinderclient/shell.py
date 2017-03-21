@@ -439,7 +439,7 @@ class OpenStackCinderShell(object):
             msg = (_(" (Supported by API version %(start)s and later)")
                 % {"start": start_version.get_string()})
         else:
-            msg = (_(" Supported until API version %(end)s)")
+            msg = (_(" (Supported until API version %(end)s)")
                 % {"end": end_version.get_string()})
         return six.text_type(msg)
 
