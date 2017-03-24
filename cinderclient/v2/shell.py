@@ -1685,14 +1685,19 @@ def do_encryption_type_show(cs, args):
            default=None,
            help='The encryption algorithm or mode. '
                 'For example, aes-xts-plain64. Default=None.')
-@utils.arg('--key_size',
+@utils.arg('--key-size',
            metavar='<key_size>',
            type=int,
            required=False,
            default=None,
            help='Size of encryption key, in bits. '
                 'For example, 128 or 256. Default=None.')
-@utils.arg('--control_location',
+@utils.arg('--key_size',
+           type=int,
+           required=False,
+           default=None,
+           help=argparse.SUPPRESS)
+@utils.arg('--control-location',
            metavar='<control_location>',
            choices=['front-end', 'back-end'],
            type=str,
@@ -1701,6 +1706,11 @@ def do_encryption_type_show(cs, args):
            help='Notional service where encryption is performed. '
                 'Valid values are "front-end" or "back-end." '
                 'For example, front-end=Nova. Default is "front-end."')
+@utils.arg('--control_location',
+           type=str,
+           required=False,
+           default='front-end',
+           help=argparse.SUPPRESS)
 def do_encryption_type_create(cs, args):
     """Creates encryption type for a volume type. Admin only."""
     volume_type = shell_utils.find_volume_type(cs, args.volume_type)
@@ -1725,8 +1735,7 @@ def do_encryption_type_create(cs, args):
            type=str,
            required=False,
            default=argparse.SUPPRESS,
-           help="Class providing encryption support (e.g. LuksEncryptor) "
-           "(Optional)")
+           help="Class providing encryption support (e.g. LuksEncryptor)")
 @utils.arg('--cipher',
            metavar='<cipher>',
            type=str,
@@ -1735,8 +1744,7 @@ def do_encryption_type_create(cs, args):
            default=argparse.SUPPRESS,
            const=None,
            help="Encryption algorithm/mode to use (e.g., aes-xts-plain64). "
-           "Provide parameter without value to set to provider default. "
-           "(Optional)")
+           "Provide parameter without value to set to provider default.")
 @utils.arg('--key-size',
            dest='key_size',
            metavar='<key-size>',
@@ -1746,8 +1754,7 @@ def do_encryption_type_create(cs, args):
            default=argparse.SUPPRESS,
            const=None,
            help="Size of the encryption key, in bits (e.g., 128, 256). "
-           "Provide parameter without value to set to provider default. "
-           "(Optional)")
+           "Provide parameter without value to set to provider default. ")
 @utils.arg('--control-location',
            dest='control_location',
            metavar='<control-location>',
@@ -1756,7 +1763,7 @@ def do_encryption_type_create(cs, args):
            required=False,
            default=argparse.SUPPRESS,
            help="Notional service where encryption is performed (e.g., "
-           "front-end=Nova). Values: 'front-end', 'back-end' (Optional)")
+           "front-end=Nova). Values: 'front-end', 'back-end'")
 def do_encryption_type_update(cs, args):
     """Update encryption type information for a volume type (Admin Only)."""
     volume_type = shell_utils.find_volume_type(cs, args.volume_type)

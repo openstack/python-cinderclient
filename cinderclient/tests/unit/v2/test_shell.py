@@ -834,6 +834,17 @@ class ShellTest(utils.TestCase):
         self.assert_called('POST', '/types/2/encryption', body=expected)
         self.assert_called_anytime('GET', '/types/2')
 
+    @ddt.data('--key-size 512 --control-location front-end',
+              '--key_size 512 --control_location front-end')  # old style
+    def test_encryption_type_create_with_args(self, arg):
+        expected = {'encryption': {'cipher': None,
+                                   'key_size': 512,
+                                   'provider': 'TestProvider',
+                                   'control_location': 'front-end'}}
+        self.run_command('encryption-type-create 2 TestProvider ' + arg)
+        self.assert_called('POST', '/types/2/encryption', body=expected)
+        self.assert_called_anytime('GET', '/types/2')
+
     def test_encryption_type_update(self):
         """
         Test encryption-type-update shell command.
