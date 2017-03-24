@@ -66,7 +66,10 @@ class FakeClient(object):
             expected + called)
 
         if body is not None:
-            assert self.client.callstack[pos][2] == body
+            actual_body = self.client.callstack[pos][2]
+            assert actual_body == body, ("body mismatch. expected:\n" +
+                                         str(body) + "\n" +
+                                         "actual:\n" + str(actual_body))
 
         if partial_body is not None:
             try:
