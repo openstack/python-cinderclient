@@ -223,6 +223,44 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
                 {'backups': backup})
 
     #
+    # Attachments
+    #
+    def post_attachments(self, **kw):
+        return (202, {}, {
+            'attachment': {'instance': 1234,
+                           'name': 'attachment-1',
+                           'volume_id': 'fake_volume_1',
+                           'status': 'reserved'}})
+
+    def get_attachments(self, **kw):
+        return (200, {}, {
+            'attachments': [{'instance': 1,
+                             'name': 'attachment-1',
+                             'volume_id': 'fake_volume_1',
+                             'status': 'reserved'},
+                            {'instance': 2,
+                             'name': 'attachment-2',
+                             'volume_id': 'fake_volume_2',
+                             'status': 'reserverd'}]})
+
+    def get_attachments_1234(self, **kw):
+        return (200, {}, {
+            'attachment': {'instance': 1234,
+                           'name': 'attachment-1',
+                           'volume_id': 'fake_volume_1',
+                           'status': 'reserved'}})
+
+    def put_attachments_1234(self, **kw):
+        return (200, {}, {
+            'attachment': {'instance': 1234,
+                           'name': 'attachment-1',
+                           'volume_id': 'fake_volume_1',
+                           'status': 'reserved'}})
+
+    def delete_attachments_1234(self, **kw):
+        return 204, {}, None
+
+    #
     # GroupTypes
     #
     def get_group_types(self, **kw):

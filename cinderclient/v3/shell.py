@@ -1417,7 +1417,7 @@ def do_attachment_show(cs, args):
 @utils.arg('--multipath',
            metavar='<multipath>',
            default=False,
-           help='OS type. Default=False.')
+           help='Use multipath. Default=False.')
 @utils.arg('--mountpoint',
            metavar='<mountpoint>',
            default=None,
@@ -1433,7 +1433,8 @@ def do_attachment_create(cs, args):
                      'platform': args.platform,
                      'host': args.host,
                      'os_type': args.ostype,
-                     'multipath': args.multipath}
+                     'multipath': args.multipath,
+                     'mountpoint': args.mountpoint}
     attachment = cs.attachments.create(args.volume,
                                        connector,
                                        args.instance)
@@ -1470,7 +1471,7 @@ def do_attachment_create(cs, args):
 @utils.arg('--multipath',
            metavar='<multipath>',
            default=False,
-           help='OS type. Default=False.')
+           help='Use multipath. Default=False.')
 @utils.arg('--mountpoint',
            metavar='<mountpoint>',
            default=None,
@@ -1486,7 +1487,8 @@ def do_attachment_update(cs, args):
                  'platform': args.platform,
                  'host': args.host,
                  'os_type': args.ostype,
-                 'multipath': args.multipath}
+                 'multipath': args.multipath,
+                 'mountpoint': args.mountpoint}
     attachment = cs.attachments.update(args.attachment,
                                        connector)
     attachment_dict = attachment.to_dict()
@@ -1504,6 +1506,7 @@ def do_attachment_delete(cs, args):
     """Delete an attachment for a cinder volume."""
     for attachment in args.attachment:
         cs.attachments.delete(attachment)
+
 
 @api_versions.wraps('3.0')
 def do_version_list(cs, args):
