@@ -95,11 +95,11 @@ class ShellTest(utils.TestCase):
         self.run_command('availability-zone-list')
         self.assert_called('GET', '/os-availability-zone')
 
-    @ddt.data({'cmd': '1234 --instance 1233',
+    @ddt.data({'cmd': '1234 1233',
                'body': {'instance_uuid': '1233',
                         'connector': {},
                         'volume_uuid': '1234'}},
-              {'cmd': '1234 --instance 1233 '
+              {'cmd': '1234 1233 '
                       '--connect True '
                       '--ip 10.23.12.23 --host server01 '
                       '--platform x86_xx '

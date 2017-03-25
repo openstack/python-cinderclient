@@ -1,0 +1,6 @@
+---
+fixes:
+- The 'server_id' is now a required parameter when creating an
+  attachment, that means we should create an attachment with
+  a command like, 'cinder attachment-create <volume> <server_id>'.
+  [Bug `1675975 <https://bugs.launchpad.net/bugs/1675975>`_]

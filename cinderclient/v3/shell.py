@@ -1355,7 +1355,7 @@ def do_attachment_list(cs, args):
                                       marker=args.marker,
                                       limit=args.limit,
                                       sort=args.sort)
-    columns = ['ID', 'Volume ID', 'Status', 'Instance']
+    columns = ['ID', 'Volume ID', 'Status', 'Server ID']
     if args.sort:
         sortby_index = None
     else:
@@ -1385,10 +1385,9 @@ def do_attachment_show(cs, args):
 @utils.arg('volume',
            metavar='<volume>',
            help='Name or ID of volume or volumes to attach.')
-@utils.arg('--instance',
-           metavar='<instance>',
-           default=None,
-           help='UUID of Instance attaching to. Default=None.')
+@utils.arg('server_id',
+           metavar='<server_id>',
+           help='ID of server attaching to.')
 @utils.arg('--connect',
            metavar='<connect>',
            default=False,
@@ -1437,7 +1436,7 @@ def do_attachment_create(cs, args):
                      'mountpoint': args.mountpoint}
     attachment = cs.attachments.create(args.volume,
                                        connector,
-                                       args.instance)
+                                       args.server_id)
     connector_dict = attachment.pop('connection_info', None)
     utils.print_dict(attachment)
     if connector_dict:
