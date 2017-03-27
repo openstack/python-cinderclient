@@ -95,6 +95,84 @@ class ShellTest(utils.TestCase):
         self.run_command('availability-zone-list')
         self.assert_called('GET', '/os-availability-zone')
 
+    @ddt.data({'cmd': '1234 --instance 1233',
+               'body': {'instance_uuid': '1233',
+                        'connector': {},
+                        'volume_uuid': '1234'}},
+              {'cmd': '1234 --instance 1233 '
+                      '--connect True '
+                      '--ip 10.23.12.23 --host server01 '
+                      '--platform x86_xx '
+                      '--ostype 123 '
+                      '--multipath true '
+                      '--mountpoint /123 '
+                      '--initiator aabbccdd',
+               'body': {'instance_uuid': '1233',
+                        'connector': {'ip': '10.23.12.23',
+                                      'host': 'server01',
+                                      'os_type': '123',
+                                      'multipath': 'true',
+                                      'mountpoint': '/123',
+                                      'initiator': 'aabbccdd',
+                                      'platform': 'x86_xx'},
+                        'volume_uuid': '1234'}})
+    @ddt.unpack
+    def test_attachment_create(self, cmd, body):
+        command = '--os-volume-api-version 3.27 attachment-create '
+        command += cmd
+        self.run_command(command)
+        expected = {'attachment': body}
+        self.assert_called('POST', '/attachments', body=expected)
+
+    @ddt.data({'cmd': '',
+               'expected': ''},
+              {'cmd': '--volume-id 1234',
+               'expected': '?volume_id=1234'},
+              {'cmd': '--status error',
+               'expected': '?status=error'},
+              {'cmd': '--all-tenants 1',
+               'expected': '?all_tenants=1'},
+              {'cmd': '--all-tenants 1 --volume-id 12345',
+               'expected': '?all_tenants=1&volume_id=12345'}
+              )
+    @ddt.unpack
+    def test_attachment_list(self, cmd, expected):
+        command = '--os-volume-api-version 3.27 attachment-list '
+        command += cmd
+        self.run_command(command)
+        self.assert_called('GET', '/attachments%s' % expected)
+
+    def test_attachment_show(self):
+        self.run_command('--os-volume-api-version 3.27 attachment-show 1234')
+        self.assert_called('GET', '/attachments/1234')
+
+    @ddt.data({'cmd': '1234 '
+                      '--ip 10.23.12.23 --host server01 '
+                      '--platform x86_xx '
+                      '--ostype 123 '
+                      '--multipath true '
+                      '--mountpoint /123 '
+                      '--initiator aabbccdd',
+               'body': {'connector': {'ip': '10.23.12.23',
+                                      'host': 'server01',
+                                      'os_type': '123',
+                                      'multipath': 'true',
+                                      'mountpoint': '/123',
+                                      'initiator': 'aabbccdd',
+                                      'platform': 'x86_xx'}}})
+    @ddt.unpack
+    def test_attachment_update(self, cmd, body):
+        command = '--os-volume-api-version 3.27 attachment-update '
+        command += cmd
+        self.run_command(command)
+        self.assert_called('PUT', '/attachments/1234', body={'attachment':
+                                                             body})
+
+    def test_attachment_delete(self):
+        self.run_command('--os-volume-api-version 3.27 '
+                         'attachment-delete 1234')
+        self.assert_called('DELETE', '/attachments/1234')
+
     def test_upload_to_image(self):
         expected = {'os-volume_upload_image': {'force': False,
                                                'container_format': 'bare',
