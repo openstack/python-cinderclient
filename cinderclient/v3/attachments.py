@@ -53,7 +53,7 @@ class VolumeAttachmentManager(base.ManagerWithFind):
     def show(self, id):
         """Attachment show.
 
-        :param name: Attachment ID.
+        :param id: Attachment ID.
         """
         url = '/attachments/%s' % id
         resp, body = self.api.client.get(url)
