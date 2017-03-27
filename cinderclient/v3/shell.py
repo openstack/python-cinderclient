@@ -1303,6 +1303,7 @@ def do_snapshot_list(cs, args):
                      ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
                      sortby_index=sortby_index)
 
+
 @api_versions.wraps('3.27')
 @utils.arg('--all-tenants',
            dest='all_tenants',
@@ -1310,7 +1311,7 @@ def do_snapshot_list(cs, args):
            nargs='?',
            type=int,
            const=1,
-           default=0,
+           default=utils.env('ALL_TENANTS', default=0),
            help='Shows details for all tenants. Admin only.')
 @utils.arg('--volume-id',
            metavar='<volume-id>',
@@ -1346,7 +1347,8 @@ def do_snapshot_list(cs, args):
 def do_attachment_list(cs, args):
     """Lists all attachments."""
     search_opts = {
-        'all_tenants': args.all_tenants,
+        'all_tenants': 1 if args.tenant else args.all_tenants,
+        'project_id': args.tenant,
         'status': args.status,
         'volume_id': args.volume_id,
     }

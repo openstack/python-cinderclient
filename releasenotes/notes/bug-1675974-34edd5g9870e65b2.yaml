@@ -1,0 +1,5 @@
+---
+fixes:
+  - The 'tenant' argument was ignored when listing attachments,
+    and now has been fixed.
+    [Bug `1675974 <https://bugs.launchpad.net/bugs/1675974>`_]
