@@ -47,14 +47,14 @@ class ClientTest(utils.TestCase):
 
     @mock.patch.object(cinderclient.client.HTTPClient, '__init__')
     @mock.patch('cinderclient.client.SessionClient')
-    def test_construct_http_client_bypass_url(
+    def test_construct_http_client_endpoint_url(
             self, session_mock, httpclient_mock):
-        bypass_url = 'http://example.com/'
+        os_endpoint = 'http://example.com/'
         httpclient_mock.return_value = None
         cinderclient.client._construct_http_client(
-            bypass_url=bypass_url)
+            bypass_url=os_endpoint)
         self.assertTrue(httpclient_mock.called)
-        self.assertEqual(bypass_url,
+        self.assertEqual(os_endpoint,
                          httpclient_mock.call_args[1].get('bypass_url'))
         session_mock.assert_not_called()
 

@@ -432,7 +432,7 @@ class HTTPClient(object):
             version = get_volume_api_from_url(self.management_url)
         except exceptions.UnsupportedVersion as e:
             if self.management_url == self.bypass_url:
-                msg = (_("Invalid url was specified in --bypass-url or "
+                msg = (_("Invalid url was specified in --os-endpoint or "
                          "environment variable CINDERCLIENT_BYPASS_URL.\n"
                          "%s") % six.text_type(e.message))
             else:
@@ -530,8 +530,6 @@ class HTTPClient(object):
             while auth_url:
                 if not self.auth_system or self.auth_system == 'keystone':
                     auth_url = self._v2_or_v3_auth(auth_url)
-                else:
-                    auth_url = self._plugin_auth(auth_url)
 
             # Are we acting on behalf of another user via an
             # existing token? If so, our actual endpoints may
@@ -584,9 +582,6 @@ class HTTPClient(object):
             return resp.headers['location']
         else:
             raise exceptions.from_response(resp, body)
-
-    def _plugin_auth(self, auth_url):
-        return self.auth_plugin.authenticate(self, auth_url)
 
     def _v2_or_v3_auth(self, url):
         """Authenticate against a v2.0 auth service."""
@@ -649,8 +644,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                            auth=None, api_version=None,
                            **kwargs):
 
-    # Don't use sessions if third party plugin or bypass_url being used
-    if session and not auth_plugin and not bypass_url:
+    if session:
         kwargs.setdefault('user_agent', 'python-cinderclient')
         kwargs.setdefault('interface', endpoint_type)
         return SessionClient(session=session,

@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Cinderclient now supports noauth mode using `--os-auth-type noauth`
+    param. Also python-cinderclient now supports keystoneauth1 plugins.
+deprecations:
+  - |
+    --bypass-url param is now deprecated. Please use --os-endpoint instead
+    of it.
+    --os-auth-system param is now deprecated. Please --os-auth-type instead of
+    it.
