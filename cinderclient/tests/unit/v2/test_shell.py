@@ -1386,3 +1386,24 @@ class ShellTest(utils.TestCase):
     def test_extra_specs_list(self):
         self.run_command('extra-specs-list')
         self.assert_called('GET', '/types?is_public=None')
+
+    def test_quota_class_show(self):
+        self.run_command('quota-class-show test')
+        self.assert_called('GET', '/os-quota-class-sets/test')
+
+    def test_quota_class_update(self):
+        expected = {'quota_class_set': {'class_name': 'test',
+                                        'volumes': 2,
+                                        'snapshots': 2,
+                                        'gigabytes': 1,
+                                        'backups': 1,
+                                        'backup_gigabytes': 1,
+                                        'per_volume_gigabytes': 1}}
+        self.run_command('quota-class-update test '
+                         '--volumes 2 '
+                         '--snapshots 2 '
+                         '--gigabytes 1 '
+                         '--backups 1 '
+                         '--backup-gigabytes 1 '
+                         '--per-volume-gigabytes 1')
+        self.assert_called('PUT', '/os-quota-class-sets/test', body=expected)

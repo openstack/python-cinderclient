@@ -1026,10 +1026,22 @@ def do_quota_class_show(cs, args):
            metavar='<gigabytes>',
            type=int, default=None,
            help='The new "gigabytes" quota value. Default=None.')
+@utils.arg('--backups',
+           metavar='<backups>',
+           type=int, default=None,
+           help='The new "backups" quota value. Default=None.')
+@utils.arg('--backup-gigabytes',
+           metavar='<backup_gigabytes>',
+           type=int, default=None,
+           help='The new "backup_gigabytes" quota value. Default=None.')
 @utils.arg('--volume-type',
            metavar='<volume_type_name>',
            default=None,
            help='Volume type. Default=None.')
+@utils.arg('--per-volume-gigabytes',
+           metavar='<per_volume_gigabytes>',
+           type=int, default=None,
+           help='Set max volume size limit. Default=None.')
 def do_quota_class_update(cs, args):
     """Updates quotas for a quota class."""
 
