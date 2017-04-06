@@ -133,7 +133,12 @@ class ShellTest(utils.TestCase):
               {'cmd': '--all-tenants 1',
                'expected': '?all_tenants=1'},
               {'cmd': '--all-tenants 1 --volume-id 12345',
-               'expected': '?all_tenants=1&volume_id=12345'}
+               'expected': '?all_tenants=1&volume_id=12345'},
+              {'cmd': '--all-tenants 1 --tenant 12345',
+               'expected': '?all_tenants=1&project_id=12345'},
+              {'cmd': '--tenant 12345',
+               'expected': '?all_tenants=1&project_id=12345'}
+
               )
     @ddt.unpack
     def test_attachment_list(self, cmd, expected):
