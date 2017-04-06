@@ -2375,7 +2375,8 @@ def do_get_capabilities(cs, args):
 
     prop = infos.pop('properties', None)
     utils.print_dict(infos, "Volume stats")
-    utils.print_dict(prop, "Backend properties")
+    utils.print_dict(prop, "Backend properties",
+                     formatters=sorted(prop.keys()))
 
 
 @utils.arg('volume',
