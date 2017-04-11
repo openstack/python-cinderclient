@@ -45,7 +45,6 @@ from cinderclient import api_versions
 from cinderclient import exceptions
 import cinderclient.extension
 from cinderclient._i18n import _
-from cinderclient._i18n import _LW
 
 try:
     from eventlet import sleep
@@ -90,8 +89,8 @@ def get_server_version(url):
                 return (api_versions.APIVersion(version['min_version']),
                         api_versions.APIVersion(version['version']))
     except exceptions.ClientException as e:
-        logger.warning(_LW("Error in server version query:%s\n"
-                 "Returning APIVersion 2.0"), six.text_type(e.message))
+        logger.warning("Error in server version query:%s\n"
+                       "Returning APIVersion 2.0", six.text_type(e.message))
         return api_versions.APIVersion("2.0"), api_versions.APIVersion("2.0")
 
 
