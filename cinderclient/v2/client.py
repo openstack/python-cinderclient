@@ -55,7 +55,7 @@ class Client(object):
                  proxy_tenant_id=None, proxy_token=None, region_name=None,
                  endpoint_type='publicURL', extensions=None,
                  service_type='volumev2', service_name=None,
-                 volume_service_name=None, bypass_url=None, retries=None,
+                 volume_service_name=None, bypass_url=None, retries=0,
                  http_log_debug=False, cacert=None, auth_system='keystone',
                  auth_plugin=None, session=None, api_version=None,
                  logger=None, **kwargs):

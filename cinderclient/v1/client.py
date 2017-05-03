@@ -52,7 +52,7 @@ class Client(object):
                  endpoint_type='publicURL', extensions=None,
                  service_type='volume', service_name=None,
                  volume_service_name=None, bypass_url=None,
-                 retries=None, http_log_debug=False,
+                 retries=0, http_log_debug=False,
                  cacert=None, auth_system='keystone', auth_plugin=None,
                  session=None, **kwargs):
         # FIXME(comstud): Rename the api_key argument above when we
