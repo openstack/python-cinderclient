@@ -193,6 +193,15 @@ def build_query_param(params, sort=False):
     return query_string
 
 
+def _pretty_format_dict(data_dict):
+    formatted_data = []
+
+    for k in sorted(data_dict):
+        formatted_data.append("%s : %s" % (k, data_dict[k]))
+
+    return "\n".join(formatted_data)
+
+
 def print_dict(d, property="Property", formatters=None):
     pt = prettytable.PrettyTable([property, 'Value'], caching=False)
     pt.align = 'l'
@@ -203,7 +212,8 @@ def print_dict(d, property="Property", formatters=None):
 
         if r[0] in formatters:
             r[1] = unicode_key_value_to_string(r[1])
-
+            if isinstance(r[1], dict):
+                r[1] = _pretty_format_dict(r[1])
         if isinstance(r[1], six.string_types) and "\r" in r[1]:
             r[1] = r[1].replace("\r", " ")
         pt.add_row(r)

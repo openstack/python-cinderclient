@@ -294,6 +294,12 @@ class PrintListTestCase(test_utils.TestCase):
 
 class PrintDictTestCase(test_utils.TestCase):
 
+    def test__pretty_format_dict(self):
+        content = {'key1': 'value1', 'key2': 'value2'}
+        expected = "key1 : value1\nkey2 : value2"
+        result = utils._pretty_format_dict(content)
+        self.assertEqual(expected, result)
+
     def test_print_dict_with_return(self):
         d = {'a': 'A', 'b': 'B', 'c': 'C', 'd': 'test\rcarriage\n\rreturn'}
         with CaptureStdout() as cso:
@@ -307,5 +313,21 @@ class PrintDictTestCase(test_utils.TestCase):
 | c        | C             |
 | d        | test carriage |
 |          |  return       |
++----------+---------------+
+""", cso.read())
+
+    def test_print_dict_with_dict_inside(self):
+        content = {'a': 'A', 'b': 'B', 'f_key':
+                   {'key1': 'value1', 'key2': 'value2'}}
+        with CaptureStdout() as cso:
+            utils.print_dict(content, formatters='f_key')
+        self.assertEqual("""\
++----------+---------------+
+| Property | Value         |
++----------+---------------+
+| a        | A             |
+| b        | B             |
+| f_key    | key1 : value1 |
+|          | key2 : value2 |
 +----------+---------------+
 """, cso.read())
