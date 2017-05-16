@@ -32,6 +32,136 @@ from cinderclient import utils
 
 from cinderclient.v2.shell import *  # flake8: noqa
 
+FILTER_DEPRECATED = ("This option is deprecated and will be removed in "
+                     "newer release. Please use '--filters' option which "
+                     "is introduced since 3.33 instead.")
+
+
+@api_versions.wraps('3.33')
+@utils.arg('--resource',
+           metavar='<resource>',
+           default=None,
+           help='Show enabled filters for specified resource. Default=None.')
+def do_list_filters(cs, args):
+        filters = cs.resource_filters.list(resource=args.resource)
+        shell_utils.print_resource_filter_list(filters)
+
+
+@utils.arg('--all-tenants',
+           metavar='<all_tenants>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=0,
+           help='Shows details for all tenants. Admin only.')
+@utils.arg('--all_tenants',
+           nargs='?',
+           type=int,
+           const=1,
+           help=argparse.SUPPRESS)
+@utils.arg('--name',
+           metavar='<name>',
+           default=None,
+           help="Filters results by a name. Default=None. "
+                "%s" % FILTER_DEPRECATED)
+@utils.arg('--status',
+           metavar='<status>',
+           default=None,
+           help="Filters results by a status. Default=None. "
+                "%s" % FILTER_DEPRECATED)
+@utils.arg('--volume-id',
+           metavar='<volume-id>',
+           default=None,
+           help="Filters results by a volume ID. Default=None. "
+                "%s" % FILTER_DEPRECATED)
+@utils.arg('--volume_id',
+           help=argparse.SUPPRESS)
+@utils.arg('--marker',
+           metavar='<marker>',
+           default=None,
+           help='Begin returning backups that appear later in the backup '
+                'list than that represented by this id. '
+                'Default=None.')
+@utils.arg('--limit',
+           metavar='<limit>',
+           default=None,
+           help='Maximum number of backups to return. Default=None.')
+@utils.arg('--sort',
+           metavar='<key>[:<direction>]',
+           default=None,
+           help=(('Comma-separated list of sort keys and directions in the '
+                  'form of <key>[:<asc|desc>]. '
+                  'Valid keys: %s. '
+                  'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
+@utils.arg('--filters',
+           type=str,
+           nargs='*',
+           start_version='3.33',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs. Please use 'cinder list-filters' "
+                "to check enabled filters from server, Default=None.")
+def do_backup_list(cs, args):
+    """Lists all backups."""
+    # pylint: disable=function-redefined
+
+    search_opts = {
+        'all_tenants': args.all_tenants,
+        'name': args.name,
+        'status': args.status,
+        'volume_id': args.volume_id,
+    }
+
+    # Update search option with `filters`
+    if hasattr(args, 'filters') and args.filters is not None:
+        search_opts.update(shell_utils.extract_filters(args.filters))
+
+    backups = cs.backups.list(search_opts=search_opts,
+                              marker=args.marker,
+                              limit=args.limit,
+                              sort=args.sort)
+    shell_utils.translate_volume_snapshot_keys(backups)
+    columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'Object Count',
+               'Container']
+    if args.sort:
+        sortby_index = None
+    else:
+        sortby_index = 0
+    utils.print_list(backups, columns, sortby_index=sortby_index)
+
+
+@utils.arg('--detail',
+           action='store_true',
+           help='Show detailed information about pools.')
+@utils.arg('--filters',
+           type=str,
+           nargs='*',
+           start_version='3.33',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs. Please use 'cinder list-filters' "
+                "to check enabled filters from server, Default=None.")
+def do_get_pools(cs, args):
+    """Show pool information for backends. Admin only."""
+    # pylint: disable=function-redefined
+    search_opts = {}
+    # Update search option with `filters`
+    if hasattr(args, 'filters') and args.filters is not None:
+        search_opts.update(shell_utils.extract_filters(args.filters))
+    if cs.api_version >= api_versions.APIVersion("3.33"):
+        pools = cs.volumes.get_pools(args.detail, search_opts)
+    else:
+        pools = cs.volumes.get_pools(args.detail)
+    infos = dict()
+    infos.update(pools._info)
+
+    for info in infos['pools']:
+        backend = dict()
+        backend['name'] = info['name']
+        if args.detail:
+            backend.update(info['capabilities'])
+        utils.print_dict(backend)
+
 
 RESET_STATE_RESOURCES = {'volume': utils.find_volume,
                          'backup': shell_utils.find_backup,
@@ -43,7 +173,8 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
 @utils.arg('--group_id',
            metavar='<group_id>',
            default=None,
-           help='Filters results by a group_id. Default=None.',
+           help="Filters results by a group_id. Default=None."
+                "%s" % FILTER_DEPRECATED,
            start_version='3.10')
 @utils.arg('--all-tenants',
            dest='all_tenants',
@@ -61,39 +192,45 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
 @utils.arg('--name',
            metavar='<name>',
            default=None,
-           help='Filters results by a name. Default=None.')
+           help="Filters results by a name. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--display-name',
            help=argparse.SUPPRESS)
 @utils.arg('--status',
            metavar='<status>',
            default=None,
-           help='Filters results by a status. Default=None.')
+           help="Filters results by a status. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--bootable',
            metavar='<True|true|False|false>',
            const=True,
            nargs='?',
            choices=['True', 'true', 'False', 'false'],
-           help='Filters results by bootable status. Default=None.')
+           help="Filters results by bootable status. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--migration_status',
            metavar='<migration_status>',
            default=None,
-           help='Filters results by a migration status. Default=None. '
-                'Admin only.')
+           help="Filters results by a migration status. Default=None. "
+                "Admin only. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--metadata',
            type=str,
            nargs='*',
            metavar='<key=value>',
            default=None,
-           help='Filters results by a metadata key and value pair. '
-                'Default=None.')
+           help="Filters results by a metadata key and value pair. "
+                "Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--image_metadata',
            type=str,
            nargs='*',
            metavar='<key=value>',
            default=None,
            start_version='3.4',
-           help='Filters results by a image metadata key and value pair. '
-                'Require volume api version >=3.4. Default=None.')
+           help="Filters results by a image metadata key and value pair. "
+                "Require volume api version >=3.4. Default=None."
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--marker',
            metavar='<marker>',
            default=None,
@@ -132,8 +269,17 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
            nargs='?',
            metavar='<tenant>',
            help='Display information from single tenant (Admin only).')
+@utils.arg('--filters',
+           type=str,
+           nargs='*',
+           start_version='3.33',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs. Please use 'cinder list-filters' "
+                "to check enabled filters from server, Default=None.")
 def do_list(cs, args):
     """Lists all volumes."""
+    # pylint: disable=function-redefined
     # NOTE(thingee): Backwards-compatibility with v1 args
     if args.display_name is not None:
         args.name = args.display_name
@@ -154,6 +300,9 @@ def do_list(cs, args):
         if hasattr(args, 'image_metadata') and args.image_metadata else None,
         'group_id': getattr(args, 'group_id', None),
     }
+    # Update search option with `filters`
+    if hasattr(args, 'filters') and args.filters is not None:
+        search_opts.update(shell_utils.extract_filters(args.filters))
 
     # If unavailable/non-existent fields are specified, these fields will
     # be removed from key_list at the print_list() during key validation.
@@ -823,9 +972,21 @@ def do_manageable_list(cs, args):
            const=1,
            default=utils.env('ALL_TENANTS', default=0),
            help='Shows details for all tenants. Admin only.')
+@utils.arg('--filters',
+           type=str,
+           nargs='*',
+           start_version='3.33',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs. Please use 'cinder list-filters' "
+                "to check enabled filters from server, Default=None.")
 def do_group_list(cs, args):
     """Lists all groups."""
     search_opts = {'all_tenants': args.all_tenants}
+
+    # Update search option with `filters`
+    if hasattr(args, 'filters') and args.filters is not None:
+        search_opts.update(shell_utils.extract_filters(args.filters))
 
     groups = cs.groups.list(search_opts=search_opts)
 
@@ -1006,11 +1167,21 @@ def do_group_update(cs, args):
 @utils.arg('--status',
            metavar='<status>',
            default=None,
-           help='Filters results by a status. Default=None.')
+           help="Filters results by a status. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--group-id',
            metavar='<group_id>',
            default=None,
-           help='Filters results by a group ID. Default=None.')
+           help="Filters results by a group ID. Default=None. "
+                "%s" % FILTER_DEPRECATED)
+@utils.arg('--filters',
+           type=str,
+           nargs='*',
+           start_version='3.33',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs. Please use 'cinder list-filters' "
+                "to check enabled filters from server, Default=None.")
 def do_group_snapshot_list(cs, args):
     """Lists all group snapshots."""
 
@@ -1021,6 +1192,9 @@ def do_group_snapshot_list(cs, args):
         'status': args.status,
         'group_id': args.group_id,
     }
+    # Update search option with `filters`
+    if hasattr(args, 'filters') and args.filters is not None:
+        search_opts.update(shell_utils.extract_filters(args.filters))
 
     group_snapshots = cs.group_snapshots.list(search_opts=search_opts)
 
@@ -1203,23 +1377,36 @@ def do_api_version(cs, args):
 @utils.arg('--resource_uuid',
            metavar='<resource_uuid>',
            default=None,
-           help='Filters results by a resource uuid. Default=None.')
+           help="Filters results by a resource uuid. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--resource_type',
            metavar='<type>',
            default=None,
-           help='Filters results by a resource type. Default=None.')
+           help="Filters results by a resource type. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--event_id',
            metavar='<id>',
            default=None,
-           help='Filters results by event id. Default=None.')
+           help="Filters results by event id. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--request_id',
            metavar='<request_id>',
            default=None,
-           help='Filters results by request id. Default=None.')
+           help="Filters results by request id. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--level',
            metavar='<level>',
            default=None,
-           help='Filters results by the message level. Default=None.')
+           help="Filters results by the message level. Default=None. "
+                "%s" % FILTER_DEPRECATED)
+@utils.arg('--filters',
+           type=str,
+           nargs='*',
+           start_version='3.33',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs. Please use 'cinder list-filters' "
+                "to check enabled filters from server, Default=None.")
 def do_message_list(cs, args):
     """Lists all messages."""
     search_opts = {
@@ -1227,6 +1414,9 @@ def do_message_list(cs, args):
         'event_id': args.event_id,
         'request_id': args.request_id,
     }
+    # Update search option with `filters`
+    if hasattr(args, 'filters') and args.filters is not None:
+        search_opts.update(shell_utils.extract_filters(args.filters))
     if args.resource_type:
         search_opts['resource_type'] = args.resource_type.upper()
     if args.level:
@@ -1297,7 +1487,8 @@ def do_message_delete(cs, args):
 @utils.arg('--name',
            metavar='<name>',
            default=None,
-           help='Filters results by a name. Default=None.')
+           help="Filters results by a name. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--display-name',
            help=argparse.SUPPRESS)
 @utils.arg('--display_name',
@@ -1305,11 +1496,13 @@ def do_message_delete(cs, args):
 @utils.arg('--status',
            metavar='<status>',
            default=None,
-           help='Filters results by a status. Default=None.')
+           help="Filters results by a status. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--volume-id',
            metavar='<volume-id>',
            default=None,
-           help='Filters results by a volume ID. Default=None.')
+           help="Filters results by a volume ID. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--volume_id',
            help=argparse.SUPPRESS)
 @utils.arg('--marker',
@@ -1340,10 +1533,20 @@ def do_message_delete(cs, args):
            metavar='<key=value>',
            default=None,
            start_version='3.22',
-           help='Filters results by a metadata key and value pair. Require '
-                'volume api version >=3.22. Default=None.')
+           help="Filters results by a metadata key and value pair. Require "
+                "volume api version >=3.22. Default=None. "
+                "%s" % FILTER_DEPRECATED)
+@utils.arg('--filters',
+           type=str,
+           nargs='*',
+           start_version='3.33',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs. Please use 'cinder list-filters' "
+                "to check enabled filters from server, Default=None.")
 def do_snapshot_list(cs, args):
     """Lists all snapshots."""
+    # pylint: disable=function-redefined
     all_tenants = (1 if args.tenant else
                    int(os.environ.get("ALL_TENANTS", args.all_tenants)))
 
@@ -1365,6 +1568,10 @@ def do_snapshot_list(cs, args):
         'project_id': args.tenant,
         'metadata': metadata
     }
+
+    # Update search option with `filters`
+    if hasattr(args, 'filters') and args.filters is not None:
+        search_opts.update(shell_utils.extract_filters(args.filters))
 
     snapshots = cs.volume_snapshots.list(search_opts=search_opts,
                                          marker=args.marker,
@@ -1389,11 +1596,13 @@ def do_snapshot_list(cs, args):
 @utils.arg('--volume-id',
            metavar='<volume-id>',
            default=None,
-           help='Filters results by a volume ID. Default=None.')
+           help="Filters results by a volume ID. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--status',
            metavar='<status>',
            default=None,
-           help='Filters results by a status. Default=None.')
+           help="Filters results by a status. Default=None. "
+                "%s" % FILTER_DEPRECATED)
 @utils.arg('--marker',
            metavar='<marker>',
            default=None,
@@ -1417,6 +1626,14 @@ def do_snapshot_list(cs, args):
            nargs='?',
            metavar='<tenant>',
            help='Display information from single tenant (Admin only).')
+@utils.arg('--filters',
+           type=str,
+           nargs='*',
+           start_version='3.33',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs. Please use 'cinder list-filters' "
+                "to check enabled filters from server, Default=None.")
 def do_attachment_list(cs, args):
     """Lists all attachments."""
     search_opts = {
@@ -1425,6 +1642,9 @@ def do_attachment_list(cs, args):
         'status': args.status,
         'volume_id': args.volume_id,
     }
+    # Update search option with `filters`
+    if hasattr(args, 'filters') and args.filters is not None:
+        search_opts.update(shell_utils.extract_filters(args.filters))
 
     attachments = cs.attachments.list(search_opts=search_opts,
                                       marker=args.marker,

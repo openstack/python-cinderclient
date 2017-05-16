@@ -143,6 +143,26 @@ def translate_availability_zone_keys(collection):
     translate_keys(collection, convert)
 
 
+def extract_filters(args):
+    filters = {}
+    for f in args:
+        if '=' in f:
+            (key, value) = f.split('=', 1)
+            if value.startswith('{') and value.endswith('}'):
+                value = _build_internal_dict(value[1:-1])
+        filters[key] = value
+
+    return filters
+
+
+def _build_internal_dict(content):
+    result = {}
+    for pair in content.split(','):
+        k, v = pair.split(':', 1)
+        result.update({k.strip(): v.strip()})
+    return result
+
+
 def extract_metadata(args, type='user_metadata'):
     metadata = {}
     if type == 'image_metadata':
@@ -167,6 +187,11 @@ def print_volume_type_list(vtypes):
 
 def print_group_type_list(gtypes):
     utils.print_list(gtypes, ['ID', 'Name', 'Description'])
+
+
+def print_resource_filter_list(filters):
+    formatter = {'Filters': lambda resource: ', '.join(resource.filters)}
+    utils.print_list(filters, ['Resource', 'Filters'], formatters=formatter)
 
 
 def quota_show(quotas):

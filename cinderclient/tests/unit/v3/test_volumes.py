@@ -15,6 +15,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import ddt
+
 from cinderclient import api_versions
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
@@ -25,6 +27,7 @@ from six.moves.urllib import parse
 cs = fakes.FakeClient()
 
 
+@ddt.data
 class VolumesTest(utils.TestCase):
 
     def test_volume_manager_upload_to_image(self):
@@ -100,3 +103,13 @@ class VolumesTest(utils.TestCase):
         expected = ("/volumes/detail?glance_metadata=%s"
                     % parse.quote_plus("{'key1': 'val1'}"))
         cs.assert_called('GET', expected)
+
+    @ddt.data(True, False)
+    def test_get_pools_filter_by_name(self, detail):
+        cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.33'))
+        vol = cs.volumes.get_pools(detail, 'pool1')
+        request_url = '/scheduler-stats/get_pools?name=pool1'
+        if detail:
+            request_url = '/scheduler-stats/get_pools?detail=True&name=pool1'
+        cs.assert_called('GET', request_url)
+        self._assert_request_id(vol)

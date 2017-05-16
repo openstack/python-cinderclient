@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import collections
+import ddt
 import sys
 
 import mock
@@ -21,6 +22,7 @@ import six
 from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
 from cinderclient import exceptions
+from cinderclient import shell_utils
 from cinderclient import utils
 from cinderclient import base
 from cinderclient.tests.unit import utils as test_utils
@@ -185,6 +187,21 @@ class BuildQueryParamTestCase(test_utils.TestCase):
         expected = "?key1=val1"
         self.assertEqual(expected, result_1)
         self.assertFalse(result_2)
+
+
+@ddt.ddt
+class ExtractFilterTestCase(test_utils.TestCase):
+
+    @ddt.data({'content': ['key1=value1'],
+               'expected': {'key1': 'value1'}},
+              {'content': ['key1={key2:value2}'],
+               'expected': {'key1': {'key2': 'value2'}}},
+              {'content': ['key1=value1', 'key2={key22:value22}'],
+               'expected': {'key1': 'value1', 'key2': {'key22': 'value22'}}})
+    @ddt.unpack
+    def test_extract_filters(self, content, expected):
+        result = shell_utils.extract_filters(content)
+        self.assertEqual(expected, result)
 
 
 class PrintListTestCase(test_utils.TestCase):
