@@ -115,12 +115,13 @@ class Manager(common_base.HookableMixin):
         # than osapi_max_limit, so we have to retrieve multiple times to
         # get the complete list.
         next = None
-        if 'volumes_links' in body:
-            volumes_links = body['volumes_links']
-            if volumes_links:
-                for volumes_link in volumes_links:
-                    if 'rel' in volumes_link and 'next' == volumes_link['rel']:
-                        next = volumes_link['href']
+        link_name = response_key + '_links'
+        if link_name in body:
+            links = body[link_name]
+            if links:
+                for link in links:
+                    if 'rel' in link and 'next' == link['rel']:
+                        next = link['href']
                         break
             if next:
                 # As long as the 'next' link is not empty, keep requesting it
