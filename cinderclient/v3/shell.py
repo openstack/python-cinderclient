@@ -1371,6 +1371,19 @@ def do_api_version(cs, args):
     utils.print_list(response, columns)
 
 
+@api_versions.wraps("3.40")
+@utils.arg(
+    'snapshot',
+    metavar='<snapshot>',
+    help='Name or ID of the snapshot to restore. The snapshot must be the '
+         'most recent one known to cinder.')
+def do_revert_to_snapshot(cs, args):
+    """Revert a volume to the specified snapshot."""
+    snapshot = shell_utils.find_volume_snapshot(cs, args.snapshot)
+    volume = utils.find_volume(cs, snapshot.volume_id)
+    volume.revert_to_snapshot(snapshot)
+
+
 @api_versions.wraps("3.3")
 @utils.arg('--marker',
            metavar='<marker>',

@@ -18,9 +18,11 @@
 import ddt
 
 from cinderclient import api_versions
+from cinderclient import exceptions
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 from cinderclient.v3 import volumes
+from cinderclient.v3 import volume_snapshots
 
 from six.moves.urllib import parse
 
@@ -47,6 +49,28 @@ class VolumesTest(utils.TestCase):
         fake_volume.upload_to_image(False, 'name', 'bare', 'raw',
                                     visibility='public', protected=True)
         cs.assert_called_anytime('POST', '/volumes/1234/action', body=expected)
+
+    @ddt.data('3.39', '3.40')
+    def test_revert_to_snapshot(self, version):
+
+        api_version = api_versions.APIVersion(version)
+        cs = fakes.FakeClient(api_version)
+        manager = volumes.VolumeManager(cs)
+        fake_snapshot = volume_snapshots.Snapshot(
+            manager, {'id': 12345, 'name': 'fake-snapshot'}, loaded=True)
+        fake_volume = volumes.Volume(manager,
+                                     {'id': 1234, 'name': 'sample-volume'},
+                                     loaded=True)
+        expected = {'revert': {'snapshot_id': 12345}}
+
+        if version == '3.40':
+            fake_volume.revert_to_snapshot(fake_snapshot)
+
+            cs.assert_called_anytime('POST', '/volumes/1234/action',
+                                     body=expected)
+        else:
+            self.assertRaises(exceptions.VersionNotFoundForAPIMethod,
+                              fake_volume.revert_to_snapshot, fake_snapshot)
 
     def test_create_volume(self):
         vol = cs.volumes.create(1, group_id='1234', volume_type='5678')

@@ -45,6 +45,10 @@ class Volume(volumes.Volume):
         return self.manager.upload_to_image(self, force, image_name,
                                             container_format, disk_format)
 
+    def revert_to_snapshot(self, snapshot):
+        """Revert a volume to a snapshot."""
+        self.manager.revert_to_snapshot(self, snapshot)
+
 
 class VolumeManager(volumes.VolumeManager):
     resource_class = Volume
@@ -109,6 +113,17 @@ class VolumeManager(volumes.VolumeManager):
 
         return self._create('/volumes', body, 'volume')
 
+    @api_versions.wraps('3.40')
+    def revert_to_snapshot(self, volume, snapshot):
+        """Revert a volume to a snapshot.
+
+        The snapshot must be the most recent one known to cinder.
+        :param volume: volume object.
+        :param snapshot: snapshot object.
+        """
+        return self._action('revert', volume,
+                            info={'snapshot_id': base.getid(snapshot.id)})
+
     @api_versions.wraps("3.0")
     def delete_metadata(self, volume, keys):
         """Delete specified keys from volumes metadata.
@@ -131,6 +146,7 @@ class VolumeManager(volumes.VolumeManager):
         :param volume: The :class:`Volume`.
         :param keys: A list of keys to be removed.
         """
+        # pylint: disable=function-redefined
         data = self._get("/volumes/%s/metadata" % base.getid(volume))
         metadata = data._info.get("metadata", {})
         if set(keys).issubset(metadata.keys()):
@@ -160,6 +176,7 @@ class VolumeManager(volumes.VolumeManager):
         """Upload volume to image service as image.
         :param volume: The :class:`Volume` to upload.
         """
+        # pylint: disable=function-redefined
         return self._action('os-volume_upload_image',
                             volume,
                             {'force': force,

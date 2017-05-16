@@ -535,6 +535,8 @@ class FakeHTTPClient(base_client.HTTPClient):
         elif action == 'os-volume_upload_image':
             assert 'image_name' in body[action]
             _body = body
+        elif action == 'revert':
+            assert 'snapshot_id' in body[action]
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)

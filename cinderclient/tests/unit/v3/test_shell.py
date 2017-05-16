@@ -23,6 +23,7 @@ from cinderclient import client
 from cinderclient import exceptions
 from cinderclient import shell
 from cinderclient.v3 import volumes
+from cinderclient.v3 import volume_snapshots
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 from cinderclient.tests.unit.fixture_data import keystone_client
@@ -277,6 +278,18 @@ class ShellTest(utils.TestCase):
         command += cmd
         self.run_command(command)
         self.assert_called('GET', '/attachments%s' % expected)
+
+    @mock.patch('cinderclient.shell_utils.find_volume_snapshot')
+    def test_revert_to_snapshot(self, mock_snapshot):
+
+        mock_snapshot.return_value = volume_snapshots.Snapshot(
+            self, {'id': '5678', 'volume_id': '1234'})
+
+        self.run_command(
+            '--os-volume-api-version 3.40 revert-to-snapshot 5678')
+
+        self.assert_called('POST', '/volumes/1234/action',
+                           body={'revert': {'snapshot_id': '5678'}})
 
     def test_attachment_show(self):
         self.run_command('--os-volume-api-version 3.27 attachment-show 1234')
