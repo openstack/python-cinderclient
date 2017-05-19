@@ -717,7 +717,8 @@ def do_cluster_disable(cs, args):
            metavar='<marker>',
            default=None,
            help='Begin returning volumes that appear later in the volume '
-                'list than that represented by this volume id. '
+                'list than that represented by this reference. This reference '
+                'should be json like. '
                 'Default=None.')
 @utils.arg('--limit',
            metavar='<limit>',
@@ -1068,7 +1069,8 @@ def do_service_list(cs, args):
            metavar='<marker>',
            default=None,
            help='Begin returning volumes that appear later in the volume '
-                'list than that represented by this volume id. '
+                'list than that represented by this reference. This reference '
+                'should be json like. '
                 'Default=None.')
 @utils.arg('--limit',
            metavar='<limit>',
