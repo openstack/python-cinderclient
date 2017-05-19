@@ -95,6 +95,10 @@ class ShellTest(utils.TestCase):
              'list --filters metadata={key1:value1}',
          'expected':
              '/volumes/detail?metadata=%7B%27key1%27%3A+%27value1%27%7D'},
+        {'command':
+             'list --filters name~=456',
+         'expected':
+             '/volumes/detail?name%7E=456'},
         # testcases for list group
         {'command':
              'group-list --filters name=456',
@@ -104,6 +108,10 @@ class ShellTest(utils.TestCase):
              'group-list --filters status=available',
          'expected':
              '/groups/detail?status=available'},
+        {'command':
+             'group-list --filters name~=456',
+         'expected':
+             '/groups/detail?name%7E=456'},
         # testcases for list group-snapshot
         {'command':
              'group-snapshot-list --status=error --filters status=available',
@@ -113,6 +121,10 @@ class ShellTest(utils.TestCase):
              'group-snapshot-list --filters availability_zone=123',
          'expected':
              '/group_snapshots/detail?availability_zone=123'},
+        {'command':
+             'group-snapshot-list --filters status~=available',
+         'expected':
+             '/group_snapshots/detail?status%7E=available'},
         # testcases for list message
         {'command':
              'message-list --event_id=123 --filters event_id=456',
@@ -122,6 +134,10 @@ class ShellTest(utils.TestCase):
              'message-list --filters request_id=123',
          'expected':
              '/messages?request_id=123'},
+        {'command':
+             'message-list --filters request_id~=123',
+         'expected':
+             '/messages?request_id%7E=123'},
         # testcases for list attachment
         {'command':
              'attachment-list --volume-id=123 --filters volume_id=456',
@@ -131,6 +147,10 @@ class ShellTest(utils.TestCase):
              'attachment-list --filters mountpoint=123',
          'expected':
              '/attachments?mountpoint=123'},
+        {'command':
+             'attachment-list --filters volume_id~=456',
+         'expected':
+             '/attachments?volume_id%7E=456'},
         # testcases for list backup
         {'command':
              'backup-list --volume-id=123 --filters volume_id=456',
@@ -140,6 +160,10 @@ class ShellTest(utils.TestCase):
              'backup-list --filters name=123',
          'expected':
              '/backups/detail?name=123'},
+        {'command':
+             'backup-list --filters volume_id~=456',
+         'expected':
+             '/backups/detail?volume_id%7E=456'},
         # testcases for list snapshot
         {'command':
              'snapshot-list --volume-id=123 --filters volume_id=456',
@@ -149,6 +173,10 @@ class ShellTest(utils.TestCase):
              'snapshot-list --filters name=123',
          'expected':
              '/snapshots/detail?name=123'},
+        {'command':
+             'snapshot-list --filters volume_id~=456',
+         'expected':
+             '/snapshots/detail?volume_id%7E=456'},
         # testcases for get pools
         {'command':
              'get-pools --filters name=456 --detail',
