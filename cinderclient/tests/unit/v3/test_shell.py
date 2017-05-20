@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) 2013 OpenStack Foundation
 # All Rights Reserved.
 #
@@ -99,6 +100,10 @@ class ShellTest(utils.TestCase):
              'list --filters name~=456',
          'expected':
              '/volumes/detail?name%7E=456'},
+        {'command':
+             u'list --filters name~=Σ',
+         'expected':
+             '/volumes/detail?name%7E=%CE%A3'},
         # testcases for list group
         {'command':
              'group-list --filters name=456',

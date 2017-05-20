@@ -98,7 +98,7 @@ def do_list_filters(cs, args):
                   'Valid keys: %s. '
                   'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
 @utils.arg('--filters',
-           type=str,
+           type=six.text_type,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -273,7 +273,7 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
            metavar='<tenant>',
            help='Display information from single tenant (Admin only).')
 @utils.arg('--filters',
-           type=str,
+           type=six.text_type,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -976,7 +976,7 @@ def do_manageable_list(cs, args):
            default=utils.env('ALL_TENANTS', default=0),
            help='Shows details for all tenants. Admin only.')
 @utils.arg('--filters',
-           type=str,
+           type=six.text_type,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -1192,7 +1192,7 @@ def do_group_update(cs, args):
            help="Filters results by a group ID. Default=None. "
                 "%s" % FILTER_DEPRECATED)
 @utils.arg('--filters',
-           type=str,
+           type=six.text_type,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -1418,7 +1418,7 @@ def do_api_version(cs, args):
            help="Filters results by the message level. Default=None. "
                 "%s" % FILTER_DEPRECATED)
 @utils.arg('--filters',
-           type=str,
+           type=six.text_type,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -1556,7 +1556,7 @@ def do_message_delete(cs, args):
                 "volume api version >=3.22. Default=None. "
                 "%s" % FILTER_DEPRECATED)
 @utils.arg('--filters',
-           type=str,
+           type=six.text_type,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -1647,7 +1647,7 @@ def do_snapshot_list(cs, args):
            metavar='<tenant>',
            help='Display information from single tenant (Admin only).')
 @utils.arg('--filters',
-           type=str,
+           type=six.text_type,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
