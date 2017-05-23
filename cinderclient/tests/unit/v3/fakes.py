@@ -56,6 +56,20 @@ def _stub_group_snapshot(detailed=True, **kwargs):
     return group_snapshot
 
 
+def _stub_snapshot(**kwargs):
+    snapshot = {
+        "created_at": "2012-08-28T16:30:31.000000",
+        "display_description": None,
+        "display_name": None,
+        "id": '11111111-1111-1111-1111-111111111111',
+        "size": 1,
+        "status": "available",
+        "volume_id": '00000000-0000-0000-0000-000000000000',
+    }
+    snapshot.update(kwargs)
+    return snapshot
+
+
 class FakeClient(fakes.FakeClient, client.Client):
 
     def __init__(self, api_version=None, *args, **kwargs):
@@ -398,6 +412,37 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
 
     def put_group_snapshots_1234(self, **kw):
         return (200, {}, {'group_snapshot': {}})
+
+    def post_groups_1234_action(self, **kw):
+        return (202, {}, {})
+
+    def get_groups_5678(self, **kw):
+        return (200, {}, {'group':
+                          _stub_group(id='5678')})
+
+    def post_groups_5678_action(self, **kw):
+        return (202, {}, {})
+
+    def post_snapshots_1234_action(self, **kw):
+        return (202, {}, {})
+
+    def get_snapshots_1234(self, **kw):
+        return (200, {}, {'snapshot': _stub_snapshot(id='1234')})
+
+    def post_snapshots_5678_action(self, **kw):
+        return (202, {}, {})
+
+    def get_snapshots_5678(self, **kw):
+        return (200, {}, {'snapshot': _stub_snapshot(id='5678')})
+
+    def post_group_snapshots_1234_action(self, **kw):
+        return (202, {}, {})
+
+    def post_group_snapshots_5678_action(self, **kw):
+        return (202, {}, {})
+
+    def get_group_snapshots_5678(self, **kw):
+        return (200, {}, {'group_snapshot': _stub_group_snapshot(id='5678')})
 
     def delete_group_snapshots_1234(self, **kw):
         return (202, {}, {})

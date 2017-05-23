@@ -99,7 +99,8 @@ class VolumeBackupManager(base.ManagerWithFind):
 
     def reset_state(self, backup, state):
         """Update the specified volume backup with the provided state."""
-        return self._action('os-reset_status', backup, {'status': state})
+        return self._action('os-reset_status', backup,
+                            {'status': state} if state else {})
 
     def _action(self, action, backup, info=None, **kwargs):
         """Perform a volume backup action."""

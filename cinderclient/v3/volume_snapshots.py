@@ -150,7 +150,8 @@ class SnapshotManager(base.ManagerWithFind):
 
     def reset_state(self, snapshot, state):
         """Update the specified snapshot with the provided state."""
-        return self._action('os-reset_status', snapshot, {'status': state})
+        return self._action('os-reset_status', snapshot,
+                            {'status': state} if state else {})
 
     def _action(self, action, snapshot, info=None, **kwargs):
         """Perform a snapshot action."""

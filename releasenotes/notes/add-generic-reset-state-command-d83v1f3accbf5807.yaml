@@ -1,0 +1,7 @@
+---
+features:
+  - Use 'cinder reset-state' as generic resource reset
+    state command for resource 'volume', 'snapshot', 'backup'
+    'group' and 'group-snapshot'. Also change volume's
+    default status from 'available' to none when no
+    status is specified.

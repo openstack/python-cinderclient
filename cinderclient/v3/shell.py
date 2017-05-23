@@ -33,6 +33,13 @@ from cinderclient import utils
 from cinderclient.v2.shell import *  # flake8: noqa
 
 
+RESET_STATE_RESOURCES = {'volume': utils.find_volume,
+                         'backup': shell_utils.find_backup,
+                         'snapshot': shell_utils.find_volume_snapshot,
+                         'group': shell_utils.find_group,
+                         'group-snapshot': shell_utils.find_group_snapshot}
+
+
 @utils.arg('--group_id',
            metavar='<group_id>',
            default=None,
@@ -192,6 +199,63 @@ def do_list(cs, args):
         sortby_index = 0
     utils.print_list(volumes, key_list, exclude_unavailable=True,
                      sortby_index=sortby_index)
+
+
+@utils.arg('entity', metavar='<entity>', nargs='+',
+           help='Name or ID of entity to update.')
+@utils.arg('--type', metavar='<type>', default='volume',
+           choices=RESET_STATE_RESOURCES.keys(),
+           help="Type of entity to update. Available resources "
+                "are: 'volume', 'snapshot', 'backup', "
+                "'group' (since 3.20) and "
+                "'group-snapshot' (since 3.19), Default=volume.")
+@utils.arg('--state', metavar='<state>', default=None,
+           help=("The state to assign to the entity. "
+                 "NOTE: This command simply changes the state of the "
+                 "entity in the database with no regard to actual status, "
+                 "exercise caution when using. Default=None, that means the "
+                 "state is unchanged."))
+@utils.arg('--attach-status', metavar='<attach-status>', default=None,
+           help=('This only used in volume entity. The attach status to '
+                 'assign to the volume in the DataBase, with no regard to '
+                 'the actual status. Valid values are "attached" and '
+                 '"detached". Default=None, that means the status '
+                 'is unchanged.'))
+@utils.arg('--reset-migration-status',
+           action='store_true',
+           help=('This only used in volume entity. Clears the migration '
+                 'status of the volume in the DataBase that indicates the '
+                 'volume is source or destination of volume migration, '
+                 'with no regard to the actual status.'))
+def do_reset_state(cs, args):
+    """Explicitly updates the entity state in the Cinder database.
+
+    Being a database change only, this has no impact on the true state of the
+    entity and may not match the actual state. This can render a entity
+    unusable in the case of changing to the 'available' state.
+    """
+    failure_count = 0
+    single = (len(args.entity) == 1)
+
+    migration_status = 'none' if args.reset_migration_status else None
+    collector = RESET_STATE_RESOURCES[args.type]
+    argument = (args.state,)
+    if args.type == 'volume':
+        argument += (args.attach_status, migration_status)
+
+    for entity in args.entity:
+        try:
+            collector(cs, entity).reset_state(*argument)
+        except Exception as e:
+            print(e)
+            failure_count += 1
+            msg = "Reset state for entity %s failed: %s" % (entity, e)
+            if not single:
+                print(msg)
+
+    if failure_count == len(args.entity):
+        msg = "Unable to reset the state for the specified entity(s)."
+        raise exceptions.CommandError(msg)
 
 
 @utils.arg('size',
