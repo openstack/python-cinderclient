@@ -14,6 +14,7 @@
 import json
 import mock
 import requests
+import uuid
 
 from cinderclient import client
 from cinderclient import exceptions
@@ -69,14 +70,15 @@ timeout_error_request = mock.Mock(
     side_effect=requests.exceptions.Timeout)
 
 
-def get_client(retries=0):
+def get_client(retries=0, **kwargs):
     cl = client.HTTPClient("username", "password",
-                           "project_id", "auth_test", retries=retries)
+                           "project_id", "auth_test", retries=retries,
+                           **kwargs)
     return cl
 
 
-def get_authed_client(retries=0):
-    cl = get_client(retries=retries)
+def get_authed_client(retries=0, **kwargs):
+    cl = get_client(retries=retries, **kwargs)
     cl.management_url = "http://example.com"
     cl.auth_token = "token"
     cl.get_service_url = mock.Mock(return_value="http://example.com")
@@ -102,6 +104,29 @@ class ClientTest(utils.TestCase):
             resp, body = cl.get("/hi")
             headers = {"X-Auth-Token": "token",
                        "X-Auth-Project-Id": "project_id",
+                       "User-Agent": cl.USER_AGENT,
+                       'Accept': 'application/json', }
+            mock_request.assert_called_with(
+                "GET",
+                "http://example.com/hi",
+                headers=headers,
+                **self.TEST_REQUEST_BASE)
+            # Automatic JSON parsing
+            self.assertEqual({"hi": "there"}, body)
+
+        test_get_call()
+
+    def test_get_global_id(self):
+        global_id = "req-%s" % uuid.uuid4()
+        cl = get_authed_client(global_request_id=global_id)
+
+        @mock.patch.object(requests, "request", mock_request)
+        @mock.patch('time.time', mock.Mock(return_value=1234))
+        def test_get_call():
+            resp, body = cl.get("/hi")
+            headers = {"X-Auth-Token": "token",
+                       "X-Auth-Project-Id": "project_id",
+                       "X-OpenStack-Request-ID": global_id,
                        "User-Agent": cl.USER_AGENT,
                        'Accept': 'application/json', }
             mock_request.assert_called_with(

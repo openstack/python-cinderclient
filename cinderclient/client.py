@@ -63,6 +63,7 @@ V1_SERVICE_TYPE = 'volume'
 SERVICE_TYPES = {'1': V1_SERVICE_TYPE,
                  '2': V2_SERVICE_TYPE,
                  '3': V3_SERVICE_TYPE}
+REQ_ID_HEADER = 'X-OpenStack-Request-ID'
 
 # tell keystoneclient that we can ignore the /v1|v2/{project_id} component of
 # the service catalog when doing discovery lookups
@@ -125,10 +126,12 @@ def _log_request_id(logger, resp, service_name):
 
 
 class SessionClient(adapter.LegacyJsonAdapter):
+    global_request_id = None
 
     def __init__(self, *args, **kwargs):
         self.api_version = kwargs.pop('api_version', None)
         self.api_version = self.api_version or api_versions.APIVersion()
+        self.global_request_id = kwargs.pop('global_request_id', None)
         self.retries = kwargs.pop('retries', 0)
         self._logger = logging.getLogger(__name__)
         super(SessionClient, self).__init__(*args, **kwargs)
@@ -137,6 +140,10 @@ class SessionClient(adapter.LegacyJsonAdapter):
         kwargs.setdefault('headers', kwargs.get('headers', {}))
         api_versions.update_headers(kwargs["headers"], self.api_version)
         kwargs.setdefault('authenticated', False)
+
+        if self.global_request_id:
+            kwargs['headers'].setdefault(REQ_ID_HEADER, self.global_request_id)
+
         # Note(tpatil): The standard call raises errors from
         # keystoneauth, here we need to raise the cinderclient errors.
         raise_exc = kwargs.pop('raise_exc', True)
@@ -231,12 +238,13 @@ class HTTPClient(object):
                  http_log_debug=False, cacert=None,
                  auth_system='keystone', auth_plugin=None, api_version=None,
                  logger=None, user_domain_name='Default',
-                 project_domain_name='Default'):
+                 project_domain_name='Default', global_request_id=None):
         self.user = user
         self.password = password
         self.projectid = projectid
         self.tenant_id = tenant_id
         self.api_version = api_version or api_versions.APIVersion()
+        self.global_request_id = global_request_id
 
         if auth_system and auth_system != 'keystone' and not auth_plugin:
             raise exceptions.AuthSystemNotFound(auth_system)
@@ -334,6 +342,9 @@ class HTTPClient(object):
             kwargs['headers']['Content-Type'] = 'application/json'
             kwargs['data'] = json.dumps(kwargs.pop('body'))
         api_versions.update_headers(kwargs["headers"], self.api_version)
+
+        if self.global_request_id:
+            kwargs['headers'].setdefault(REQ_ID_HEADER, self.global_request_id)
 
         if self.timeout:
             kwargs.setdefault('timeout', self.timeout)
