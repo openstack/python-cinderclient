@@ -92,8 +92,8 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
            metavar='<key=value>',
            default=None,
            start_version='3.4',
-           help='Filters results by a image metadata key and value pair. Require '
-                'volume api version >=3.4. Default=None.')
+           help='Filters results by a image metadata key and value pair. '
+                'Require volume api version >=3.4. Default=None.')
 @utils.arg('--marker',
            metavar='<marker>',
            default=None,
@@ -234,6 +234,7 @@ def do_reset_state(cs, args):
     entity and may not match the actual state. This can render a entity
     unusable in the case of changing to the 'available' state.
     """
+    # pylint: disable=function-redefined
     failure_count = 0
     single = (len(args.entity) == 1)
 
@@ -533,7 +534,7 @@ def do_group_type_delete(cs, args):
             gtype = shell_utils.find_group_type(cs, group_type)
             cs.group_types.delete(gtype)
             print("Request to delete group type %s has been accepted."
-                  % (group_type))
+                  % group_type)
         except Exception as e:
             failure_count += 1
             print("Delete for group type %s failed: %s" % (group_type, e))
@@ -798,9 +799,11 @@ def do_cluster_disable(cs, args):
            help=(('Comma-separated list of sort keys and directions in the '
                   'form of <key>[:<asc|desc>]. '
                   'Valid keys: %s. '
-                  'Default=None.') % ', '.join(base.SORT_MANAGEABLE_KEY_VALUES)))
+                  'Default=None.'
+                  ) % ', '.join(base.SORT_MANAGEABLE_KEY_VALUES)))
 def do_manageable_list(cs, args):
     """Lists all manageable volumes."""
+    # pylint: disable=function-redefined
     detailed = strutils.bool_from_string(args.detailed)
     volumes = cs.volumes.list_manageable(host=args.host, detailed=detailed,
                                          marker=args.marker, limit=args.limit,
@@ -1150,9 +1153,11 @@ def do_service_list(cs, args):
            help=(('Comma-separated list of sort keys and directions in the '
                   'form of <key>[:<asc|desc>]. '
                   'Valid keys: %s. '
-                  'Default=None.') % ', '.join(base.SORT_MANAGEABLE_KEY_VALUES)))
+                  'Default=None.'
+                  ) % ', '.join(base.SORT_MANAGEABLE_KEY_VALUES)))
 def do_snapshot_manageable_list(cs, args):
     """Lists all manageable snapshots."""
+    # pylint: disable=function-redefined
     detailed = strutils.bool_from_string(args.detailed)
     snapshots = cs.volume_snapshots.list_manageable(host=args.host,
                                                     detailed=detailed,
@@ -1172,6 +1177,7 @@ def do_api_version(cs, args):
     columns = ['ID', 'Status', 'Version', 'Min_version']
     response = cs.services.server_api_version()
     utils.print_list(response, columns)
+
 
 @api_versions.wraps("3.3")
 @utils.arg('--marker',
@@ -1273,6 +1279,7 @@ def do_message_delete(cs, args):
     if failure_count == len(args.message):
         raise exceptions.CommandError("Unable to delete any of the specified "
                                       "messages.")
+
 
 @utils.arg('--all-tenants',
            dest='all_tenants',
@@ -1396,7 +1403,7 @@ def do_snapshot_list(cs, args):
 @utils.arg('--limit',
            metavar='<limit>',
            default=None,
-           help='Maximum number of attachemnts to return. Default=None.')
+           help='Maximum number of attachments to return. Default=None.')
 @utils.arg('--sort',
            metavar='<key>[:<direction>]',
            default=None,
@@ -1584,11 +1591,11 @@ def do_version_list(cs, args):
     else:
         columns = ["Id", "Status", "Updated"]
 
-    print(("Client supported API versions:"))
-    print(("Minimum version %(v)s") %
+    print("Client supported API versions:")
+    print("Minimum version %(v)s" %
           {'v': api_versions.MIN_VERSION})
-    print(("Maximum version %(v)s") %
+    print("Maximum version %(v)s" %
           {'v': api_versions.MAX_VERSION})
 
-    print(("\nServer supported API versions:"))
+    print("\nServer supported API versions:")
     utils.print_list(result, columns)
