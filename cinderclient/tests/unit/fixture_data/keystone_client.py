@@ -12,7 +12,8 @@
 
 import copy
 import json
-import uuid
+
+from oslo_utils import uuidutils
 
 
 # these are copied from python-keystoneclient tests
@@ -75,19 +76,27 @@ CINDER_ENDPOINT = 'http://www.cinder.com/v1'
 def _get_normalized_token_data(**kwargs):
     ref = copy.deepcopy(kwargs)
     # normalized token data
-    ref['user_id'] = ref.get('user_id', uuid.uuid4().hex)
-    ref['username'] = ref.get('username', uuid.uuid4().hex)
+    ref['user_id'] = ref.get('user_id', uuidutils.generate_uuid(dashed=False))
+    ref['username'] = ref.get('username',
+                              uuidutils.generate_uuid(dashed=False))
     ref['project_id'] = ref.get('project_id',
-                                ref.get('tenant_id', uuid.uuid4().hex))
+                                ref.get('tenant_id', uuidutils.generate_uuid(
+                                    dashed=False)))
     ref['project_name'] = ref.get('project_name',
-                                  ref.get('tenant_name', uuid.uuid4().hex))
-    ref['user_domain_id'] = ref.get('user_domain_id', uuid.uuid4().hex)
-    ref['user_domain_name'] = ref.get('user_domain_name', uuid.uuid4().hex)
-    ref['project_domain_id'] = ref.get('project_domain_id', uuid.uuid4().hex)
+                                  ref.get('tenant_name',
+                                          uuidutils.generate_uuid(
+                                              dashed=False)))
+    ref['user_domain_id'] = ref.get('user_domain_id',
+                                    uuidutils.generate_uuid(dashed=False))
+    ref['user_domain_name'] = ref.get('user_domain_name',
+                                      uuidutils.generate_uuid(dashed=False))
+    ref['project_domain_id'] = ref.get('project_domain_id',
+                                       uuidutils.generate_uuid(dashed=False))
     ref['project_domain_name'] = ref.get('project_domain_name',
-                                         uuid.uuid4().hex)
-    ref['roles'] = ref.get('roles', [{'name': uuid.uuid4().hex,
-                                      'id': uuid.uuid4().hex}])
+                                         uuidutils.generate_uuid(dashed=False))
+    ref['roles'] = ref.get('roles',
+                           [{'name': uuidutils.generate_uuid(dashed=False),
+                             'id': uuidutils.generate_uuid(dashed=False)}])
     ref['roles_link'] = ref.get('roles_link', [])
     ref['cinder_url'] = ref.get('cinder_url', CINDER_ENDPOINT)
 
@@ -97,7 +106,7 @@ def _get_normalized_token_data(**kwargs):
 def generate_v2_project_scoped_token(**kwargs):
     """Generate a Keystone V2 token based on auth request."""
     ref = _get_normalized_token_data(**kwargs)
-    token = uuid.uuid4().hex
+    token = uuidutils.generate_uuid(dashed=False)
 
     o = {'access': {'token': {'id': token,
                               'expires': '2099-05-22T00:02:43.941430Z',
@@ -108,7 +117,7 @@ def generate_v2_project_scoped_token(**kwargs):
                                          }
                               },
                     'user': {'id': ref.get('user_id'),
-                             'name': uuid.uuid4().hex,
+                             'name': uuidutils.generate_uuid(dashed=False),
                              'username': ref.get('username'),
                              'roles': ref.get('roles'),
                              'roles_links': ref.get('roles_links')
@@ -123,7 +132,7 @@ def generate_v2_project_scoped_token(**kwargs):
                 'publicURL': ref.get('auth_url'),
                 'adminURL': ref.get('auth_url'),
                 'internalURL': ref.get('auth_url'),
-                'id': uuid.uuid4().hex,
+                'id': uuidutils.generate_uuid(dashed=False),
                 'region': 'RegionOne'
             }],
             'endpoint_links': [],
@@ -138,7 +147,7 @@ def generate_v2_project_scoped_token(**kwargs):
                 'publicURL': 'public_' + ref.get('cinder_url'),
                 'internalURL': 'internal_' + ref.get('cinder_url'),
                 'adminURL': 'admin_' + (ref.get('auth_url') or ""),
-                'id': uuid.uuid4().hex,
+                'id': uuidutils.generate_uuid(dashed=False),
                 'region': 'RegionOne'
             }
         ],
@@ -189,44 +198,44 @@ def generate_v3_project_scoped_token(**kwargs):
     o['token']['catalog'] = [
         {'endpoints': [
             {
-                'id': uuid.uuid4().hex,
+                'id': uuidutils.generate_uuid(dashed=False),
                 'interface': 'public',
                 'region': 'RegionOne',
                 'url': 'public_' + ref.get('cinder_url')
             },
             {
-                'id': uuid.uuid4().hex,
+                'id': uuidutils.generate_uuid(dashed=False),
                 'interface': 'internal',
                 'region': 'RegionOne',
                 'url': 'internal_' + ref.get('cinder_url')
             },
             {
-                'id': uuid.uuid4().hex,
+                'id': uuidutils.generate_uuid(dashed=False),
                 'interface': 'admin',
                 'region': 'RegionOne',
                 'url': 'admin_' + ref.get('cinder_url')
             }],
-         'id': uuid.uuid4().hex,
+         'id': uuidutils.generate_uuid(dashed=False),
          'type': 'network'},
         {'endpoints': [
             {
-                'id': uuid.uuid4().hex,
+                'id': uuidutils.generate_uuid(dashed=False),
                 'interface': 'public',
                 'region': 'RegionOne',
                 'url': ref.get('auth_url')
             },
             {
-                'id': uuid.uuid4().hex,
+                'id': uuidutils.generate_uuid(dashed=False),
                 'interface': 'admin',
                 'region': 'RegionOne',
                 'url': ref.get('auth_url')
             }],
-         'id': uuid.uuid4().hex,
+         'id': uuidutils.generate_uuid(dashed=False),
          'type': 'identity'}]
 
     # token ID is conveyed via the X-Subject-Token header so we are generating
     # one to stash there
-    token_id = uuid.uuid4().hex
+    token_id = uuidutils.generate_uuid(dashed=False)
 
     return token_id, o
 
