@@ -80,14 +80,12 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
            help='Filters results by a migration status. Default=None. '
                 'Admin only.')
 @utils.arg('--metadata',
-           type=str,
            nargs='*',
            metavar='<key=value>',
            default=None,
            help='Filters results by a metadata key and value pair. '
                 'Default=None.')
 @utils.arg('--image_metadata',
-           type=str,
            nargs='*',
            metavar='<key=value>',
            default=None,
@@ -334,7 +332,6 @@ def do_reset_state(cs, args):
 @utils.arg('--availability_zone',
            help=argparse.SUPPRESS)
 @utils.arg('--metadata',
-           type=str,
            nargs='*',
            metavar='<key=value>',
            default=None,

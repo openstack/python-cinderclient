@@ -67,7 +67,6 @@ from cinderclient.v2 import availability_zones
            help='Filters results by a migration status. Default=None. '
                 'Admin only.')
 @utils.arg('--metadata',
-           type=str,
            nargs='*',
            metavar='<key=value>',
            default=None,
@@ -272,7 +271,6 @@ class CheckSizeArgForCreate(argparse.Action):
 @utils.arg('--availability_zone',
            help=argparse.SUPPRESS)
 @utils.arg('--metadata',
-           type=str,
            nargs='*',
            metavar='<key=value>',
            default=None,
@@ -643,7 +641,6 @@ def do_snapshot_show(cs, args):
 @utils.arg('--display_description',
            help=argparse.SUPPRESS)
 @utils.arg('--metadata',
-           type=str,
            nargs='*',
            metavar='<key=value>',
            default=None,
@@ -1986,7 +1983,6 @@ def do_set_bootable(cs, args):
            metavar='<availability-zone>',
            help='Availability zone for volume (Default=None)')
 @utils.arg('--metadata',
-           type=str,
            nargs='*',
            metavar='<key=value>',
            help='Metadata key=value pairs (Default=None)')
@@ -2372,7 +2368,6 @@ def do_get_capabilities(cs, args):
            metavar='<description>',
            help='Snapshot description (Default=None)')
 @utils.arg('--metadata',
-           type=str,
            nargs='*',
            metavar='<key=value>',
            help='Metadata key=value pairs (Default=None)')
