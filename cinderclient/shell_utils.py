@@ -21,8 +21,7 @@ from cinderclient import utils
 
 _quota_resources = ['volumes', 'snapshots', 'gigabytes',
                     'backups', 'backup_gigabytes',
-                    'consistencygroups', 'per_volume_gigabytes',
-                    'groups', ]
+                    'per_volume_gigabytes', 'groups', ]
 _quota_infos = ['Type', 'In_use', 'Reserved', 'Limit']
 
 

@@ -743,10 +743,6 @@ def do_group_type_key(cs, args):
            metavar='<backup_gigabytes>',
            type=int, default=None,
            help='The new "backup_gigabytes" quota value. Default=None.')
-@utils.arg('--consistencygroups',
-           metavar='<consistencygroups>',
-           type=int, default=None,
-           help='The new "consistencygroups" quota value. Default=None.')
 @utils.arg('--groups',
            metavar='<groups>',
            type=int, default=None,
