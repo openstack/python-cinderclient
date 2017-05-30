@@ -169,14 +169,17 @@ class ShellTest(utils.TestCase):
             tenant_name=self.FAKE_ENV['OS_TENANT_NAME'],
             username=self.FAKE_ENV['OS_USERNAME'])
 
-    def test_noauth_plugin(self):
+    @requests_mock.Mocker()
+    def test_noauth_plugin(self, mocker):
+        os_auth_url = "http://example.com/v2"
+        mocker.register_uri('GET',
+                            "%s/admin/volumes/detail"
+                            % os_auth_url, text='{"volumes": []}')
         _shell = shell.OpenStackCinderShell()
-        args = ['--os-endpoint', 'http://example.com/v2',
+        args = ['--os-endpoint', os_auth_url,
                 '--os-auth-type', 'noauth', '--os-user-id',
                 'admin', '--os-project-id', 'admin', 'list']
-
-        # This "fails" but instantiates the client with session
-        self.assertRaises(exceptions.NotFound, _shell.main, args)
+        _shell.main(args)
         self.assertIsInstance(_shell.cs.client.session.auth,
                               noauth.CinderNoAuthPlugin)
 
