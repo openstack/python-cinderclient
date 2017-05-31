@@ -66,6 +66,104 @@ class ShellTest(utils.TestCase):
         return self.shell.cs.assert_called(method, url, body,
                                            partial_body, **kwargs)
 
+    @ddt.data({'resource': None, 'query_url': None},
+              {'resource': 'volume', 'query_url': '?resource=volume'},
+              {'resource': 'group', 'query_url': '?resource=group'})
+    @ddt.unpack
+    def test_list_filters(self, resource, query_url):
+        url = '/resource_filters'
+        if resource is not None:
+            url += query_url
+            self.run_command('--os-volume-api-version 3.33 '
+                             'list-filters --resource=%s' % resource)
+        else:
+            self.run_command('--os-volume-api-version 3.33 list-filters')
+
+        self.assert_called('GET', url)
+
+    @ddt.data(
+        # testcases for list volume
+        {'command':
+            'list --name=123 --filters name=456',
+         'expected':
+             '/volumes/detail?name=456'},
+        {'command':
+             'list --filters name=123',
+         'expected':
+             '/volumes/detail?name=123'},
+        {'command':
+             'list --filters metadata={key1:value1}',
+         'expected':
+             '/volumes/detail?metadata=%7B%27key1%27%3A+%27value1%27%7D'},
+        # testcases for list group
+        {'command':
+             'group-list --filters name=456',
+         'expected':
+             '/groups/detail?name=456'},
+        {'command':
+             'group-list --filters status=available',
+         'expected':
+             '/groups/detail?status=available'},
+        # testcases for list group-snapshot
+        {'command':
+             'group-snapshot-list --status=error --filters status=available',
+         'expected':
+             '/group_snapshots/detail?status=available'},
+        {'command':
+             'group-snapshot-list --filters availability_zone=123',
+         'expected':
+             '/group_snapshots/detail?availability_zone=123'},
+        # testcases for list message
+        {'command':
+             'message-list --event_id=123 --filters event_id=456',
+         'expected':
+             '/messages?event_id=456'},
+        {'command':
+             'message-list --filters request_id=123',
+         'expected':
+             '/messages?request_id=123'},
+        # testcases for list attachment
+        {'command':
+             'attachment-list --volume-id=123 --filters volume_id=456',
+         'expected':
+             '/attachments?volume_id=456'},
+        {'command':
+             'attachment-list --filters mountpoint=123',
+         'expected':
+             '/attachments?mountpoint=123'},
+        # testcases for list backup
+        {'command':
+             'backup-list --volume-id=123 --filters volume_id=456',
+         'expected':
+             '/backups/detail?volume_id=456'},
+        {'command':
+             'backup-list --filters name=123',
+         'expected':
+             '/backups/detail?name=123'},
+        # testcases for list snapshot
+        {'command':
+             'snapshot-list --volume-id=123 --filters volume_id=456',
+         'expected':
+             '/snapshots/detail?volume_id=456'},
+        {'command':
+             'snapshot-list --filters name=123',
+         'expected':
+             '/snapshots/detail?name=123'},
+        # testcases for get pools
+        {'command':
+             'get-pools --filters name=456 --detail',
+         'expected':
+             '/scheduler-stats/get_pools?detail=True&name=456'},
+        {'command':
+             'get-pools --filters name=456',
+         'expected':
+             '/scheduler-stats/get_pools?name=456'}
+    )
+    @ddt.unpack
+    def test_list_with_filters_mixed(self, command, expected):
+        self.run_command('--os-volume-api-version 3.33 %s' % command)
+        self.assert_called('GET', expected)
+
     def test_list(self):
         self.run_command('list')
         # NOTE(jdg): we default to detail currently

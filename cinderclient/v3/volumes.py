@@ -176,3 +176,23 @@ class VolumeManager(volumes.VolumeManager):
                                    search_opts={'host': host}, marker=marker,
                                    limit=limit, offset=offset, sort=sort)
         return self._list(url, "manageable-volumes")
+
+    @api_versions.wraps("2.0", "3.32")
+    def get_pools(self, detail):
+        """Show pool information for backends."""
+        query_string = ""
+        if detail:
+            query_string = "?detail=True"
+
+        return self._get('/scheduler-stats/get_pools%s' % query_string, None)
+
+    @api_versions.wraps("3.33")
+    def get_pools(self, detail, search_opts):
+        """Show pool information for backends."""
+        # pylint: disable=function-redefined
+        options = {'detail': detail}
+        options.update(search_opts)
+        url = self._build_list_url('scheduler-stats/get_pools', detailed=False,
+                                   search_opts=options)
+
+        return self._get(url, None)

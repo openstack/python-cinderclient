@@ -1,0 +1,14 @@
+---
+features:
+  - |
+    Added new command ``list-filters`` to retrieve enabled resource filters,
+    Added new option ``--filters`` to these list commands:
+
+    - list
+    - snapshot-list
+    - backup-list
+    - group-list
+    - group-snapshot-list
+    - attachment-list
+    - message-list
+    - get-pools

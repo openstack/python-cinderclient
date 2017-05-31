@@ -43,6 +43,9 @@ ignore_messages = [
 
     # six.moves
     "Instance of '_MovedItems' has no 'builtins' member",
+
+    # This error message is for code [E1101]
+    "Instance of 'ResourceFilterManager' has no '_list' member",
 ]
 
 ignore_modules = ["cinderclient/tests/"]

@@ -544,6 +544,12 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         }
         return 200, {}, {'message': message}
 
+    #
+    # resource filters
+    #
+    def get_resource_filters(self, **kw):
+        return 200, {}, {'resource_filters': []}
+
 
 def fake_request_get():
     versions = {'versions': [{'id': 'v1.0',

@@ -32,6 +32,7 @@ from cinderclient.v3 import pools
 from cinderclient.v3 import qos_specs
 from cinderclient.v3 import quota_classes
 from cinderclient.v3 import quotas
+from cinderclient.v3 import resource_filters
 from cinderclient.v3 import services
 from cinderclient.v3 import volumes
 from cinderclient.v3 import volume_snapshots
@@ -85,6 +86,7 @@ class Client(object):
         self.quotas = quotas.QuotaSetManager(self)
         self.backups = volume_backups.VolumeBackupManager(self)
         self.messages = messages.MessageManager(self)
+        self.resource_filters = resource_filters.ResourceFilterManager(self)
         self.restores = volume_backups_restore.VolumeBackupRestoreManager(self)
         self.transfers = volume_transfers.VolumeTransferManager(self)
         self.services = services.ServiceManager(self)
