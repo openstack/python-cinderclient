@@ -78,6 +78,8 @@ def get_server_version(url):
     :returns: APIVersion object for min and max version supported by
               the server
     """
+    min_version = "2.0"
+    current_version = "2.0"
 
     logger = logging.getLogger(__name__)
     try:
@@ -87,12 +89,14 @@ def get_server_version(url):
         versions = data['versions']
         for version in versions:
             if '3.' in version['version']:
-                return (api_versions.APIVersion(version['min_version']),
-                        api_versions.APIVersion(version['version']))
+                min_version = version['min_version']
+                current_version = version['version']
+                break
     except exceptions.ClientException as e:
         logger.warning("Error in server version query:%s\n"
                        "Returning APIVersion 2.0", six.text_type(e.message))
-        return api_versions.APIVersion("2.0"), api_versions.APIVersion("2.0")
+    return (api_versions.APIVersion(min_version),
+            api_versions.APIVersion(current_version))
 
 
 def get_highest_client_server_version(url):

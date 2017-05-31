@@ -612,3 +612,31 @@ def fake_request_get():
                               'updated': '2016-02-08T12:20:21Z',
                               'version': '3.16'}]}
     return versions
+
+
+def fake_request_get_no_v3():
+    versions = {'versions': [{'id': 'v1.0',
+                              'links': [{'href': 'http://docs.openstack.org/',
+                                         'rel': 'describedby',
+                                         'type': 'text/html'},
+                                        {'href': 'http://192.168.122.197/v1/',
+                                         'rel': 'self'}],
+                              'media-types': [{'base': 'application/json',
+                                               'type': 'application/'}],
+                              'min_version': '',
+                              'status': 'DEPRECATED',
+                              'updated': '2016-05-02T20:25:19Z',
+                              'version': ''},
+                             {'id': 'v2.0',
+                              'links': [{'href': 'http://docs.openstack.org/',
+                                         'rel': 'describedby',
+                                         'type': 'text/html'},
+                                        {'href': 'http://192.168.122.197/v2/',
+                                         'rel': 'self'}],
+                              'media-types': [{'base': 'application/json',
+                                               'type': 'application/'}],
+                              'min_version': '',
+                              'status': 'SUPPORTED',
+                              'updated': '2014-06-28T12:20:21Z',
+                              'version': ''}]}
+    return versions
