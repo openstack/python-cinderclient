@@ -143,9 +143,8 @@ class OpenStackCinderShell(object):
         parser.add_argument('--os-auth-system',
                             metavar='<os-auth-system>',
                             dest='os_auth_type',
-                            default=utils.env('OS_AUTH_SYSTEM',
-                            default=utils.env('OS_AUTH_TYPE')),
-                            help=_('DEPRECATED! Use --os-auth-type.'
+                            default=utils.env('OS_AUTH_SYSTEM'),
+                            help=_('DEPRECATED! Use --os-auth-type. '
                                    'Defaults to env[OS_AUTH_SYSTEM].'))
         parser.add_argument('--os_auth_system',
                             help=argparse.SUPPRESS)
