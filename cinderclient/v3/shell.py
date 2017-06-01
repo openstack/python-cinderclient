@@ -363,14 +363,14 @@ def do_list(cs, args):
                  "exercise caution when using. Default=None, that means the "
                  "state is unchanged."))
 @utils.arg('--attach-status', metavar='<attach-status>', default=None,
-           help=('This only used in volume entity. The attach status to '
-                 'assign to the volume in the DataBase, with no regard to '
-                 'the actual status. Valid values are "attached" and '
+           help=('This is only used for a volume entity. The attach status '
+                 'to assign to the volume in the database, with no regard '
+                 'to the actual status. Valid values are "attached" and '
                  '"detached". Default=None, that means the status '
                  'is unchanged.'))
 @utils.arg('--reset-migration-status',
            action='store_true',
-           help=('This only used in volume entity. Clears the migration '
+           help=('This is only used for a volume entity. Clears the migration '
                  'status of the volume in the DataBase that indicates the '
                  'volume is source or destination of volume migration, '
                  'with no regard to the actual status.'))
