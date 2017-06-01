@@ -23,6 +23,7 @@ import six
 from cinderclient import client
 from cinderclient import exceptions
 from cinderclient import shell
+from cinderclient import utils as cinderclient_utils
 from cinderclient.v3 import volumes
 from cinderclient.v3 import volume_snapshots
 from cinderclient.tests.unit import utils
@@ -248,14 +249,35 @@ class ShellTest(utils.TestCase):
                                       'mountpoint': '/123',
                                       'initiator': 'aabbccdd',
                                       'platform': 'x86_xx'},
+                        'volume_uuid': '1234'}},
+              {'cmd': 'abc 1233',
+               'body': {'instance_uuid': '1233',
+                        'connector': {},
                         'volume_uuid': '1234'}})
+    @mock.patch.object(cinderclient_utils, 'find_volume')
     @ddt.unpack
-    def test_attachment_create(self, cmd, body):
+    def test_attachment_create(self, mock_find_volume, cmd, body):
+        mock_find_volume.return_value = volumes.Volume(self,
+                                                       {'id': '1234'},
+                                                       loaded=True)
         command = '--os-volume-api-version 3.27 attachment-create '
         command += cmd
         self.run_command(command)
         expected = {'attachment': body}
+        self.assertTrue(mock_find_volume.called)
         self.assert_called('POST', '/attachments', body=expected)
+
+    @mock.patch.object(volumes.VolumeManager, 'findall')
+    def test_attachment_create_duplicate_name_vol(self, mock_findall):
+        found = [volumes.Volume(self, {'id': '7654', 'name': 'abc'},
+                                loaded=True),
+                 volumes.Volume(self, {'id': '9876', 'name': 'abc'},
+                                loaded=True)]
+        mock_findall.return_value = found
+        self.assertRaises(exceptions.CommandError,
+                          self.run_command,
+                          '--os-volume-api-version 3.27 '
+                          'attachment-create abc 789')
 
     @ddt.data({'cmd': '',
                'expected': ''},
