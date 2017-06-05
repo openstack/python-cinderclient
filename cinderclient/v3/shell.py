@@ -792,9 +792,9 @@ def do_quota_update(cs, args):
 @utils.arg('--image_name',
            help=argparse.SUPPRESS)
 @utils.arg('--visibility',
-           metavar='<public|private>',
-           help='Set image visibility to either public or private. '
-                'Default=private.',
+           metavar='<public|private|community|shared>',
+           help='Set image visibility to public, private, community or '
+                'shared. Default=private.',
            default='private',
            start_version='3.1')
 @utils.arg('--protected',
