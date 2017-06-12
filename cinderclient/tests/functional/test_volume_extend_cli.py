@@ -27,7 +27,7 @@ class CinderVolumeExtendNegativeTests(base.ClientTestBase):
         self.volume = self.object_create('volume', params='1')
 
     @ddt.data(
-        ('', (r'too few arguments')),
+        ('', (r'too few arguments|the following arguments are required')),
         ('-1', (r'New size for extend must be greater than current size')),
         ('0', (r'Invalid input received')),
         ('size', (r'invalid int value')),
@@ -43,7 +43,7 @@ class CinderVolumeExtendNegativeTests(base.ClientTestBase):
             params='{0} {1}'.format(self.volume['id'], value))
 
     @ddt.data(
-        ('', (r'too few arguments')),
+        ('', (r'too few arguments|the following arguments are required')),
         ('1234-1234-1234', (r'No volume with a name or ID of')),
         ('my_volume', (r'No volume with a name or ID of')),
         ('1234 1234', (r'unrecognized arguments'))
