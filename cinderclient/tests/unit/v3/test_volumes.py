@@ -27,7 +27,7 @@ from six.moves.urllib import parse
 cs = fakes.FakeClient()
 
 
-@ddt.data
+@ddt.ddt
 class VolumesTest(utils.TestCase):
 
     def test_volume_manager_upload_to_image(self):
@@ -107,7 +107,7 @@ class VolumesTest(utils.TestCase):
     @ddt.data(True, False)
     def test_get_pools_filter_by_name(self, detail):
         cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.33'))
-        vol = cs.volumes.get_pools(detail, 'pool1')
+        vol = cs.volumes.get_pools(detail, {'name': 'pool1'})
         request_url = '/scheduler-stats/get_pools?name=pool1'
         if detail:
             request_url = '/scheduler-stats/get_pools?detail=True&name=pool1'
