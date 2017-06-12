@@ -108,7 +108,7 @@ class CinderVolumeTestsWithParameters(base.ClientTestBase):
         1) create volume with metadata
         2) check that metadata complies entered
         """
-        volume = self.object_create('volume',
-                                params='--metadata test_metadata=test_date 1')
-        self.assertEqual("{u'test_metadata': u'test_date'}",
+        volume = self.object_create(
+            'volume', params='--metadata test_metadata=test_date 1')
+        self.assertEqual(six.text_type({u'test_metadata': u'test_date'}),
                          volume['metadata'])
