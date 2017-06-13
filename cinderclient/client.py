@@ -126,12 +126,10 @@ def _log_request_id(logger, resp, service_name):
 
 
 class SessionClient(adapter.LegacyJsonAdapter):
-    global_request_id = None
 
     def __init__(self, *args, **kwargs):
         self.api_version = kwargs.pop('api_version', None)
         self.api_version = self.api_version or api_versions.APIVersion()
-        self.global_request_id = kwargs.pop('global_request_id', None)
         self.retries = kwargs.pop('retries', 0)
         self._logger = logging.getLogger(__name__)
         super(SessionClient, self).__init__(*args, **kwargs)
@@ -140,9 +138,6 @@ class SessionClient(adapter.LegacyJsonAdapter):
         kwargs.setdefault('headers', kwargs.get('headers', {}))
         api_versions.update_headers(kwargs["headers"], self.api_version)
         kwargs.setdefault('authenticated', False)
-
-        if self.global_request_id:
-            kwargs['headers'].setdefault(REQ_ID_HEADER, self.global_request_id)
 
         # Note(tpatil): The standard call raises errors from
         # keystoneauth, here we need to raise the cinderclient errors.
