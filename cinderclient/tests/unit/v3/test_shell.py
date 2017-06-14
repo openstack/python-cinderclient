@@ -427,6 +427,11 @@ class ShellTest(utils.TestCase):
                          'group-show 1234')
         self.assert_called('GET', '/groups/1234')
 
+    def test_group_show_with_list_volume(self):
+        self.run_command('--os-volume-api-version 3.25 '
+                         'group-show 1234 --list-volume')
+        self.assert_called('GET', '/groups/1234?list_volume=True')
+
     @ddt.data(True, False)
     def test_group_delete(self, delete_vol):
         cmd = '--os-volume-api-version 3.13 group-delete 1234'

@@ -1,0 +1,5 @@
+---
+features:
+  - |
+      Support show group with ``list-volume`` argument.
+      The command is : cinder group-show {group_id} --list-volume

@@ -101,6 +101,11 @@ class GroupsTest(utils.TestCase):
         cs.assert_called('GET', '/groups/detail?foo=bar')
         self._assert_request_id(lst)
 
+    def test_list_group_with_volume(self):
+        lst = cs.groups.list(list_volume=True)
+        cs.assert_called('GET', '/groups/detail?list_volume=True')
+        self._assert_request_id(lst)
+
     def test_list_group_with_empty_search_opt(self):
         lst = cs.groups.list(
             search_opts={'foo': 'bar', 'abc': None}
@@ -112,6 +117,12 @@ class GroupsTest(utils.TestCase):
         group_id = '1234'
         grp = cs.groups.get(group_id)
         cs.assert_called('GET', '/groups/%s' % group_id)
+        self._assert_request_id(grp)
+
+    def test_get_group_with_list_volume(self):
+        group_id = '1234'
+        grp = cs.groups.get(group_id, list_volume=True)
+        cs.assert_called('GET', '/groups/%s?list_volume=True' % group_id)
         self._assert_request_id(grp)
 
     def test_create_group_from_src_snap(self):
