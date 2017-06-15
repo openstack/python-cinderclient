@@ -108,7 +108,7 @@ class ClientTestBase(base.ClientTestBase):
         return (object_name + '-' + cmd if object_name != 'volume' else cmd)
 
     def wait_for_object_status(self, object_name, object_id, status,
-                               timeout=60):
+                               timeout=120, interval=3):
         """Wait until object reaches given status.
 
         :param object_name: object name
@@ -121,6 +121,7 @@ class ClientTestBase(base.ClientTestBase):
         while time.time() - start_time < timeout:
             if status in self.cinder(cmd, params=object_id):
                 break
+            time.sleep(interval)
         else:
             self.fail("%s %s did not reach status %s after %d seconds."
                       % (object_name, object_id, status, timeout))
