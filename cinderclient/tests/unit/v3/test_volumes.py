@@ -94,6 +94,14 @@ class VolumesTest(utils.TestCase):
         cs.assert_called('POST', '/volumes', body=expected)
         self._assert_request_id(vol)
 
+    @ddt.data((False, '/volumes/summary'),
+              (True, '/volumes/summary?all_tenants=True'))
+    def test_volume_summary(self, all_tenants_input):
+        all_tenants, url = all_tenants_input
+        cs = fakes.FakeClient(api_versions.APIVersion('3.12'))
+        cs.volumes.summary(all_tenants=all_tenants)
+        cs.assert_called('GET', url)
+
     def test_volume_list_manageable(self):
         cs = fakes.FakeClient(api_versions.APIVersion('3.8'))
         cs.volumes.list_manageable('host1', detailed=False)

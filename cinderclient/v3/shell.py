@@ -600,6 +600,27 @@ def do_metadata(cs, args):
                                    reverse=True))
 
 
+@api_versions.wraps('3.12')
+@utils.arg('--all-tenants',
+           dest='all_tenants',
+           metavar='<0|1>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=utils.env('ALL_TENANTS', default=0),
+           help='Shows details for all tenants. Admin only.')
+def do_summary(cs, args):
+    """Get volumes summary."""
+    all_tenants = args.all_tenants
+    info = cs.volumes.summary(all_tenants)
+
+    formatters = ['total_size', 'total_count']
+    if cs.api_version >= api_versions.APIVersion("3.36"):
+        formatters.append('metadata')
+
+    utils.print_dict(info['volume-summary'], formatters=formatters)
+
+
 @api_versions.wraps('3.11')
 def do_group_type_list(cs, args):
     """Lists available 'group types'. (Admin only will see private types)"""
