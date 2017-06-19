@@ -19,6 +19,7 @@ from __future__ import print_function
 import argparse
 import collections
 import os
+import sys
 
 from oslo_utils import strutils
 import six
@@ -503,6 +504,9 @@ def do_reset_state(cs, args):
            help=('Allow volume to be attached more than once.'
                  ' Default=False'),
            default=False)
+@utils.arg('--poll',
+           action="store_true",
+           help=('Wait for volume creation until it completes.'))
 def do_create(cs, args):
     """Creates a volume."""
 
@@ -563,6 +567,12 @@ def do_create(cs, args):
         info['readonly'] = info['metadata']['readonly']
 
     info.pop('links', None)
+
+    if args.poll:
+        timeout_period = os.environ.get("POLL_TIMEOUT_PERIOD", 3600)
+        shell_utils._poll_for_status(cs.volumes.get, volume.id, info, 'creating', ['available'],
+                timeout_period, cs.client.global_request_id, cs.messages)
+
     utils.print_dict(info)
 
 

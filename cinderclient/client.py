@@ -149,6 +149,9 @@ class SessionClient(adapter.LegacyJsonAdapter):
         if raise_exc and resp.status_code >= 400:
             raise exceptions.from_response(resp, body)
 
+        if not self.global_request_id:
+            self.global_request_id = resp.headers.get('x-openstack-request-id')
+
         return resp, body
 
     def _cs_request(self, url, method, **kwargs):

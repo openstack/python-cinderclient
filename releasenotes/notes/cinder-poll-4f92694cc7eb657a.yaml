@@ -1,0 +1,4 @@
+features:
+  - |
+      Support to wait for volume creation until it completes.
+      The command is: ``cinder create --poll <volume_size>``

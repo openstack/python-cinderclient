@@ -131,9 +131,11 @@ class ClientTest(utils.TestCase):
             "code": 202
         }
 
+        request_id = "req-f551871a-4950-4225-9b2c-29a14c8f075e"
         mock_response = utils.TestResponse({
             "status_code": 202,
             "text": six.b(json.dumps(resp)),
+            "headers": {"x-openstack-request-id": request_id},
         })
 
         # 'request' method of Adaptor will return 202 response

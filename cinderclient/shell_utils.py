@@ -18,6 +18,7 @@ import sys
 import time
 
 from cinderclient import utils
+from cinderclient import exceptions
 
 _quota_resources = ['volumes', 'snapshots', 'gigabytes',
                     'backups', 'backup_gigabytes',
@@ -276,3 +277,36 @@ def print_qos_specs_and_associations_list(q_specs):
 
 def print_associations_list(associations):
     utils.print_list(associations, ['Association_Type', 'Name', 'ID'])
+
+
+def _poll_for_status(poll_fn, obj_id, info, action, final_ok_states,
+                     timeout_period, global_request_id=None, messages=None,
+                     poll_period=2, status_field="status"):
+    """Block while an action is being performed."""
+    time_elapsed = 0
+    while True:
+        time.sleep(poll_period)
+        time_elapsed += poll_period
+        obj = poll_fn(obj_id)
+        status = getattr(obj, status_field)
+        info[status_field] = status
+        if status:
+            status = status.lower()
+
+        if status in final_ok_states:
+            break
+        elif status == "error":
+            utils.print_dict(info)
+            if global_request_id:
+                search_opts = {
+                    'request_id': global_request_id
+                    }
+                message_list = messages.list(search_opts=search_opts)
+                try:
+                    fault_msg = message_list[0].user_message
+                except IndexError:
+                    fault_msg = "Unknown error. Operation failed."
+                raise exceptions.ResourceInErrorState(obj, fault_msg)
+        elif time_elapsed == timeout_period:
+            utils.print_dict(info)
+            raise exceptions.TimeoutException(obj, action)
