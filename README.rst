@@ -289,6 +289,7 @@ You'll find complete documentation on the shell by running
                             match the one configured on the cinder api server.
                             Without key the profiling will not be triggered even
                             if osprofiler is enabled on server side.
+                            Defaults to env[OS_PROFILE].
       --os-auth-strategy <auth-strategy>
                             Authentication strategy (Env: OS_AUTH_STRATEGY,
                             default keystone). For now, any other value will
