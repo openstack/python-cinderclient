@@ -32,7 +32,7 @@ class QuotaClassSetsTest(utils.TestCase):
         q = cs.quota_classes.get('test')
         q.update(volumes=2, snapshots=2, gigabytes=2000,
                  backups=2, backup_gigabytes=2000,
-                 consistencygroups=2, per_volume_gigabytes=100)
+                 per_volume_gigabytes=100)
         cs.assert_called('PUT', '/os-quota-class-sets/test')
         self._assert_request_id(q)
 
@@ -44,7 +44,6 @@ class QuotaClassSetsTest(utils.TestCase):
         self.assertEqual(q.gigabytes, q2.gigabytes)
         self.assertEqual(q.backups, q2.backups)
         self.assertEqual(q.backup_gigabytes, q2.backup_gigabytes)
-        self.assertEqual(q.consistencygroups, q2.consistencygroups)
         self.assertEqual(q.per_volume_gigabytes, q2.per_volume_gigabytes)
         q2.volumes = 0
         self.assertNotEqual(q.volumes, q2.volumes)
@@ -56,8 +55,6 @@ class QuotaClassSetsTest(utils.TestCase):
         self.assertNotEqual(q.backups, q2.backups)
         q2.backup_gigabytes = 0
         self.assertNotEqual(q.backup_gigabytes, q2.backup_gigabytes)
-        q2.consistencygroups = 0
-        self.assertNotEqual(q.consistencygroups, q2.consistencygroups)
         q2.per_volume_gigabytes = 0
         self.assertNotEqual(q.per_volume_gigabytes, q2.per_volume_gigabytes)
         q2.get()
@@ -66,7 +63,6 @@ class QuotaClassSetsTest(utils.TestCase):
         self.assertEqual(q.gigabytes, q2.gigabytes)
         self.assertEqual(q.backups, q2.backups)
         self.assertEqual(q.backup_gigabytes, q2.backup_gigabytes)
-        self.assertEqual(q.consistencygroups, q2.consistencygroups)
         self.assertEqual(q.per_volume_gigabytes, q2.per_volume_gigabytes)
         self._assert_request_id(q)
         self._assert_request_id(q2)

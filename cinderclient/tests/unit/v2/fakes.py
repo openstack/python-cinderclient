@@ -668,13 +668,11 @@ class FakeHTTPClient(base_client.HTTPClient):
     def get_os_quota_class_sets_test(self, **kw):
         return (200, {}, {'quota_class_set': {
                           'class_name': 'test',
-                          'metadata_items': [],
                           'volumes': 1,
                           'snapshots': 1,
                           'gigabytes': 1,
                           'backups': 1,
                           'backup_gigabytes': 1,
-                          'consistencygroups': 1,
                           'per_volume_gigabytes': 1, }})
 
     def put_os_quota_class_sets_test(self, body, **kw):
@@ -683,13 +681,11 @@ class FakeHTTPClient(base_client.HTTPClient):
                               required=['class_name'])
         return (200, {}, {'quota_class_set': {
                           'class_name': 'test',
-                          'metadata_items': [],
                           'volumes': 2,
                           'snapshots': 2,
                           'gigabytes': 1,
                           'backups': 1,
                           'backup_gigabytes': 1,
-                          'consistencygroups': 2,
                           'per_volume_gigabytes': 1}})
 
     #
