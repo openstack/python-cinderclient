@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Enabled like filter support in these list commands.
+    - list
+    - snapshot-list
+    - backup-list
+    - group-list
+    - group-snapshot-list
+    - attachment-list
+    - message-list

@@ -43,6 +43,10 @@ FILTER_DEPRECATED = ("This option is deprecated and will be removed in "
            default=None,
            help='Show enabled filters for specified resource. Default=None.')
 def do_list_filters(cs, args):
+        """List enabled filters.
+
+        Symbol '~' after filter key means it supports inexact filtering.
+        """
         filters = cs.resource_filters.list(resource=args.resource)
         shell_utils.print_resource_filter_list(filters)
 
@@ -100,7 +104,8 @@ def do_list_filters(cs, args):
            metavar='<key=value>',
            default=None,
            help="Filter key and value pairs. Please use 'cinder list-filters' "
-                "to check enabled filters from server, Default=None.")
+                "to check enabled filters from server. Use 'key~=value' for "
+                "inexact filtering if the key supports. Default=None.")
 def do_backup_list(cs, args):
     """Lists all backups."""
     # pylint: disable=function-redefined
@@ -274,7 +279,8 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
            metavar='<key=value>',
            default=None,
            help="Filter key and value pairs. Please use 'cinder list-filters' "
-                "to check enabled filters from server, Default=None.")
+                "to check enabled filters from server. Use 'key~=value' "
+                "for inexact filtering if the key supports. Default=None.")
 def do_list(cs, args):
     """Lists all volumes."""
     # pylint: disable=function-redefined
@@ -976,7 +982,8 @@ def do_manageable_list(cs, args):
            metavar='<key=value>',
            default=None,
            help="Filter key and value pairs. Please use 'cinder list-filters' "
-                "to check enabled filters from server, Default=None.")
+                "to check enabled filters from server. Use 'key~=value' "
+                "for inexact filtering if the key supports. Default=None.")
 def do_group_list(cs, args):
     """Lists all groups."""
     search_opts = {'all_tenants': args.all_tenants}
@@ -1191,7 +1198,8 @@ def do_group_update(cs, args):
            metavar='<key=value>',
            default=None,
            help="Filter key and value pairs. Please use 'cinder list-filters' "
-                "to check enabled filters from server, Default=None.")
+                "to check enabled filters from server. Use 'key~=value' "
+                "for inexact filtering if the key supports. Default=None.")
 def do_group_snapshot_list(cs, args):
     """Lists all group snapshots."""
 
@@ -1416,7 +1424,8 @@ def do_api_version(cs, args):
            metavar='<key=value>',
            default=None,
            help="Filter key and value pairs. Please use 'cinder list-filters' "
-                "to check enabled filters from server, Default=None.")
+                "to check enabled filters from server. Use 'key~=value' "
+                "for inexact filtering if the key supports. Default=None.")
 def do_message_list(cs, args):
     """Lists all messages."""
     search_opts = {
@@ -1553,7 +1562,8 @@ def do_message_delete(cs, args):
            metavar='<key=value>',
            default=None,
            help="Filter key and value pairs. Please use 'cinder list-filters' "
-                "to check enabled filters from server, Default=None.")
+                "to check enabled filters from server. Use 'key~=value' "
+                "for inexact filtering if the key supports. Default=None.")
 def do_snapshot_list(cs, args):
     """Lists all snapshots."""
     # pylint: disable=function-redefined
@@ -1643,7 +1653,8 @@ def do_snapshot_list(cs, args):
            metavar='<key=value>',
            default=None,
            help="Filter key and value pairs. Please use 'cinder list-filters' "
-                "to check enabled filters from server, Default=None.")
+                "to check enabled filters from server. Use 'key~=value' "
+                "for inexact filtering if the key supports. Default=None.")
 def do_attachment_list(cs, args):
     """Lists all attachments."""
     search_opts = {
