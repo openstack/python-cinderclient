@@ -151,7 +151,9 @@ def extract_filters(args):
             (key, value) = f.split('=', 1)
             if value.startswith('{') and value.endswith('}'):
                 value = _build_internal_dict(value[1:-1])
-        filters[key] = value
+            filters[key] = value
+        else:
+            print("WARNING: Ignoring the filter %s while showing result." % f)
 
     return filters
 
