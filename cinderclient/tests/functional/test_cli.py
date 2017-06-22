@@ -17,7 +17,8 @@ from cinderclient.tests.functional import base
 class CinderVolumeTests(base.ClientTestBase):
     """Check of base cinder volume commands."""
 
-    VOLUME_PROPERTY = ('attachments', 'availability_zone', 'bootable',
+    VOLUME_PROPERTY = ('attachment_ids', 'attached_servers',
+                       'availability_zone', 'bootable',
                        'created_at', 'description', 'encrypted', 'id',
                        'metadata', 'name', 'size', 'status',
                        'user_id', 'volume_type')

@@ -32,6 +32,18 @@ from cinderclient import utils
 from cinderclient.v2 import availability_zones
 
 
+def _translate_attachments(info):
+    attachments = []
+    attached_servers = []
+    for attachment in info['attachments']:
+        attachments.append(attachment['id'])
+        attached_servers.append(attachment['server_id'])
+    info.pop('attachments', None)
+    info['attachment_ids'] = attachments
+    info['attached_servers'] = attached_servers
+    return info
+
+
 @utils.arg('--all-tenants',
            dest='all_tenants',
            metavar='<0|1>',
@@ -188,9 +200,10 @@ def do_show(cs, args):
         info['readonly'] = info['metadata']['readonly']
 
     info.pop('links', None)
+    info = _translate_attachments(info)
     utils.print_dict(info,
                      formatters=['metadata', 'volume_image_metadata',
-                                 'attachments'])
+                                 'attachment_ids', 'attached_servers'])
 
 
 class CheckSizeArgForCreate(argparse.Action):
@@ -340,6 +353,7 @@ def do_create(cs, args):
         info['readonly'] = info['metadata']['readonly']
 
     info.pop('links', None)
+    info = _translate_attachments(info)
     utils.print_dict(info)
 
 
