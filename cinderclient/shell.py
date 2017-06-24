@@ -1,4 +1,3 @@
-
 # Copyright 2011-2014 OpenStack Foundation
 # All Rights Reserved.
 #
@@ -25,15 +24,12 @@ import getpass
 import logging
 import sys
 
-import requests
-import six
-
 from keystoneauth1 import discover
-from keystoneauth1 import loading
-from keystoneauth1 import session
+from keystoneauth1 import exceptions
 from keystoneauth1.identity import v2 as v2_auth
 from keystoneauth1.identity import v3 as v3_auth
-from keystoneauth1.exceptions import DiscoveryFailure
+from keystoneauth1 import loading
+from keystoneauth1 import session
 from oslo_utils import encodeutils
 from oslo_utils import importutils
 osprofiler_profiler = importutils.try_import("osprofiler.profiler")  # noqa
@@ -42,16 +38,15 @@ import six
 import six.moves.urllib.parse as urlparse
 
 import cinderclient
+from cinderclient import _i18n
+from cinderclient._i18n import _
 from cinderclient import api_versions
 from cinderclient import client
 from cinderclient import exceptions as exc
 from cinderclient import utils
-from cinderclient import _i18n
-from cinderclient._i18n import _
-
-
 # Enable i18n lazy translation
 _i18n.enable_lazy()
+
 
 DEFAULT_MAJOR_OS_VOLUME_API_VERSION = "3"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
@@ -877,7 +872,7 @@ class OpenStackCinderShell(object):
             ks_discover = discover.Discover(session=session, url=auth_url)
             v2_auth_url = ks_discover.url_for('2.0')
             v3_auth_url = ks_discover.url_for('3.0')
-        except DiscoveryFailure:
+        except exceptions.DiscoveryFailure:
             # Discovery response mismatch. Raise the error
             raise
         except Exception:
