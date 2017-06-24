@@ -51,6 +51,31 @@ To get usage and options of a command::
     cinder help <command>
 
 
+EXAMPLES
+========
+
+Get information about volume create command::
+
+    cinder help create
+
+List all the volumes::
+
+    cinder list
+
+Create new volume::
+
+    cinder create 1 --name volume01
+
+Describe a specific volume::
+
+    cinder show 65d23a41-b13f-4345-ab65-918a4b8a6fe6
+
+Create a snapshot::
+
+    cinder snapshot-create 65d23a41-b13f-4345-ab65-918a4b8a6fe6 \
+                           --name qt-snap
+
+
 BUGS
 ====
 
