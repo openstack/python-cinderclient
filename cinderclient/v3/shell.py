@@ -139,7 +139,7 @@ def do_backup_list(cs, args):
            action='store_true',
            help='Show detailed information about pools.')
 @utils.arg('--filters',
-           type=str,
+           type=six.text_type,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
