@@ -717,6 +717,8 @@ def do_snapshot_rename(cs, args):
         raise exceptions.ClientException(code=1, message=msg)
 
     shell_utils.find_volume_snapshot(cs, args.snapshot).update(**kwargs)
+    print("Request to rename snapshot '%s' has been accepted." % (
+        args.snapshot))
 
 
 @utils.arg('snapshot', metavar='<snapshot>', nargs='+',
@@ -1397,6 +1399,7 @@ def do_backup_reset_state(cs, args):
     for backup in args.backup:
         try:
             shell_utils.find_backup(cs, backup).reset_state(args.state)
+            print("Request to update backup '%s' has been accepted." % backup)
         except Exception as e:
             failure_count += 1
             msg = "Reset state for backup %s failed: %s" % (backup, e)
@@ -2236,6 +2239,8 @@ def do_consisgroup_update(cs, args):
 
     shell_utils.find_consistencygroup(
         cs, args.consistencygroup).update(**kwargs)
+    print("Request to update consistency group '%s' has been accepted." % (
+        args.consistencygroup))
 
 
 @utils.arg('--all-tenants',
