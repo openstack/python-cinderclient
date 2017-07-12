@@ -34,7 +34,7 @@ UUID = '8e8ec658-c7b0-4243-bdf8-6f7f2952c0d0'
 class FakeResource(object):
     NAME_ATTR = 'name'
 
-    def __init__(self, _id, properties):
+    def __init__(self, _id, properties, **kwargs):
         self.id = _id
         try:
             self.name = properties['name']
