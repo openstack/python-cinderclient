@@ -756,6 +756,10 @@ def do_group_type_key(cs, args):
            metavar='<per_volume_gigabytes>',
            type=int, default=None,
            help='Set max volume size limit. Default=None.')
+@utils.arg('--skip-validation',
+           metavar='<skip_validation>',
+           default=False,
+           help='Skip validate the existing resource quota. Default=False.')
 def do_quota_update(cs, args):
     """Updates quotas for a tenant."""
 
