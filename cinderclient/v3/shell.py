@@ -1828,7 +1828,8 @@ def do_attachment_create(cs, args):
                      'os_type': args.ostype,
                      'multipath': args.multipath,
                      'mountpoint': args.mountpoint}
-    attachment = cs.attachments.create(args.volume,
+    volume = utils.find_volume(cs, args.volume)
+    attachment = cs.attachments.create(volume.id,
                                        connector,
                                        args.server_id)
     connector_dict = attachment.pop('connection_info', None)
