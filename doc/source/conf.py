@@ -43,7 +43,7 @@ sys.path.insert(0, ROOT)
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'oslosphinx',
+    'openstackdocstheme',
     'reno.sphinxext',
 ]
 
@@ -120,6 +120,7 @@ man_pages = [
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
 #    html_theme = 'nature'
+html_theme = 'openstackdocs'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -188,6 +189,10 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'python-cinderclientdoc'
 
+# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
+# using the given strftime format.
+# html_last_updated_fmt = '%b %d, %Y'
+html_last_updated_fmt = '%Y-%m-%d %H:%M'
 
 # -- Options for LaTeX output -------------------------------------------------
 
@@ -221,3 +226,8 @@ latex_documents = [
 
 # If false, no module index is generated.
 #    latex_use_modindex = True
+
+# -- Options for openstackdocstheme -------------------------------------------
+repository_name = 'openstack/python-cinderclient'
+bug_project = 'cinderclient'
+bug_tag = ''
