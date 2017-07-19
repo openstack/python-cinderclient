@@ -96,10 +96,10 @@ def get_server_version(url):
 
 
 def get_highest_client_server_version(url):
+    """Returns highest supported version by client and server as a string."""
     min_server, max_server = get_server_version(url)
-    max_server_version = api_versions.APIVersion.get_string(max_server)
-
-    return min(float(max_server_version), float(api_versions.MAX_VERSION))
+    max_client = api_versions.APIVersion(api_versions.MAX_VERSION)
+    return min(max_server, max_client).get_string()
 
 
 def get_volume_api_from_url(url):

@@ -14,6 +14,7 @@
 import json
 import logging
 
+import ddt
 import fixtures
 from keystoneauth1 import adapter
 from keystoneauth1 import exceptions as keystone_exception
@@ -309,6 +310,7 @@ class ClientTestSensitiveInfo(utils.TestCase):
         self.assertNotIn(auth_password, output[1], output)
 
 
+@ddt.ddt
 class GetAPIVersionTestCase(utils.TestCase):
 
     @mock.patch('cinderclient.client.requests.get')
@@ -334,7 +336,8 @@ class GetAPIVersionTestCase(utils.TestCase):
         self.assertEqual(max_version, api_versions.APIVersion('3.16'))
 
     @mock.patch('cinderclient.client.requests.get')
-    def test_get_highest_client_server_version(self, mock_request):
+    @ddt.data('3.12', '3.40')
+    def test_get_highest_client_server_version(self, version, mock_request):
 
         mock_response = utils.TestResponse({
             "status_code": 200,
@@ -345,9 +348,8 @@ class GetAPIVersionTestCase(utils.TestCase):
 
         url = "http://192.168.122.127:8776/v3/e5526285ebd741b1819393f772f11fc3"
 
-        highest = cinderclient.client.get_highest_client_server_version(url)
-        current_client_MAX_VERSION = float(api_versions.MAX_VERSION)
-        if current_client_MAX_VERSION > 3.16:
-            self.assertEqual(3.16, highest)
-        else:
-            self.assertEqual(current_client_MAX_VERSION, highest)
+        with mock.patch.object(api_versions, 'MAX_VERSION', version):
+            highest = (
+                cinderclient.client.get_highest_client_server_version(url))
+        expected = version if version == '3.12' else '3.16'
+        self.assertEqual(expected, highest)
