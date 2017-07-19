@@ -14,6 +14,30 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+
+# NOTE(geguileo): For v3 we cannot mock any of the following methods
+#   - utils.find_volume
+#   - shell_utils.find_backup
+#   - shell_utils.find_volume_snapshot
+#   - shell_utils.find_group
+#   - shell_utils.find_group_snapshot
+# because we are caching them in cinderclient.v3.shell:RESET_STATE_RESOURCES
+# which means that our tests could fail depending on the mocking and loading
+# order.
+#
+# Alternatives are:
+#   - Mock utils.find_resource when we have only 1 call to that method
+#   - Use an auxiliary method that will call original method for irrelevant
+#     calls.  Example from test_revert_to_snapshot:
+#         original = client_utils.find_resource
+#
+#         def find_resource(manager, name_or_id, **kwargs):
+#             if isinstance(manager, volume_snapshots.SnapshotManager):
+#                 return volume_snapshots.Snapshot(self,
+#                                                  {'id': '5678',
+#                                                   'volume_id': '1234'})
+#             return original(manager, name_or_id, **kwargs)
+
 import ddt
 import fixtures
 import mock
@@ -254,7 +278,7 @@ class ShellTest(utils.TestCase):
                'body': {'instance_uuid': '1233',
                         'connector': {},
                         'volume_uuid': '1234'}})
-    @mock.patch.object(cinderclient_utils, 'find_volume')
+    @mock.patch('cinderclient.utils.find_resource')
     @ddt.unpack
     def test_attachment_create(self, mock_find_volume, cmd, body):
         mock_find_volume.return_value = volumes.Volume(self,
@@ -302,14 +326,20 @@ class ShellTest(utils.TestCase):
         self.run_command(command)
         self.assert_called('GET', '/attachments%s' % expected)
 
-    @mock.patch('cinderclient.shell_utils.find_volume_snapshot')
-    def test_revert_to_snapshot(self, mock_snapshot):
+    def test_revert_to_snapshot(self):
+        original = cinderclient_utils.find_resource
 
-        mock_snapshot.return_value = volume_snapshots.Snapshot(
-            self, {'id': '5678', 'volume_id': '1234'})
+        def find_resource(manager, name_or_id, **kwargs):
+            if isinstance(manager, volume_snapshots.SnapshotManager):
+                return volume_snapshots.Snapshot(self,
+                                                 {'id': '5678',
+                                                  'volume_id': '1234'})
+            return original(manager, name_or_id, **kwargs)
 
-        self.run_command(
-            '--os-volume-api-version 3.40 revert-to-snapshot 5678')
+        with mock.patch('cinderclient.utils.find_resource',
+                        side_effect=find_resource):
+            self.run_command(
+                '--os-volume-api-version 3.40 revert-to-snapshot 5678')
 
         self.assert_called('POST', '/volumes/1234/action',
                            body={'revert': {'snapshot_id': '5678'}})
@@ -753,7 +783,7 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('DELETE', '/messages/1234')
         self.assert_called_anytime('DELETE', '/messages/12345')
 
-    @mock.patch('cinderclient.utils.find_volume')
+    @mock.patch('cinderclient.utils.find_resource')
     def test_delete_metadata(self, mock_find_volume):
         mock_find_volume.return_value = volumes.Volume(self,
                                                        {'id': '1234',
