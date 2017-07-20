@@ -1,0 +1,10 @@
+---
+fixes:
+  - |
+    Fixes `bug 1705093`_ by having the
+    ``cinderclient.client.get_highest_client_server_version`` method return a
+    string rather than a float. The problem with returning a float is when a
+    user of that method would cast the float result to a str which turns 3.40,
+    for example, into "3.4" which is wrong.
+
+    .. _bug 1705093: https://bugs.launchpad.net/python-cinderclient/+bug/1705093
