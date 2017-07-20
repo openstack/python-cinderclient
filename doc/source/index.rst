@@ -47,7 +47,7 @@ Release Notes
 
 All python-cinderclient release notes can now be found on the `release notes`_ page.
 
-.. _`release notes`: http://docs.openstack.org/releasenotes/python-cinderclient/
+.. _`release notes`: https://docs.openstack.org/releasenotes/python-cinderclient/
 
 The following are kept for historical purposes.
 

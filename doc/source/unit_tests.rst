@@ -39,7 +39,7 @@ Or all tests in the test_volumes.py file::
     tox -epy27 -- -n cinderclient.tests.unit.v2.test_volumes
 
 For more information on these options and how to run tests, please see the
-`ostestr documentation <http://docs.openstack.org/developer/os-testr/>`_.
+`ostestr documentation <https://docs.openstack.org/os-testr/latest/>`_.
 
 Run tests wrapper script
 ------------------------
@@ -94,7 +94,7 @@ This will show the following help information::
 
 Because ``run_tests.sh`` is a wrapper around testr, it also accepts the same
 flags as testr. See the documentation for details about these additional flags:
-`ostestr documentation <http://docs.openstack.org/developer/os-testr/>`_.
+`ostestr documentation <https://docs.openstack.org/os-testr/latest/>`_.
 
 .. _nose options documentation: http://readthedocs.org/docs/nose/en/latest/usage.html#options
 
