@@ -38,7 +38,7 @@ Or all tests in the test_readonly_clitest_readonly_cli.py file::
     tox -e functional -- -n cinderclient.tests.functional.test_readonly_cli
 
 For more information on these options and how to run tests, please see the
-`ostestr documentation <http://docs.openstack.org/developer/os-testr/>`_.
+`ostestr documentation <https://docs.openstack.org/os-testr/latest/>`_.
 
 Gotchas
 -------

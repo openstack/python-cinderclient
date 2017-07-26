@@ -26,15 +26,15 @@ See the `OpenStack CLI Reference`_ for information on how to use the ``cinder``
 command-line tool. You may also want to look at the
 `OpenStack API documentation`_.
 
-.. _OpenStack CLI Reference: http://docs.openstack.org/cli-reference/overview.html
-.. _OpenStack API documentation: http://developer.openstack.org/api-ref.html
+.. _OpenStack CLI Reference: https://docs.openstack.org/python-openstackclient/latest/cli/
+.. _OpenStack API documentation: https://developer.openstack.org/api-guide/quick-start/
 
 The project is hosted on `Launchpad`_, where bugs can be filed. The code is
 hosted on `OpenStack`_. Patches must be submitted using `Gerrit`_.
 
 .. _OpenStack: https://git.openstack.org/cgit/openstack/python-cinderclient
 .. _Launchpad: https://launchpad.net/python-cinderclient
-.. _Gerrit: http://docs.openstack.org/infra/manual/developers.html#development-workflow
+.. _Gerrit: https://docs.openstack.org/infra/manual/developers.html#development-workflow
 
 This code is a fork of `Jacobian's python-cloudservers`__. If you need API support
 for the Rackspace API solely or the BSD license, you should use that repository.
@@ -52,12 +52,12 @@ __ https://github.com/jacobian-archive/python-cloudservers
 * `How to Contribute`_
 
 .. _PyPi: https://pypi.python.org/pypi/python-cinderclient
-.. _Online Documentation: http://docs.openstack.org/developer/python-cinderclient
+.. _Online Documentation: https://docs.openstack.org/python-cinderclient/latest/
 .. _Blueprints: https://blueprints.launchpad.net/python-cinderclient
 .. _Bugs: https://bugs.launchpad.net/python-cinderclient
 .. _Source: https://git.openstack.org/cgit/openstack/python-cinderclient
-.. _How to Contribute: http://docs.openstack.org/infra/manual/developers.html
-.. _Specs: http://specs.openstack.org/openstack/cinder-specs/
+.. _How to Contribute: https://docs.openstack.org/infra/manual/developers.html
+.. _Specs: https://specs.openstack.org/openstack/cinder-specs/
 
 
 .. contents:: Contents:
@@ -366,4 +366,4 @@ Quick-start using keystone::
     >>> nt.volumes.list()
     [...]
 
-See release notes and more at `<http://docs.openstack.org/developer/python-cinderclient/>`_.
+See release notes and more at `<https://docs.openstack.org/python-cinderclient/latest/>`_.

@@ -2,7 +2,7 @@ Cinder Client Style Commandments
 ================================
 
 - Step 1: Read the OpenStack Style Commandments
-  http://docs.openstack.org/developer/hacking/
+  https://docs.openstack.org/hacking/latest/
 - Step 2: Read on
 
 Cinder Client Specific Commandments
@@ -29,7 +29,7 @@ Release Notes
 - Cinder Client uses Reno for release notes management. See the `Reno Documentation`_
   for more details on its usage.
 
-.. _Reno Documentation: http://docs.openstack.org/developer/reno/
+.. _Reno Documentation: https://docs.openstack.org/reno/latest/
 
 - As a quick example, when adding a new shell command for Awesome Storage Feature, one
   could perform the following steps to include a release note for the new feature:
