@@ -124,6 +124,14 @@ class VolumeManager(volumes.VolumeManager):
         return self._action('revert', volume,
                             info={'snapshot_id': base.getid(snapshot.id)})
 
+    def summary(self, all_tenants):
+        """Get volumes summary."""
+        url = "/volumes/summary"
+        if all_tenants:
+            url += "?all_tenants=True"
+        _, body = self.api.client.get(url)
+        return body
+
     @api_versions.wraps("3.0")
     def delete_metadata(self, volume, keys):
         """Delete specified keys from volumes metadata.

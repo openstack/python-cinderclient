@@ -558,6 +558,15 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
                    'levels': {'prefix3': 'WARNING', 'prefix4': 'ERROR'}}]
         return (200, {}, {'log_levels': levels})
 
+    def get_volumes_summary(self, **kw):
+        return 200, {}, {"volume-summary": {'total_size': 5,
+                                            'total_count': 5,
+                                            'metadata': {
+                                                "test_key": ["test_value"]
+                                            }
+                                            }
+                         }
+
     #
     # resource filters
     #

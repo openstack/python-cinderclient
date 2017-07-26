@@ -231,6 +231,10 @@ class ShellTest(utils.TestCase):
         # NOTE(jdg): we default to detail currently
         self.assert_called('GET', '/volumes/detail')
 
+    def test_summary(self):
+        self.run_command('--os-volume-api-version 3.12 summary')
+        self.assert_called('GET', '/volumes/summary')
+
     def test_list_with_group_id_before_3_10(self):
         self.assertRaises(exceptions.UnsupportedAttribute,
                           self.run_command,
