@@ -33,7 +33,17 @@ class Volume(base.Resource):
         return self.manager.update(self, **kwargs)
 
     def attach(self, instance_uuid, mountpoint, mode='rw', host_name=None):
-        """Set attachment metadata.
+        """Inform Cinder that the given volume is attached to the given instance.
+
+        Calling this method will not actually ask Cinder to attach
+        a volume, but to mark it on the DB as attached. If the volume
+        is not actually attached to the given instance, inconsistent
+        data will result.
+
+        The right flow of calls is :
+        1- call reserve
+        2- call initialize_connection
+        3- call attach
 
         :param instance_uuid: uuid of the attaching instance.
         :param mountpoint: mountpoint on the attaching instance or host.
@@ -44,7 +54,18 @@ class Volume(base.Resource):
                                    host_name)
 
     def detach(self):
-        """Clear attachment metadata."""
+        """Inform Cinder that the given volume is detached from the given instance.
+
+        Calling this method will not actually ask Cinder to detach
+        a volume, but to mark it on the DB as detached. If the volume
+        is not actually detached from the given instance, inconsistent
+        data will result.
+
+        The right flow of calls is :
+        1- call reserve
+        2- call initialize_connection
+        3- call detach
+        """
         return self.manager.detach(self)
 
     def reserve(self, volume):
