@@ -28,8 +28,8 @@ Alternatively, you can create a client instance using the keystoneauth session A
     >>> cinder.volumes.list()
     []
 
-Command-line Tool
-=================
+User Guides
+===========
 In order to use the CLI, you must provide your OpenStack username, password, tenant, and auth endpoint. Use the corresponding configuration options (``--os-username``, ``--os-password``, ``--os-tenant-id``, and ``--os-auth-url``) or set them in environment variables::
 
     export OS_USERNAME=user
@@ -41,6 +41,28 @@ Once you've configured your authentication parameters, you can run ``cinder help
 
 See also :doc:`/cli/index` for detailed documentation.
 
+.. toctree::
+   :maxdepth: 2
+
+   user/cinder
+
+Command-Line Reference
+======================
+
+.. toctree::
+   :maxdepth: 2
+
+   cli/shell
+   cli/no_auth
+
+Developer Guides
+================
+
+.. toctree::
+   :maxdepth: 2
+
+   contributor/functional_tests
+   contributor/unit_tests
 
 Release Notes
 =============
