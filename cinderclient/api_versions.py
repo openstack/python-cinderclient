@@ -235,7 +235,14 @@ def get_api_version(version_string):
 
 
 def _get_server_version_range(client):
-    versions = client.services.server_api_version()
+    try:
+        versions = client.services.server_api_version()
+    except AttributeError:
+        # Wrong client was used, translate to something helpful.
+        raise exceptions.UnsupportedVersion(
+            _('Invalid client version %s to get server version range. Only '
+              'the v3 client is supported for this operation.') %
+            client.version)
 
     if not versions:
         return APIVersion(), APIVersion()

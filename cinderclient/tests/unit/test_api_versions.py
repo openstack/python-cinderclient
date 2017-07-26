@@ -15,8 +15,10 @@
 
 import ddt
 import mock
+import six
 
 from cinderclient import api_versions
+from cinderclient import client as base_client
 from cinderclient import exceptions
 from cinderclient.v3 import client
 from cinderclient.tests.unit import utils
@@ -259,3 +261,10 @@ class DiscoverVersionTestCase(utils.TestCase):
         highest_version = api_versions.get_highest_version(self.fake_client)
         self.assertEqual("3.14", highest_version.get_string())
         self.assertTrue(self.fake_client.services.server_api_version.called)
+
+    def test_get_highest_version_bad_client(self):
+        """Tests that we gracefully handle the wrong version of client."""
+        v2_client = base_client.Client('2.0')
+        ex = self.assertRaises(exceptions.UnsupportedVersion,
+                               api_versions.get_highest_version, v2_client)
+        self.assertIn('Invalid client version 2.0 to get', six.text_type(ex))
