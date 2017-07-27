@@ -240,13 +240,15 @@ class OpenStackCinderShell(object):
         if osprofiler_profiler:
             parser.add_argument('--profile',
                                 metavar='HMAC_KEY',
+                                default=utils.env('OS_PROFILE'),
                                 help=_('HMAC key to use for encrypting '
                                 'context data for performance profiling '
                                 'of operation. This key needs to match the '
                                 'one configured on the cinder api server. '
                                 'Without key the profiling will not be '
                                 'triggered even if osprofiler is enabled '
-                                'on server side.'))
+                                'on server side. Defaults to '
+                                'env[OS_PROFILE].'))
 
         self._append_global_identity_args(parser)
 

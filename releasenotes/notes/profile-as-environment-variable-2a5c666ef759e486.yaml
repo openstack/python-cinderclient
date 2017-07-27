@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    ``--profile`` argument can be loaded from ``OS_PROFILE``
+    environment variable to avoid repeating ``--profile``
+    in openstack commands.
