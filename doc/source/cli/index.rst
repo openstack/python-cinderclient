@@ -50,6 +50,8 @@ To get usage and options of a command::
 
     cinder help <command>
 
+You can see more details about the Cinder Command-Line Client at
+:doc:`details`.
 
 EXAMPLES
 ========
