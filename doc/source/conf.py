@@ -112,7 +112,7 @@ pygments_style = 'sphinx'
 
 
 man_pages = [
-    ('man/cinder', 'cinder', u'Client for OpenStack Block Storage API',
+    ('cli/details', 'cinder', u'Client for OpenStack Block Storage API',
      [u'OpenStack Contributors'], 1),
 ]
 # -- Options for HTML output --------------------------------------------------
