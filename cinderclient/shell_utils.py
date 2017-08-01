@@ -17,8 +17,8 @@ from __future__ import print_function
 import sys
 import time
 
-from cinderclient import utils
 from cinderclient import exceptions
+from cinderclient import utils
 
 _quota_resources = ['volumes', 'snapshots', 'gigabytes',
                     'backups', 'backup_gigabytes',

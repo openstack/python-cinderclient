@@ -20,9 +20,9 @@ import pkg_resources
 import sys
 import uuid
 
+import prettytable
 import six
 from six.moves.urllib import parse
-import prettytable
 
 from cinderclient import exceptions
 from oslo_utils import encodeutils

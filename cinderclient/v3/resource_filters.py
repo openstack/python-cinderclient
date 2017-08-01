@@ -12,8 +12,8 @@
 
 """Resource filters interface."""
 
-from cinderclient import base
 from cinderclient import api_versions
+from cinderclient import base
 
 
 class ResourceFilter(base.Resource):

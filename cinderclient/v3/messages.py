@@ -12,8 +12,8 @@
 
 """Message interface (v3 extension)."""
 
-from cinderclient import base
 from cinderclient import api_versions
+from cinderclient import base
 
 
 class Message(base.Resource):

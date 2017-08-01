@@ -13,9 +13,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.fixture_data import client
 from cinderclient.tests.unit.fixture_data import snapshots
+from cinderclient.tests.unit import utils
 
 
 class SnapshotActionsTest(utils.FixturedTestCase):

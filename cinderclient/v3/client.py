@@ -15,17 +15,17 @@
 
 import logging
 
-from cinderclient import client
 from cinderclient import api_versions
+from cinderclient import client
 from cinderclient.v3 import attachments
 from cinderclient.v3 import availability_zones
+from cinderclient.v3 import capabilities
 from cinderclient.v3 import cgsnapshots
 from cinderclient.v3 import clusters
 from cinderclient.v3 import consistencygroups
-from cinderclient.v3 import capabilities
-from cinderclient.v3 import groups
 from cinderclient.v3 import group_snapshots
 from cinderclient.v3 import group_types
+from cinderclient.v3 import groups
 from cinderclient.v3 import limits
 from cinderclient.v3 import messages
 from cinderclient.v3 import pools
@@ -34,14 +34,14 @@ from cinderclient.v3 import quota_classes
 from cinderclient.v3 import quotas
 from cinderclient.v3 import resource_filters
 from cinderclient.v3 import services
-from cinderclient.v3 import volumes
-from cinderclient.v3 import volume_snapshots
-from cinderclient.v3 import volume_types
-from cinderclient.v3 import volume_type_access
-from cinderclient.v3 import volume_encryption_types
 from cinderclient.v3 import volume_backups
 from cinderclient.v3 import volume_backups_restore
+from cinderclient.v3 import volume_encryption_types
+from cinderclient.v3 import volume_snapshots
 from cinderclient.v3 import volume_transfers
+from cinderclient.v3 import volume_type_access
+from cinderclient.v3 import volume_types
+from cinderclient.v3 import volumes
 
 
 class Client(object):

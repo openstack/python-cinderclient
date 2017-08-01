@@ -21,6 +21,7 @@ import requests
 
 from cinderclient import exceptions
 from cinderclient.v2 import client
+
 from cinderclient.tests.unit import utils
 
 

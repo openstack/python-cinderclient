@@ -12,6 +12,7 @@
 # limitations under the License.
 
 from cinderclient.v1 import volume_types
+
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v1 import fakes
 

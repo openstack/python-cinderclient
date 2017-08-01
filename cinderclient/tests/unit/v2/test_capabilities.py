@@ -14,6 +14,7 @@
 #    under the License.
 
 from cinderclient.v2.capabilities import Capabilities
+
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v2 import fakes
 

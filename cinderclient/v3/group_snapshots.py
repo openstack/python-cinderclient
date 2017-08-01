@@ -16,8 +16,8 @@
 """group snapshot interface (v3)."""
 
 
-from cinderclient.apiclient import base as common_base
 from cinderclient import api_versions
+from cinderclient.apiclient import base as common_base
 from cinderclient import base
 from cinderclient import utils
 

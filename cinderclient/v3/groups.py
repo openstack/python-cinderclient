@@ -17,8 +17,8 @@
 from six.moves.urllib import parse
 
 from cinderclient import api_versions
-from cinderclient import base
 from cinderclient.apiclient import base as common_base
+from cinderclient import base
 from cinderclient import utils
 
 

@@ -21,8 +21,9 @@ from cinderclient import api_versions
 from cinderclient import client as base_client
 from cinderclient import exceptions
 from cinderclient.v3 import client
-from cinderclient.tests.unit import utils
+
 from cinderclient.tests.unit import test_utils
+from cinderclient.tests.unit import utils
 
 
 @ddt.ddt
