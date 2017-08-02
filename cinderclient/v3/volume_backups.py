@@ -52,6 +52,9 @@ class VolumeBackupManager(volume_backups.VolumeBackupManager):
         :param description: The description of the backup.
         :param incremental: Incremental backup.
         :param force: If True, allows an in-use volume to be backed up.
+        :param snapshot_id: The ID of the snapshot to backup. This should
+                            be a snapshot of the src volume, when specified,
+                            the new backup will be based on the snapshot.
         :rtype: :class:`VolumeBackup`
         """
         body = {'backup': {'volume_id': volume_id,
@@ -78,6 +81,9 @@ class VolumeBackupManager(volume_backups.VolumeBackupManager):
         :param incremental: Incremental backup.
         :param force: If True, allows an in-use volume to be backed up.
         :param metadata: Key Value pairs
+        :param snapshot_id: The ID of the snapshot to backup. This should
+                            be a snapshot of the src volume, when specified,
+                            the new backup will be based on the snapshot.
         :rtype: :class:`VolumeBackup`
         """
         # pylint: disable=function-redefined
