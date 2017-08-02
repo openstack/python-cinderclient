@@ -332,22 +332,18 @@ class GetAPIVersionTestCase(utils.TestCase):
         self.assertEqual(api_versions.APIVersion('2.0'), max_version)
 
     @mock.patch('cinderclient.client.requests.get')
-    def test_get_server_version(self, mock_request):
-
+    @ddt.data(
+        'http://192.168.122.127:8776/v3/e5526285ebd741b1819393f772f11fc3',
+        'https://192.168.122.127:8776/v3/e55285ebd741b1819393f772f11fc3',
+        'http://192.168.122.127/volumesv3/e5526285ebd741b1819393f772f11fc3'
+        )
+    def test_get_server_version(self, url, mock_request):
         mock_response = utils.TestResponse({
             "status_code": 200,
             "text": json.dumps(fakes.fake_request_get())
         })
 
         mock_request.return_value = mock_response
-
-        url = "http://192.168.122.127:8776/v3/e5526285ebd741b1819393f772f11fc3"
-
-        min_version, max_version = cinderclient.client.get_server_version(url)
-        self.assertEqual(min_version, api_versions.APIVersion('3.0'))
-        self.assertEqual(max_version, api_versions.APIVersion('3.16'))
-
-        url = "https://192.168.122.127:8776/v3/e55285ebd741b1819393f772f11fc3"
 
         min_version, max_version = cinderclient.client.get_server_version(url)
         self.assertEqual(min_version, api_versions.APIVersion('3.0'))
