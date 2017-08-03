@@ -23,7 +23,7 @@ from cinderclient import exceptions
 _quota_resources = ['volumes', 'snapshots', 'gigabytes',
                     'backups', 'backup_gigabytes',
                     'per_volume_gigabytes', 'groups', ]
-_quota_infos = ['Type', 'In_use', 'Reserved', 'Limit']
+_quota_infos = ['Type', 'In_use', 'Reserved', 'Limit', 'Allocated']
 
 
 def print_volume_image(image):
