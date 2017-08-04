@@ -72,6 +72,26 @@ class ShellTest(utils.TestCase):
 
         return out
 
+    def test_default_auth_env(self):
+        _shell = shell.OpenStackCinderShell()
+        args, __ = _shell.get_base_parser().parse_known_args([])
+        self.assertEqual('', args.os_auth_type)
+
+    def test_auth_type_env(self):
+        self.make_env(exclude='OS_PASSWORD',
+                      include={'OS_AUTH_SYSTEM': 'non existent auth',
+                               'OS_AUTH_TYPE': 'noauth'})
+        _shell = shell.OpenStackCinderShell()
+        args, __ = _shell.get_base_parser().parse_known_args([])
+        self.assertEqual('noauth', args.os_auth_type)
+
+    def test_auth_system_env(self):
+        self.make_env(exclude='OS_PASSWORD',
+                      include={'OS_AUTH_SYSTEM': 'noauth'})
+        _shell = shell.OpenStackCinderShell()
+        args, __ = _shell.get_base_parser().parse_known_args([])
+        self.assertEqual('noauth', args.os_auth_type)
+
     def test_help_unknown_command(self):
         self.assertRaises(exceptions.CommandError, self.shell, 'help foofoo')
 
