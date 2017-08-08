@@ -13,4 +13,22 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient.v2.quotas import *  # flake8: noqa
+from cinderclient.v2 import quotas
+
+
+class QuotaSetManager(quotas.QuotaSetManager):
+
+    def update(self, tenant_id, **updates):
+        skip_validation = updates.pop('skip_validation', True)
+
+        body = {'quota_set': {'tenant_id': tenant_id}}
+        for update in updates:
+            body['quota_set'][update] = updates[update]
+
+        request_url = '/os-quota-sets/%s' % tenant_id
+        if not skip_validation:
+            request_url += '?skip_validation=False'
+
+        result = self._update(request_url, body)
+        return self.resource_class(self, result['quota_set'], loaded=True,
+                                   resp=result.request_ids)

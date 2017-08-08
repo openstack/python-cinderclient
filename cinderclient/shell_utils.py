@@ -238,6 +238,9 @@ def quota_update(manager, identifier, args):
             updates[resource] = val
 
     if updates:
+        skip_validation = getattr(args, 'skip_validation', True)
+        if not skip_validation:
+            updates['skip_validation'] = skip_validation
         quota_show(manager.update(identifier, **updates))
 
 
