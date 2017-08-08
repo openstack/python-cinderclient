@@ -39,6 +39,7 @@ from oslo_utils import importutils
 from oslo_utils import strutils
 osprofiler_web = importutils.try_import("osprofiler.web")  # noqa
 import requests
+from six.moves import urllib
 import six.moves.urllib.parse as urlparse
 
 from cinderclient import api_versions
@@ -83,8 +84,29 @@ def get_server_version(url):
 
     logger = logging.getLogger(__name__)
     try:
-        scheme, netloc, path, query, frag = urlparse.urlsplit(url)
-        response = requests.get(scheme + '://' + netloc)
+        u = urllib.parse.urlparse(url)
+        version_url = None
+
+        # NOTE(andreykurilin): endpoint URL has at least 2 formats:
+        #   1. The classic (legacy) endpoint:
+        #       http://{host}:{optional_port}/v{1 or 2 or 3}/{project-id}
+        #       http://{host}:{optional_port}/v{1 or 2 or 3}
+        #   3. Under wsgi:
+        #       http://{host}:{optional_port}/volume/v{1 or 2 or 3}
+        for ver in ['v1', 'v2', 'v3']:
+            if u.path.endswith(ver) or "/{0}/".format(ver) in u.path:
+                path = u.path[:u.path.rfind(ver)]
+                version_url = '%s://%s%s' % (u.scheme, u.netloc, path)
+                break
+
+        if not version_url:
+            # NOTE(andreykurilin): probably, it is one of the next cases:
+            #  * https://volume.example.com/
+            #  * https://example.com/volume
+            # leave as is without cropping.
+            version_url = url
+
+        response = requests.get(version_url)
         data = json.loads(response.text)
         versions = data['versions']
         for version in versions:
