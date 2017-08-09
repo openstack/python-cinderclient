@@ -134,6 +134,7 @@ class Volume(base.Resource):
                         disk_format, visibility=None,
                         protected=None):
         """Upload a volume to image service as an image.
+
         :param force: Boolean to enables or disables upload of a volume that
                       is attached to an instance.
         :param image_name: The new image name.
