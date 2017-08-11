@@ -66,3 +66,20 @@ class VolumeAttachmentManager(base.ManagerWithFind):
         resp = self._update('/attachments/%s' % id, body)
         return self.resource_class(self, resp['attachment'], loaded=True,
                                    resp=resp)
+
+    def complete(self, attachment):
+        """Mark the attachment as completed."""
+        resp, body = self._action_return_resp_and_body('os-complete',
+                                                       attachment,
+                                                       None)
+        return resp
+
+    def _action_return_resp_and_body(self, action, attachment, info=None,
+                                     **kwargs):
+        """Perform a attachments "action" and return response headers and body.
+
+        """
+        body = {action: info}
+        self.run_hooks('modify_body_for_action', body, **kwargs)
+        url = '/attachments/%s/action' % base.getid(attachment)
+        return self.api.client.post(url, body=body)

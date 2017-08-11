@@ -1937,6 +1937,16 @@ def do_attachment_delete(cs, args):
         cs.attachments.delete(attachment)
 
 
+@api_versions.wraps('3.44')
+@utils.arg('attachment',
+           metavar='<attachment>', nargs='+',
+           help='ID of attachment or attachments to delete.')
+def do_attachment_complete(cs, args):
+    """Complete an attachment for a cinder volume."""
+    for attachment in args.attachment:
+        cs.attachments.complete(attachment)
+
+
 @api_versions.wraps('3.0')
 def do_version_list(cs, args):
     """List all API versions."""
