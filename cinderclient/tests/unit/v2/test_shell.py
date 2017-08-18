@@ -1392,8 +1392,7 @@ class ShellTest(utils.TestCase):
         self.assert_called('GET', '/os-quota-class-sets/test')
 
     def test_quota_class_update(self):
-        expected = {'quota_class_set': {'class_name': 'test',
-                                        'volumes': 2,
+        expected = {'quota_class_set': {'volumes': 2,
                                         'snapshots': 2,
                                         'gigabytes': 1,
                                         'backups': 1,
