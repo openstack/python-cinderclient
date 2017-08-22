@@ -22,12 +22,13 @@ import mock
 from oslo_serialization import jsonutils
 import six
 
-import cinderclient.client
-import cinderclient.v1.client
-import cinderclient.v2.client
 from cinderclient import api_versions
+import cinderclient.client
 from cinderclient import exceptions
 from cinderclient import utils
+import cinderclient.v1.client
+import cinderclient.v2.client
+
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 

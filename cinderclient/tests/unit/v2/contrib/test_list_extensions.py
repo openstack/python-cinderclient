@@ -16,6 +16,7 @@
 
 from cinderclient import extension
 from cinderclient.v2.contrib import list_extensions
+
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v1 import fakes
 

@@ -20,13 +20,13 @@ from cinderclient.v1 import qos_specs
 from cinderclient.v1 import quota_classes
 from cinderclient.v1 import quotas
 from cinderclient.v1 import services
-from cinderclient.v1 import volumes
-from cinderclient.v1 import volume_snapshots
-from cinderclient.v1 import volume_types
-from cinderclient.v1 import volume_encryption_types
 from cinderclient.v1 import volume_backups
 from cinderclient.v1 import volume_backups_restore
+from cinderclient.v1 import volume_encryption_types
+from cinderclient.v1 import volume_snapshots
 from cinderclient.v1 import volume_transfers
+from cinderclient.v1 import volume_types
+from cinderclient.v1 import volumes
 
 
 class Client(object):

@@ -44,6 +44,8 @@ from cinderclient import api_versions
 from cinderclient import client
 from cinderclient import exceptions as exc
 from cinderclient import utils
+
+
 # Enable i18n lazy translation
 _i18n.enable_lazy()
 

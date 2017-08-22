@@ -19,11 +19,12 @@ import six
 from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
 from cinderclient import base
-from cinderclient.v3 import client
 from cinderclient import exceptions
+from cinderclient.v3 import client
 from cinderclient.v3 import volumes
-from cinderclient.tests.unit import utils
+
 from cinderclient.tests.unit import test_utils
+from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v1 import fakes
 
 

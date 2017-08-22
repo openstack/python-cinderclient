@@ -11,6 +11,7 @@
 # under the License.
 
 from datetime import datetime
+
 from cinderclient.tests.unit.fixture_data import base
 
 # FIXME(jamielennox): use timeutils from oslo

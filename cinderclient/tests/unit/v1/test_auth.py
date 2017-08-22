@@ -16,8 +16,9 @@ import mock
 
 import requests
 
-from cinderclient.v1 import client
 from cinderclient import exceptions
+from cinderclient.v1 import client
+
 from cinderclient.tests.unit import utils
 
 

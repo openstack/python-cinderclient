@@ -21,8 +21,8 @@ from cinderclient import api_versions
 from cinderclient import exceptions
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
-from cinderclient.v3 import volumes
 from cinderclient.v3 import volume_snapshots
+from cinderclient.v3 import volumes
 
 from six.moves.urllib import parse
 

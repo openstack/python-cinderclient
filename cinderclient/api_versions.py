@@ -19,9 +19,9 @@ import re
 
 from oslo_utils import strutils
 
+from cinderclient._i18n import _
 from cinderclient import exceptions
 from cinderclient import utils
-from cinderclient._i18n import _
 
 LOG = logging.getLogger(__name__)
 

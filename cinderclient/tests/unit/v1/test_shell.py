@@ -23,9 +23,10 @@ from cinderclient import client
 from cinderclient import exceptions
 from cinderclient import shell
 from cinderclient.v1 import shell as shell_v1
-from cinderclient.tests.unit.v1 import fakes
-from cinderclient.tests.unit import utils
+
 from cinderclient.tests.unit.fixture_data import keystone_client
+from cinderclient.tests.unit import utils
+from cinderclient.tests.unit.v1 import fakes
 
 
 @mock.patch.object(client, 'Client', fakes.FakeClient)

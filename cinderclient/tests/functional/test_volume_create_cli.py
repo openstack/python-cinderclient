@@ -12,8 +12,8 @@
 
 import unittest
 
-import six
 import ddt
+import six
 
 from tempest.lib import exceptions
 
