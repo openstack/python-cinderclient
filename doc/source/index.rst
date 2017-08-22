@@ -1,6 +1,9 @@
 Python API
 ==========
-In order to use the python api directly, you must first obtain an auth token and identify which endpoint you wish to speak to. Once you have done so, you can use the API like so::
+
+In order to use the Python api directly, you must first obtain an auth token
+and identify which endpoint you wish to speak to. Once you have done so, you
+can use the API like so::
 
     >>> from cinderclient import client
     >>> cinder = client.Client('1', $OS_USER_NAME, $OS_PASSWORD, $OS_TENANT_NAME, $OS_AUTH_URL)
@@ -13,7 +16,8 @@ In order to use the python api directly, you must first obtain an auth token and
     [<Volume: ce06d0a8-5c1b-4e2c-81d2-39eca6bbfb70>]
     >>>myvol.delete
 
-Alternatively, you can create a client instance using the keystoneauth session API::
+Alternatively, you can create a client instance using the keystoneauth session
+API::
 
     >>> from keystoneauth1 import loading
     >>> from keystoneauth1 import session
@@ -30,14 +34,19 @@ Alternatively, you can create a client instance using the keystoneauth session A
 
 User Guides
 ===========
-In order to use the CLI, you must provide your OpenStack username, password, tenant, and auth endpoint. Use the corresponding configuration options (``--os-username``, ``--os-password``, ``--os-tenant-id``, and ``--os-auth-url``) or set them in environment variables::
+
+In order to use the CLI, you must provide your OpenStack username, password,
+tenant, and auth endpoint. Use the corresponding configuration options
+(``--os-username``, ``--os-password``, ``--os-tenant-id``, and
+``--os-auth-url``) or set them in environment variables::
 
     export OS_USERNAME=user
     export OS_PASSWORD=pass
     export OS_TENANT_ID=b363706f891f48019483f8bd6503c54b
     export OS_AUTH_URL=http://auth.example.com:5000/v2.0
 
-Once you've configured your authentication parameters, you can run ``cinder help`` to see a complete listing of available commands.
+Once you've configured your authentication parameters, you can run ``cinder
+help`` to see a complete listing of available commands.
 
 See also :doc:`/cli/index` for detailed documentation.
 
@@ -52,8 +61,10 @@ Command-Line Reference
 .. toctree::
    :maxdepth: 2
 
-   cli/shell
-   cli/no_auth
+   cli/index
+   cli/details
+   user/shell
+   user/no_auth
 
 Developer Guides
 ================
@@ -67,7 +78,8 @@ Developer Guides
 Release Notes
 =============
 
-All python-cinderclient release notes can now be found on the `release notes`_ page.
+All python-cinderclient release notes can now be found on the `release notes`_
+page.
 
 .. _`release notes`: https://docs.openstack.org/releasenotes/python-cinderclient/
 
@@ -83,11 +95,11 @@ The following are kept for historical purposes.
 * Support for non-disruptive backup.
 * Support for cloning consistency groups.
 
-.. _1493612 https://bugs.launchpad.net/python-cinderclient/+bug/1493612
-.. _1482988 https://bugs.launchpad.net/python-cinderclient/+bug/1482988
-.. _1422046 https://bugs.launchpad.net/python-cinderclient/+bug/1422046
-.. _1481478 https://bugs.launchpad.net/python-cinderclient/+bug/1481478
-.. _1475430 https://bugs.launchpad.net/python-cinderclient/+bug/1475430
+.. _1493612: https://bugs.launchpad.net/python-cinderclient/+bug/1493612
+.. _1482988: https://bugs.launchpad.net/python-cinderclient/+bug/1482988
+.. _1422046: https://bugs.launchpad.net/python-cinderclient/+bug/1422046
+.. _1481478: https://bugs.launchpad.net/python-cinderclient/+bug/1481478
+.. _1475430: https://bugs.launchpad.net/python-cinderclient/+bug/1475430
 
 1.3.1
 -----
@@ -99,10 +111,9 @@ The following are kept for historical purposes.
 * Added volume multi attach support.
 * Support host-attach of volumes.
 
-.. _1467628 https://bugs.launchpad.net/python-cinderclient/+bug/1467628
-.. _1454436 https://bugs.launchpad.net/cinder/+bug/1454436
-.. _1423884 https://bugs.launchpad.net/python-cinderclient/+bug/1423884
-.. _1462104 https://bugs.launchpad.net/cinder/+bug/1462104
+.. _1467628: https://bugs.launchpad.net/python-cinderclient/+bug/1467628
+.. _1454436: https://bugs.launchpad.net/cinder/+bug/1454436
+.. _1423884: https://bugs.launchpad.net/python-cinderclient/+bug/1423884
 
 1.3.0
 -----
@@ -114,10 +125,10 @@ The following are kept for historical purposes.
 * Add volume multi-attach support.
 * Add encryption-type-update to update volume encryption types.
 
-.. _1454276 http://bugs.launchpad.net/python-cinderclient/+bug/1454276
-.. _1462104 http://bugs.launchpad.net/python-cinderclient/+bug/1462104
-.. _1418580 http://bugs.launchpad.net/python-cinderclient/+bug/1418580
-.. _1464160 http://bugs.launchpad.net/python-cinderclient/+bug/1464160
+.. _1454276: http://bugs.launchpad.net/python-cinderclient/+bug/1454276
+.. _1462104: http://bugs.launchpad.net/python-cinderclient/+bug/1462104
+.. _1418580: http://bugs.launchpad.net/python-cinderclient/+bug/1418580
+.. _1464160: http://bugs.launchpad.net/python-cinderclient/+bug/1464160
 
 1.2.2
 -----
@@ -140,12 +151,12 @@ The following are kept for historical purposes.
   consisgroup-create-from-src subcommand.
 * --force no longer needs a boolean to be specified.
 
-.. _1341411 http://bugs.launchpad.net/python-cinderclient/+bug/1341411
-.. _1429102 http://bugs.launchpad.net/python-cinderclient/+bug/1429102
-.. _1447589 http://bugs.launchpad.net/python-cinderclient/+bug/1447589
-.. _1447162 http://bugs.launchpad.net/python-cinderclient/+bug/1447162
-.. _1448244 http://bugs.launchpad.net/python-cinderclient/+bug/1448244
-.. _1244453 http://bugs.launchpad.net/python-cinderclient/+bug/1244453
+.. _1341411: http://bugs.launchpad.net/python-cinderclient/+bug/1341411
+.. _1429102: http://bugs.launchpad.net/python-cinderclient/+bug/1429102
+.. _1447589: http://bugs.launchpad.net/python-cinderclient/+bug/1447589
+.. _1447162: http://bugs.launchpad.net/python-cinderclient/+bug/1447162
+.. _1448244: http://bugs.launchpad.net/python-cinderclient/+bug/1448244
+.. _1244453: http://bugs.launchpad.net/python-cinderclient/+bug/1244453
 
 1.2.0
 -----
@@ -174,45 +185,48 @@ The following are kept for historical purposes.
   type in your keystone catalog.
 * Filter by tenant in list subcommand.
 
-.. _1373662 http://bugs.launchpad.net/python-cinderclient/+bug/1373662
-.. _1376311 http://bugs.launchpad.net/python-cinderclient/+bug/1376311
-.. _1368910 http://bugs.launchpad.net/python-cinderclient/+bug/1368910
-.. _1374211 http://bugs.launchpad.net/python-cinderclient/+bug/1374211
-.. _1379505 http://bugs.launchpad.net/python-cinderclient/+bug/1379505
-.. _1282324 http://bugs.launchpad.net/python-cinderclient/+bug/1282324
-.. _1358926 http://bugs.launchpad.net/python-cinderclient/+bug/1358926
-.. _1342192 http://bugs.launchpad.net/python-cinderclient/+bug/1342192
-.. _1386232 http://bugs.launchpad.net/python-cinderclient/+bug/1386232
-.. _1402846 http://bugs.launchpad.net/python-cinderclient/+bug/1402846
-.. _1373766 http://bugs.launchpad.net/python-cinderclient/+bug/1373766
-.. _1403902 http://bugs.launchpad.net/python-cinderclient/+bug/1403902
-.. _1377823 http://bugs.launchpad.net/python-cinderclient/+bug/1377823
-.. _1350702 http://bugs.launchpad.net/python-cinderclient/+bug/1350702
-.. _1357559 http://bugs.launchpad.net/python-cinderclient/+bug/1357559
-.. _1341424 http://bugs.launchpad.net/python-cinderclient/+bug/1341424
-.. _1365273 http://bugs.launchpad.net/python-cinderclient/+bug/1365273
-.. _1404020 http://bugs.launchpad.net/python-cinderclient/+bug/1404020
-.. _1380729 http://bugs.launchpad.net/python-cinderclient/+bug/1380729
-.. _1417273 http://bugs.launchpad.net/python-cinderclient/+bug/1417273
-.. _1420238 http://bugs.launchpad.net/python-cinderclient/+bug/1420238
-.. _1421210 http://bugs.launchpad.net/python-cinderclient/+bug/1421210
-.. _1351084 http://bugs.launchpad.net/python-cinderclient/+bug/1351084
-.. _1366289 http://bugs.launchpad.net/python-cinderclient/+bug/1366289
-.. _1309086 http://bugs.launchpad.net/python-cinderclient/+bug/1309086
-.. _1379486 http://bugs.launchpad.net/python-cinderclient/+bug/1379486
-.. _1422244 http://bugs.launchpad.net/python-cinderclient/+bug/1422244
-.. _1399747 http://bugs.launchpad.net/python-cinderclient/+bug/1399747
-.. _1431693 http://bugs.launchpad.net/python-cinderclient/+bug/1431693
-.. _1428764 http://bugs.launchpad.net/python-cinderclient/+bug/1428764
+.. _1373662: http://bugs.launchpad.net/python-cinderclient/+bug/1373662
+.. _1376311: http://bugs.launchpad.net/python-cinderclient/+bug/1376311
+.. _1368910: http://bugs.launchpad.net/python-cinderclient/+bug/1368910
+.. _1374211: http://bugs.launchpad.net/python-cinderclient/+bug/1374211
+.. _1379505: http://bugs.launchpad.net/python-cinderclient/+bug/1379505
+.. _1282324: http://bugs.launchpad.net/python-cinderclient/+bug/1282324
+.. _1358926: http://bugs.launchpad.net/python-cinderclient/+bug/1358926
+.. _1342192: http://bugs.launchpad.net/python-cinderclient/+bug/1342192
+.. _1386232: http://bugs.launchpad.net/python-cinderclient/+bug/1386232
+.. _1402846: http://bugs.launchpad.net/python-cinderclient/+bug/1402846
+.. _1373766: http://bugs.launchpad.net/python-cinderclient/+bug/1373766
+.. _1403902: http://bugs.launchpad.net/python-cinderclient/+bug/1403902
+.. _1377823: http://bugs.launchpad.net/python-cinderclient/+bug/1377823
+.. _1350702: http://bugs.launchpad.net/python-cinderclient/+bug/1350702
+.. _1357559: http://bugs.launchpad.net/python-cinderclient/+bug/1357559
+.. _1341424: http://bugs.launchpad.net/python-cinderclient/+bug/1341424
+.. _1365273: http://bugs.launchpad.net/python-cinderclient/+bug/1365273
+.. _1404020: http://bugs.launchpad.net/python-cinderclient/+bug/1404020
+.. _1380729: http://bugs.launchpad.net/python-cinderclient/+bug/1380729
+.. _1417273: http://bugs.launchpad.net/python-cinderclient/+bug/1417273
+.. _1420238: http://bugs.launchpad.net/python-cinderclient/+bug/1420238
+.. _1421210: http://bugs.launchpad.net/python-cinderclient/+bug/1421210
+.. _1351084: http://bugs.launchpad.net/python-cinderclient/+bug/1351084
+.. _1366289: http://bugs.launchpad.net/python-cinderclient/+bug/1366289
+.. _1309086: http://bugs.launchpad.net/python-cinderclient/+bug/1309086
+.. _1379486: http://bugs.launchpad.net/python-cinderclient/+bug/1379486
+.. _1422244: http://bugs.launchpad.net/python-cinderclient/+bug/1422244
+.. _1399747: http://bugs.launchpad.net/python-cinderclient/+bug/1399747
+.. _1431693: http://bugs.launchpad.net/python-cinderclient/+bug/1431693
+.. _1428764: http://bugs.launchpad.net/python-cinderclient/+bug/1428764
 
 ** Python 2.4 support removed.
+
 ** --sort-key and --sort-dir are deprecated. Use --sort instead.
+
 ** A dash will be displayed of None when there is no data to display under
    a column.
 
 1.1.1
 ------
-.. _1370152 http://bugs.launchpad.net/python-cinderclient/+bug/1370152
+
+.. _1370152: http://bugs.launchpad.net/python-cinderclient/+bug/1370152
 
 1.1.0
 ------
@@ -222,29 +236,31 @@ The following are kept for historical purposes.
 * Add support for Replication feature
 * Add pagination for Volume List
 
-.. _1325773 http://bugs.launchpad.net/python-cinderclient/+bug/1325773
-.. _1333257 http://bugs.launchpad.net/python-cinderclient/+bug/1333257
-.. _1268480 http://bugs.launchpad.net/python-cinderclient/+bug/1268480
-.. _1275025 http://bugs.launchpad.net/python-cinderclient/+bug/1275025
-.. _1258489 http://bugs.launchpad.net/python-cinderclient/+bug/1258489
-.. _1241682 http://bugs.launchpad.net/python-cinderclient/+bug/1241682
-.. _1203471 http://bugs.launchpad.net/python-cinderclient/+bug/1203471
-.. _1210874 http://bugs.launchpad.net/python-cinderclient/+bug/1210874
-.. _1200214 http://bugs.launchpad.net/python-cinderclient/+bug/1200214
-.. _1130572 http://bugs.launchpad.net/python-cinderclient/+bug/1130572
-.. _1156994 http://bugs.launchpad.net/python-cinderclient/+bug/1156994
+.. _1325773: http://bugs.launchpad.net/python-cinderclient/+bug/1325773
+.. _1333257: http://bugs.launchpad.net/python-cinderclient/+bug/1333257
+.. _1268480: http://bugs.launchpad.net/python-cinderclient/+bug/1268480
+.. _1275025: http://bugs.launchpad.net/python-cinderclient/+bug/1275025
+.. _1258489: http://bugs.launchpad.net/python-cinderclient/+bug/1258489
+.. _1241682: http://bugs.launchpad.net/python-cinderclient/+bug/1241682
+.. _1203471: http://bugs.launchpad.net/python-cinderclient/+bug/1203471
+.. _1210874: http://bugs.launchpad.net/python-cinderclient/+bug/1210874
+.. _1200214: http://bugs.launchpad.net/python-cinderclient/+bug/1200214
+.. _1130572: http://bugs.launchpad.net/python-cinderclient/+bug/1130572
+.. _1156994: http://bugs.launchpad.net/python-cinderclient/+bug/1156994
 
 ** Note Connection refused --> Connection error commit: c9e7818f3f90ce761ad8ccd09181c705880a4266
 ** Note Mask Passwords in log output commit: 80582f2b860b2dadef7ae07bdbd8395bf03848b1
 
 1.0.9
 ------
+
 .. _1255905: http://bugs.launchpad.net/python-cinderclient/+bug/1255905
 .. _1267168: http://bugs.launchpad.net/python-cinderclient/+bug/1267168
 .. _1284540: http://bugs.launchpad.net/python-cinderclient/+bug/1284540
 
 1.0.8
 -----
+
 * Add support for reset-state on multiple volumes or snapshots at once
 * Add volume retype command
 
@@ -263,6 +279,7 @@ The following are kept for historical purposes.
 
 1.0.7
 -----
+
 * Add support for read-only volumes
 * Add support for setting snapshot metadata
 * Deprecate volume-id arg to backup restore in favor of --volume
@@ -280,6 +297,7 @@ The following are kept for historical purposes.
 
 1.0.6
 -----
+
 * Add support for multiple endpoints
 * Add response info for backup command
 * Add metadata option to cinder list command
@@ -306,6 +324,7 @@ The following are kept for historical purposes.
 
 1.0.5
 -----
+
 * Add CLI man page
 * Add Availability Zone list command
 * Add support for scheduler-hints
@@ -325,7 +344,9 @@ The following are kept for historical purposes.
 
 1.0.4
 -----
+
 * Added support for backup-service commands
+
 .. _1163546: http://bugs.launchpad.net/python-cinderclient/+bug/1163546
 .. _1161857: http://bugs.launchpad.net/python-cinderclient/+bug/1161857
 .. _1160898: http://bugs.launchpad.net/python-cinderclient/+bug/1160898
@@ -347,6 +368,7 @@ The following are kept for historical purposes.
 * Add retries to cinderclient operations
 * Add Type/Extra-Specs support
 * Add volume and snapshot rename commands
+
 .. _1155655: http://bugs.launchpad.net/python-cinderclient/+bug/1155655
 .. _1130730: http://bugs.launchpad.net/python-cinderclient/+bug/1130730
 .. _1068521: http://bugs.launchpad.net/python-cinderclient/+bug/1068521
