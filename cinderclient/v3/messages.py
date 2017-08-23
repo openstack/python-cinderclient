@@ -51,7 +51,7 @@ class MessageManager(base.ManagerWithFind):
         url = self._build_list_url(resource_type, detailed=False)
         return self._list(url, resource_type)
 
-    @api_versions.wraps('3.5')
+    @api_versions.wraps('3.5')  # noqa: F811
     def list(self, search_opts=None, marker=None, limit=None, sort=None):
         """Lists all messages.
 

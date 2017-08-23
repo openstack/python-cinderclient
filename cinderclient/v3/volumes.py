@@ -147,7 +147,7 @@ class VolumeManager(volumes.VolumeManager):
 
         return common_base.ListWithMeta([], response_list)
 
-    @api_versions.wraps("3.15")
+    @api_versions.wraps("3.15")  # noqa: F811
     def delete_metadata(self, volume, keys):
         """Delete specified keys from volumes metadata.
 
@@ -178,7 +178,7 @@ class VolumeManager(volumes.VolumeManager):
                              'container_format': container_format,
                              'disk_format': disk_format})
 
-    @api_versions.wraps("3.1")
+    @api_versions.wraps("3.1")  # noqa: F811
     def upload_to_image(self, volume, force, image_name, container_format,
                         disk_format, visibility, protected):
         """Upload volume to image service as image.
@@ -211,7 +211,7 @@ class VolumeManager(volumes.VolumeManager):
 
         return self._get('/scheduler-stats/get_pools%s' % query_string, None)
 
-    @api_versions.wraps("3.33")
+    @api_versions.wraps("3.33")  # noqa: F811
     def get_pools(self, detail, search_opts):
         """Show pool information for backends."""
         # pylint: disable=function-redefined
