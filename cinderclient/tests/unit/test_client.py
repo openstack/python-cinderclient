@@ -25,7 +25,6 @@ import six
 from cinderclient import api_versions
 import cinderclient.client
 from cinderclient import exceptions
-from cinderclient import utils
 import cinderclient.v1.client
 import cinderclient.v2.client
 

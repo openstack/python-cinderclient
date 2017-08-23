@@ -372,7 +372,8 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         if action == 'delete':
             assert 'delete-volumes' in body[action]
         elif action in ('enable_replication', 'disable_replication',
-                        'failover_replication', 'list_replication_targets'):
+                        'failover_replication', 'list_replication_targets',
+                        'reset_status'):
             assert action in body
         else:
             raise AssertionError("Unexpected action: %s" % action)
@@ -418,9 +419,6 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
     def put_group_snapshots_1234(self, **kw):
         return (200, {}, {'group_snapshot': {}})
 
-    def post_groups_1234_action(self, **kw):
-        return (202, {}, {})
-
     def get_groups_5678(self, **kw):
         return (200, {}, {'group':
                           _stub_group(id='5678')})
@@ -445,9 +443,6 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
 
     def post_group_snapshots_5678_action(self, **kw):
         return (202, {}, {})
-
-    def get_group_snapshots_5678(self, **kw):
-        return (200, {}, {'group_snapshot': _stub_group_snapshot(id='5678')})
 
     def delete_group_snapshots_1234(self, **kw):
         return (202, {}, {})

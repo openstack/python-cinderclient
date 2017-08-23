@@ -22,11 +22,6 @@ from cinderclient.tests.unit.v3 import fakes
 
 class ServicesTest(utils.TestCase):
 
-    def test_api_version(self):
-        client = fakes.FakeClient(version_header='3.0')
-        svs = client.services.server_api_version()
-        [self.assertIsInstance(s, services.Service) for s in svs]
-
     def test_list_services_with_cluster_info(self):
         cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.7'))
         services_list = cs.services.list()
