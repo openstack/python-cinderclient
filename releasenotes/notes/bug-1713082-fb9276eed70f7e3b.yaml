@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    The attachment_ids in the volume info returned by show volume were
+    incorrect. It was showing the volume_id, not the attachment_id. This fix
+    changes the attachment_ids returned by show volume to correctly reflect
+    the attachment_id.
+    [Bug `1713082 <https://bugs.launchpad.net/bugs/1713082>`_]

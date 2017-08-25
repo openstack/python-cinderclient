@@ -36,7 +36,7 @@ def _translate_attachments(info):
     attachments = []
     attached_servers = []
     for attachment in info['attachments']:
-        attachments.append(attachment['id'])
+        attachments.append(attachment['attachment_id'])
         attached_servers.append(attachment['server_id'])
     info.pop('attachments', None)
     info['attachment_ids'] = attachments
