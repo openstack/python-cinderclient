@@ -1408,3 +1408,20 @@ class ShellTest(utils.TestCase):
                          '--backup-gigabytes 1 '
                          '--per-volume-gigabytes 1')
         self.assert_called('PUT', '/os-quota-class-sets/test', body=expected)
+
+    def test_translate_attachments(self):
+        attachment_id = 'aaaa'
+        server_id = 'bbbb'
+        obj_id = 'cccc'
+        info = {
+            'attachments': [{
+                'attachment_id': attachment_id,
+                'id': obj_id,
+                'server_id': server_id}]
+            }
+
+        new_info = test_shell._translate_attachments(info)
+
+        self.assertEqual(attachment_id, new_info['attachment_ids'][0])
+        self.assertEqual(server_id, new_info['attached_servers'][0])
+        self.assertNotIn('id', new_info)

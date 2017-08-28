@@ -28,8 +28,9 @@ REQUEST_ID = 'req-test-request-id'
 def _stub_volume(*args, **kwargs):
     volume = {
         "migration_status": None,
-        "attachments": [{u'server_id': u'1234', u'id':
-                         u'3f88836f-adde-4296-9f6b-2c59a0bcda9a'}],
+        "attachments": [{u'server_id': u'1234',
+                         u'id': u'3f88836f-adde-4296-9f6b-2c59a0bcda9a',
+                         u'attachment_id': u'5678'}],
         "links": [
             {
                 "href": "http://localhost/v2/fake/volumes/1234",
