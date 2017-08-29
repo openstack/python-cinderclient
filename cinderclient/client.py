@@ -217,7 +217,7 @@ class SessionClient(adapter.LegacyJsonAdapter):
             version = get_volume_api_from_url(self.get_endpoint())
         except exceptions.UnsupportedVersion as e:
             msg = (_("Service catalog returned invalid url.\n"
-                     "%s") % six.text_type(e.message))
+                     "%s") % six.text_type(e))
             raise exceptions.UnsupportedVersion(msg)
 
         return version
@@ -468,10 +468,10 @@ class HTTPClient(object):
             if self.management_url == self.bypass_url:
                 msg = (_("Invalid url was specified in --os-endpoint or "
                          "environment variable CINDERCLIENT_BYPASS_URL.\n"
-                         "%s") % six.text_type(e.message))
+                         "%s") % six.text_type(e))
             else:
                 msg = (_("Service catalog returned invalid url.\n"
-                         "%s") % six.text_type(e.message))
+                         "%s") % six.text_type(e))
 
             raise exceptions.UnsupportedVersion(msg)
 
