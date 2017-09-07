@@ -858,13 +858,19 @@ def do_upload_to_image(cs, args):
                                    args.disk_format))
 
 
-@api_versions.wraps('3.9')
+@api_versions.wraps('3.9', '3.43')
 @utils.arg('backup', metavar='<backup>',
            help='Name or ID of backup to rename.')
 @utils.arg('--name', nargs='?', metavar='<name>',
            help='New name for backup.')
 @utils.arg('--description', metavar='<description>',
            help='Backup description. Default=None.')
+@utils.arg('--metadata',
+           nargs='*',
+           metavar='<key=value>',
+           default=None,
+           help='Metadata key and value pairs. Default=None.',
+           start_version='3.43')
 def do_backup_update(cs, args):
     """Renames a backup."""
     kwargs = {}
@@ -874,6 +880,10 @@ def do_backup_update(cs, args):
 
     if args.description is not None:
         kwargs['description'] = args.description
+
+    if cs.api_version >= api_versions.APIVersion("3.43"):
+        if args.metadata is not None:
+            kwargs['metadata'] = args.metadata
 
     if not kwargs:
         msg = 'Must supply either name or description.'
@@ -2005,3 +2015,68 @@ def do_service_get_log(cs, args):
                                             args.prefix)
     columns = ('Binary', 'Host', 'Prefix', 'Level')
     utils.print_list(log_levels, columns)
+
+@api_versions.wraps('3.43')
+@utils.arg('volume', metavar='<volume>',
+           help='Name or ID of volume to backup.')
+@utils.arg('--container', metavar='<container>',
+           default=None,
+           help='Backup container name. Default=None.')
+@utils.arg('--display-name',
+           help=argparse.SUPPRESS)
+@utils.arg('--name', metavar='<name>',
+           default=None,
+           help='Backup name. Default=None.')
+@utils.arg('--display-description',
+           help=argparse.SUPPRESS)
+@utils.arg('--description',
+           metavar='<description>',
+           default=None,
+           help='Backup description. Default=None.')
+@utils.arg('--incremental',
+           action='store_true',
+           help='Incremental backup. Default=False.',
+           default=False)
+@utils.arg('--force',
+           action='store_true',
+           help='Allows or disallows backup of a volume '
+           'when the volume is attached to an instance. '
+           'If set to True, backs up the volume whether '
+           'its status is "available" or "in-use". The backup '
+           'of an "in-use" volume means your data is crash '
+           'consistent. Default=False.',
+           default=False)
+@utils.arg('--snapshot-id',
+           metavar='<snapshot-id>',
+           default=None,
+           help='ID of snapshot to backup. Default=None.')
+@utils.arg('--metadata',
+           nargs='*',
+           metavar='<key=value>',
+           default=None,
+           help='Metadata key and value pairs. Default=None.')
+def do_backup_create(cs, args):
+    """Creates a volume backup."""
+    if args.display_name is not None:
+        args.name = args.display_name
+
+    if args.display_description is not None:
+        args.description = args.display_description
+
+    volume = utils.find_volume(cs, args.volume)
+    backup = cs.backups.create(volume.id,
+                               args.container,
+                               args.name,
+                               args.description,
+                               args.incremental,
+                               args.force,
+                               args.snapshot_id,
+                               args.metadata)
+
+    info = {"volume_id": volume.id}
+    info.update(backup._info)
+
+    if 'links' in info:
+        info.pop('links')
+
+    utils.print_dict(info)
