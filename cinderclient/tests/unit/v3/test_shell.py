@@ -998,3 +998,12 @@ class ShellTest(utils.TestCase):
         cmd += '1234'
         self.run_command(cmd)
         self.assert_called('POST', '/backups')
+
+    @mock.patch("cinderclient.utils.print_list")
+    def test_snapshot_list_with_userid(self, mock_print_list):
+        """Ensure 3.41 provides User ID header."""
+        self.run_command('--os-volume-api-version 3.41 snapshot-list')
+        self.assert_called('GET', '/snapshots/detail')
+        columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'User ID']
+        mock_print_list.assert_called_once_with(mock.ANY, columns,
+                                                sortby_index=0)

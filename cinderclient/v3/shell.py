@@ -1722,9 +1722,15 @@ def do_snapshot_list(cs, args):
                                          sort=args.sort)
     shell_utils.translate_volume_snapshot_keys(snapshots)
     sortby_index = None if args.sort else 0
-    utils.print_list(snapshots,
-                     ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
-                     sortby_index=sortby_index)
+    if cs.api_version >= api_versions.APIVersion("3.41"):
+        utils.print_list(snapshots,
+                         ['ID', 'Volume ID', 'Status',
+                          'Name', 'Size', 'User ID'],
+                         sortby_index=sortby_index)
+    else:
+        utils.print_list(snapshots,
+                         ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
+                         sortby_index=sortby_index)
 
 
 @api_versions.wraps('3.27')
