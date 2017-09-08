@@ -8,9 +8,9 @@ The :program:`cinder` shell utility interacts with the OpenStack Cinder API
 from the command line. It supports the entirety of the OpenStack Cinder API.
 
 You'll need to provide :program:`cinder` with your OpenStack username and
-API key. You can do this with the :option:`--os-username`, :option:`--os-password`
-and :option:`--os-tenant-name` options, but it's easier to just set them as
-environment variables by setting two environment variables:
+API key. You can do this with the `--os-username`, `--os-password` and
+`--os-tenant-name` options, but it's easier to just set them as environment
+variables by setting two environment variables:
 
 .. envvar:: OS_USERNAME or CINDER_USERNAME
 

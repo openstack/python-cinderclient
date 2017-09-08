@@ -9,7 +9,7 @@ Cinderclient contains a suite of unit tests, in the cinderclient/tests/unit
 directory.
 
 Any proposed code change will be automatically rejected by the OpenStack
-Jenkins server [#f1]_ if the change causes unit test failures.
+Jenkins server if the change causes unit test failures.
 
 Running the tests
 -----------------
@@ -54,7 +54,7 @@ Note that there has been talk around deprecating this wrapper and this method of
 testing, it's currently available still but it may be good to get used to using
 tox or even ostestr directly.
 
-Documenation is left in place for those that still use it.
+Documentation is left in place for those that still use it.
 
 Flags
 -----
@@ -115,10 +115,9 @@ flag::
 Virtualenv
 ----------
 
-By default, the tests use the Python packages installed inside a
-virtualenv [#f2]_. (This is equivalent to using the ``-V, --virtualenv`` flag).
-If the virtualenv does not exist, it will be created the first time the tests
-are run.
+By default, the tests use the Python packages installed inside a virtualenv.
+(This is equivalent to using the ``-V, --virtualenv`` flag). If the virtualenv
+does not exist, it will be created the first time the tests are run.
 
 If you wish to recreate the virtualenv, call ``run_tests.sh`` with the flag::
 
@@ -157,8 +156,3 @@ Note that you may use any location (not just ``/tmp``!) as long as it is not
 a shared folder.
 
 .. rubric:: Footnotes
-
-.. [#f1] See :doc:`jenkins`.
-
-.. [#f2] See :doc:`development.environment` for more details about the use of
-   virtualenv.
