@@ -20,6 +20,42 @@ from cinderclient.tests.unit import fakes
 from cinderclient.tests.unit.v2 import fakes as fake_v2
 
 
+fake_attachment = {'attachment': {
+    'status': 'reserved',
+    'detached_at': '',
+    'connection_info': {},
+    'attached_at': '',
+    'attach_mode': None,
+    'id': 'a232e9ae',
+    'instance': 'e84fda45-4de4-4ce4-8f39-fc9d3b0aa05e',
+    'volume_id': '557ad76c-ce54-40a3-9e91-c40d21665cc3', }}
+
+fake_connection_info = {
+    'auth_password': 'i6h9E5HQqSkcGX3H',
+    'attachment_id': 'a232e9ae',
+    'target_discovered': False,
+    'encrypted': False,
+    'driver_volume_type': 'iscsi',
+    'qos_specs': None,
+    'target_iqn': 'iqn.2010-10.org.openstack:volume-557ad76c',
+    'target_portal': '10.117.36.28:3260',
+    'volume_id': '557ad76c-ce54-40a3-9e91-c40d21665cc3',
+    'target_lun': 0,
+    'access_mode': 'rw',
+    'auth_username': 'MwRrnAFLHN7enw5R95yM',
+    'auth_method': 'CHAP'}
+
+fake_connector = {
+    'initiator': 'iqn.1993-08.org.debian:01:b79dbce99387',
+    'mount_device': '/dev/vdb',
+    'ip': '10.117.36.28',
+    'platform': 'x86_64',
+    'host': 'os-2',
+    'do_local_attach': False,
+    'os_type': 'linux2',
+    'multipath': False}
+
+
 def _stub_group(detailed=True, **kwargs):
     group = {
         "name": "test-1",
@@ -241,12 +277,9 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
     #
     # Attachments
     #
+
     def post_attachments(self, **kw):
-        return (202, {}, {
-            'attachment': {'instance': 1234,
-                           'name': 'attachment-1',
-                           'volume_id': 'fake_volume_1',
-                           'status': 'reserved'}})
+        return (200, {}, fake_attachment)
 
     def get_attachments(self, **kw):
         return (200, {}, {
@@ -258,6 +291,16 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
                              'name': 'attachment-2',
                              'volume_id': 'fake_volume_2',
                              'status': 'reserverd'}]})
+
+    def post_attachments_a232e9ae_action(self, **kw):  # noqa: E501
+        attached_fake = fake_attachment
+        attached_fake['status'] = 'attached'
+        return (200, {}, attached_fake)
+
+    def post_attachments_1234_action(self, **kw):  # noqa: E501
+        attached_fake = fake_attachment
+        attached_fake['status'] = 'attached'
+        return (200, {}, attached_fake)
 
     def get_attachments_1234(self, **kw):
         return (200, {}, {
@@ -294,7 +337,7 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         return (200, {}, {'group_type': {'id': 1,
                           'name': 'test-type-1',
                           'description': 'test_type-1-desc',
-                          'group_specs': {u'key': u'value'}}})
+                          'group_specs': {'key': 'value'}}})
 
     def get_group_types_2(self, **kw):
         return (200, {}, {'group_type': {'id': 2,

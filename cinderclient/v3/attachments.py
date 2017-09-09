@@ -12,6 +12,7 @@
 
 """Attachment interface."""
 
+from cinderclient import api_versions
 from cinderclient import base
 
 
@@ -64,9 +65,12 @@ class VolumeAttachmentManager(base.ManagerWithFind):
         """Attachment update."""
         body = {'attachment': {'connector': connector}}
         resp = self._update('/attachments/%s' % id, body)
+        # NOTE(jdg): This kinda sucks,
+        # create returns a dict, but update returns an object :(
         return self.resource_class(self, resp['attachment'], loaded=True,
                                    resp=resp)
 
+    @api_versions.wraps('3.44')
     def complete(self, attachment):
         """Mark the attachment as completed."""
         resp, body = self._action_return_resp_and_body('os-complete',
