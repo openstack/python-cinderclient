@@ -26,15 +26,45 @@ VolumeBackup = volume_backups.VolumeBackup
 
 
 class VolumeBackupManager(volume_backups.VolumeBackupManager):
-    @api_versions.wraps("3.9")
+    @api_versions.wraps("3.9", "3.43")
     def update(self, backup, **kwargs):
         """Update the name or description for a backup.
 
         :param backup: The :class:`Backup` to update.
         """
+        # NOTE(jdg): Placing 3.43 in versions.wraps above for clarity,
+        # but it's irrelevant as this just uses the kwargs, should we
+        # remove that?
         if not kwargs:
             return
 
         body = {"backup": kwargs}
 
         return self._update("/backups/%s" % base.getid(backup), body)
+
+    @api_versions.wraps("3.43")
+    def create(self, volume_id, container=None,
+               name=None, description=None,
+               incremental=False, force=False,
+               snapshot_id=None,
+               metadata=None):
+        """Creates a volume backup.
+
+        :param volume_id: The ID of the volume to backup.
+        :param container: The name of the backup service container.
+        :param name: The name of the backup.
+        :param description: The description of the backup.
+        :param incremental: Incremental backup.
+        :param force: If True, allows an in-use volume to be backed up.
+        :param metadata: Key Value pairs
+        :rtype: :class:`VolumeBackup`
+        """
+        body = {'backup': {'volume_id': volume_id,
+                           'container': container,
+                           'name': name,
+                           'description': description,
+                           'incremental': incremental,
+                           'force': force,
+                           'snapshot_id': snapshot_id,
+                           'metadata': metadata, }}
+        return self._create('/backups', body, 'backup')

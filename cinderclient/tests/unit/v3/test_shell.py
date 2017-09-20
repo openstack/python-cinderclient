@@ -990,3 +990,11 @@ class ShellTest(utils.TestCase):
         self.assertEqual([mock.call(poll_period)] * 2,
                 mock_time.sleep.call_args_list)
         self.assertEqual([mock.call(some_id)] * 2, poll_fn.call_args_list)
+
+    def test_backup_with_metadata(self):
+        cmd = '--os-volume-api-version 3.43 '
+        cmd += 'backup-create '
+        cmd += '--metadata foo=bar '
+        cmd += '1234'
+        self.run_command(cmd)
+        self.assert_called('POST', '/backups')
