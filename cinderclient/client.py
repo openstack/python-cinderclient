@@ -154,15 +154,16 @@ def _log_request_id(logger, resp, service_name):
 class SessionClient(adapter.LegacyJsonAdapter):
 
     def __init__(self, *args, **kwargs):
-        self.api_version = kwargs.pop('api_version', None)
-        self.api_version = self.api_version or api_versions.APIVersion()
+        apiver = kwargs.pop('api_version', None) or api_versions.APIVersion()
+        if not isinstance(apiver, api_versions.APIVersion):
+            apiver = api_versions.APIVersion(str(apiver))
+        if apiver.ver_minor != 0:
+            kwargs['default_microversion'] = apiver.get_string()
         self.retries = kwargs.pop('retries', 0)
         self._logger = logging.getLogger(__name__)
         super(SessionClient, self).__init__(*args, **kwargs)
 
     def request(self, *args, **kwargs):
-        kwargs.setdefault('headers', kwargs.get('headers', {}))
-        api_versions.update_headers(kwargs["headers"], self.api_version)
         kwargs.setdefault('authenticated', False)
 
         # Note(tpatil): The standard call raises errors from
