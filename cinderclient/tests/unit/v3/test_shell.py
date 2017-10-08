@@ -376,6 +376,12 @@ class ShellTest(utils.TestCase):
         self.assert_called('PUT', '/attachments/1234', body={'attachment':
                                                              body})
 
+    @ddt.unpack
+    def test_attachment_complete(self):
+        command = '--os-volume-api-version 3.44 attachment-complete 1234'
+        self.run_command(command)
+        self.assert_called('POST', '/attachments/1234/action', body=None)
+
     def test_attachment_delete(self):
         self.run_command('--os-volume-api-version 3.27 '
                          'attachment-delete 1234')
