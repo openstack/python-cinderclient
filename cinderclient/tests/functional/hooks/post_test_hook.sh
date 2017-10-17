@@ -24,14 +24,14 @@ function generate_testr_results {
         sudo /usr/os-testr-env/bin/subunit2html $BASE/logs/testrepository.subunit $BASE/logs/testr_results.html
         sudo gzip -9 $BASE/logs/testrepository.subunit
         sudo gzip -9 $BASE/logs/testr_results.html
-        sudo chown jenkins:jenkins $BASE/logs/testrepository.subunit.gz $BASE/logs/testr_results.html.gz
+        sudo chown $USER:$USER $BASE/logs/testrepository.subunit.gz $BASE/logs/testr_results.html.gz
         sudo chmod a+r $BASE/logs/testrepository.subunit.gz $BASE/logs/testr_results.html.gz
     fi
 }
 
 export CINDERCLIENT_DIR="$BASE/new/python-cinderclient"
 
-sudo chown -R jenkins:stack $CINDERCLIENT_DIR
+sudo chown -R $USER:stack $CINDERCLIENT_DIR
 
 # Get admin credentials
 cd $STACK_DIR
@@ -44,7 +44,7 @@ cd $CINDERCLIENT_DIR
 echo "Running cinderclient functional test suite"
 set +e
 # Preserve env for OS_ credentials
-sudo -E -H -u jenkins tox -efunctional
+sudo -E -H -u $USER tox -efunctional
 EXIT_CODE=$?
 set -e
 
