@@ -75,7 +75,7 @@ class VolumeManager(volumes.VolumeManager):
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
                metadata=None, imageRef=None, scheduler_hints=None,
-               source_replica=None, multiattach=False):
+               source_replica=None, multiattach=False, backup_id=None):
         """Create a volume.
 
         :param size: Size of volume in GB
@@ -96,6 +96,7 @@ class VolumeManager(volumes.VolumeManager):
                             specified by the client to help boot an instance
         :param multiattach: Allow the volume to be attached to more than
                             one instance
+        :param backup_id: ID of the backup
         :rtype: :class:`Volume`
         """
         if metadata is None:
@@ -119,6 +120,7 @@ class VolumeManager(volumes.VolumeManager):
                            'source_volid': source_volid,
                            'source_replica': source_replica,
                            'multiattach': multiattach,
+                           'backup_id': backup_id
                            }}
 
         if group_id:

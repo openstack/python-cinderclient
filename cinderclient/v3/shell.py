@@ -498,6 +498,11 @@ def do_reset_state(cs, args):
            metavar='<image>',
            default=None,
            help='Creates a volume from image (ID or name). Default=None.')
+@utils.arg('--backup-id',
+           metavar='<backup-id>',
+           default=None,
+           start_version='3.47',
+           help='Creates a volume from backup ID. Default=None.')
 @utils.arg('--image_ref',
            help=argparse.SUPPRESS)
 @utils.arg('--name',
@@ -585,6 +590,8 @@ def do_create(cs, args):
     except AttributeError:
         group_id = None
 
+    backup_id = args.backup_id if hasattr(args, 'backup_id') else None
+
     volume = cs.volumes.create(args.size,
                                args.consisgroup_id,
                                group_id,
@@ -598,7 +605,8 @@ def do_create(cs, args):
                                metadata=volume_metadata,
                                scheduler_hints=hints,
                                source_replica=args.source_replica,
-                               multiattach=args.multiattach)
+                               multiattach=args.multiattach,
+                               backup_id=backup_id)
 
     info = dict()
     volume = cs.volumes.get(volume.id)

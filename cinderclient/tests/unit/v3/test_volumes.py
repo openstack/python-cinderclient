@@ -91,7 +91,8 @@ class VolumesTest(utils.TestCase):
                                'source_replica': None,
                                'consistencygroup_id': None,
                                'multiattach': False,
-                               'group_id': '1234'}}
+                               'group_id': '1234',
+                               'backup_id': None}}
         cs.assert_called('POST', '/volumes', body=expected)
         self._assert_request_id(vol)
 

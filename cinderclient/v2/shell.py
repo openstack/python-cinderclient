@@ -210,8 +210,9 @@ class CheckSizeArgForCreate(argparse.Action):
     def __call__(self, parser, args, values, option_string=None):
         if ((args.snapshot_id or args.source_volid or args.source_replica)
                 is None and values is None):
-            parser.error('Size is a required parameter if snapshot '
-                         'or source volume is not specified.')
+            if not hasattr(args, 'backup_id') or args.backup_id is None:
+                parser.error('Size is a required parameter if snapshot '
+                             'or source volume or backup is not specified.')
         setattr(args, self.dest, values)
 
 

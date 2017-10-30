@@ -530,8 +530,38 @@ class ShellTest(utils.TestCase):
                                'metadata': {},
                                'volume_type': '4321',
                                'description': None,
-                               'multiattach': False}}
+                               'multiattach': False,
+                               'backup_id': None}}
         self.assert_called_anytime('POST', '/volumes', expected)
+
+    @ddt.data({'cmd': '--os-volume-api-version 3.47 create --backup-id 1234',
+               'update': {'backup_id': '1234'}},
+              {'cmd': '--os-volume-api-version 3.47 create 2',
+               'update': {'size': 2}}
+              )
+    @ddt.unpack
+    def test_create_volume_with_backup(self, cmd, update):
+        self.run_command(cmd)
+        self.assert_called('GET', '/volumes/1234')
+        expected = {'volume': {'imageRef': None,
+                               'project_id': None,
+                               'status': 'creating',
+                               'user_id': None,
+                               'size': None,
+                               'availability_zone': None,
+                               'source_replica': None,
+                               'attach_status': 'detached',
+                               'source_volid': None,
+                               'consistencygroup_id': None,
+                               'name': None,
+                               'snapshot_id': None,
+                               'metadata': {},
+                               'volume_type': None,
+                               'description': None,
+                               'multiattach': False,
+                               'backup_id': None}}
+        expected['volume'].update(update)
+        self.assert_called_anytime('POST', '/volumes', body=expected)
 
     def test_group_list(self):
         self.run_command('--os-volume-api-version 3.13 group-list')
