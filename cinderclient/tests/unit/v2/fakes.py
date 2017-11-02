@@ -678,10 +678,8 @@ class FakeHTTPClient(base_client.HTTPClient):
 
     def put_os_quota_class_sets_test(self, body, **kw):
         assert list(body) == ['quota_class_set']
-        fakes.assert_has_keys(body['quota_class_set'],
-                              required=['class_name'])
+        fakes.assert_has_keys(body['quota_class_set'])
         return (200, {}, {'quota_class_set': {
-                          'class_name': 'test',
                           'volumes': 2,
                           'snapshots': 2,
                           'gigabytes': 1,
