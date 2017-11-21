@@ -1,0 +1,31 @@
+- job:
+    name: cinderclient-dsvm-functional
+    parent: legacy-dsvm-base
+    run: playbooks/legacy/cinderclient-dsvm-functional/run.yaml
+    post-run: playbooks/legacy/cinderclient-dsvm-functional/post.yaml
+    timeout: 4200
+    voting: false
+    required-projects:
+      - openstack-infra/devstack-gate
+      - openstack/cinder
+      - openstack/python-cinderclient
+
+- job:
+    name: cinderclient-dsvm-functional-identity-v3-only
+    parent: legacy-dsvm-base
+    run: playbooks/legacy/cinderclient-dsvm-functional-identity-v3-only/run.yaml
+    post-run: playbooks/legacy/cinderclient-dsvm-functional-identity-v3-only/post.yaml
+    timeout: 4200
+    voting: false
+    required-projects:
+      - openstack-infra/devstack-gate
+      - openstack/cinder
+      - openstack/python-cinderclient
+
+
+- project:
+    name: openstack/python-cinderclient
+    check:
+      jobs:
+        - cinderclient-dsvm-functional
+        - cinderclient-dsvm-functional-identity-v3-only
