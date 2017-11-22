@@ -36,7 +36,7 @@ def print_help(project, venv, root):
     To activate the %(project)s virtualenv for the extent of your current
     shell session you can run:
 
-    $ source %(venv)s/bin/activate
+    $ . %(venv)s/bin/activate
 
     Or, if you prefer, you can run commands in the virtualenv on a case by
     case basis by running:
