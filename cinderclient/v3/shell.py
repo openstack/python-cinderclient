@@ -969,7 +969,7 @@ def do_migrate(cs, args):
            help='Metadata key and value pairs. Default=None.',
            start_version='3.43')
 def do_backup_update(cs, args):
-    """Renames a backup."""
+    """Updates a backup."""
     kwargs = {}
 
     if args.name is not None:
@@ -980,10 +980,10 @@ def do_backup_update(cs, args):
 
     if cs.api_version >= api_versions.APIVersion("3.43"):
         if args.metadata is not None:
-            kwargs['metadata'] = args.metadata
+            kwargs['metadata'] = shell_utils.extract_metadata(args)
 
     if not kwargs:
-        msg = 'Must supply either name or description.'
+        msg = 'Must supply at least one: name, description or metadata.'
         raise exceptions.ClientException(code=1, message=msg)
 
     shell_utils.find_backup(cs, args.backup).update(**kwargs)

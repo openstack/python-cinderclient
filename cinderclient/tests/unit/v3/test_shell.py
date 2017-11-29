@@ -445,14 +445,25 @@ class ShellTest(utils.TestCase):
         expected = {'backup': {'description': 'new-description'}}
         self.assert_called('PUT', '/backups/1234', body=expected)
 
+    def test_backup_update_with_metadata(self):
+        cmd = '--os-volume-api-version 3.43 '
+        cmd += 'backup-update '
+        cmd += '--metadata foo=bar '
+        cmd += '1234'
+        self.run_command(cmd)
+        expected = {'backup': {'metadata': {'foo': 'bar'}}}
+        self.assert_called('PUT', '/backups/1234', body=expected)
+
     def test_backup_update_all(self):
         # rename and change description
-        self.run_command('--os-volume-api-version 3.9 '
+        self.run_command('--os-volume-api-version 3.43 '
                          'backup-update --name new-name '
-                         '--description=new-description 1234')
+                         '--description=new-description '
+                         '--metadata foo=bar 1234')
         expected = {'backup': {
             'name': 'new-name',
             'description': 'new-description',
+            'metadata': {'foo': 'bar'}
         }}
         self.assert_called('PUT', '/backups/1234', body=expected)
 
