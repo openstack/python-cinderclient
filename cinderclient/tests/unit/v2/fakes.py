@@ -543,6 +543,15 @@ class FakeHTTPClient(base_client.HTTPClient):
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, _body)
 
+    def get_volumes_fake(self, **kw):
+        r = {'volume': self.get_volumes_detail(id='fake')[2]['volumes'][0]}
+        return (200, {}, r)
+
+    def post_volumes_fake_action(self, body, **kw):
+        _body = None
+        resp = 202
+        return (resp, {}, _body)
+
     def post_volumes_5678_action(self, body, **kw):
         return self.post_volumes_1234_action(body, **kw)
 

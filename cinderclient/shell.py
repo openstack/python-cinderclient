@@ -20,6 +20,7 @@ Command-line interface to the OpenStack Cinder API.
 from __future__ import print_function
 
 import argparse
+import collections
 import getpass
 import logging
 import sys
@@ -492,6 +493,7 @@ class OpenStackCinderShell(object):
                 action_help = desc.strip().split('\n')[0]
                 action_help += additional_msg
 
+            exclusive_args = getattr(callback, 'exclusive_args', {})
             arguments = getattr(callback, 'arguments', [])
 
             subparser = subparsers.add_parser(
@@ -506,40 +508,58 @@ class OpenStackCinderShell(object):
                                    help=argparse.SUPPRESS,)
 
             self.subcommands[command] = subparser
-
-            # NOTE(ntpttr): We get a counter for each argument in this
-            # command here because during the microversion check we only
-            # want to raise an exception if no version of the argument
-            # matches the current microversion. The exception will only
-            # be raised after the last instance of a particular argument
-            # fails the check.
-            arg_counter = dict()
-            for (args, kwargs) in arguments:
-                arg_counter[args[0]] = arg_counter.get(args[0], 0) + 1
-
-            for (args, kwargs) in arguments:
-                start_version = kwargs.get("start_version", None)
-                start_version = api_versions.APIVersion(start_version)
-                end_version = kwargs.get('end_version', None)
-                end_version = api_versions.APIVersion(end_version)
-                if do_help and (start_version or end_version):
-                    kwargs["help"] = kwargs.get("help", "") + (
-                        self._build_versioned_help_message(start_version,
-                                                           end_version))
-                if not version.matches(start_version, end_version):
-                    if args[0] in input_args and command == input_args[0]:
-                        if arg_counter[args[0]] == 1:
-                            # This is the last version of this argument,
-                            # raise the exception.
-                            raise exc.UnsupportedAttribute(args[0],
-                                start_version, end_version)
-                        arg_counter[args[0]] -= 1
-                    continue
-                kw = kwargs.copy()
-                kw.pop("start_version", None)
-                kw.pop("end_version", None)
-                subparser.add_argument(*args, **kw)
+            self._add_subparser_args(subparser, arguments, version, do_help,
+                                     input_args, command)
+            self._add_subparser_exclusive_args(subparser, exclusive_args,
+                                               version, do_help, input_args,
+                                               command)
             subparser.set_defaults(func=callback)
+
+    def _add_subparser_args(self, subparser, arguments, version, do_help,
+                            input_args, command):
+        # NOTE(ntpttr): We get a counter for each argument in this
+        # command here because during the microversion check we only
+        # want to raise an exception if no version of the argument
+        # matches the current microversion. The exception will only
+        # be raised after the last instance of a particular argument
+        # fails the check.
+        arg_counter = collections.defaultdict(int)
+        for (args, kwargs) in arguments:
+            arg_counter[args[0]] += 1
+
+        for (args, kwargs) in arguments:
+            start_version = kwargs.get("start_version", None)
+            start_version = api_versions.APIVersion(start_version)
+            end_version = kwargs.get('end_version', None)
+            end_version = api_versions.APIVersion(end_version)
+            if do_help and (start_version or end_version):
+                kwargs["help"] = kwargs.get("help", "") + (
+                    self._build_versioned_help_message(start_version,
+                                                       end_version))
+            if not version.matches(start_version, end_version):
+                if args[0] in input_args and command == input_args[0]:
+                    if arg_counter[args[0]] == 1:
+                        # This is the last version of this argument,
+                        # raise the exception.
+                        raise exc.UnsupportedAttribute(args[0],
+                            start_version, end_version)
+                    arg_counter[args[0]] -= 1
+                continue
+            kw = kwargs.copy()
+            kw.pop("start_version", None)
+            kw.pop("end_version", None)
+            subparser.add_argument(*args, **kw)
+
+    def _add_subparser_exclusive_args(self, subparser, exclusive_args,
+                                      version, do_help, input_args, command):
+        for group_name, arguments in exclusive_args.items():
+            if group_name == '__required__':
+                continue
+            required = exclusive_args['__required__'][group_name]
+            exclusive_group = subparser.add_mutually_exclusive_group(
+                required=required)
+            self._add_subparser_args(exclusive_group, arguments,
+                                     version, do_help, input_args, command)
 
     def setup_debugging(self, debug):
         if not debug:

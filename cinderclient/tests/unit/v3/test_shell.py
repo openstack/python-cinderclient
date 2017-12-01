@@ -1013,3 +1013,129 @@ class ShellTest(utils.TestCase):
         columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'User ID']
         mock_print_list.assert_called_once_with(mock.ANY, columns,
                                                 sortby_index=0)
+
+    @mock.patch('cinderclient.v3.volumes.Volume.migrate_volume')
+    def test_migrate_volume_before_3_16(self, v3_migrate_mock):
+        self.run_command('--os-volume-api-version 3.15 '
+                         'migrate 1234 fakehost')
+
+        v3_migrate_mock.assert_called_once_with(
+            'fakehost', False, False, None)
+
+    @mock.patch('cinderclient.v3.volumes.Volume.migrate_volume')
+    def test_migrate_volume_3_16(self, v3_migrate_mock):
+        self.run_command('--os-volume-api-version 3.16 '
+                         'migrate 1234 fakehost')
+        self.assertEqual(4, len(v3_migrate_mock.call_args[0]))
+
+    def test_migrate_volume_with_cluster_before_3_16(self):
+        self.assertRaises(exceptions.UnsupportedAttribute,
+                          self.run_command,
+                          '--os-volume-api-version 3.15 '
+                          'migrate 1234 fakehost --cluster fakecluster')
+
+    @mock.patch('cinderclient.shell.CinderClientArgumentParser.error')
+    def test_migrate_volume_mutual_exclusion(self, error_mock):
+        error_mock.side_effect = SystemExit
+        self.assertRaises(SystemExit,
+                          self.run_command,
+                          '--os-volume-api-version 3.16 '
+                          'migrate 1234 fakehost --cluster fakecluster')
+        msg = 'argument --cluster: not allowed with argument <host>'
+        error_mock.assert_called_once_with(msg)
+
+    @mock.patch('cinderclient.shell.CinderClientArgumentParser.error')
+    def test_migrate_volume_missing_required(self, error_mock):
+        error_mock.side_effect = SystemExit
+        self.assertRaises(SystemExit,
+                          self.run_command,
+                          '--os-volume-api-version 3.16 '
+                          'migrate 1234')
+        msg = 'one of the arguments <host> --cluster is required'
+        error_mock.assert_called_once_with(msg)
+
+    def test_migrate_volume_host(self):
+        self.run_command('--os-volume-api-version 3.16 '
+                         'migrate 1234 fakehost')
+        expected = {'os-migrate_volume': {'force_host_copy': False,
+                                          'lock_volume': False,
+                                          'host': 'fakehost'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_migrate_volume_cluster(self):
+        self.run_command('--os-volume-api-version 3.16 '
+                         'migrate 1234 --cluster mycluster')
+        expected = {'os-migrate_volume': {'force_host_copy': False,
+                                          'lock_volume': False,
+                                          'cluster': 'mycluster'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_migrate_volume_bool_force(self):
+        self.run_command('--os-volume-api-version 3.16 '
+                         'migrate 1234 fakehost --force-host-copy '
+                         '--lock-volume')
+        expected = {'os-migrate_volume': {'force_host_copy': True,
+                                          'lock_volume': True,
+                                          'host': 'fakehost'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_migrate_volume_bool_force_false(self):
+        # Set both --force-host-copy and --lock-volume to False.
+        self.run_command('--os-volume-api-version 3.16 '
+                         'migrate 1234 fakehost --force-host-copy=False '
+                         '--lock-volume=False')
+        expected = {'os-migrate_volume': {'force_host_copy': 'False',
+                                          'lock_volume': 'False',
+                                          'host': 'fakehost'}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+        # Do not set the values to --force-host-copy and --lock-volume.
+        self.run_command('--os-volume-api-version 3.16 '
+                         'migrate 1234 fakehost')
+        expected = {'os-migrate_volume': {'force_host_copy': False,
+                                          'lock_volume': False,
+                                          'host': 'fakehost'}}
+        self.assert_called('POST', '/volumes/1234/action',
+                           body=expected)
+
+    @ddt.data({'bootable': False, 'by_id': False, 'cluster': None},
+              {'bootable': True, 'by_id': False, 'cluster': None},
+              {'bootable': False, 'by_id': True, 'cluster': None},
+              {'bootable': True, 'by_id': True, 'cluster': None},
+              {'bootable': True, 'by_id': True, 'cluster': 'clustername'})
+    @ddt.unpack
+    def test_volume_manage(self, bootable, by_id, cluster):
+        cmd = ('--os-volume-api-version 3.16 '
+               'manage host1 some_fake_name --name foo --description bar '
+               '--volume-type baz --availability-zone az '
+               '--metadata k1=v1 k2=v2')
+        if by_id:
+            cmd += ' --id-type source-id'
+        if bootable:
+            cmd += ' --bootable'
+        if cluster:
+            cmd += ' --cluster ' + cluster
+
+        self.run_command(cmd)
+        ref = 'source-id' if by_id else 'source-name'
+        expected = {'volume': {'host': 'host1',
+                               'ref': {ref: 'some_fake_name'},
+                               'name': 'foo',
+                               'description': 'bar',
+                               'volume_type': 'baz',
+                               'availability_zone': 'az',
+                               'metadata': {'k1': 'v1', 'k2': 'v2'},
+                               'bootable': bootable}}
+        if cluster:
+            expected['cluster'] = cluster
+        self.assert_called_anytime('POST', '/os-volume-manage', body=expected)
+
+    def test_volume_manage_before_3_16(self):
+        """Cluster optional argument was not acceptable."""
+        self.assertRaises(exceptions.UnsupportedAttribute,
+                          self.run_command,
+                          'manage host1 some_fake_name '
+                          '--cluster clustername'
+                          '--name foo --description bar --bootable '
+                          '--volume-type baz --availability-zone az '
+                          '--metadata k1=v1 k2=v2')

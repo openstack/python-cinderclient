@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Cinder migrate and manage commands now accept ``--cluster`` argument to
+    define the destination for Active-Active deployments on microversion 3.16
+    and higher.  This argument and the ``host`` positional argument are
+    mutually exclusive for the migrate command.

@@ -858,6 +858,54 @@ def do_upload_to_image(cs, args):
                                    args.disk_format))
 
 
+@utils.arg('volume', metavar='<volume>', help='ID of volume to migrate.')
+# NOTE(geguileo): host is positional but optional in order to maintain backward
+# compatibility even with mutually exclusive arguments.  If version is < 3.16
+# then only host positional argument will be possible, and since the
+# exclusive_arg group has required=True it will be required even if it's
+# optional.
+@utils.exclusive_arg('destination', 'host', required=True, nargs='?',
+                     metavar='<host>', help='Destination host. Takes the '
+                     'form: host@backend-name#pool')
+@utils.exclusive_arg('destination', '--cluster', required=True,
+                     help='Destination cluster. Takes the form: '
+                     'cluster@backend-name#pool',
+                     start_version='3.16')
+@utils.arg('--force-host-copy', metavar='<True|False>',
+           choices=['True', 'False'],
+           required=False,
+           const=True,
+           nargs='?',
+           default=False,
+           help='Enables or disables generic host-based '
+           'force-migration, which bypasses driver '
+           'optimizations. Default=False.')
+@utils.arg('--lock-volume', metavar='<True|False>',
+           choices=['True', 'False'],
+           required=False,
+           const=True,
+           nargs='?',
+           default=False,
+           help='Enables or disables the termination of volume migration '
+           'caused by other commands. This option applies to the '
+           'available volume. True means it locks the volume '
+           'state and does not allow the migration to be aborted. The '
+           'volume status will be in maintenance during the '
+           'migration. False means it allows the volume migration '
+           'to be aborted. The volume status is still in the original '
+           'status. Default=False.')
+def do_migrate(cs, args):
+    """Migrates volume to a new host."""
+    volume = utils.find_volume(cs, args.volume)
+    try:
+        volume.migrate_volume(args.host, args.force_host_copy,
+                              args.lock_volume, getattr(args, 'cluster', None))
+        print("Request to migrate volume %s has been accepted." % (volume.id))
+    except Exception as e:
+        print("Migration for volume %s failed: %s." % (volume.id,
+                                                       six.text_type(e)))
+
+
 @api_versions.wraps('3.9', '3.43')
 @utils.arg('backup', metavar='<backup>',
            help='Name or ID of backup to rename.')
@@ -961,6 +1009,84 @@ def do_cluster_disable(cs, args):
     cluster = cs.clusters.update(args.name, args.binary, disabled=True,
                                  disabled_reason=args.reason)
     utils.print_dict(cluster.to_dict())
+
+
+@utils.arg('host',
+           metavar='<host>',
+           help='Cinder host on which the existing volume resides; '
+                'takes the form: host@backend-name#pool')
+@utils.arg('--cluster',
+           help='Cinder cluster on which the existing volume resides; '
+                'takes the form: cluster@backend-name#pool',
+           start_version='3.16')
+@utils.arg('identifier',
+           metavar='<identifier>',
+           help='Name or other Identifier for existing volume')
+@utils.arg('--id-type',
+           metavar='<id-type>',
+           default='source-name',
+           help='Type of backend device identifier provided, '
+                'typically source-name or source-id (Default=source-name)')
+@utils.arg('--name',
+           metavar='<name>',
+           help='Volume name (Default=None)')
+@utils.arg('--description',
+           metavar='<description>',
+           help='Volume description (Default=None)')
+@utils.arg('--volume-type',
+           metavar='<volume-type>',
+           help='Volume type (Default=None)')
+@utils.arg('--availability-zone',
+           metavar='<availability-zone>',
+           help='Availability zone for volume (Default=None)')
+@utils.arg('--metadata',
+           type=str,
+           nargs='*',
+           metavar='<key=value>',
+           help='Metadata key=value pairs (Default=None)')
+@utils.arg('--bootable',
+           action='store_true',
+           help='Specifies that the newly created volume should be'
+                ' marked as bootable')
+def do_manage(cs, args):
+    """Manage an existing volume."""
+    volume_metadata = None
+    if args.metadata is not None:
+        volume_metadata = shell_utils.extract_metadata(args)
+
+    # Build a dictionary of key/value pairs to pass to the API.
+    ref_dict = {args.id_type: args.identifier}
+
+    # The recommended way to specify an existing volume is by ID or name, and
+    # have the Cinder driver look for 'source-name' or 'source-id' elements in
+    # the ref structure.  To make things easier for the user, we have special
+    # --source-name and --source-id CLI options that add the appropriate
+    # element to the ref structure.
+    #
+    # Note how argparse converts hyphens to underscores.  We use hyphens in the
+    # dictionary so that it is consistent with what the user specified on the
+    # CLI.
+
+    if hasattr(args, 'source_name') and args.source_name is not None:
+        ref_dict['source-name'] = args.source_name
+    if hasattr(args, 'source_id') and args.source_id is not None:
+        ref_dict['source-id'] = args.source_id
+
+    volume = cs.volumes.manage(host=args.host,
+                               ref=ref_dict,
+                               name=args.name,
+                               description=args.description,
+                               volume_type=args.volume_type,
+                               availability_zone=args.availability_zone,
+                               metadata=volume_metadata,
+                               bootable=args.bootable,
+                               cluster=getattr(args, 'cluster', None))
+
+    info = {}
+    volume = cs.volumes.get(volume.id)
+    info.update(volume._info)
+    info.pop('links', None)
+    utils.print_dict(info)
 
 
 @api_versions.wraps('3.8')
