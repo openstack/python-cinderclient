@@ -231,6 +231,10 @@ class ShellTest(utils.TestCase):
         # NOTE(jdg): we default to detail currently
         self.assert_called('GET', '/volumes/detail')
 
+    def test_list_with_with_count(self):
+        self.run_command('--os-volume-api-version 3.45 list --with-count')
+        self.assert_called('GET', '/volumes/detail?with_count=True')
+
     def test_summary(self):
         self.run_command('--os-volume-api-version 3.12 summary')
         self.assert_called('GET', '/volumes/summary')
@@ -429,6 +433,11 @@ class ShellTest(utils.TestCase):
                          'backup-update --name new_name 1234')
         expected = {'backup': {'name': 'new_name'}}
         self.assert_called('PUT', '/backups/1234', body=expected)
+
+    def test_backup_list_with_with_count(self):
+        self.run_command(
+            '--os-volume-api-version 3.45 backup-list --with-count')
+        self.assert_called('GET', '/backups/detail?with_count=True')
 
     def test_backup_update_with_description(self):
         self.run_command('--os-volume-api-version 3.9 '
@@ -741,6 +750,11 @@ class ShellTest(utils.TestCase):
         self.run_command('reset-state %s 1234' % command)
         expected = {'os-reset_status': expected}
         self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    def test_snapshot_list_with_with_count(self):
+        self.run_command(
+            '--os-volume-api-version 3.45 snapshot-list --with-count')
+        self.assert_called('GET', '/snapshots/detail?with_count=True')
 
     def test_snapshot_list_with_metadata(self):
         self.run_command('--os-volume-api-version 3.22 '
