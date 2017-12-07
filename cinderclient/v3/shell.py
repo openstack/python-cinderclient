@@ -107,10 +107,21 @@ def do_list_filters(cs, args):
            help="Filter key and value pairs. Please use 'cinder list-filters' "
                 "to check enabled filters from server. Use 'key~=value' for "
                 "inexact filtering if the key supports. Default=None.")
+@utils.arg('--with-count',
+           type=bool,
+           default=False,
+           const=True,
+           nargs='?',
+           start_version='3.45',
+           metavar='<True|False>',
+           help="Show total number of backup entities. This is useful when "
+                "pagination is applied in the request.")
 def do_backup_list(cs, args):
     """Lists all backups."""
     # pylint: disable=function-redefined
 
+    show_count = True if hasattr(
+        args, 'with_count') and args.with_count else False
     search_opts = {
         'all_tenants': args.all_tenants,
         'name': args.name,
@@ -122,10 +133,18 @@ def do_backup_list(cs, args):
     if hasattr(args, 'filters') and args.filters is not None:
         search_opts.update(shell_utils.extract_filters(args.filters))
 
-    backups = cs.backups.list(search_opts=search_opts,
-                              marker=args.marker,
-                              limit=args.limit,
-                              sort=args.sort)
+    total_count = 0
+    if show_count:
+        search_opts['with_count'] = args.with_count
+        backups, total_count = cs.backups.list(search_opts=search_opts,
+                                               marker=args.marker,
+                                               limit=args.limit,
+                                               sort=args.sort)
+    else:
+        backups = cs.backups.list(search_opts=search_opts,
+                                  marker=args.marker,
+                                  limit=args.limit,
+                                  sort=args.sort)
     shell_utils.translate_volume_snapshot_keys(backups)
     columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'Object Count',
                'Container']
@@ -134,6 +153,8 @@ def do_backup_list(cs, args):
     else:
         sortby_index = 0
     utils.print_list(backups, columns, sortby_index=sortby_index)
+    if show_count:
+        print("Backup in total: %s" % total_count)
 
 
 @utils.arg('--detail',
@@ -282,13 +303,23 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
            help="Filter key and value pairs. Please use 'cinder list-filters' "
                 "to check enabled filters from server. Use 'key~=value' "
                 "for inexact filtering if the key supports. Default=None.")
+@utils.arg('--with-count',
+           type=bool,
+           default=False,
+           const=True,
+           nargs='?',
+           start_version='3.45',
+           metavar='<True|False>',
+           help="Show total number of volume entities. This is useful when "
+                "pagination is applied in the request.")
 def do_list(cs, args):
     """Lists all volumes."""
     # pylint: disable=function-redefined
     # NOTE(thingee): Backwards-compatibility with v1 args
     if args.display_name is not None:
         args.name = args.display_name
-
+    show_count = True if hasattr(
+        args, 'with_count') and args.with_count else False
     all_tenants = 1 if args.tenant else \
         int(os.environ.get("ALL_TENANTS", args.all_tenants))
     search_opts = {
@@ -323,9 +354,17 @@ def do_list(cs, args):
             'The --sort_key and --sort_dir arguments are deprecated and are '
             'not supported with --sort.')
 
-    volumes = cs.volumes.list(search_opts=search_opts, marker=args.marker,
-                              limit=args.limit, sort_key=args.sort_key,
-                              sort_dir=args.sort_dir, sort=args.sort)
+    total_count = 0
+    if show_count:
+        search_opts['with_count'] = args.with_count
+        volumes, total_count = cs.volumes.list(
+            search_opts=search_opts, marker=args.marker,
+            limit=args.limit, sort_key=args.sort_key,
+            sort_dir=args.sort_dir, sort=args.sort)
+    else:
+        volumes = cs.volumes.list(search_opts=search_opts, marker=args.marker,
+                                  limit=args.limit, sort_key=args.sort_key,
+                                  sort_dir=args.sort_dir, sort=args.sort)
     shell_utils.translate_volume_keys(volumes)
 
     # Create a list of servers to which the volume is attached
@@ -353,6 +392,8 @@ def do_list(cs, args):
         sortby_index = 0
     utils.print_list(volumes, key_list, exclude_unavailable=True,
                      sortby_index=sortby_index)
+    if show_count:
+        print("Volume in total: %s" % total_count)
 
 
 @utils.arg('entity', metavar='<entity>', nargs='+',
@@ -1813,9 +1854,20 @@ def do_message_delete(cs, args):
            help="Filter key and value pairs. Please use 'cinder list-filters' "
                 "to check enabled filters from server. Use 'key~=value' "
                 "for inexact filtering if the key supports. Default=None.")
+@utils.arg('--with-count',
+           type=bool,
+           default=False,
+           const=True,
+           nargs='?',
+           start_version='3.45',
+           metavar='<True|False>',
+           help="Show total number of snapshot entities. This is useful when "
+                "pagination is applied in the request.")
 def do_snapshot_list(cs, args):
     """Lists all snapshots."""
     # pylint: disable=function-redefined
+    show_count = True if hasattr(
+        args, 'with_count') and args.with_count else False
     all_tenants = (1 if args.tenant else
                    int(os.environ.get("ALL_TENANTS", args.all_tenants)))
 
@@ -1842,10 +1894,20 @@ def do_snapshot_list(cs, args):
     if hasattr(args, 'filters') and args.filters is not None:
         search_opts.update(shell_utils.extract_filters(args.filters))
 
-    snapshots = cs.volume_snapshots.list(search_opts=search_opts,
-                                         marker=args.marker,
-                                         limit=args.limit,
-                                         sort=args.sort)
+    total_count = 0
+    if show_count:
+        search_opts['with_count'] = args.with_count
+        snapshots, total_count = cs.volume_snapshots.list(
+            search_opts=search_opts,
+            marker=args.marker,
+            limit=args.limit,
+            sort=args.sort)
+    else:
+        snapshots = cs.volume_snapshots.list(search_opts=search_opts,
+                                             marker=args.marker,
+                                             limit=args.limit,
+                                             sort=args.sort)
+
     shell_utils.translate_volume_snapshot_keys(snapshots)
     sortby_index = None if args.sort else 0
     if cs.api_version >= api_versions.APIVersion("3.41"):
@@ -1857,6 +1919,8 @@ def do_snapshot_list(cs, args):
         utils.print_list(snapshots,
                          ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
                          sortby_index=sortby_index)
+    if show_count:
+        print("Snapshot in total: %s" % total_count)
 
 
 @api_versions.wraps('3.27')

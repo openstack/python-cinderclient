@@ -389,9 +389,12 @@ class FakeHTTPClient(base_client.HTTPClient):
     #
 
     def get_snapshots_detail(self, **kw):
+        if kw.get('with_count', False):
+            return (200, {}, {'snapshots': [
+                _stub_snapshot(),
+            ], 'count': 1})
         return (200, {}, {'snapshots': [
-            _stub_snapshot(),
-        ]})
+            _stub_snapshot()]})
 
     def get_snapshots_1234(self, **kw):
         return (200, {}, {'snapshot': _stub_snapshot(id='1234')})
@@ -464,6 +467,10 @@ class FakeHTTPClient(base_client.HTTPClient):
             ]})
 
     def get_volumes_detail(self, **kw):
+        if kw.get('with_count', False):
+            return (200, {}, {"volumes": [
+                _stub_volume(id=kw.get('id', 1234))
+            ], "count": 1})
         return (200, {}, {"volumes": [
             _stub_volume(id=kw.get('id', 1234))
         ]})
@@ -885,6 +892,12 @@ class FakeHTTPClient(base_client.HTTPClient):
         tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
         backup1 = '76a17945-3c6f-435c-975b-b5685db10b62'
         backup2 = 'd09534c6-08b8-4441-9e87-8976f3a8f699'
+        if kw.get('with_count', False):
+            return (200, {},
+                    {'backups': [
+                        _stub_backup_full(backup1, base_uri, tenant_id),
+                        _stub_backup_full(backup2, base_uri, tenant_id)],
+                    'count': 2})
         return (200, {},
                 {'backups': [
                     _stub_backup_full(backup1, base_uri, tenant_id),

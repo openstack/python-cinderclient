@@ -105,7 +105,10 @@ class Manager(common_base.HookableMixin):
             if margin <= len(items_new):
                 # If the limit is reached, return the items.
                 items = items + items_new[:margin]
-                return common_base.ListWithMeta(items, resp)
+                if "count" in body:
+                    return common_base.ListWithMeta(items, resp), body['count']
+                else:
+                    return common_base.ListWithMeta(items, resp)
             else:
                 items = items + items_new
         else:
@@ -128,7 +131,10 @@ class Manager(common_base.HookableMixin):
                 # till there is no more items.
                 items = self._list(next, response_key, obj_class, None,
                                    limit, items)
-        return common_base.ListWithMeta(items, resp)
+        if "count" in body:
+            return common_base.ListWithMeta(items, resp), body['count']
+        else:
+            return common_base.ListWithMeta(items, resp)
 
     def _build_list_url(self, resource_type, detailed=True, search_opts=None,
                         marker=None, limit=None, sort_key=None, sort_dir=None,

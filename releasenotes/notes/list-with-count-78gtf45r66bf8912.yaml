@@ -1,0 +1,3 @@
+---
+features:
+  - Added ``with_count`` option in volume, snapshot and backup's list commands since 3.45.
