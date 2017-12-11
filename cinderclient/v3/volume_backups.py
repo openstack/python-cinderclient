@@ -26,15 +26,12 @@ VolumeBackup = volume_backups.VolumeBackup
 
 
 class VolumeBackupManager(volume_backups.VolumeBackupManager):
-    @api_versions.wraps("3.9", "3.43")
+    @api_versions.wraps("3.9")
     def update(self, backup, **kwargs):
         """Update the name or description for a backup.
 
         :param backup: The :class:`Backup` to update.
         """
-        # NOTE(jdg): Placing 3.43 in versions.wraps above for clarity,
-        # but it's irrelevant as this just uses the kwargs, should we
-        # remove that?
         if not kwargs:
             return
 

@@ -955,7 +955,7 @@ def do_migrate(cs, args):
                                                        six.text_type(e)))
 
 
-@api_versions.wraps('3.9', '3.43')
+@api_versions.wraps('3.9')
 @utils.arg('backup', metavar='<backup>',
            help='Name or ID of backup to rename.')
 @utils.arg('--name', nargs='?', metavar='<name>',
