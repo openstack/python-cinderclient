@@ -62,9 +62,6 @@ class GroupSnapshotManager(base.ManagerWithFind):
                 'group_id': group_id,
                 'name': name,
                 'description': description,
-                'user_id': user_id,
-                'project_id': project_id,
-                'status': "creating",
             }
         }
 

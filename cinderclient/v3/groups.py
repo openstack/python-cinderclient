@@ -81,10 +81,7 @@ class GroupManager(base.ManagerWithFind):
                           'description': description,
                           'group_type': group_type,
                           'volume_types': volume_types.split(','),
-                          'user_id': user_id,
-                          'project_id': project_id,
                           'availability_zone': availability_zone,
-                          'status': "creating",
                           }}
 
         return self._create('/groups', body, 'group')

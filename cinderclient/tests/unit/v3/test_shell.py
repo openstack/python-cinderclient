@@ -594,9 +594,6 @@ class ShellTest(utils.TestCase):
     def test_group_create(self):
         expected = {'group': {'name': 'test-1',
                               'description': 'test-1-desc',
-                              'user_id': None,
-                              'project_id': None,
-                              'status': 'creating',
                               'group_type': 'my_group_type',
                               'volume_types': ['type1', 'type2'],
                               'availability_zone': 'zone1'}}
@@ -642,10 +639,7 @@ class ShellTest(utils.TestCase):
     def test_group_snapshot_create(self):
         expected = {'group_snapshot': {'name': 'test-1',
                                        'description': 'test-1-desc',
-                                       'user_id': None,
-                                       'project_id': None,
-                                       'group_id': '1234',
-                                       'status': 'creating'}}
+                                       'group_id': '1234'}}
         self.run_command('--os-volume-api-version 3.14 '
                          'group-snapshot-create --name test-1 '
                          '--description test-1-desc 1234')

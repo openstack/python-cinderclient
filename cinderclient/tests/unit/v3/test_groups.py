@@ -45,14 +45,11 @@ class GroupsTest(utils.TestCase):
 
     def test_create_group_with_volume_types(self):
         grp = cs.groups.create('my_group_type', 'type1,type2', name='group')
-        expected = {'group': {'status': 'creating',
-                              'description': None,
+        expected = {'group': {'description': None,
                               'availability_zone': None,
-                              'user_id': None,
                               'name': 'group',
                               'group_type': 'my_group_type',
-                              'volume_types': ['type1', 'type2'],
-                              'project_id': None}}
+                              'volume_types': ['type1', 'type2']}}
         cs.assert_called('POST', '/groups', body=expected)
         self._assert_request_id(grp)
 
