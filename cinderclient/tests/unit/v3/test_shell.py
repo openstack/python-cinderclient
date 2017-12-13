@@ -1041,13 +1041,31 @@ class ShellTest(utils.TestCase):
                 mock_time.sleep.call_args_list)
         self.assertEqual([mock.call(some_id)] * 2, poll_fn.call_args_list)
 
+    def test_backup(self):
+        self.run_command('--os-volume-api-version 3.42 backup-create '
+                         '--name 1234 1234')
+        expected = {'backup': {'volume_id': 1234,
+                               'container': None,
+                               'name': '1234',
+                               'description': None,
+                               'incremental': False,
+                               'force': False,
+                               'snapshot_id': None,
+                               }}
+        self.assert_called('POST', '/backups', body=expected)
+
     def test_backup_with_metadata(self):
-        cmd = '--os-volume-api-version 3.43 '
-        cmd += 'backup-create '
-        cmd += '--metadata foo=bar '
-        cmd += '1234'
-        self.run_command(cmd)
-        self.assert_called('POST', '/backups')
+        self.run_command('--os-volume-api-version 3.43 backup-create '
+                         '--metadata foo=bar --name 1234 1234')
+        expected = {'backup': {'volume_id': 1234,
+                               'container': None,
+                               'name': '1234',
+                               'description': None,
+                               'incremental': False,
+                               'force': False,
+                               'snapshot_id': None,
+                               'metadata': {'foo': 'bar'}, }}
+        self.assert_called('POST', '/backups', body=expected)
 
     @mock.patch("cinderclient.utils.print_list")
     def test_snapshot_list_with_userid(self, mock_print_list):

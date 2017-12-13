@@ -2220,7 +2220,7 @@ def do_service_get_log(cs, args):
     columns = ('Binary', 'Host', 'Prefix', 'Level')
     utils.print_list(log_levels, columns)
 
-@api_versions.wraps('3.43')
+
 @utils.arg('volume', metavar='<volume>',
            help='Name or ID of volume to backup.')
 @utils.arg('--container', metavar='<container>',
@@ -2258,6 +2258,7 @@ def do_service_get_log(cs, args):
            nargs='*',
            metavar='<key=value>',
            default=None,
+           start_version='3.43',
            help='Metadata key and value pairs. Default=None.')
 def do_backup_create(cs, args):
     """Creates a volume backup."""
@@ -2268,14 +2269,23 @@ def do_backup_create(cs, args):
         args.description = args.display_description
 
     volume = utils.find_volume(cs, args.volume)
-    backup = cs.backups.create(volume.id,
-                               args.container,
-                               args.name,
-                               args.description,
-                               args.incremental,
-                               args.force,
-                               args.snapshot_id,
-                               args.metadata)
+    if hasattr(args, 'metadata') and args.metadata:
+        backup = cs.backups.create(volume.id,
+                                   args.container,
+                                   args.name,
+                                   args.description,
+                                   args.incremental,
+                                   args.force,
+                                   args.snapshot_id,
+                                   shell_utils.extract_metadata(args))
+    else:
+        backup = cs.backups.create(volume.id,
+                                   args.container,
+                                   args.name,
+                                   args.description,
+                                   args.incremental,
+                                   args.force,
+                                   args.snapshot_id)
 
     info = {"volume_id": volume.id}
     info.update(backup._info)
