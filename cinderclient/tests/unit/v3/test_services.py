@@ -79,3 +79,17 @@ class ServicesTest(utils.TestCase):
                                       loaded=True)]
         # Since it will be sorted by the prefix we can compare them directly
         self.assertListEqual(expected, result)
+
+    def test_list_services_with_backend_state(self):
+        cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.49'))
+        services_list = cs.services.list()
+        cs.assert_called('GET', '/os-services')
+        self.assertEqual(3, len(services_list))
+        for service in services_list:
+            self.assertIsInstance(service, services.Service)
+            # Make sure backend_state fields from v3.49 is present and not
+            # None
+            if service.binary == 'cinder-volume':
+                self.assertIsNotNone(getattr(service, 'backend_state',
+                                             None))
+        self._assert_request_id(services_list)

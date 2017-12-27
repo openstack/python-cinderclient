@@ -1597,6 +1597,8 @@ def do_service_list(cs, args):
     # so as not to add the column when the extended ext is not enabled.
     if result and hasattr(result[0], 'disabled_reason'):
         columns.append("Disabled Reason")
+    if cs.api_version.matches('3.49'):
+        columns.extend(["Backend State"])
     utils.print_list(result, columns)
 
 

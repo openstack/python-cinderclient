@@ -145,6 +145,7 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
                 'state': 'up',
                 'updated_at': datetime(2012, 10, 29, 13, 42, 2),
                 'cluster': 'cluster1',
+                'backend_state': 'up',
             },
             {
                 'id': 2,
@@ -155,6 +156,7 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
                 'state': 'down',
                 'updated_at': datetime(2012, 9, 18, 8, 3, 38),
                 'cluster': 'cluster1',
+                'backend_state': 'down',
             },
             {
                 'id': 3,
@@ -174,6 +176,11 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         if not self.api_version.matches('3.7'):
             for svc in services:
                 del svc['cluster']
+
+        if not self.api_version.matches('3.49'):
+            for svc in services:
+                if svc['binary'] == 'cinder-volume':
+                    del svc['backend_state']
         return (200, {}, {'services': services})
 
     #
