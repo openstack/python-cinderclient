@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    The ``--allow-multiattach`` flag on volume creation has now been marked
+    deprecated and will be removed in a future release.
