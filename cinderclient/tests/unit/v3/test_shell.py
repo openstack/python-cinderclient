@@ -1194,7 +1194,7 @@ class ShellTest(utils.TestCase):
                                'metadata': {'k1': 'v1', 'k2': 'v2'},
                                'bootable': bootable}}
         if cluster:
-            expected['cluster'] = cluster
+            expected['volume']['cluster'] = cluster
         self.assert_called_anytime('POST', '/os-volume-manage', body=expected)
 
     def test_volume_manage_before_3_16(self):

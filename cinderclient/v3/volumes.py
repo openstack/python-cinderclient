@@ -258,7 +258,7 @@ class VolumeManager(volumes.VolumeManager):
                            'bootable': bootable
                            }}
         if self.api_version.matches('3.16') and cluster:
-            body['cluster'] = cluster
+            body['volume']['cluster'] = cluster
         return self._create('/os-volume-manage', body, 'volume')
 
     @api_versions.wraps("3.8")

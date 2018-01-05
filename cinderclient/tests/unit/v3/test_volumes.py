@@ -104,6 +104,16 @@ class VolumesTest(utils.TestCase):
         cs.volumes.summary(all_tenants=all_tenants)
         cs.assert_called('GET', url)
 
+    def test_volume_manage_cluster(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.16'))
+        vol = cs.volumes.manage(None, {'k': 'v'}, cluster='cluster1')
+        expected = {'host': None, 'name': None, 'availability_zone': None,
+                    'description': None, 'metadata': None, 'ref': {'k': 'v'},
+                    'volume_type': None, 'bootable': False,
+                    'cluster': 'cluster1'}
+        cs.assert_called('POST', '/os-volume-manage', {'volume': expected})
+        self._assert_request_id(vol)
+
     def test_volume_list_manageable(self):
         cs = fakes.FakeClient(api_versions.APIVersion('3.8'))
         cs.volumes.list_manageable('host1', detailed=False)
