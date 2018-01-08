@@ -15,13 +15,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient import api_versions
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v2 import fakes
 from cinderclient.v2.volumes import Volume
 
 cs = fakes.FakeClient()
-cs3 = fakes.FakeClient(api_versions.APIVersion('3.15'))
 
 
 class VolumesTest(utils.TestCase):
@@ -213,23 +211,23 @@ class VolumesTest(utils.TestCase):
         self._assert_request_id(vol)
 
     def test_migrate(self):
-        v = cs3.volumes.get('1234')
+        v = cs.volumes.get('1234')
         self._assert_request_id(v)
-        vol = cs3.volumes.migrate_volume(v, 'dest', False, False)
-        cs3.assert_called('POST', '/volumes/1234/action',
-                          {'os-migrate_volume': {'host': 'dest',
-                                                 'force_host_copy': False,
+        vol = cs.volumes.migrate_volume(v, 'dest', False, False)
+        cs.assert_called('POST', '/volumes/1234/action',
+                         {'os-migrate_volume': {'host': 'dest',
+                                                'force_host_copy': False,
                                                 'lock_volume': False}})
         self._assert_request_id(vol)
 
     def test_migrate_with_lock_volume(self):
-        v = cs3.volumes.get('1234')
+        v = cs.volumes.get('1234')
         self._assert_request_id(v)
-        vol = cs3.volumes.migrate_volume(v, 'dest', False, True)
-        cs3.assert_called('POST', '/volumes/1234/action',
-                          {'os-migrate_volume': {'host': 'dest',
-                                                 'force_host_copy': False,
-                                                 'lock_volume': True}})
+        vol = cs.volumes.migrate_volume(v, 'dest', False, True)
+        cs.assert_called('POST', '/volumes/1234/action',
+                         {'os-migrate_volume': {'host': 'dest',
+                                                'force_host_copy': False,
+                                                'lock_volume': True}})
         self._assert_request_id(vol)
 
     def test_metadata_update_all(self):
@@ -262,19 +260,19 @@ class VolumesTest(utils.TestCase):
         self._assert_request_id(vol)
 
     def test_volume_manage(self):
-        vol = cs3.volumes.manage('host1', {'k': 'v'})
+        vol = cs.volumes.manage('host1', {'k': 'v'})
         expected = {'host': 'host1', 'name': None, 'availability_zone': None,
                     'description': None, 'metadata': None, 'ref': {'k': 'v'},
                     'volume_type': None, 'bootable': False}
-        cs3.assert_called('POST', '/os-volume-manage', {'volume': expected})
+        cs.assert_called('POST', '/os-volume-manage', {'volume': expected})
         self._assert_request_id(vol)
 
     def test_volume_manage_bootable(self):
-        vol = cs3.volumes.manage('host1', {'k': 'v'}, bootable=True)
+        vol = cs.volumes.manage('host1', {'k': 'v'}, bootable=True)
         expected = {'host': 'host1', 'name': None, 'availability_zone': None,
                     'description': None, 'metadata': None, 'ref': {'k': 'v'},
                     'volume_type': None, 'bootable': True}
-        cs3.assert_called('POST', '/os-volume-manage', {'volume': expected})
+        cs.assert_called('POST', '/os-volume-manage', {'volume': expected})
         self._assert_request_id(vol)
 
     def test_volume_list_manageable(self):
