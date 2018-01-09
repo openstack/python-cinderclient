@@ -19,6 +19,7 @@ import unittest
 import fixtures
 import keystoneauth1.exceptions as ks_exc
 from keystoneauth1.exceptions import DiscoveryFailure
+from keystoneauth1.identity.generic.password import Password as ks_password
 from keystoneauth1 import session
 import mock
 import requests_mock
@@ -91,6 +92,21 @@ class ShellTest(utils.TestCase):
         _shell = shell.OpenStackCinderShell()
         args, __ = _shell.get_base_parser().parse_known_args([])
         self.assertEqual('noauth', args.os_auth_type)
+
+    @mock.patch.object(cinderclient.shell.OpenStackCinderShell,
+                       '_get_keystone_session')
+    @mock.patch.object(cinderclient.client.SessionClient, 'authenticate',
+                       side_effect=RuntimeError())
+    def test_password_auth_type(self, mock_authenticate,
+                                mock_get_session):
+        self.make_env(include={'OS_AUTH_TYPE': 'password'})
+        _shell = shell.OpenStackCinderShell()
+
+        # We crash the command after Client instantiation because this test
+        # focuses only keystoneauth1 indentity cli opts parsing.
+        self.assertRaises(RuntimeError, _shell.main, ['list'])
+        self.assertIsInstance(_shell.cs.client.session.auth,
+                              ks_password)
 
     def test_help_unknown_command(self):
         self.assertRaises(exceptions.CommandError, self.shell, 'help foofoo')
