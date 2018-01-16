@@ -1241,3 +1241,23 @@ class ShellTest(utils.TestCase):
                           '--name foo --description bar --bootable '
                           '--volume-type baz --availability-zone az '
                           '--metadata k1=v1 k2=v2')
+
+    def test_worker_cleanup_before_3_24(self):
+        self.assertRaises(SystemExit,
+                          self.run_command,
+                          'work-cleanup fakehost')
+
+    def test_worker_cleanup(self):
+        self.run_command('--os-volume-api-version 3.24 '
+                         'work-cleanup --cluster clustername --host hostname '
+                         '--binary binaryname --is-up false --disabled true '
+                         '--resource-id uuid --resource-type Volume')
+        expected = {'cluster_name': 'clustername',
+                    'host': 'hostname',
+                    'binary': 'binaryname',
+                    'is_up': 'false',
+                    'disabled': 'true',
+                    'resource_id': 'uuid',
+                    'resource_type': 'Volume'}
+
+        self.assert_called('POST', '/workers/cleanup', body=expected)

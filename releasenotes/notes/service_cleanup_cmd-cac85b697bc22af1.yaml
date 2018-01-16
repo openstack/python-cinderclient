@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    New ``work-cleanup`` command to trigger server cleanups by other nodes
+    within a cluster on Active-Active deployments on microversion 3.24 and
+    higher.

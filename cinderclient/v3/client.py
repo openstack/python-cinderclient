@@ -42,6 +42,7 @@ from cinderclient.v3 import volume_transfers
 from cinderclient.v3 import volume_type_access
 from cinderclient.v3 import volume_types
 from cinderclient.v3 import volumes
+from cinderclient.v3 import workers
 
 
 class Client(object):
@@ -91,6 +92,7 @@ class Client(object):
         self.transfers = volume_transfers.VolumeTransferManager(self)
         self.services = services.ServiceManager(self)
         self.clusters = clusters.ClusterManager(self)
+        self.workers = workers.WorkerManager(self)
         self.consistencygroups = consistencygroups.\
             ConsistencygroupManager(self)
         self.groups = groups.GroupManager(self)
