@@ -261,11 +261,12 @@ class VolumeManager(volumes.VolumeManager):
             body['volume']['cluster'] = cluster
         return self._create('/os-volume-manage', body, 'volume')
 
-    @api_versions.wraps("3.8")
+    @api_versions.wraps('3.8')
     def list_manageable(self, host, detailed=True, marker=None, limit=None,
-                        offset=None, sort=None):
+                        offset=None, sort=None, cluster=None):
+        search_opts = {'cluster': cluster} if cluster else {'host': host}
         url = self._build_list_url("manageable_volumes", detailed=detailed,
-                                   search_opts={'host': host}, marker=marker,
+                                   search_opts=search_opts, marker=marker,
                                    limit=limit, offset=offset, sort=sort)
         return self._list(url, "manageable-volumes")
 
