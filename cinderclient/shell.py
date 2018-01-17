@@ -138,23 +138,6 @@ class OpenStackCinderShell(object):
                                               default=False),
                             help=_('Shows debugging output.'))
 
-        parser.add_argument('--os-auth-system',
-                            metavar='<os-auth-system>',
-                            dest='os_auth_type',
-                            default=(utils.env('OS_AUTH_TYPE') or
-                                     utils.env('OS_AUTH_SYSTEM')),
-                            help=_('DEPRECATED! Use --os-auth-type. '
-                                   'Defaults to env[OS_AUTH_SYSTEM].'))
-        parser.add_argument('--os_auth_system',
-                            help=argparse.SUPPRESS)
-        parser.add_argument('--os-auth-type',
-                            metavar='<os-auth-type>',
-                            dest='os_auth_type',
-                            default=(utils.env('OS_AUTH_TYPE') or
-                                     utils.env('OS_AUTH_SYSTEM')),
-                            help=_('Defaults to env[OS_AUTH_TYPE].'))
-        parser.add_argument('--os_auth_type',
-                            help=argparse.SUPPRESS)
         parser.add_argument('--service-type',
                             metavar='<service-type>',
                             help=_('Service type. '
@@ -255,11 +238,16 @@ class OpenStackCinderShell(object):
         return parser
 
     def _append_global_identity_args(self, parser):
-        # FIXME(bklei): these are global identity (Keystone) arguments which
-        # should be consistent and shared by all service clients. Therefore,
-        # they should be provided by python-keystoneclient. We will need to
-        # refactor this code once this functionality is available in
-        # python-keystoneclient.
+        loading.register_session_argparse_arguments(parser)
+
+        # Use "password" auth plugin as default and keep the explicit
+        # "--os-token" arguments below for backward compatibility.
+        default_auth_plugin = 'password'
+
+        # Passing [] to loading.register_auth_argparse_arguments to avoid
+        # the auth_type being overriden by the command line.
+        loading.register_auth_argparse_arguments(
+            parser, [], default=default_auth_plugin)
 
         parser.add_argument(
             '--os-auth-strategy', metavar='<auth-strategy>',
@@ -271,128 +259,88 @@ class OpenStackCinderShell(object):
             '--os_auth_strategy',
             help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-username',
-                            metavar='<auth-user-name>',
-                            default=utils.env('OS_USERNAME',
-                                              'CINDER_USERNAME'),
-                            help=_('OpenStack user name. '
-                            'Default=env[OS_USERNAME].'))
+        # Change os_auth_type default value defined by
+        # register_auth_argparse_arguments to be backward compatible
+        # with OS_AUTH_SYSTEM.
+        env_plugin = utils.env('OS_AUTH_TYPE',
+                               'OS_AUTH_PLUGIN',
+                               'OS_AUTH_SYSTEM')
+        parser.set_defaults(os_auth_type=env_plugin)
+        parser.add_argument('--os_auth_type',
+                            help=argparse.SUPPRESS)
+
+        parser.add_argument('--os-auth-system',
+                            metavar='<os-auth-system>',
+                            dest='os_auth_type',
+                            default=env_plugin,
+                            help=_('DEPRECATED! Use --os-auth-type. '
+                                   'Defaults to env[OS_AUTH_SYSTEM].'))
+        parser.add_argument('--os_auth_system',
+                            help=argparse.SUPPRESS)
+
+        parser.set_defaults(os_username=utils.env('OS_USERNAME',
+                                                  'CINDER_USERNAME'))
         parser.add_argument('--os_username',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-password',
-                            metavar='<auth-password>',
-                            default=utils.env('OS_PASSWORD',
-                                              'CINDER_PASSWORD'),
-                            help=_('Password for OpenStack user. '
-                            'Default=env[OS_PASSWORD].'))
+        parser.set_defaults(os_password=utils.env('OS_PASSWORD',
+                                                  'CINDER_PASSWORD'))
         parser.add_argument('--os_password',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-tenant-name',
-                            metavar='<auth-tenant-name>',
-                            default=utils.env('OS_TENANT_NAME',
-                                              'OS_PROJECT_NAME',
-                                              'CINDER_PROJECT_ID'),
-                            help=_('Tenant name. '
-                            'Default=env[OS_TENANT_NAME].'))
+        # tenant_name is deprecated by project_name in keystoneauth
+        parser.set_defaults(os_project_name=utils.env('OS_PROJECT_NAME',
+                                                      'OS_TENANT_NAME',
+                                                      'CINDER_PROJECT_ID'))
         parser.add_argument('--os_tenant_name',
+                            dest='os_project_name',
                             help=argparse.SUPPRESS)
-
-        parser.add_argument('--os-tenant-id',
-                            metavar='<auth-tenant-id>',
-                            default=utils.env('OS_TENANT_ID',
-                                              'OS_PROJECT_ID',
-                                              'CINDER_TENANT_ID'),
-                            help=_('ID for the tenant. '
-                            'Default=env[OS_TENANT_ID].'))
-        parser.add_argument('--os_tenant_id',
-                            help=argparse.SUPPRESS)
-
-        parser.add_argument('--os-auth-url',
-                            metavar='<auth-url>',
-                            default=utils.env('OS_AUTH_URL',
-                                              'CINDER_URL'),
-                            help=_('URL for the authentication service. '
-                            'Default=env[OS_AUTH_URL].'))
-        parser.add_argument('--os_auth_url',
-                            help=argparse.SUPPRESS)
-
-        parser.add_argument(
-            '--os-user-id', metavar='<auth-user-id>',
-            default=utils.env('OS_USER_ID'),
-            help=_('Authentication user ID (Env: OS_USER_ID).'))
-
-        parser.add_argument(
-            '--os_user_id',
-            help=argparse.SUPPRESS)
-
-        parser.add_argument(
-            '--os-user-domain-id',
-            metavar='<auth-user-domain-id>',
-            default=utils.env('OS_USER_DOMAIN_ID'),
-            help=_('OpenStack user domain ID. '
-            'Defaults to env[OS_USER_DOMAIN_ID].'))
-
-        parser.add_argument(
-            '--os_user_domain_id',
-            help=argparse.SUPPRESS)
-
-        parser.add_argument(
-            '--os-user-domain-name',
-            metavar='<auth-user-domain-name>',
-            default=utils.env('OS_USER_DOMAIN_NAME'),
-            help=_('OpenStack user domain name. '
-                 'Defaults to env[OS_USER_DOMAIN_NAME].'))
-
-        parser.add_argument(
-            '--os_user_domain_name',
-            help=argparse.SUPPRESS)
-
-        parser.add_argument(
-            '--os-project-id',
-            metavar='<auth-project-id>',
-            default=utils.env('OS_PROJECT_ID'),
-            help=_('Another way to specify tenant ID. '
-            'This option is mutually exclusive with '
-            ' --os-tenant-id. '
-            'Defaults to env[OS_PROJECT_ID].'))
-
-        parser.add_argument(
-            '--os_project_id',
-            help=argparse.SUPPRESS)
-
-        parser.add_argument(
-            '--os-project-name',
-            metavar='<auth-project-name>',
-            default=utils.env('OS_PROJECT_NAME'),
-            help=_('Another way to specify tenant name. '
-                 'This option is mutually exclusive with '
-                 ' --os-tenant-name. '
-                 'Defaults to env[OS_PROJECT_NAME].'))
-
         parser.add_argument(
             '--os_project_name',
             help=argparse.SUPPRESS)
 
+        # tenant_id is deprecated by project_id in keystoneauth
+        parser.set_defaults(os_project_id=utils.env('OS_PROJECT_ID',
+                                                    'OS_TENANT_ID',
+                                                    'CINDER_TENANT_ID'))
+        parser.add_argument('--os_tenant_id',
+                            dest='os_project_id',
+                            help=argparse.SUPPRESS)
         parser.add_argument(
-            '--os-project-domain-id',
-            metavar='<auth-project-domain-id>',
-            default=utils.env('OS_PROJECT_DOMAIN_ID'),
-            help=_('Defaults to env[OS_PROJECT_DOMAIN_ID].'))
+            '--os_project_id',
+            help=argparse.SUPPRESS)
 
+        parser.set_defaults(os_auth_url=utils.env('OS_AUTH_URL',
+                                                  'CINDER_URL'))
+        parser.add_argument('--os_auth_url',
+                            help=argparse.SUPPRESS)
+
+        parser.set_defaults(os_user_id=utils.env('OS_USER_ID'))
         parser.add_argument(
-            '--os-project-domain-name',
-            metavar='<auth-project-domain-name>',
-            default=utils.env('OS_PROJECT_DOMAIN_NAME'),
-            help=_('Defaults to env[OS_PROJECT_DOMAIN_NAME].'))
+            '--os_user_id',
+            help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-region-name',
-                            metavar='<region-name>',
-                            default=utils.env('OS_REGION_NAME',
-                                              'CINDER_REGION_NAME'),
-                            help=_('Region name. '
-                            'Default=env[OS_REGION_NAME].'))
+        parser.set_defaults(
+            os_user_domain_id=utils.env('OS_USER_DOMAIN_ID'))
+        parser.add_argument(
+            '--os_user_domain_id',
+            help=argparse.SUPPRESS)
+
+        parser.set_defaults(
+            os_user_domain_name=utils.env('OS_USER_DOMAIN_NAME'))
+        parser.add_argument(
+            '--os_user_domain_name',
+            help=argparse.SUPPRESS)
+
+        parser.set_defaults(
+            os_project_domain_id=utils.env('OS_PROJECT_DOMAIN_ID'))
+
+        parser.set_defaults(
+            os_project_domain_name=utils.env('OS_PROJECT_DOMAIN_NAME'))
+
+        parser.set_defaults(
+            os_region_name=utils.env('OS_REGION_NAME',
+                                     'CINDER_REGION_NAME'))
         parser.add_argument('--os_region_name',
                             help=argparse.SUPPRESS)
 
@@ -412,8 +360,6 @@ class OpenStackCinderShell(object):
             '--os_url',
             help=argparse.SUPPRESS)
 
-        # Register the CLI arguments that have moved to the session object.
-        loading.register_session_argparse_arguments(parser)
         parser.set_defaults(insecure=utils.env('CINDERCLIENT_INSECURE',
                                                default=False))
 
@@ -646,13 +592,13 @@ class OpenStackCinderShell(object):
             self.do_bash_completion(args)
             return 0
 
-        (os_username, os_password, os_tenant_name, os_auth_url,
-         os_region_name, os_tenant_id, endpoint_type,
+        (os_username, os_password, os_project_name, os_auth_url,
+         os_region_name, os_project_id, endpoint_type,
          service_type, service_name, volume_service_name, os_endpoint,
          cacert, os_auth_type) = (
              args.os_username, args.os_password,
-             args.os_tenant_name, args.os_auth_url,
-             args.os_region_name, args.os_tenant_id,
+             args.os_project_name, args.os_auth_url,
+             args.os_region_name, args.os_project_id,
              args.os_endpoint_type,
              args.service_type, args.service_name,
              args.volume_service_name,
@@ -675,12 +621,11 @@ class OpenStackCinderShell(object):
         # for os_username or os_password but for compatibility it is not.
 
         # V3 stuff
-        project_info_provided = ((self.options.os_tenant_name or
-                                  self.options.os_tenant_id) or
-                                 (self.options.os_project_name and
+        project_info_provided = ((self.options.os_project_name and
                                   (self.options.os_project_domain_name or
                                    self.options.os_project_domain_id)) or
-                                 self.options.os_project_id)
+                                 self.options.os_project_id or
+                                 self.options.os_project_name)
 
         # NOTE(e0ne): if auth_session exists it means auth plugin created
         # session and we don't need to check for password and other
@@ -752,9 +697,9 @@ class OpenStackCinderShell(object):
 
         self.cs = client.Client(
             api_version, os_username,
-            os_password, os_tenant_name, os_auth_url,
+            os_password, os_project_name, os_auth_url,
             region_name=os_region_name,
-            tenant_id=os_tenant_id,
+            tenant_id=os_project_id,
             endpoint_type=endpoint_type,
             extensions=self.extensions,
             service_type=service_type,
@@ -852,9 +797,8 @@ class OpenStackCinderShell(object):
 
         username = self.options.os_username
         password = self.options.os_password
-        tenant_id = self.options.os_tenant_id or self.options.os_project_id
-        tenant_name = (self.options.os_tenant_name or
-                       self.options.os_project_name)
+        tenant_id = self.options.os_project_id
+        tenant_name = self.options.os_project_name
 
         return v2_auth.Password(
             v2_auth_url,
@@ -870,9 +814,8 @@ class OpenStackCinderShell(object):
         user_domain_name = self.options.os_user_domain_name
         user_domain_id = self.options.os_user_domain_id
         password = self.options.os_password
-        project_id = self.options.os_project_id or self.options.os_tenant_id
-        project_name = (self.options.os_project_name or
-                        self.options.os_tenant_name)
+        project_id = self.options.os_project_id
+        project_name = self.options.os_project_name
         project_domain_name = self.options.os_project_domain_name
         project_domain_id = self.options.os_project_domain_id
 
