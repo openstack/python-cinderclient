@@ -63,6 +63,7 @@ class GroupManager(base.ManagerWithFind):
     """Manage :class:`Group` resources."""
     resource_class = Group
 
+    @api_versions.wraps('3.13')
     def create(self, group_type, volume_types, name=None,
                description=None, user_id=None,
                project_id=None, availability_zone=None):
@@ -96,6 +97,7 @@ class GroupManager(base.ManagerWithFind):
         body = {'status': state} if state else {}
         return self._action('reset_status', group, body)
 
+    @api_versions.wraps('3.14')
     def create_from_src(self, group_snapshot_id, source_group_id,
                         name=None, description=None, user_id=None,
                         project_id=None):
@@ -123,6 +125,7 @@ class GroupManager(base.ManagerWithFind):
             "/groups/action", body=body)
         return common_base.DictWithMeta(body['group'], resp)
 
+    @api_versions.wraps('3.13')
     def get(self, group_id, **kwargs):
         """Get a group.
 
@@ -139,6 +142,7 @@ class GroupManager(base.ManagerWithFind):
         return self._get("/groups/%s" % group_id + query_string,
                          "group")
 
+    @api_versions.wraps('3.13')
     def list(self, detailed=True, search_opts=None, list_volume=False):
         """Lists all groups.
 
@@ -157,6 +161,7 @@ class GroupManager(base.ManagerWithFind):
         return self._list("/groups%s%s" % (detail, query_string),
                           "groups")
 
+    @api_versions.wraps('3.13')
     def delete(self, group, delete_volumes=False):
         """Delete a group.
 
@@ -169,6 +174,7 @@ class GroupManager(base.ManagerWithFind):
         resp, body = self.api.client.post(url, body=body)
         return common_base.TupleWithMeta((resp, body), resp)
 
+    @api_versions.wraps('3.13')
     def update(self, group, **kwargs):
         """Update the name or description for a group.
 
@@ -197,6 +203,7 @@ class GroupManager(base.ManagerWithFind):
         resp, body = self.api.client.post(url, body=body)
         return common_base.TupleWithMeta((resp, body), resp)
 
+    @api_versions.wraps('3.38')
     def enable_replication(self, group):
         """Enables replication for a group.
 
@@ -208,6 +215,7 @@ class GroupManager(base.ManagerWithFind):
         resp, body = self.api.client.post(url, body=body)
         return common_base.TupleWithMeta((resp, body), resp)
 
+    @api_versions.wraps('3.38')
     def disable_replication(self, group):
         """disables replication for a group.
 
@@ -219,6 +227,7 @@ class GroupManager(base.ManagerWithFind):
         resp, body = self.api.client.post(url, body=body)
         return common_base.TupleWithMeta((resp, body), resp)
 
+    @api_versions.wraps('3.38')
     def failover_replication(self, group, allow_attached_volume=False,
                              secondary_backend_id=None):
         """fails over replication for a group.
@@ -238,6 +247,7 @@ class GroupManager(base.ManagerWithFind):
         resp, body = self.api.client.post(url, body=body)
         return common_base.TupleWithMeta((resp, body), resp)
 
+    @api_versions.wraps('3.38')
     def list_replication_targets(self, group):
         """List replication targets for a group.
 
