@@ -1278,9 +1278,9 @@ class FakeHTTPClient(base_client.HTTPClient):
                 'storage_protocol': 'iSCSI',
                 'properties': {
                     'compression': {
-                        'title': 'Compression',
-                        'description': 'Enables compression.',
-                        'type': 'boolean'},
+                        u'title': u'Compression',
+                        u'description': u'Enables compression.',
+                        u'type': u'boolean'},
                 }
             }
         )
