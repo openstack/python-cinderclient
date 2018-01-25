@@ -24,7 +24,6 @@
 
 
 - project:
-    name: openstack/python-cinderclient
     check:
       jobs:
         - cinderclient-dsvm-functional
