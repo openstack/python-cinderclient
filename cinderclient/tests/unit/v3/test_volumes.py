@@ -26,9 +26,6 @@ from cinderclient.v3 import volumes
 
 from six.moves.urllib import parse
 
-cs = fakes.FakeClient()
-cs3 = fakes.FakeClient(api_versions.APIVersion('3.16'))
-
 
 @ddt.ddt
 class VolumesTest(utils.TestCase):
@@ -74,6 +71,7 @@ class VolumesTest(utils.TestCase):
                               fake_volume.revert_to_snapshot, fake_snapshot)
 
     def test_create_volume(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.13'))
         vol = cs.volumes.create(1, group_id='1234', volume_type='5678')
         expected = {'volume': {'status': 'creating',
                                'description': None,
@@ -159,32 +157,35 @@ class VolumesTest(utils.TestCase):
         self._assert_request_id(vol)
 
     def test_migrate_host(self):
-        v = cs3.volumes.get('1234')
+        cs = fakes.FakeClient(api_versions.APIVersion('3.0'))
+        v = cs.volumes.get('1234')
         self._assert_request_id(v)
-        vol = cs3.volumes.migrate_volume(v, 'host_dest', False, False)
-        cs3.assert_called('POST', '/volumes/1234/action',
-                          {'os-migrate_volume': {'host': 'host_dest',
-                                                 'force_host_copy': False,
-                                                 'lock_volume': False}})
+        vol = cs.volumes.migrate_volume(v, 'host_dest', False, False)
+        cs.assert_called('POST', '/volumes/1234/action',
+                         {'os-migrate_volume': {'host': 'host_dest',
+                                                'force_host_copy': False,
+                                                'lock_volume': False}})
         self._assert_request_id(vol)
 
     def test_migrate_with_lock_volume(self):
-        v = cs3.volumes.get('1234')
+        cs = fakes.FakeClient(api_versions.APIVersion('3.0'))
+        v = cs.volumes.get('1234')
         self._assert_request_id(v)
-        vol = cs3.volumes.migrate_volume(v, 'dest', False, True)
-        cs3.assert_called('POST', '/volumes/1234/action',
-                          {'os-migrate_volume': {'host': 'dest',
-                                                 'force_host_copy': False,
-                                                 'lock_volume': True}})
+        vol = cs.volumes.migrate_volume(v, 'dest', False, True)
+        cs.assert_called('POST', '/volumes/1234/action',
+                         {'os-migrate_volume': {'host': 'dest',
+                                                'force_host_copy': False,
+                                                'lock_volume': True}})
         self._assert_request_id(vol)
 
     def test_migrate_cluster(self):
-        v = cs3.volumes.get('fake')
+        cs = fakes.FakeClient(api_versions.APIVersion('3.16'))
+        v = cs.volumes.get('fake')
         self._assert_request_id(v)
-        vol = cs3.volumes.migrate_volume(v, 'host_dest', False, False,
-                                         'cluster_dest')
-        cs3.assert_called('POST', '/volumes/fake/action',
-                          {'os-migrate_volume': {'cluster': 'cluster_dest',
-                                                 'force_host_copy': False,
-                                                 'lock_volume': False}})
+        vol = cs.volumes.migrate_volume(v, 'host_dest', False, False,
+                                        'cluster_dest')
+        cs.assert_called('POST', '/volumes/fake/action',
+                         {'os-migrate_volume': {'cluster': 'cluster_dest',
+                                                'force_host_copy': False,
+                                                'lock_volume': False}})
         self._assert_request_id(vol)

@@ -13,16 +13,16 @@
 import ddt
 from six.moves.urllib import parse
 
+from cinderclient import api_versions
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
-
-cs = fakes.FakeClient()
 
 
 @ddt.ddt
 class MessagesTest(utils.TestCase):
 
     def test_list_messages(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.3'))
         cs.messages.list()
         cs.assert_called('GET', '/messages')
 
@@ -30,26 +30,31 @@ class MessagesTest(utils.TestCase):
               'resource_uuid', 'message_level', 'guaranteed_until',
               'request_id')
     def test_list_messages_with_sort(self, sort_string):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.5'))
         cs.messages.list(sort=sort_string)
         cs.assert_called('GET', '/messages?sort=%s' % parse.quote(sort_string))
 
     @ddt.data('id', 'resource_type', 'event_id', 'resource_uuid',
               'message_level', 'guaranteed_until', 'request_id')
     def test_list_messages_with_filters(self, filter_string):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.5'))
         cs.messages.list(search_opts={filter_string: 'value'})
         cs.assert_called('GET', '/messages?%s=value' % parse.quote(
             filter_string))
 
     @ddt.data('fake', 'fake:asc', 'fake:desc')
     def test_list_messages_with_invalid_sort(self, sort_string):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.5'))
         self.assertRaises(ValueError, cs.messages.list, sort=sort_string)
 
     def test_get_messages(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.3'))
         fake_id = '1234'
         cs.messages.get(fake_id)
         cs.assert_called('GET', '/messages/%s' % fake_id)
 
     def test_delete_messages(self):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.3'))
         fake_id = '1234'
         cs.messages.delete(fake_id)
         cs.assert_called('DELETE', '/messages/%s' % fake_id)

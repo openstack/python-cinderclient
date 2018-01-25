@@ -16,11 +16,11 @@
 
 import ddt
 
+from cinderclient import api_versions
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 
-
-cs = fakes.FakeClient()
+cs = fakes.FakeClient(api_versions.APIVersion('3.14'))
 
 
 @ddt.ddt
