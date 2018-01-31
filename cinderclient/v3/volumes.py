@@ -151,6 +151,7 @@ class VolumeManager(volumes.VolumeManager):
         return self._action('revert', volume,
                             info={'snapshot_id': base.getid(snapshot.id)})
 
+    @api_versions.wraps('3.12')
     def summary(self, all_tenants):
         """Get volumes summary."""
         url = "/volumes/summary"

@@ -16,6 +16,7 @@
 """
 Interface to workers API
 """
+from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
 from cinderclient import base
 
@@ -33,6 +34,7 @@ class Service(base.Resource):
 class WorkerManager(base.Manager):
     base_url = '/workers'
 
+    @api_versions.wraps('3.24')
     def clean(self, **filters):
         url = self.base_url + '/cleanup'
         resp, body = self.api.client.post(url, body=filters)
