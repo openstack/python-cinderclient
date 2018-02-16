@@ -1658,8 +1658,8 @@ def do_encryption_type_show(cs, args):
 @utils.arg('provider',
            metavar='<provider>',
            type=str,
-           help='The class that provides encryption support. '
-                'For example, LuksEncryptor.')
+           help='The encryption provider format. '
+                'For example, "luks" or "plain."')
 @utils.arg('--cipher',
            metavar='<cipher>',
            type=str,
@@ -1717,7 +1717,7 @@ def do_encryption_type_create(cs, args):
            type=str,
            required=False,
            default=argparse.SUPPRESS,
-           help="Class providing encryption support (e.g. LuksEncryptor)")
+           help="Encryption provider format (e.g. 'luks' or 'plain').")
 @utils.arg('--cipher',
            metavar='<cipher>',
            type=str,
