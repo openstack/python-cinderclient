@@ -4341,10 +4341,17 @@ cinder type-list
 
 .. code-block:: console
 
-   usage: cinder type-list
+   usage: cinder type-list [--filters <key=value> [<key=value> ...]]
 
 Lists available 'volume types'. (Only admin and tenant users will see private
 types)
+
+**Optional arguments:**
+
+``--filters [<key=value> [<key=value> ...]]``
+  Filter key and value pairs. Please use 'cinder list-filters'
+  to check enabled filters from server, Default=None.
+  (Supported by API version 3.52 and later)
 
 .. _cinder_type-show:
 

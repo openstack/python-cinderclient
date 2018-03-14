@@ -15,6 +15,7 @@
 
 
 """Volume Type interface."""
+from six.moves.urllib import parse
 
 from cinderclient.apiclient import base as common_base
 from cinderclient import base
@@ -86,10 +87,13 @@ class VolumeTypeManager(base.ManagerWithFind):
 
         :rtype: list of :class:`VolumeType`.
         """
-        query_string = ''
-        if not is_public:
-            query_string = '?is_public=%s' % is_public
-        return self._list("/types%s" % (query_string), "volume_types")
+        if not search_opts:
+            search_opts = dict()
+        if is_public:
+            search_opts.update({"is_public": is_public})
+        query_string = "?%s" % parse.urlencode(
+            search_opts) if search_opts else ''
+        return self._list("/types%s" % query_string, "volume_types")
 
     def get(self, volume_type):
         """Get a specific volume type.

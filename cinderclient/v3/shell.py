@@ -52,6 +52,27 @@ def do_list_filters(cs, args):
         shell_utils.print_resource_filter_list(filters)
 
 
+@utils.arg('--filters',
+           type=six.text_type,
+           nargs='*',
+           start_version='3.52',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs. Admin only.")
+def do_type_list(cs, args):
+    """Lists available 'volume types'.
+
+    (Only admin and tenant users will see private types)
+    """
+    # pylint: disable=function-redefined
+    search_opts = {}
+    # Update search option with `filters`
+    if hasattr(args, 'filters') and args.filters is not None:
+        search_opts.update(shell_utils.extract_filters(args.filters))
+    vtypes = cs.volume_types.list(search_opts=search_opts)
+    shell_utils.print_volume_type_list(vtypes)
+
+
 @utils.arg('--all-tenants',
            metavar='<all_tenants>',
            nargs='?',

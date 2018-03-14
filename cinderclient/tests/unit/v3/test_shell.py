@@ -244,6 +244,20 @@ class ShellTest(utils.TestCase):
                           self.run_command,
                           'list --group_id fake_id')
 
+    def test_type_list_with_filters_invalid(self):
+        self.assertRaises(exceptions.UnsupportedAttribute,
+                          self.run_command,
+                          '--os-volume-api-version 3.51 type-list '
+                          '--filters key=value')
+
+    def test_type_list_with_filters(self):
+        self.run_command('--os-volume-api-version 3.52 type-list '
+                         '--filters extra_specs={key:value}')
+        self.assert_called(
+            'GET', '/types?%s' % parse.urlencode(
+                {'extra_specs':
+                    {six.text_type('key'): six.text_type('value')}}))
+
     @ddt.data("3.10", "3.11")
     def test_list_with_group_id_after_3_10(self, version):
         command = ('--os-volume-api-version %s list --group_id fake_id' %
