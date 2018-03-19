@@ -1516,6 +1516,7 @@ def do_group_list_replication_targets(cs, args):
         utils.print_list(rep_targets, [key for key in rep_targets[0].keys()])
 
 
+@api_versions.wraps('3.14')
 @utils.arg('--all-tenants',
            dest='all_tenants',
            metavar='<0|1>',
