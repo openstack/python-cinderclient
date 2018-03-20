@@ -2381,25 +2381,26 @@ def do_get_capabilities(cs, args):
 
 @utils.arg('volume',
            metavar='<volume>',
-           help='Cinder volume already exists in volume backend')
+           help='Cinder volume that already exists in the volume backend.')
 @utils.arg('identifier',
            metavar='<identifier>',
-           help='Name or other Identifier for existing snapshot')
+           help='Name or other identifier for existing snapshot. This is '
+                'backend specific.')
 @utils.arg('--id-type',
            metavar='<id-type>',
            default='source-name',
            help='Type of backend device identifier provided, '
-                'typically source-name or source-id (Default=source-name)')
+                'typically source-name or source-id (Default=source-name).')
 @utils.arg('--name',
            metavar='<name>',
-           help='Snapshot name (Default=None)')
+           help='Snapshot name (Default=None).')
 @utils.arg('--description',
            metavar='<description>',
-           help='Snapshot description (Default=None)')
+           help='Snapshot description (Default=None).')
 @utils.arg('--metadata',
            nargs='*',
            metavar='<key=value>',
-           help='Metadata key=value pairs (Default=None)')
+           help='Metadata key=value pairs (Default=None).')
 def do_snapshot_manage(cs, args):
     """Manage an existing snapshot."""
     snapshot_metadata = None
@@ -2509,17 +2510,17 @@ def do_manageable_list(cs, args):
 @utils.arg('--marker',
            metavar='<marker>',
            default=None,
-           help='Begin returning volumes that appear later in the volume '
-                'list than that represented by this volume id. '
+           help='Begin returning snapshots that appear later in the snapshot '
+                'list than that represented by this snapshot id. '
                 'Default=None.')
 @utils.arg('--limit',
            metavar='<limit>',
            default=None,
-           help='Maximum number of volumes to return. Default=None.')
+           help='Maximum number of snapshots to return. Default=None.')
 @utils.arg('--offset',
            metavar='<offset>',
            default=None,
-           help='Number of volumes to skip after marker. Default=None.')
+           help='Number of snapshots to skip after marker. Default=None.')
 @utils.arg('--sort',
            metavar='<key>[:<direction>]',
            default=None,
