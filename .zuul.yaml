@@ -28,3 +28,7 @@
       jobs:
         - cinderclient-dsvm-functional
         - cinderclient-dsvm-functional-identity-v3-only
+        - openstack-tox-lower-constraints
+    gate:
+      jobs:
+        - openstack-tox-lower-constraints
