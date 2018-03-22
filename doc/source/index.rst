@@ -26,7 +26,8 @@ API::
     >>> auth = loader.load_from_options(auth_url=AUTH_URL,
     ...                                 username=USERNAME,
     ...                                 password=PASSWORD,
-    ...                                 project_id=PROJECT_ID)
+    ...                                 project_id=PROJECT_ID,
+    ...                                 user_domain_name=USER_DOMAIN_NAME)
     >>> sess = session.Session(auth=auth)
     >>> cinder = client.Client(VERSION, session=sess)
     >>> cinder.volumes.list()
