@@ -57,14 +57,8 @@ class VolumeBackupManager(volume_backups.VolumeBackupManager):
                             the new backup will be based on the snapshot.
         :rtype: :class:`VolumeBackup`
         """
-        body = {'backup': {'volume_id': volume_id,
-                           'container': container,
-                           'name': name,
-                           'description': description,
-                           'incremental': incremental,
-                           'force': force,
-                           'snapshot_id': snapshot_id, }}
-        return self._create('/backups', body, 'backup')
+        return self._create_backup(volume_id, container, name, description,
+                                   incremental, force, snapshot_id)
 
     @api_versions.wraps("3.43")  # noqa: F811
     def create(self, volume_id, container=None,
@@ -87,12 +81,46 @@ class VolumeBackupManager(volume_backups.VolumeBackupManager):
         :rtype: :class:`VolumeBackup`
         """
         # pylint: disable=function-redefined
+        return self._create_backup(volume_id, container, name, description,
+                                   incremental, force, snapshot_id, metadata)
+
+    @api_versions.wraps("3.51")  # noqa: F811
+    def create(self, volume_id, container=None, name=None, description=None,
+               incremental=False, force=False, snapshot_id=None, metadata=None,
+               availability_zone=None):
+        return self._create_backup(volume_id, container, name, description,
+                                   incremental, force, snapshot_id, metadata,
+                                   availability_zone)
+
+    def _create_backup(self, volume_id, container=None, name=None,
+                       description=None, incremental=False, force=False,
+                       snapshot_id=None, metadata=None,
+                       availability_zone=None):
+        """Creates a volume backup.
+
+        :param volume_id: The ID of the volume to backup.
+        :param container: The name of the backup service container.
+        :param name: The name of the backup.
+        :param description: The description of the backup.
+        :param incremental: Incremental backup.
+        :param force: If True, allows an in-use volume to be backed up.
+        :param metadata: Key Value pairs
+        :param snapshot_id: The ID of the snapshot to backup. This should
+                            be a snapshot of the src volume, when specified,
+                            the new backup will be based on the snapshot.
+        :param availability_zone: The AZ where we want the backup stored.
+        :rtype: :class:`VolumeBackup`
+        """
+        # pylint: disable=function-redefined
         body = {'backup': {'volume_id': volume_id,
                            'container': container,
                            'name': name,
                            'description': description,
                            'incremental': incremental,
                            'force': force,
-                           'snapshot_id': snapshot_id,
-                           'metadata': metadata, }}
+                           'snapshot_id': snapshot_id, }}
+        if metadata:
+            body['backup']['metadata'] = metadata
+        if availability_zone:
+            body['backup']['availability_zone'] = availability_zone
         return self._create('/backups', body, 'backup')

@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Support cross AZ backup creation specifying desired backup service AZ
+    (added in microversion v3.51)

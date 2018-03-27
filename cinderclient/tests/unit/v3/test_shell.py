@@ -1107,6 +1107,19 @@ class ShellTest(utils.TestCase):
                                'metadata': {'foo': 'bar'}, }}
         self.assert_called('POST', '/backups', body=expected)
 
+    def test_backup_with_az(self):
+        self.run_command('--os-volume-api-version 3.51 backup-create '
+                         '--availability-zone AZ2 --name 1234 1234')
+        expected = {'backup': {'volume_id': 1234,
+                               'container': None,
+                               'name': '1234',
+                               'description': None,
+                               'incremental': False,
+                               'force': False,
+                               'snapshot_id': None,
+                               'availability_zone': 'AZ2'}}
+        self.assert_called('POST', '/backups', body=expected)
+
     @mock.patch("cinderclient.utils.print_list")
     def test_snapshot_list_with_userid(self, mock_print_list):
         """Ensure 3.41 provides User ID header."""

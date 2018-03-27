@@ -2332,6 +2332,11 @@ def do_service_get_log(cs, args):
            default=None,
            start_version='3.43',
            help='Metadata key and value pairs. Default=None.')
+@utils.arg('--availability-zone',
+           default=None,
+           start_version='3.51',
+           help='AZ where the backup should be stored, by default it will be '
+           'the same as the source.')
 def do_backup_create(cs, args):
     """Creates a volume backup."""
     if args.display_name is not None:
@@ -2340,25 +2345,22 @@ def do_backup_create(cs, args):
     if args.display_description is not None:
         args.description = args.display_description
 
-    volume = utils.find_volume(cs, args.volume)
-    if hasattr(args, 'metadata') and args.metadata:
-        backup = cs.backups.create(volume.id,
-                                   args.container,
-                                   args.name,
-                                   args.description,
-                                   args.incremental,
-                                   args.force,
-                                   args.snapshot_id,
-                                   shell_utils.extract_metadata(args))
-    else:
-        backup = cs.backups.create(volume.id,
-                                   args.container,
-                                   args.name,
-                                   args.description,
-                                   args.incremental,
-                                   args.force,
-                                   args.snapshot_id)
+    kwargs = {}
+    if getattr(args, 'metadata', None):
+        kwargs['metadata'] =  shell_utils.extract_metadata(args)
+    az = getattr(args, 'availability_zone', None)
+    if az:
+        kwargs['availability_zone'] = az
 
+    volume = utils.find_volume(cs, args.volume)
+    backup = cs.backups.create(volume.id,
+                               args.container,
+                               args.name,
+                               args.description,
+                               args.incremental,
+                               args.force,
+                               args.snapshot_id,
+                               **kwargs)
     info = {"volume_id": volume.id}
     info.update(backup._info)
 
