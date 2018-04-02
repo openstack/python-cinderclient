@@ -245,7 +245,7 @@ class OpenStackCinderShell(object):
         default_auth_plugin = 'password'
 
         # Passing [] to loading.register_auth_argparse_arguments to avoid
-        # the auth_type being overriden by the command line.
+        # the auth_type being overridden by the command line.
         loading.register_auth_argparse_arguments(
             parser, [], default=default_auth_plugin)
 
