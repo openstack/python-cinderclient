@@ -2164,6 +2164,13 @@ def do_attachment_show(cs, args):
            metavar='<mountpoint>',
            default=None,
            help='Mountpoint volume will be attached at. Default=None.')
+@utils.arg('--mode',
+           metavar='<mode>',
+           default='null',
+           start_version='3.54',
+           help='Mode of attachment, rw, ro and null, where null '
+                'indicates we want to honor any existing '
+                'admin-metadata settings.  Default=null.')
 def do_attachment_create(cs, args):
     """Create an attachment for a cinder volume."""
 
@@ -2178,9 +2185,12 @@ def do_attachment_create(cs, args):
                      'multipath': args.multipath,
                      'mountpoint': args.mountpoint}
     volume = utils.find_volume(cs, args.volume)
+    mode = getattr(args, 'mode', 'null')
     attachment = cs.attachments.create(volume.id,
                                        connector,
-                                       args.server_id)
+                                       args.server_id,
+                                       mode)
+
     connector_dict = attachment.pop('connection_info', None)
     utils.print_dict(attachment)
     if connector_dict:

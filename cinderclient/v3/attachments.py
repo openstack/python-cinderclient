@@ -27,11 +27,14 @@ class VolumeAttachmentManager(base.ManagerWithFind):
     resource_class = VolumeAttachment
 
     @api_versions.wraps('3.27')
-    def create(self, volume_id, connector, instance_id):
+    def create(self, volume_id, connector, instance_id, mode='null'):
         """Create a attachment for specified volume."""
         body = {'attachment': {'volume_uuid': volume_id,
                                'instance_uuid': instance_id,
                                'connector': connector}}
+        if self.api_version >= api_versions.APIVersion("3.54"):
+            if mode and mode != 'null':
+                body['attachment']['mode'] = mode
         retval = self._create('/attachments', body, 'attachment')
         return retval.to_dict()
 
