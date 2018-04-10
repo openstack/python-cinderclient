@@ -576,6 +576,12 @@ class OpenStackCinderShell(object):
                                                        do_help, args)
         self.parser = subcommand_parser
 
+        if argv and len(argv) > 1 and '--help' in argv:
+            argv = [x for x in argv if x != '--help']
+            if argv[0] in self.subcommands:
+                self.subcommands[argv[0]].print_help()
+                return 0
+
         if options.help or not argv:
             subcommand_parser.print_help()
             return 0
