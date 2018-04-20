@@ -11,11 +11,11 @@ Python bindings to the OpenStack Cinder API
 ===========================================
 
 .. image:: https://img.shields.io/pypi/v/python-cinderclient.svg
-    :target: https://pypi.python.org/pypi/python-cinderclient/
+    :target: https://pypi.org/project/python-cinderclient/
     :alt: Latest Version
 
 .. image:: https://img.shields.io/pypi/dm/python-cinderclient.svg
-    :target: https://pypi.python.org/pypi/python-cinderclient/
+    :target: https://pypi.org/project/python-cinderclient/
     :alt: Downloads
 
 This is a client for the OpenStack Cinder API. There's a Python API (the
@@ -51,7 +51,7 @@ __ https://github.com/jacobian-archive/python-cloudservers
 * `Specs`_
 * `How to Contribute`_
 
-.. _PyPi: https://pypi.python.org/pypi/python-cinderclient
+.. _PyPi: https://pypi.org/project/python-cinderclient
 .. _Online Documentation: https://docs.openstack.org/python-cinderclient/latest/
 .. _Blueprints: https://blueprints.launchpad.net/python-cinderclient
 .. _Bugs: https://bugs.launchpad.net/python-cinderclient
