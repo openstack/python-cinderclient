@@ -16,6 +16,7 @@ import re
 import sys
 import unittest
 
+import ddt
 import fixtures
 import keystoneauth1.exceptions as ks_exc
 from keystoneauth1.exceptions import DiscoveryFailure
@@ -36,6 +37,7 @@ from cinderclient.tests.unit.fixture_data import keystone_client
 from cinderclient.tests.unit import utils
 
 
+@ddt.ddt
 class ShellTest(utils.TestCase):
 
     FAKE_ENV = {
@@ -128,6 +130,15 @@ class ShellTest(utils.TestCase):
             '.*?(?m)^Lists all volumes.',
         ]
         help_text = self.shell('help list')
+        for r in required:
+            self.assertThat(help_text,
+                            matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
+
+    @ddt.data('backup-create --help', '--help backup-create')
+    def test_dash_dash_help_on_subcommand(self, cmd):
+        required = ['.*?^Creates a volume backup.']
+        help_text = self.shell(cmd)
+
         for r in required:
             self.assertThat(help_text,
                             matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
