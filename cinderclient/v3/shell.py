@@ -1080,12 +1080,19 @@ def do_cluster_disable(cs, args):
 @utils.arg('--resource-type', metavar='<Volume|Snapshot>', default=None,
            choices=('Volume', 'Snapshot'),
            help='Type of resource to cleanup.')
+@utils.arg('--service-id',
+           metavar='<service-id>',
+           type=int,
+           default=None,
+           help='The service id field from the DB, not the uuid of the'
+                ' service. Default=None.')
 def do_work_cleanup(cs, args):
     """Request cleanup of services with optional filtering."""
     filters = dict(cluster_name=args.cluster, host=args.host,
                    binary=args.binary, is_up=args.is_up,
                    disabled=args.disabled, resource_id=args.resource_id,
-                   resource_type=args.resource_type)
+                   resource_type=args.resource_type,
+                   service_id=args.service_id)
 
     filters = {k: v for k, v in filters.items() if v is not None}
 

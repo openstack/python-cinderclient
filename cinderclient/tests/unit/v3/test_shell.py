@@ -1264,13 +1264,15 @@ class ShellTest(utils.TestCase):
         self.run_command('--os-volume-api-version 3.24 '
                          'work-cleanup --cluster clustername --host hostname '
                          '--binary binaryname --is-up false --disabled true '
-                         '--resource-id uuid --resource-type Volume')
+                         '--resource-id uuid --resource-type Volume '
+                         '--service-id 1')
         expected = {'cluster_name': 'clustername',
                     'host': 'hostname',
                     'binary': 'binaryname',
                     'is_up': 'false',
                     'disabled': 'true',
                     'resource_id': 'uuid',
-                    'resource_type': 'Volume'}
+                    'resource_type': 'Volume',
+                    'service_id': 1}
 
         self.assert_called('POST', '/workers/cleanup', body=expected)
