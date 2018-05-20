@@ -1,0 +1,5 @@
+---
+features:
+  - New command option ``--filters`` is added to ``type-list``
+    command to support filter types since 3.52, and it's only
+    valid for administrator.
