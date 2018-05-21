@@ -680,9 +680,6 @@ class ShellTest(utils.TestCase):
     def test_group_create_from_src(self, grp_snap_id, src_grp_id, src):
         expected = {'create-from-src': {'name': 'test-1',
                                         'description': 'test-1-desc',
-                                        'user_id': None,
-                                        'project_id': None,
-                                        'status': 'creating',
                                         'group_snapshot_id': grp_snap_id,
                                         'source_group_id': src_grp_id}}
         cmd = ('--os-volume-api-version 3.14 '

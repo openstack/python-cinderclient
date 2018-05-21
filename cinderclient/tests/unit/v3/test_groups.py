@@ -128,12 +128,9 @@ class GroupsTest(utils.TestCase):
         grp = cs.groups.create_from_src('5678', None, name='group')
         expected = {
             'create-from-src': {
-                'status': 'creating',
                 'description': None,
-                'user_id': None,
                 'name': 'group',
                 'group_snapshot_id': '5678',
-                'project_id': None,
                 'source_group_id': None
             }
         }
@@ -146,12 +143,9 @@ class GroupsTest(utils.TestCase):
         grp = cs.groups.create_from_src(None, '5678', name='group')
         expected = {
             'create-from-src': {
-                'status': 'creating',
                 'description': None,
-                'user_id': None,
                 'name': 'group',
                 'source_group_id': '5678',
-                'project_id': None,
                 'group_snapshot_id': None
             }
         }

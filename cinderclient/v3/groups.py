@@ -114,10 +114,7 @@ class GroupManager(base.ManagerWithFind):
         body = {'create-from-src': {'name': name,
                                     'description': description,
                                     'group_snapshot_id': group_snapshot_id,
-                                    'source_group_id': source_group_id,
-                                    'user_id': user_id,
-                                    'project_id': project_id,
-                                    'status': "creating", }}
+                                    'source_group_id': source_group_id, }}
 
         self.run_hooks('modify_body_for_action', body,
                        'create-from-src')
