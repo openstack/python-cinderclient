@@ -1,7 +1,7 @@
 /.*
 !.gitignore
 !.mailmap
-!.testr.conf
+!.stestr.conf
 .*.sw?
 subunit.log
 *,cover
