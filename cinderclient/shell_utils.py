@@ -27,6 +27,10 @@ _quota_infos = ['Type', 'In_use', 'Reserved', 'Limit', 'Allocated']
 
 
 def print_volume_image(image):
+    if 'volume_type' in image[1]['os-volume_upload_image']:
+        volume_type_name = (
+            image[1]['os-volume_upload_image']['volume_type']['name'])
+        image[1]['os-volume_upload_image']['volume_type'] = volume_type_name
     utils.print_dict(image[1]['os-volume_upload_image'])
 
 
