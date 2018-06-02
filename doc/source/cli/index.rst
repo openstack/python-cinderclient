@@ -31,12 +31,12 @@ variables::
     export OS_USERNAME=user
     export OS_PASSWORD=pass
     export OS_TENANT_NAME=myproject
-    export OS_AUTH_URL=http://auth.example.com:5000/v2.0
+    export OS_AUTH_URL=http://auth.example.com:5000/v3
 
 You can select an API version to use by `--os-volume-api-version` option or by
 setting corresponding environment variable::
 
-    export OS_VOLUME_API_VERSION=2
+    export OS_VOLUME_API_VERSION=3
 
 
 OPTIONS
