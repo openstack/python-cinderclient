@@ -14,10 +14,6 @@ Python bindings to the OpenStack Cinder API
     :target: https://pypi.org/project/python-cinderclient/
     :alt: Latest Version
 
-.. image:: https://img.shields.io/pypi/dm/python-cinderclient.svg
-    :target: https://pypi.org/project/python-cinderclient/
-    :alt: Downloads
-
 This is a client for the OpenStack Cinder API. There's a Python API (the
 ``cinderclient`` module), and a command-line script (``cinder``). Each
 implements 100% of the OpenStack Cinder API.
