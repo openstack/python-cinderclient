@@ -592,13 +592,8 @@ class ShellTest(utils.TestCase):
                          '--volume-type 4321 1')
         self.assert_called('GET', '/volumes/1234')
         expected = {'volume': {'imageRef': None,
-                               'project_id': None,
-                               'status': 'creating',
                                'size': 1,
-                               'user_id': None,
                                'availability_zone': None,
-                               'source_replica': None,
-                               'attach_status': 'detached',
                                'source_volid': None,
                                'consistencygroup_id': None,
                                'group_id': '5678',
@@ -621,13 +616,8 @@ class ShellTest(utils.TestCase):
         self.run_command(cmd)
         self.assert_called('GET', '/volumes/1234')
         expected = {'volume': {'imageRef': None,
-                               'project_id': None,
-                               'status': 'creating',
-                               'user_id': None,
                                'size': None,
                                'availability_zone': None,
-                               'source_replica': None,
-                               'attach_status': 'detached',
                                'source_volid': None,
                                'consistencygroup_id': None,
                                'name': None,

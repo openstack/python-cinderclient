@@ -73,20 +73,15 @@ class VolumesTest(utils.TestCase):
     def test_create_volume(self):
         cs = fakes.FakeClient(api_versions.APIVersion('3.13'))
         vol = cs.volumes.create(1, group_id='1234', volume_type='5678')
-        expected = {'volume': {'status': 'creating',
-                               'description': None,
+        expected = {'volume': {'description': None,
                                'availability_zone': None,
                                'source_volid': None,
                                'snapshot_id': None,
                                'size': 1,
-                               'user_id': None,
                                'name': None,
                                'imageRef': None,
-                               'attach_status': 'detached',
                                'volume_type': '5678',
-                               'project_id': None,
                                'metadata': {},
-                               'source_replica': None,
                                'consistencygroup_id': None,
                                'multiattach': False,
                                'group_id': '1234',

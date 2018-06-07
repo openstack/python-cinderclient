@@ -94,13 +94,8 @@ class ShellTest(utils.TestCase):
         self.run_command('create --metadata key1="--test1" 1')
         self.assert_called('GET', '/volumes/1234')
         expected = {'volume': {'imageRef': None,
-                               'project_id': None,
-                               'status': 'creating',
                                'size': 1,
-                               'user_id': None,
                                'availability_zone': None,
-                               'source_replica': None,
-                               'attach_status': 'detached',
                                'source_volid': None,
                                'consistencygroup_id': None,
                                'name': None,
@@ -115,13 +110,8 @@ class ShellTest(utils.TestCase):
         self.run_command('create --metadata key1="--t1" --name="t" 1')
         self.assert_called('GET', '/volumes/1234')
         expected = {'volume': {'imageRef': None,
-                               'project_id': None,
-                               'status': 'creating',
                                'size': 1,
-                               'user_id': None,
                                'availability_zone': None,
-                               'source_replica': None,
-                               'attach_status': 'detached',
                                'source_volid': None,
                                'consistencygroup_id': None,
                                'name': '"t"',
@@ -135,13 +125,8 @@ class ShellTest(utils.TestCase):
     def test_delimit_metadata_args(self):
         self.run_command('create --metadata key1="test1" key2="test2" 1')
         expected = {'volume': {'imageRef': None,
-                               'project_id': None,
-                               'status': 'creating',
                                'size': 1,
-                               'user_id': None,
                                'availability_zone': None,
-                               'source_replica': None,
-                               'attach_status': 'detached',
                                'source_volid': None,
                                'consistencygroup_id': None,
                                'name': None,
@@ -157,13 +142,8 @@ class ShellTest(utils.TestCase):
         self.run_command('create --metadata key1="t1" --name="t" 1')
         self.assert_called('GET', '/volumes/1234')
         expected = {'volume': {'imageRef': None,
-                               'project_id': None,
-                               'status': 'creating',
                                'size': 1,
-                               'user_id': None,
                                'availability_zone': None,
-                               'source_replica': None,
-                               'attach_status': 'detached',
                                'source_volid': None,
                                'consistencygroup_id': None,
                                'name': '"t"',
@@ -345,19 +325,9 @@ class ShellTest(utils.TestCase):
         self.assert_called_anytime('POST', '/volumes', partial_body=expected)
         self.assert_called('GET', '/volumes/1234')
 
-    def test_create_volume_from_replica(self):
-        expected = {'volume': {'size': None}}
-
-        expected['volume']['source_replica'] = '1234'
-        self.run_command('create --source-replica=1234')
-        self.assert_called_anytime('POST', '/volumes', partial_body=expected)
-        self.assert_called('GET', '/volumes/1234')
-
     def test_create_volume_from_image(self):
-        expected = {'volume': {'status': 'creating',
-                               'size': 1,
-                               'imageRef': '1234',
-                               'attach_status': 'detached'}}
+        expected = {'volume': {'size': 1,
+                               'imageRef': '1234'}}
         self.run_command('create --image=1234 1')
         self.assert_called_anytime('POST', '/volumes', partial_body=expected)
         self.assert_called('GET', '/volumes/1234')
@@ -386,8 +356,7 @@ class ShellTest(utils.TestCase):
         self.assertRaises(SystemExit, self.run_command, 'create')
 
     def test_create_size_zero_if_not_snapshot_or_clone(self):
-        expected = {'volume': {'status': 'creating',
-                               'size': 0}}
+        expected = {'volume': {'size': 0}}
         self.run_command('create 0')
         self.assert_called_anytime('POST', '/volumes', partial_body=expected)
         self.assert_called('GET', '/volumes/1234')

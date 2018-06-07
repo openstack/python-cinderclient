@@ -87,8 +87,8 @@ class VolumeManager(volumes.VolumeManager):
         :param name: Name of the volume
         :param description: Description of the volume
         :param volume_type: Type of volume
-        :param user_id: User id derived from context
-        :param project_id: Project id derived from context
+        :param user_id: User id derived from context (IGNORED)
+        :param project_id: Project id derived from context (IGNORED)
         :param availability_zone: Availability Zone to use
         :param metadata: Optional metadata to set on volume creation
         :param imageRef: reference to an image stored in glance
@@ -119,15 +119,10 @@ class VolumeManager(volumes.VolumeManager):
                            'name': name,
                            'description': description,
                            'volume_type': volume_type,
-                           'user_id': user_id,
-                           'project_id': project_id,
                            'availability_zone': availability_zone,
-                           'status': "creating",
-                           'attach_status': "detached",
                            'metadata': volume_metadata,
                            'imageRef': imageRef,
                            'source_volid': source_volid,
-                           'source_replica': source_replica,
                            'multiattach': multiattach,
                            'backup_id': backup_id
                            }}
