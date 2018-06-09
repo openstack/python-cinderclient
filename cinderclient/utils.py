@@ -187,7 +187,7 @@ def print_list(objs, fields, exclude_unavailable=False, formatters=None,
 
 def _encode(src):
     """remove extra 'u' in PY2."""
-    if six.PY2 and isinstance(src, unicode):
+    if six.PY2 and isinstance(src, six.text_type):
         return src.encode('utf-8')
     return src
 
