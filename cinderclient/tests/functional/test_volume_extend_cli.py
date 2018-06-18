@@ -28,8 +28,10 @@ class CinderVolumeExtendNegativeTests(base.ClientTestBase):
 
     @ddt.data(
         ('', (r'too few arguments|the following arguments are required')),
-        ('-1', (r'New size for extend must be greater than current size')),
-        ('0', (r'Invalid input received')),
+        ('-1', (r'Invalid input for field/attribute new_size. Value: -1. '
+                r'-1 is less than the minimum of 1')),
+        ('0', (r'Invalid input for field/attribute new_size. Value: 0. '
+               r'0 is less than the minimum of 1')),
         ('size', (r'invalid int value')),
         ('0.2', (r'invalid int value')),
         ('2 GB', (r'unrecognized arguments')),
