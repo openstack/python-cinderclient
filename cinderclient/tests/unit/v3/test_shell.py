@@ -679,9 +679,12 @@ class ShellTest(utils.TestCase):
     @ddt.unpack
     def test_group_create_from_src(self, grp_snap_id, src_grp_id, src):
         expected = {'create-from-src': {'name': 'test-1',
-                                        'description': 'test-1-desc',
-                                        'group_snapshot_id': grp_snap_id,
-                                        'source_group_id': src_grp_id}}
+                                        'description': 'test-1-desc'}}
+        if grp_snap_id:
+            expected['create-from-src']['group_snapshot_id'] = grp_snap_id
+        elif src_grp_id:
+            expected['create-from-src']['source_group_id'] = src_grp_id
+
         cmd = ('--os-volume-api-version 3.14 '
                'group-create-from-src --name test-1 '
                '--description test-1-desc ')

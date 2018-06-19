@@ -111,10 +111,20 @@ class GroupManager(base.ManagerWithFind):
         :param project_id: Project id derived from context
         :rtype: A dictionary containing Group metadata
         """
+
+        # NOTE(wanghao): According the API schema in cinder side, client
+        # should NOT specify the group_snapshot_id and source_group_id at
+        # same time, even one of them is None.
+        if group_snapshot_id:
+            create_key = 'group_snapshot_id'
+            create_value = group_snapshot_id
+        elif source_group_id:
+            create_key = 'source_group_id'
+            create_value = source_group_id
+
         body = {'create-from-src': {'name': name,
                                     'description': description,
-                                    'group_snapshot_id': group_snapshot_id,
-                                    'source_group_id': source_group_id, }}
+                                    create_key: create_value}}
 
         self.run_hooks('modify_body_for_action', body,
                        'create-from-src')

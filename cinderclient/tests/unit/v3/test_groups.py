@@ -130,8 +130,7 @@ class GroupsTest(utils.TestCase):
             'create-from-src': {
                 'description': None,
                 'name': 'group',
-                'group_snapshot_id': '5678',
-                'source_group_id': None
+                'group_snapshot_id': '5678'
             }
         }
         cs.assert_called('POST', '/groups/action',
@@ -145,8 +144,7 @@ class GroupsTest(utils.TestCase):
             'create-from-src': {
                 'description': None,
                 'name': 'group',
-                'source_group_id': '5678',
-                'group_snapshot_id': None
+                'source_group_id': '5678'
             }
         }
         cs.assert_called('POST', '/groups/action',
