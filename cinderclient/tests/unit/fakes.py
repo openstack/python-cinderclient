@@ -51,16 +51,22 @@ class FakeClient(object):
             result = False
         return result
 
+    def assert_in_call(self, url_part):
+        """Assert a call contained a part in its URL."""
+        assert self.client.callstack, "Expected call but no calls were made"
+
+        called = self.client.callstack[-1][1]
+        assert url_part in called, 'Expected %s in call but found %s' % (
+            url_part, called)
+
     def assert_called(self, method, url, body=None,
                       partial_body=None, pos=-1, **kwargs):
-        """
-        Assert than an API method was just called.
-        """
+        """Assert than an API method was just called."""
         expected = (method, url)
-        called = self.client.callstack[pos][0:2]
-
         assert self.client.callstack, ("Expected %s %s but no calls "
                                        "were made." % expected)
+
+        called = self.client.callstack[pos][0:2]
 
         assert expected == called, 'Expected %s %s; got %s %s' % (
             expected + called)

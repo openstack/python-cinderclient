@@ -96,6 +96,9 @@ class ShellTest(utils.TestCase):
         return self.shell.cs.assert_called(method, url, body,
                                            partial_body, **kwargs)
 
+    def assert_call_contained(self, url_part):
+        self.shell.cs.assert_in_call(url_part)
+
     @ddt.data({'resource': None, 'query_url': None},
               {'resource': 'volume', 'query_url': '?resource=volume'},
               {'resource': 'group', 'query_url': '?resource=group'})
@@ -253,10 +256,16 @@ class ShellTest(utils.TestCase):
     def test_type_list_with_filters(self):
         self.run_command('--os-volume-api-version 3.52 type-list '
                          '--filters extra_specs={key:value}')
-        self.assert_called(
-            'GET', '/types?%s' % parse.urlencode(
+        self.assert_called('GET', mock.ANY)
+        self.assert_call_contained(
+            parse.urlencode(
                 {'extra_specs':
                     {six.text_type('key'): six.text_type('value')}}))
+        self.assert_call_contained(parse.urlencode({'is_public': None}))
+
+    def test_type_list_no_filters(self):
+        self.run_command('--os-volume-api-version 3.52 type-list')
+        self.assert_called('GET', '/types?is_public=None')
 
     @ddt.data("3.10", "3.11")
     def test_list_with_group_id_after_3_10(self, version):
