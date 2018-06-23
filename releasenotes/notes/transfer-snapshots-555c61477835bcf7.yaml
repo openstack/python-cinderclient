@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Starting with microversion 3.55, the volume transfer command now has the
+    ability to exclude a volume's snapshots when transferring a volume to another
+    project. The new command format is `cinder transfer-create --no-snapshots`.

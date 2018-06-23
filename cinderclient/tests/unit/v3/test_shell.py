@@ -1299,3 +1299,12 @@ class ShellTest(utils.TestCase):
                     'service_id': 1}
 
         self.assert_called('POST', '/workers/cleanup', body=expected)
+
+    def test_create_transfer(self):
+        self.run_command('--os-volume-api-version 3.55 transfer-create '
+                         '--no-snapshots 1234')
+        expected = {'transfer': {'volume_id': 1234,
+                                 'name': None,
+                                 'no_snapshots': True
+                                 }}
+        self.assert_called('POST', '/volume-transfers', body=expected)

@@ -630,6 +630,45 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
     def get_resource_filters(self, **kw):
         return 200, {}, {'resource_filters': []}
 
+    def get_volume_transfers_detail(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        transfer1 = '5678'
+        transfer2 = 'f625ec3e-13dd-4498-a22a-50afd534cc41'
+        return (200, {},
+                {'transfers': [
+                    fake_v2._stub_transfer_full(transfer1, base_uri,
+                                                tenant_id),
+                    fake_v2._stub_transfer_full(transfer2, base_uri,
+                                                tenant_id)]})
+
+    def get_volume_transfers_5678(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        transfer1 = '5678'
+        return (200, {},
+                {'transfer':
+                 fake_v2._stub_transfer_full(transfer1, base_uri, tenant_id)})
+
+    def delete_volume_transfers_5678(self, **kw):
+        return (202, {}, None)
+
+    def post_volume_transfers(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        transfer1 = '5678'
+        return (202, {},
+                {'transfer': fake_v2._stub_transfer(transfer1, base_uri,
+                                                    tenant_id)})
+
+    def post_volume_transfers_5678_accept(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        transfer1 = '5678'
+        return (200, {},
+                {'transfer': fake_v2._stub_transfer(transfer1, base_uri,
+                                                    tenant_id)})
+
 
 def fake_request_get():
     versions = {'versions': [{'id': 'v1.0',

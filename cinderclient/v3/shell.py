@@ -2375,7 +2375,7 @@ def do_backup_create(cs, args):
 
     kwargs = {}
     if getattr(args, 'metadata', None):
-        kwargs['metadata'] =  shell_utils.extract_metadata(args)
+        kwargs['metadata'] = shell_utils.extract_metadata(args)
     az = getattr(args, 'availability_zone', None)
     if az:
         kwargs['availability_zone'] = az
@@ -2395,4 +2395,39 @@ def do_backup_create(cs, args):
     if 'links' in info:
         info.pop('links')
 
+    utils.print_dict(info)
+
+
+@utils.arg('volume', metavar='<volume>',
+           help='Name or ID of volume to transfer.')
+@utils.arg('--name',
+           metavar='<name>',
+           default=None,
+           help='Transfer name. Default=None.')
+@utils.arg('--display-name',
+           help=argparse.SUPPRESS)
+@utils.arg('--no-snapshots',
+           action='store_true',
+           help='Allows or disallows transfer volumes without snapshots. '
+                'Default=False.',
+           start_version='3.55',
+           default=False)
+def do_transfer_create(cs, args):
+    """Creates a volume transfer."""
+    if args.display_name is not None:
+        args.name = args.display_name
+
+    kwargs = {}
+    no_snapshots = getattr(args, 'no_snapshots', None)
+    if no_snapshots is not None:
+        kwargs['no_snapshots'] = no_snapshots
+
+    volume = utils.find_volume(cs, args.volume)
+    transfer = cs.transfers.create(volume.id,
+                                   args.name,
+                                   **kwargs)
+    info = dict()
+    info.update(transfer._info)
+
+    info.pop('links', None)
     utils.print_dict(info)
