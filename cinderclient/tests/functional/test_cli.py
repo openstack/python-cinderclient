@@ -17,7 +17,14 @@ from cinderclient.tests.functional import base
 class CinderVolumeTests(base.ClientTestBase):
     """Check of base cinder volume commands."""
 
-    VOLUME_PROPERTY = ('attachment_ids', 'attached_servers',
+    CREATE_VOLUME_PROPERTY = ('attachments', 'multiattach',
+                       'os-vol-tenant-attr:tenant_id',
+                       'availability_zone', 'bootable',
+                       'created_at', 'description', 'encrypted', 'id',
+                       'metadata', 'name', 'size', 'status',
+                       'user_id', 'volume_type')
+
+    SHOW_VOLUME_PROPERTY = ('attachment_ids', 'attached_servers',
                        'availability_zone', 'bootable',
                        'created_at', 'description', 'encrypted', 'id',
                        'metadata', 'name', 'size', 'status',
@@ -26,7 +33,7 @@ class CinderVolumeTests(base.ClientTestBase):
     def test_volume_create_delete_id(self):
         """Create and delete a volume by ID."""
         volume = self.object_create('volume', params='1')
-        self.assert_object_details(self.VOLUME_PROPERTY, volume.keys())
+        self.assert_object_details(self.CREATE_VOLUME_PROPERTY, volume.keys())
         self.object_delete('volume', volume['id'])
         self.check_object_deleted('volume', volume['id'])
 
@@ -44,7 +51,7 @@ class CinderVolumeTests(base.ClientTestBase):
         output = self.cinder('show', params='TestVolumeShow')
         volume = self._get_property_from_output(output)
         self.assertEqual('TestVolumeShow', volume['name'])
-        self.assert_object_details(self.VOLUME_PROPERTY, volume.keys())
+        self.assert_object_details(self.SHOW_VOLUME_PROPERTY, volume.keys())
 
         self.object_delete('volume', volume['id'])
         self.check_object_deleted('volume', volume['id'])

@@ -27,7 +27,7 @@ class CinderVolumeNegativeTests(base.ClientTestBase):
     @ddt.data(
         ('', (r'Size is a required parameter')),
         ('-1', (r'Invalid volume size provided for create request')),
-        ('0', (r'Invalid input received')),
+        ('0', (r"Volume size '0' must be an integer and greater than 0")),
         ('size', (r'invalid int value')),
         ('0.2', (r'invalid int value')),
         ('2 GB', (r'unrecognized arguments')),
