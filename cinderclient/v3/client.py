@@ -13,8 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import logging
-
 from cinderclient import api_versions
 from cinderclient import client
 from cinderclient.v3 import attachments
@@ -111,9 +109,6 @@ class Client(object):
                 if extension.manager_class:
                     setattr(self, extension.name,
                             extension.manager_class(self))
-
-        if not logger:
-            logger = logging.getLogger(__name__)
 
         self.client = client._construct_http_client(
             username=username,
