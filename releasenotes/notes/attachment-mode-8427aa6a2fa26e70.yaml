@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Added the ability to specify the read-write or read-only mode of an
+    attachment starting with microversion 3.54. The command line usage is
+    `cinder attachment-create --mode [rw|ro]`.
