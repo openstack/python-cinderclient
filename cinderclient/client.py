@@ -69,7 +69,7 @@ REQ_ID_HEADER = 'X-OpenStack-Request-ID'
 # tell keystoneclient that we can ignore the /v1|v2/{project_id} component of
 # the service catalog when doing discovery lookups
 for svc in ('volume', 'volumev2', 'volumev3'):
-    discover.add_catalog_discover_hack(svc, re.compile('/v[12]/\w+/?$'), '/')
+    discover.add_catalog_discover_hack(svc, re.compile(r'/v[12]/\w+/?$'), '/')
 
 
 def get_server_version(url):

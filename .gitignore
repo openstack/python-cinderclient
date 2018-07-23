@@ -16,3 +16,7 @@ build
 dist
 cinderclient/versioninfo
 python_cinderclient.egg-info
+
+# pylint files
+tools/lintstack.head.py
+tools/pylint_exceptions
