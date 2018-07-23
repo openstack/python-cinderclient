@@ -1,0 +1,15 @@
+---
+upgrade:
+  - |
+    The following CLI options were deprecated for one or more releases and have
+    now been removed:
+
+    ``--endpoint-type``
+      This option has been replaced by ``--os-endpoint-type``.
+
+    ``--bypass-url``
+      This option has been replaced by ``--os-endpoint``.
+
+    ``--os-auth-system``
+      This option has been replaced by ``--os-auth-type``.
+
