@@ -173,13 +173,6 @@ class OpenStackCinderShell(object):
                             % DEFAULT_CINDER_ENDPOINT_TYPE)
         parser.add_argument('--os_endpoint_type',
                             help=argparse.SUPPRESS)
-        parser.add_argument('--endpoint-type',
-                            metavar='<endpoint-type>',
-                            dest='os_endpoint_type',
-                            help=_('DEPRECATED! Use --os-endpoint-type.'))
-        parser.add_argument('--endpoint_type',
-                            dest='os_endpoint_type',
-                            help=argparse.SUPPRESS)
 
         parser.add_argument('--os-volume-api-version',
                             metavar='<volume-api-ver>',
@@ -190,18 +183,6 @@ class OpenStackCinderShell(object):
                             'part).'
                             'Default=env[OS_VOLUME_API_VERSION].'))
         parser.add_argument('--os_volume_api_version',
-                            help=argparse.SUPPRESS)
-
-        parser.add_argument('--bypass-url',
-                            metavar='<bypass-url>',
-                            dest='os_endpoint',
-                            default=utils.env('CINDERCLIENT_BYPASS_URL',
-                            default=utils.env('CINDER_ENDPOINT')),
-                            help=_("DEPRECATED! Use os_endpoint. "
-                            "Use this API endpoint instead of the "
-                            "Service Catalog. Defaults to "
-                            "env[CINDERCLIENT_BYPASS_URL]."))
-        parser.add_argument('--bypass_url',
                             help=argparse.SUPPRESS)
 
         parser.add_argument('--os-endpoint',
@@ -267,15 +248,6 @@ class OpenStackCinderShell(object):
                                'OS_AUTH_SYSTEM')
         parser.set_defaults(os_auth_type=env_plugin)
         parser.add_argument('--os_auth_type',
-                            help=argparse.SUPPRESS)
-
-        parser.add_argument('--os-auth-system',
-                            metavar='<os-auth-system>',
-                            dest='os_auth_type',
-                            default=env_plugin,
-                            help=_('DEPRECATED! Use --os-auth-type. '
-                                   'Defaults to env[OS_AUTH_SYSTEM].'))
-        parser.add_argument('--os_auth_system',
                             help=argparse.SUPPRESS)
 
         parser.set_defaults(os_username=utils.env('OS_USERNAME',
