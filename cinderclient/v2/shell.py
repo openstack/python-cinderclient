@@ -208,7 +208,7 @@ def do_show(cs, args):
 
 class CheckSizeArgForCreate(argparse.Action):
     def __call__(self, parser, args, values, option_string=None):
-        if ((args.snapshot_id or args.source_volid or args.source_replica)
+        if ((args.snapshot_id or args.source_volid)
                 is None and values is None):
             if not hasattr(args, 'backup_id') or args.backup_id is None:
                 parser.error('Size is a required parameter if snapshot '
@@ -240,10 +240,6 @@ class CheckSizeArgForCreate(argparse.Action):
            help='Creates volume from volume ID. Default=None.')
 @utils.arg('--source_volid',
            help=argparse.SUPPRESS)
-@utils.arg('--source-replica',
-           metavar='<source-replica>',
-           default=None,
-           help='Creates volume from replicated volume ID. Default=None.')
 @utils.arg('--image-id',
            metavar='<image-id>',
            default=None,
@@ -343,7 +339,6 @@ def do_create(cs, args):
                                imageRef=image_ref,
                                metadata=volume_metadata,
                                scheduler_hints=hints,
-                               source_replica=args.source_replica,
                                multiattach=args.multiattach)
 
     info = dict()

@@ -1,0 +1,7 @@
+---
+upgrade:
+  - |
+    The volume creation argument ``--source-replica`` on the command line and
+    the ``source_replica`` kwarg for the ``create()`` call when using the
+    cinderclient library were for the replication v1 support that was removed
+    in the Mitaka release. These options have now been removed.

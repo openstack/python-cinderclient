@@ -505,10 +505,6 @@ def do_reset_state(cs, args):
            help='Creates volume from volume ID. Default=None.')
 @utils.arg('--source_volid',
            help=argparse.SUPPRESS)
-@utils.arg('--source-replica',
-           metavar='<source-replica>',
-           default=None,
-           help='Creates volume from replicated volume ID. Default=None.')
 @utils.arg('--image-id',
            metavar='<image-id>',
            default=None,
@@ -625,7 +621,6 @@ def do_create(cs, args):
                                imageRef=image_ref,
                                metadata=volume_metadata,
                                scheduler_hints=hints,
-                               source_replica=args.source_replica,
                                multiattach=args.multiattach,
                                backup_id=backup_id)
 
