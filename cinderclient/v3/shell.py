@@ -564,7 +564,7 @@ def do_reset_state(cs, args):
 @utils.arg('--allow-multiattach',
            dest='multiattach',
            action="store_true",
-           help=('Allow volume to be attached more than once.'
+           help=('Allow volume to be attached more than once. (DEPRECATED)'
                  ' Default=False'),
            default=False)
 @utils.arg('--poll',
