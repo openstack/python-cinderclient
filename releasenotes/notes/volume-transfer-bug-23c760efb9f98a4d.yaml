@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    An issue was discovered with the way API microversions were handled for the
+    new volume-transfer with snapshot handling with microversion 3.55. This
+    release includes a fix to keep backwards compatibility with earlier
+    releases. See `bug #1784703
+    <https://bugs.launchpad.net/cinder/+bug/1784703>`_ for more details.
