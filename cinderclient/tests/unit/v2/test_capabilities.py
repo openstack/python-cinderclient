@@ -53,3 +53,8 @@ class CapabilitiesTest(utils.TestCase):
         cap = Capabilities(None, FAKE_CAPABILITY)
         self.assertEqual(
             "<Capabilities: %s>" % FAKE_CAPABILITY['namespace'], repr(cap))
+
+    def test__repr__when_empty(self):
+        cap = Capabilities(None, {})
+        self.assertEqual(
+            "<Capabilities: None>", repr(cap))

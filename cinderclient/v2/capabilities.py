@@ -22,7 +22,7 @@ class Capabilities(base.Resource):
     NAME_ATTR = 'name'
 
     def __repr__(self):
-        return "<Capabilities: %s>" % self._info['namespace']
+        return "<Capabilities: %s>" % self._info.get('namespace')
 
 
 class CapabilitiesManager(base.Manager):
