@@ -36,7 +36,7 @@ This code is a fork of `Jacobian's python-cloudservers`__. If you need API suppo
 for the Rackspace API solely or the BSD license, you should use that repository.
 python-cinderclient is licensed under the Apache License like the rest of OpenStack.
 
-__ https://github.com/jacobian-archive/python-cloudservers
+__ https://github.com/rackerlabs/python-cloudservers
 
 * License: Apache License, Version 2.0
 * `PyPi`_ - package installation
