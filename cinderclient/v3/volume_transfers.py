@@ -13,10 +13,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""
-Volume transfer interface (v3 extension).
-"""
+"""Volume transfer interface (v3 extension)."""
 
+from cinderclient import base
+from cinderclient import utils
 from cinderclient.v2 import volume_transfers
 
 
@@ -33,4 +33,63 @@ class VolumeTransferManager(volume_transfers.VolumeTransferManager):
                              'name': name}}
         if self.api_version.matches('3.55'):
             body['transfer']['no_snapshots'] = no_snapshots
-        return self._create('/volume-transfers', body, 'transfer')
+            return self._create('/volume-transfers', body, 'transfer')
+
+        return self._create('/os-volume-transfer', body, 'transfer')
+
+    def accept(self, transfer_id, auth_key):
+        """Accept a volume transfer.
+
+        :param transfer_id: The ID of the transfer to accept.
+        :param auth_key: The auth_key of the transfer.
+        :rtype: :class:`VolumeTransfer`
+        """
+        body = {'accept': {'auth_key': auth_key}}
+        if self.api_version.matches('3.55'):
+            return self._create('/volume-transfers/%s/accept' % transfer_id,
+                                body, 'transfer')
+
+        return self._create('/os-volume-transfer/%s/accept' % transfer_id,
+                            body, 'transfer')
+
+    def get(self, transfer_id):
+        """Show details of a volume transfer.
+
+        :param transfer_id: The ID of the volume transfer to display.
+        :rtype: :class:`VolumeTransfer`
+        """
+        if self.api_version.matches('3.55'):
+            return self._get("/volume-transfers/%s" % transfer_id, "transfer")
+
+        return self._get("/os-volume-transfer/%s" % transfer_id, "transfer")
+
+    def list(self, detailed=True, search_opts=None):
+        """Get a list of all volume transfer.
+
+        :param detailed: Get detailed object information.
+        :param search_opts: Filtering options.
+        :rtype: list of :class:`VolumeTransfer`
+        """
+        query_string = utils.build_query_param(search_opts)
+
+        detail = ""
+        if detailed:
+            detail = "/detail"
+
+        if self.api_version.matches('3.55'):
+            return self._list("/volume-transfers%s%s" % (detail, query_string),
+                              "transfers")
+
+        return self._list("/os-volume-transfer%s%s" % (detail, query_string),
+                          "transfers")
+
+    def delete(self, transfer_id):
+        """Delete a volume transfer.
+
+        :param transfer_id: The :class:`VolumeTransfer` to delete.
+        """
+        if self.api_version.matches('3.55'):
+            return self._delete(
+                "/volume-transfers/%s" % base.getid(transfer_id))
+
+        return self._delete("/os-volume-transfer/%s" % base.getid(transfer_id))
