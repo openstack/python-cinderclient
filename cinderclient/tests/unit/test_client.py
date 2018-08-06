@@ -32,6 +32,7 @@ from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 
 
+@ddt.ddt
 class ClientTest(utils.TestCase):
 
     def test_get_client_class_v1(self):
@@ -99,11 +100,21 @@ class ClientTest(utils.TestCase):
                           unknown_url)
 
     @mock.patch('cinderclient.client.SessionClient.get_endpoint')
-    def test_get_base_url(self, mock_get_endpoint):
-        url = 'http://192.168.122.104:8776/v3/de50d1f33a38415fadfd3e1dea28f4d3'
+    @ddt.data(
+        ('http://192.168.1.1:8776/v2', 'http://192.168.1.1:8776/'),
+        ('http://192.168.1.1:8776/v3/e5526285ebd741b1819393f772f11fc3',
+         'http://192.168.1.1:8776/'),
+        ('https://192.168.1.1:8080/volumes/v3/'
+         'e5526285ebd741b1819393f772f11fc3',
+         'https://192.168.1.1:8080/volumes/'),
+        ('http://192.168.1.1/volumes/v3/e5526285ebd741b1819393f772f11fc3',
+         'http://192.168.1.1/volumes/'),
+        ('https://volume.example.com/', 'https://volume.example.com/'))
+    @ddt.unpack
+    def test_get_base_url(self, url, expected_base, mock_get_endpoint):
         mock_get_endpoint.return_value = url
         cs = cinderclient.client.SessionClient(self, api_version='3.0')
-        self.assertEqual('http://192.168.122.104:8776/', cs._get_base_url())
+        self.assertEqual(expected_base, cs._get_base_url())
 
     @mock.patch.object(adapter.Adapter, 'request')
     @mock.patch.object(exceptions, 'from_response')
