@@ -24,8 +24,19 @@
 
 
 - project:
-    name: openstack/python-cinderclient
+    templates:
+      - openstack-python-jobs
+      - openstack-python35-jobs
+      - publish-openstack-sphinx-docs
+      - check-requirements
+      - lib-forward-testing
+      - release-notes-jobs
     check:
       jobs:
         - cinderclient-dsvm-functional
         - cinderclient-dsvm-functional-identity-v3-only
+        - openstack-tox-pylint:
+            voting: false
+    post:
+      jobs:
+        - openstack-tox-cover
