@@ -162,6 +162,7 @@ class CaptureStdout(object):
         self.read = self.stringio.read
 
 
+@ddt.ddt
 class BuildQueryParamTestCase(test_utils.TestCase):
 
     def test_build_param_without_sort_switch(self):
@@ -187,19 +188,17 @@ class BuildQueryParamTestCase(test_utils.TestCase):
         expected = "?key1=val1&key2=val2&key3=val3"
         self.assertEqual(expected, result)
 
-    def test_build_param_with_none(self):
-        dict_param = {
-            'key1': 'val1',
-            'key2': None,
-            'key3': False,
-            'key4': ''
-        }
-        result_1 = utils.build_query_param(dict_param)
-        result_2 = utils.build_query_param(None)
+    @ddt.data({},
+              None,
+              {'key1': 'val1', 'key2': None, 'key3': False, 'key4': ''})
+    def test_build_param_with_nones(self, dict_param):
+        result = utils.build_query_param(dict_param)
 
-        expected = "?key1=val1"
-        self.assertEqual(expected, result_1)
-        self.assertFalse(result_2)
+        expected = ("key1=val1", "key3=False") if dict_param else ()
+        for exp in expected:
+            self.assertIn(exp, result)
+        if not expected:
+            self.assertEqual("", result)
 
 
 @ddt.ddt

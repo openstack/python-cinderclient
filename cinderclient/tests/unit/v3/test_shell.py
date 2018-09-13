@@ -131,37 +131,37 @@ class ShellTest(utils.TestCase):
         {'command':
              'list --filters name~=456',
          'expected':
-             '/volumes/detail?name%7E=456'},
+             '/volumes/detail?name~=456'},
         {'command':
              u'list --filters name~=Σ',
          'expected':
-             '/volumes/detail?name%7E=%CE%A3'},
+             '/volumes/detail?name~=%CE%A3'},
         # testcases for list group
         {'command':
              'group-list --filters name=456',
          'expected':
-             '/groups/detail?name=456'},
+             '/groups/detail?all_tenants=0&name=456'},
         {'command':
              'group-list --filters status=available',
          'expected':
-             '/groups/detail?status=available'},
+             '/groups/detail?all_tenants=0&status=available'},
         {'command':
              'group-list --filters name~=456',
          'expected':
-             '/groups/detail?name%7E=456'},
+             '/groups/detail?all_tenants=0&name~=456'},
         # testcases for list group-snapshot
         {'command':
              'group-snapshot-list --status=error --filters status=available',
          'expected':
-             '/group_snapshots/detail?status=available'},
+             '/group_snapshots/detail?all_tenants=0&status=available'},
         {'command':
              'group-snapshot-list --filters availability_zone=123',
          'expected':
-             '/group_snapshots/detail?availability_zone=123'},
+             '/group_snapshots/detail?all_tenants=0&availability_zone=123'},
         {'command':
              'group-snapshot-list --filters status~=available',
          'expected':
-             '/group_snapshots/detail?status%7E=available'},
+             '/group_snapshots/detail?all_tenants=0&status~=available'},
         # testcases for list message
         {'command':
              'message-list --event_id=123 --filters event_id=456',
@@ -174,7 +174,7 @@ class ShellTest(utils.TestCase):
         {'command':
              'message-list --filters request_id~=123',
          'expected':
-             '/messages?request_id%7E=123'},
+             '/messages?request_id~=123'},
         # testcases for list attachment
         {'command':
              'attachment-list --volume-id=123 --filters volume_id=456',
@@ -187,7 +187,7 @@ class ShellTest(utils.TestCase):
         {'command':
              'attachment-list --filters volume_id~=456',
          'expected':
-             '/attachments?volume_id%7E=456'},
+             '/attachments?volume_id~=456'},
         # testcases for list backup
         {'command':
              'backup-list --volume-id=123 --filters volume_id=456',
@@ -200,7 +200,7 @@ class ShellTest(utils.TestCase):
         {'command':
              'backup-list --filters volume_id~=456',
          'expected':
-             '/backups/detail?volume_id%7E=456'},
+             '/backups/detail?volume_id~=456'},
         # testcases for list snapshot
         {'command':
              'snapshot-list --volume-id=123 --filters volume_id=456',
@@ -213,7 +213,7 @@ class ShellTest(utils.TestCase):
         {'command':
              'snapshot-list --filters volume_id~=456',
          'expected':
-             '/snapshots/detail?volume_id%7E=456'},
+             '/snapshots/detail?volume_id~=456'},
         # testcases for get pools
         {'command':
              'get-pools --filters name=456 --detail',
@@ -632,7 +632,7 @@ class ShellTest(utils.TestCase):
 
     def test_group_list(self):
         self.run_command('--os-volume-api-version 3.13 group-list')
-        self.assert_called_anytime('GET', '/groups/detail')
+        self.assert_called_anytime('GET', '/groups/detail?all_tenants=0')
 
     def test_group_list__with_all_tenant(self):
         self.run_command(
@@ -691,7 +691,8 @@ class ShellTest(utils.TestCase):
 
     def test_group_snapshot_list(self):
         self.run_command('--os-volume-api-version 3.14 group-snapshot-list')
-        self.assert_called_anytime('GET', '/group_snapshots/detail')
+        self.assert_called_anytime('GET',
+                                   '/group_snapshots/detail?all_tenants=0')
 
     def test_group_snapshot_show(self):
         self.run_command('--os-volume-api-version 3.14 '

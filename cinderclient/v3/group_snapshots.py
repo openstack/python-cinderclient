@@ -96,7 +96,7 @@ class GroupSnapshotManager(base.ManagerWithFind):
         :param search_opts: search options
         :rtype: list of :class:`GroupSnapshot`
         """
-        query_string = utils.build_query_param(search_opts)
+        query_string = utils.build_query_param(search_opts, sort=True)
 
         detail = ""
         if detailed:

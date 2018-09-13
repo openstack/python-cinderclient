@@ -206,15 +206,27 @@ def unicode_key_value_to_string(src):
 def build_query_param(params, sort=False):
     """parse list to url query parameters"""
 
-    if params is None:
-        params = {}
+    if not params:
+        return ""
+
     if not sort:
         param_list = list(params.items())
     else:
         param_list = list(sorted(params.items()))
 
     query_string = parse.urlencode(
-        [(k, v) for (k, v) in param_list if v])
+        [(k, v) for (k, v) in param_list if v not in (None, '')])
+
+    # urllib's parse library used to adhere to RFC 2396 until
+    # python 3.7. The library moved from RFC 2396 to RFC 3986
+    # for quoting URL strings in python 3.7 and '~' is now
+    # included in the set of reserved characters. [1]
+    #
+    # Below ensures "~" is never encoded. See LP 1784728 [2] for more details.
+    # [1] https://docs.python.org/3/library/urllib.parse.html#url-quoting
+    # [2] https://bugs.launchpad.net/python-cinderclient/+bug/1784728
+    query_string = query_string.replace("%7E=", "~=")
+
     if query_string:
         query_string = "?%s" % (query_string,)
 
