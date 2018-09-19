@@ -481,7 +481,7 @@ def do_reset_state(cs, args):
            type=int,
            action=CheckSizeArgForCreate,
            help='Size of volume, in GiBs. (Required unless '
-                'snapshot-id/source-volid is specified).')
+                'snapshot-id/source-volid/backup-id is specified).')
 @utils.arg('--consisgroup-id',
            metavar='<consistencygroup-id>',
            default=None,
