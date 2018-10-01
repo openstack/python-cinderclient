@@ -201,3 +201,15 @@ class VolumesTest(utils.TestCase):
                                                 'force_host_copy': False,
                                                 'lock_volume': False}})
         self._assert_request_id(vol)
+
+    @ddt.data(False, True)
+    def test_reimage(self, reimage_reserved):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.68'))
+        v = cs.volumes.get('1234')
+        self._assert_request_id(v)
+        vol = cs.volumes.reimage(v, '1', reimage_reserved)
+        cs.assert_called('POST', '/volumes/1234/action',
+                         {'os-reimage': {'image_id': '1',
+                                         'reimage_reserved':
+                                         reimage_reserved}})
+        self._assert_request_id(vol)

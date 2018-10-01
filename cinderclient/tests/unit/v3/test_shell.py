@@ -1895,3 +1895,18 @@ class ShellTest(utils.TestCase):
             'volume_id': '1234',
             'volume_name': volume_name,
             })
+
+    def test_reimage(self):
+        self.run_command('--os-volume-api-version 3.68 reimage 1234 1')
+        expected = {'os-reimage': {'image_id': '1',
+                                   'reimage_reserved': False}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)
+
+    @ddt.data('False', 'True')
+    def test_reimage_reserved(self, reimage_reserved):
+        self.run_command(
+            '--os-volume-api-version 3.68 reimage --reimage-reserved %s 1234 1'
+            % reimage_reserved)
+        expected = {'os-reimage': {'image_id': '1',
+                                   'reimage_reserved': reimage_reserved}}
+        self.assert_called('POST', '/volumes/1234/action', body=expected)

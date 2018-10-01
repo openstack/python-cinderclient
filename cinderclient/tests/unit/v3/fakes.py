@@ -453,6 +453,8 @@ class FakeHTTPClient(fakes_base.FakeHTTPClient):
                         'failover_replication', 'list_replication_targets',
                         'reset_status'):
             assert action in body
+        elif action == 'os-reimage':
+            assert 'image_id' in body[action]
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, {})

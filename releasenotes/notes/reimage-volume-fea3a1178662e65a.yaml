@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    A new ``cinder reimage`` command and related python API binding has been
+    added which allows a user to replace the current content of a specified
+    volume with the data of a specified image supplied by the Image service
+    (Glance).  (Note that this is a destructive action, that is, all data
+    currently contained in the volume is destroyed when the volume is
+    re-imaged.)  This feature requires Block Storage API microversion 3.68
+    or greater.
