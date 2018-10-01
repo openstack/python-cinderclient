@@ -290,7 +290,9 @@ class CheckSizeArgForCreate(argparse.Action):
            dest='scheduler_hints',
            action='append',
            default=[],
-           help='Scheduler hint, like in nova.')
+           help='Scheduler hint, similar to nova. Repeat option to set '
+                'multiple hints. Values with the same key will be stored '
+                'as a list.')
 @utils.arg('--allow-multiattach',
            dest='multiattach',
            action="store_true",
