@@ -210,7 +210,13 @@ class SessionClient(adapter.LegacyJsonAdapter):
 
     def _get_base_url(self):
         endpoint = self.get_endpoint()
-        base_url = '/'.join(endpoint.split('/')[:3]) + '/'
+        m = re.search('(.+)/v[1-3].*', endpoint)
+        if m:
+            # Get everything up until the version identifier
+            base_url = '%s/' % m.group(1)
+        else:
+            # Fall back to the root of the URL
+            base_url = '/'.join(endpoint.split('/')[:3]) + '/'
         return base_url
 
     def get_volume_api_version_from_endpoint(self):
