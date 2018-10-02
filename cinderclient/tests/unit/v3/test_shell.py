@@ -1338,7 +1338,7 @@ class ShellTest(utils.TestCase):
         expected = {'transfer': {'volume_id': 1234,
                                  'name': None,
                                  }}
-        self.assert_called('POST', '/volume-transfers', body=expected)
+        self.assert_called('POST', '/os-volume-transfer', body=expected)
 
     def test_create_transfer_no_snaps(self):
         self.run_command('--os-volume-api-version 3.55 transfer-create '
