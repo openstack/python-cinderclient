@@ -51,7 +51,6 @@ from cinderclient import utils
 _i18n.enable_lazy()
 
 
-DEFAULT_MAJOR_OS_VOLUME_API_VERSION = "3"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
 V1_SHELL = 'cinderclient.v1.shell'
 V2_SHELL = 'cinderclient.v2.shell'
@@ -534,7 +533,7 @@ class OpenStackCinderShell(object):
 
         if not options.os_volume_api_version:
             api_version = api_versions.get_api_version(
-                DEFAULT_MAJOR_OS_VOLUME_API_VERSION)
+                api_versions.MAX_VERSION)
         else:
             api_version = api_versions.get_api_version(
                 options.os_volume_api_version)
