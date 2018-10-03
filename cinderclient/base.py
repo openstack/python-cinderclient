@@ -53,10 +53,7 @@ def getid(obj):
     Abstracts the common pattern of allowing both an object or an object's ID
     as a parameter when dealing with relationships.
     """
-    try:
-        return obj.id
-    except AttributeError:
-        return obj
+    return getattr(obj, 'id', obj)
 
 
 class Manager(common_base.HookableMixin):
