@@ -203,7 +203,7 @@ class VolumeManager(base.ManagerWithFind):
         if limit:
             search_opts['limit'] = limit
 
-        query_string = utils.build_query_param(search_opts, True)
+        query_string = utils.build_query_param(search_opts, sort=True)
 
         detail = ""
         if detailed:

@@ -101,7 +101,7 @@ class ShellTest(utils.TestCase):
     def test_list(self):
         self.run_command('list')
         # NOTE(jdg): we default to detail currently
-        self.assert_called('GET', '/volumes/detail')
+        self.assert_called('GET', '/volumes/detail?all_tenants=0')
 
     def test_list_filter_tenant_with_all_tenants(self):
         self.run_command('list --tenant=123 --all-tenants 1')
@@ -184,11 +184,13 @@ class ShellTest(utils.TestCase):
 
     def test_list_filter_status(self):
         self.run_command('list --status=available')
-        self.assert_called('GET', '/volumes/detail?status=available')
+        self.assert_called('GET',
+                           '/volumes/detail?all_tenants=0&status=available')
 
     def test_list_filter_display_name(self):
         self.run_command('list --display-name=1234')
-        self.assert_called('GET', '/volumes/detail?display_name=1234')
+        self.assert_called('GET',
+                           '/volumes/detail?all_tenants=0&display_name=1234')
 
     def test_list_all_tenants(self):
         self.run_command('list --all-tenants=1')
@@ -200,7 +202,7 @@ class ShellTest(utils.TestCase):
 
     def test_list_limit(self):
         self.run_command('list --limit=10')
-        self.assert_called('GET', '/volumes/detail?limit=10')
+        self.assert_called('GET', '/volumes/detail?all_tenants=0&limit=10')
 
     def test_show(self):
         self.run_command('show 1234')
@@ -231,12 +233,13 @@ class ShellTest(utils.TestCase):
 
     def test_snapshot_list_filter_volume_id(self):
         self.run_command('snapshot-list --volume-id=1234')
-        self.assert_called('GET', '/snapshots/detail?volume_id=1234')
+        self.assert_called('GET',
+                           '/snapshots/detail?all_tenants=0&volume_id=1234')
 
     def test_snapshot_list_filter_status_and_volume_id(self):
         self.run_command('snapshot-list --status=available --volume-id=1234')
         self.assert_called('GET', '/snapshots/detail?'
-                           'status=available&volume_id=1234')
+                           'all_tenants=0&status=available&volume_id=1234')
 
     def test_rename(self):
         # basic rename with positional arguments
@@ -483,7 +486,7 @@ class ShellTest(utils.TestCase):
 
     def test_list_transfer(self):
         self.run_command('transfer-list')
-        self.assert_called('GET', '/os-volume-transfer/detail')
+        self.assert_called('GET', '/os-volume-transfer/detail?all_tenants=0')
 
     def test_list_transfer_all_tenants(self):
         self.run_command('transfer-list --all-tenants=1')

@@ -24,7 +24,6 @@ import hashlib
 import os
 
 import six
-from six.moves.urllib import parse
 
 from cinderclient.apiclient import base as common_base
 from cinderclient import exceptions
@@ -170,10 +169,8 @@ class Manager(common_base.HookableMixin):
         query_params = utils.unicode_key_value_to_string(query_params)
         # Transform the dict to a sequence of two-element tuples in fixed
         # order, then the encoded string will be consistent in Python 2&3.
-        query_string = ""
-        if query_params:
-            params = sorted(query_params.items(), key=lambda x: x[0])
-            query_string = "?%s" % parse.urlencode(params)
+
+        query_string = utils.build_query_param(query_params, sort=True)
 
         detail = ""
         if detailed:

@@ -1176,7 +1176,7 @@ class ShellTest(utils.TestCase):
 
     def test_list_transfer(self):
         self.run_command('transfer-list')
-        self.assert_called('GET', '/os-volume-transfer/detail')
+        self.assert_called('GET', '/os-volume-transfer/detail?all_tenants=0')
 
     def test_list_transfer_all_tenants(self):
         self.run_command('transfer-list --all-tenants=1')

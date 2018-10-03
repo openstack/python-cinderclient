@@ -28,9 +28,9 @@ import copy
 
 from requests import Response
 import six
-from six.moves.urllib import parse
 
 from cinderclient.apiclient import exceptions
+from cinderclient import utils
 from oslo_utils import encodeutils
 from oslo_utils import strutils
 
@@ -325,7 +325,7 @@ class CrudManager(BaseManager):
         return self._list(
             '%(base_url)s%(query)s' % {
                 'base_url': self.build_url(base_url=base_url, **kwargs),
-                'query': '?%s' % parse.urlencode(kwargs) if kwargs else '',
+                'query': utils.build_query_param(kwargs),
             },
             self.collection_key)
 
@@ -364,7 +364,7 @@ class CrudManager(BaseManager):
         rl = self._list(
             '%(base_url)s%(query)s' % {
                 'base_url': self.build_url(base_url=base_url, **kwargs),
-                'query': '?%s' % parse.urlencode(kwargs) if kwargs else '',
+                'query': '?%s' % utils.build_query_param(kwargs),
             },
             self.collection_key)
         num = len(rl)

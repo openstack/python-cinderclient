@@ -14,9 +14,8 @@
 # limitations under the License.
 """Limits interface (v2 extension)"""
 
-from six.moves.urllib import parse
-
 from cinderclient import base
+from cinderclient import utils
 
 
 class Limits(base.Resource):
@@ -95,6 +94,6 @@ class LimitsManager(base.Manager):
         if tenant_id:
             opts['tenant_id'] = tenant_id
 
-        query_string = "?%s" % parse.urlencode(opts) if opts else ""
+        query_string = utils.build_query_param(opts)
 
         return self._get("/limits%s" % query_string, "limits")

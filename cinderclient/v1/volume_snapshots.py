@@ -107,7 +107,7 @@ class SnapshotManager(base.ManagerWithFind):
 
         :rtype: list of :class:`Snapshot`
         """
-        query_string = utils.build_query_param(search_opts, True)
+        query_string = utils.build_query_param(search_opts, sort=True)
 
         detail = ""
         if detailed:
