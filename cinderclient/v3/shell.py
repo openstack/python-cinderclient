@@ -23,6 +23,7 @@ import os
 from oslo_utils import strutils
 import six
 
+import cinderclient
 from cinderclient import api_versions
 from cinderclient import base
 from cinderclient import exceptions
@@ -174,6 +175,13 @@ def do_backup_list(cs, args):
     utils.print_list(backups, columns, sortby_index=sortby_index)
     if show_count:
         print("Backup in total: %s" % total_count)
+
+    with cs.backups.completion_cache(
+            'uuid',
+            cinderclient.v3.volume_backups.VolumeBackup,
+            mode="w"):
+        for backup in backups:
+            cs.backups.write_to_completion_cache('uuid', backup.id)
 
 
 @utils.arg('--detail',
@@ -390,6 +398,12 @@ def do_list(cs, args):
     for vol in volumes:
         servers = [s.get('server_id') for s in vol.attachments]
         setattr(vol, 'attached_to', ','.join(map(str, servers)))
+
+    with cs.volumes.completion_cache('uuid',
+                                     cinderclient.v3.volumes.Volume,
+                                     mode="w"):
+        for vol in volumes:
+            cs.volumes.write_to_completion_cache('uuid', vol.id)
 
     if field_titles:
         # Remove duplicate fields
@@ -640,6 +654,11 @@ def do_create(cs, args):
             timeout_period, cs.client.global_request_id, cs.messages)
 
     utils.print_dict(info)
+
+    with cs.volumes.completion_cache('uuid',
+                                     cinderclient.v3.volumes.Volume,
+                                     mode="a"):
+        cs.volumes.write_to_completion_cache('uuid', volume.id)
 
 
 @utils.arg('volume',
@@ -2402,6 +2421,12 @@ def do_backup_create(cs, args):
         info.pop('links')
 
     utils.print_dict(info)
+
+    with cs.backups.completion_cache(
+            'uuid',
+            cinderclient.v3.volume_backups.VolumeBackup,
+            mode="a"):
+        cs.backups.write_to_completion_cache('uuid', backup.id)
 
 
 @utils.arg('volume', metavar='<volume>',
