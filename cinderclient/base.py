@@ -309,7 +309,10 @@ class Manager(common_base.HookableMixin):
     def write_to_completion_cache(self, cache_type, val):
         cache = getattr(self, "_%s_cache" % cache_type, None)
         if cache:
-            cache.write("%s\n" % val)
+            try:
+                cache.write("%s\n" % val)
+            except UnicodeEncodeError:
+                pass
 
     def _get(self, url, response_key=None):
         resp, body = self.api.client.get(url)
