@@ -13,4 +13,4 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient.v2.contrib.list_extensions import *  # flake8: noqa
+from cinderclient.v2.contrib.list_extensions import *  # noqa

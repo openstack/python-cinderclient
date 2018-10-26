@@ -19,4 +19,4 @@
 QoS Specs interface.
 """
 
-from cinderclient.v2.qos_specs import *  # flake8: noqa
+from cinderclient.v2.qos_specs import *  # noqa

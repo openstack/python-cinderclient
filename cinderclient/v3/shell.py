@@ -19,19 +19,17 @@ from __future__ import print_function
 import argparse
 import collections
 import os
-import sys
 
 from oslo_utils import strutils
 import six
 
-import cinderclient
 from cinderclient import api_versions
 from cinderclient import base
 from cinderclient import exceptions
 from cinderclient import shell_utils
 from cinderclient import utils
 
-from cinderclient.v2.shell import *  # flake8: noqa
+from cinderclient.v2.shell import *  # noqa
 
 FILTER_DEPRECATED = ("This option is deprecated and will be removed in "
                      "newer release. Please use '--filters' option which "
@@ -637,8 +635,9 @@ def do_create(cs, args):
 
     if args.poll:
         timeout_period = os.environ.get("POLL_TIMEOUT_PERIOD", 3600)
-        shell_utils._poll_for_status(cs.volumes.get, volume.id, info, 'creating', ['available'],
-                timeout_period, cs.client.global_request_id, cs.messages)
+        shell_utils._poll_for_status(
+            cs.volumes.get, volume.id, info, 'creating', ['available'],
+            timeout_period, cs.client.global_request_id, cs.messages)
 
     utils.print_dict(info)
 

@@ -16,4 +16,4 @@
 """Capabilities interface (v3 extension)"""
 
 
-from cinderclient.v2.capabilities import *  # flake8: noqa
+from cinderclient.v2.capabilities import *  # noqa

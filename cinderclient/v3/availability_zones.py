@@ -16,4 +16,4 @@
 
 """Availability Zone interface (v3 extension)"""
 
-from cinderclient.v2.availability_zones import *  # flake8: noqa
+from cinderclient.v2.availability_zones import *  # noqa

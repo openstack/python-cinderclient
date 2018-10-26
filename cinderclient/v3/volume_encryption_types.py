@@ -18,4 +18,4 @@
 Volume Encryption Type interface
 """
 
-from cinderclient.v2.volume_encryption_types import *  # flake8: noqa
+from cinderclient.v2.volume_encryption_types import *  # noqa

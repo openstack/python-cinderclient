@@ -15,4 +15,4 @@
 
 """Pools interface (v3 extension)"""
 
-from cinderclient.v2.pools import *  # flake8: noqa
+from cinderclient.v2.pools import *  # noqa

@@ -14,4 +14,4 @@
 
 """Volume type access interface."""
 
-from cinderclient.v2.volume_type_access import *  # flake8: noqa
+from cinderclient.v2.volume_type_access import *  # noqa

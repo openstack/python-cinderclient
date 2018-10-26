@@ -15,4 +15,4 @@
 
 """cgsnapshot interface (v3 extension)."""
 
-from cinderclient.v2.cgsnapshots import *  # flake8: noqa
+from cinderclient.v2.cgsnapshots import *  # noqa

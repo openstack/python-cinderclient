@@ -18,4 +18,4 @@
 This is part of the Volume Backups interface.
 """
 
-from cinderclient.v2.volume_backups_restore import *  # flake8: noqa
+from cinderclient.v2.volume_backups_restore import *  # noqa
