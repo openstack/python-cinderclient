@@ -529,10 +529,10 @@ class ShellTest(utils.TestCase):
     def test_rename_invalid_args(self):
         """Ensure that error generated does not reference an HTTP code."""
 
-        self.assertRaisesRegexp(exceptions.ClientException,
-                                '(?!HTTP)',
-                                self.run_command,
-                                'rename volume-1234-abcd')
+        self.assertRaisesRegex(exceptions.ClientException,
+                               '(?!HTTP)',
+                               self.run_command,
+                               'rename volume-1234-abcd')
 
     def test_rename_snapshot(self):
         # basic rename with positional arguments
