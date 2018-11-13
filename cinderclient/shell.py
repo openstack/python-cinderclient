@@ -39,16 +39,11 @@ import six
 import six.moves.urllib.parse as urlparse
 
 import cinderclient
-from cinderclient import _i18n
 from cinderclient._i18n import _
 from cinderclient import api_versions
 from cinderclient import client
 from cinderclient import exceptions as exc
 from cinderclient import utils
-
-
-# Enable i18n lazy translation
-_i18n.enable_lazy()
 
 
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
