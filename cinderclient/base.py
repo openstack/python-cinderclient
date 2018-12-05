@@ -273,7 +273,7 @@ class Manager(common_base.HookableMixin):
         cache_dir = os.path.expanduser(os.path.join(base_dir, uniqifier))
 
         try:
-            os.makedirs(cache_dir, 0o755)
+            os.makedirs(cache_dir, 0o750)
         except OSError:
             # NOTE(kiall): This is typically either permission denied while
             #              attempting to create the directory, or the directory
