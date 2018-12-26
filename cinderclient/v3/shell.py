@@ -1291,7 +1291,7 @@ def do_manageable_list(cs, args):
            nargs='?',
            type=int,
            const=1,
-           default=utils.env('ALL_TENANTS', default=0),
+           default=utils.env('ALL_TENANTS', default=None),
            help='Shows details for all tenants. Admin only.')
 @utils.arg('--filters',
            type=six.text_type,
@@ -1566,7 +1566,7 @@ def do_group_list_replication_targets(cs, args):
            nargs='?',
            type=int,
            const=1,
-           default=0,
+           default=utils.env('ALL_TENANTS', default=None),
            help='Shows details for all tenants. Admin only.')
 @utils.arg('--status',
            metavar='<status>',
@@ -1590,10 +1590,8 @@ def do_group_list_replication_targets(cs, args):
 def do_group_snapshot_list(cs, args):
     """Lists all group snapshots."""
 
-    all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
-
     search_opts = {
-        'all_tenants': all_tenants,
+        'all_tenants': args.all_tenants,
         'status': args.status,
         'group_id': args.group_id,
     }
