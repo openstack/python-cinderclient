@@ -1656,7 +1656,7 @@ def do_encryption_type_show(cs, args):
            metavar='<provider>',
            type=str,
            help='The encryption provider format. '
-                'For example, "luks" or "plain."')
+                'For example, "luks" or "plain".')
 @utils.arg('--cipher',
            metavar='<cipher>',
            type=str,
@@ -1683,8 +1683,8 @@ def do_encryption_type_show(cs, args):
            required=False,
            default='front-end',
            help='Notional service where encryption is performed. '
-                'Valid values are "front-end" or "back-end." '
-                'For example, front-end=Nova. Default is "front-end."')
+                'Valid values are "front-end" or "back-end". '
+                'For example, front-end=Nova. Default is "front-end".')
 @utils.arg('--control_location',
            type=str,
            required=False,
