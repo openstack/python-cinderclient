@@ -114,9 +114,11 @@ class ShellTest(utils.TestCase):
         self.assertRaises(exceptions.CommandError, self.shell, 'help foofoo')
 
     def test_help(self):
+        # Some expected help output, including microversioned commands
         required = [
             '.*?^usage: ',
             '.*?(?m)^\s+create\s+Creates a volume.',
+            '.*?(?m)^\s+summary\s+Get volumes summary.',
             '.*?(?m)^Run "cinder help SUBCOMMAND" for help on a subcommand.',
         ]
         help_text = self.shell('help')
@@ -130,6 +132,16 @@ class ShellTest(utils.TestCase):
             '.*?(?m)^Lists all volumes.',
         ]
         help_text = self.shell('help list')
+        for r in required:
+            self.assertThat(help_text,
+                            matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
+
+    def test_help_on_subcommand_mv(self):
+        required = [
+            '.*?^usage: cinder summary',
+            '.*?(?m)^Get volumes summary.',
+        ]
+        help_text = self.shell('help summary')
         for r in required:
             self.assertThat(help_text,
                             matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
