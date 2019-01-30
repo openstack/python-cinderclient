@@ -46,6 +46,7 @@ from cinderclient import exceptions as exc
 from cinderclient import utils
 
 
+DEFAULT_MAJOR_OS_VOLUME_API_VERSION = "3"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
 V1_SHELL = 'cinderclient.v1.shell'
 V2_SHELL = 'cinderclient.v2.shell'
@@ -527,8 +528,10 @@ class OpenStackCinderShell(object):
             '--help' in argv) or ('-h' in argv) or not argv
 
         if not options.os_volume_api_version:
-            api_version = api_versions.get_api_version(
-                api_versions.MAX_VERSION)
+            use_version = DEFAULT_MAJOR_OS_VOLUME_API_VERSION
+            if do_help:
+                use_version = api_versions.MAX_VERSION
+            api_version = api_versions.get_api_version(use_version)
         else:
             api_version = api_versions.get_api_version(
                 options.os_volume_api_version)
