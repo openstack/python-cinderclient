@@ -9,6 +9,10 @@
       - openstack-infra/devstack-gate
       - openstack/cinder
       - openstack/python-cinderclient
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*$
+      - ^releasenotes/.*$
 
 - job:
     name: cinderclient-dsvm-functional-identity-v3-only
@@ -21,7 +25,10 @@
       - openstack-infra/devstack-gate
       - openstack/cinder
       - openstack/python-cinderclient
-
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*$
+      - ^releasenotes/.*$
 
 - project:
     templates:
