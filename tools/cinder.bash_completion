@@ -16,7 +16,7 @@ _cinder()
      fi
 
      if [[ "$prev" != "help" ]] ; then
-                COMPLETION_CACHE=~/.cinderclient/*/*-cache
+                COMPLETION_CACHE=~/.cache/cinderclient/*/*-cache
                 cflags="$_cinder_flags $_cinder_opts "$(cat $COMPLETION_CACHE 2> /dev/null | tr '\n' ' ')
                 COMPREPLY=($(compgen -W "${cflags}" -- ${cur}))
      else
