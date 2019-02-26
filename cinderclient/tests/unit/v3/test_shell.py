@@ -79,6 +79,8 @@ class ShellTest(utils.TestCase):
             self.useFixture(fixtures.EnvironmentVariable(var,
                                                          self.FAKE_ENV[var]))
 
+        self.mock_completion()
+
         self.shell = shell.OpenStackCinderShell()
 
         self.requests = self.useFixture(requests_mock_fixture.Fixture())

@@ -91,6 +91,8 @@ class Manager(common_base.HookableMixin):
             except KeyError:
                 pass
 
+        # FIXME(eharney): This is probably a bug - we should only call
+        # completion_cache for the shell, not here.
         with self.completion_cache('human_id', obj_class, mode="w"):
             with self.completion_cache('uuid', obj_class, mode="w"):
                 items_new = [obj_class(self, res, loaded=True)
