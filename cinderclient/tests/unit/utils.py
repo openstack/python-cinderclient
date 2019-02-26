@@ -15,6 +15,7 @@ import json
 import os
 
 import fixtures
+import mock
 import requests
 from requests_mock.contrib import fixture as requests_mock_fixture
 import six
@@ -40,6 +41,9 @@ class TestCase(testtools.TestCase):
             stderr = self.useFixture(fixtures.StringStream('stderr')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
 
+        # FIXME(eharney) - this should only be needed for shell tests
+        self.mock_completion()
+
     def _assert_request_id(self, obj, count=1):
         self.assertTrue(hasattr(obj, 'request_ids'))
         self.assertEqual(REQUEST_ID * count, obj.request_ids)
@@ -48,6 +52,16 @@ class TestCase(testtools.TestCase):
                               partial_body=None):
         return self.shell.cs.assert_called_anytime(method, url, body,
                                                    partial_body)
+
+    def mock_completion(self):
+        patcher = mock.patch(
+            'cinderclient.base.Manager.write_to_completion_cache')
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+        patcher = mock.patch('cinderclient.base.Manager.completion_cache')
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
 
 class FixturedTestCase(TestCase):

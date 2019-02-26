@@ -59,6 +59,8 @@ class ShellTest(utils.TestCase):
             self.useFixture(fixtures.EnvironmentVariable(var,
                                                          self.FAKE_ENV[var]))
 
+        self.mock_completion()
+
     def shell(self, argstr):
         orig = sys.stdout
         try:
@@ -294,6 +296,11 @@ class ShellTest(utils.TestCase):
 
 class CinderClientArgumentParserTest(utils.TestCase):
 
+    def setUp(self):
+        super(CinderClientArgumentParserTest, self).setUp()
+
+        self.mock_completion()
+
     def test_ambiguity_solved_for_one_visible_argument(self):
         parser = shell.CinderClientArgumentParser(add_help=False)
         parser.add_argument('--test-parameter',
@@ -336,6 +343,10 @@ class CinderClientArgumentParserTest(utils.TestCase):
 
 
 class TestLoadVersionedActions(utils.TestCase):
+    def setUp(self):
+        super(TestLoadVersionedActions, self).setUp()
+
+        self.mock_completion()
 
     def test_load_versioned_actions(self):
         parser = cinderclient.shell.CinderClientArgumentParser()

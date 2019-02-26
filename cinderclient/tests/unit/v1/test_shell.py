@@ -48,6 +48,8 @@ class ShellTest(utils.TestCase):
             self.useFixture(fixtures.EnvironmentVariable(var,
                                                          self.FAKE_ENV[var]))
 
+        self.mock_completion()
+
         self.shell = shell.OpenStackCinderShell()
 
         # HACK(bcwaldon): replace this when we start using stubs
