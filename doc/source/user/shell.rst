@@ -1,5 +1,5 @@
 The :program:`cinder` shell utility
-=========================================
+===================================
 
 .. program:: cinder
 .. highlight:: bash
