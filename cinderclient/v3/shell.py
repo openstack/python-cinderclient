@@ -1348,6 +1348,20 @@ def do_group_list(cs, args):
     columns = ['ID', 'Status', 'Name']
     utils.print_list(groups, columns)
 
+    with cs.groups.completion_cache(
+            'uuid',
+            cinderclient.v3.groups.Group,
+            mode='w'):
+        for group in groups:
+            cs.groups.write_to_completion_cache('uuid', group.id)
+    with cs.groups.completion_cache('name',
+                                    cinderclient.v3.groups.Group,
+                                    mode='w'):
+        for group in groups:
+            if group.name is None:
+                continue
+            cs.groups.write_to_completion_cache('name', group.name)
+
 
 @api_versions.wraps('3.13')
 @utils.arg('--list-volume',
@@ -1410,6 +1424,17 @@ def do_group_create(cs, args):
 
     info.pop('links', None)
     utils.print_dict(info)
+
+    with cs.groups.completion_cache('uuid',
+                                    cinderclient.v3.groups.Group,
+                                    mode='a'):
+        cs.groups.write_to_completion_cache('uuid', group.id)
+
+    if group.name is not None:
+        with cs.groups.completion_cache('name',
+                                        cinderclient.v3.groups.Group,
+                                        mode='a'):
+            cs.groups.write_to_completion_cache('name', group.name)
 
 
 @api_versions.wraps('3.14')
