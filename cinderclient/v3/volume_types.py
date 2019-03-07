@@ -99,7 +99,8 @@ class VolumeTypeManager(base.ManagerWithFind):
         # Need to keep backwards compatibility with is_public usage. If it
         # isn't included then cinder will assume you want is_public=True, which
         # negatively affects the results.
-        search_opts['is_public'] = is_public
+        if 'is_public' not in search_opts:
+            search_opts['is_public'] = is_public
 
         query_string = "?%s" % parse.urlencode(search_opts)
         return self._list("/types%s" % query_string, "volume_types")

@@ -750,9 +750,20 @@ def do_summary(cs, args):
 
 
 @api_versions.wraps('3.11')
+@utils.arg('--filters',
+           type=six.text_type,
+           nargs='*',
+           start_version='3.52',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs. Admin only.")
 def do_group_type_list(cs, args):
     """Lists available 'group types'. (Admin only will see private types)"""
-    gtypes = cs.group_types.list()
+    search_opts = {}
+    # Update search option with `filters`
+    if hasattr(args, 'filters') and args.filters is not None:
+        search_opts.update(shell_utils.extract_filters(args.filters))
+    gtypes = cs.group_types.list(search_opts=search_opts)
     shell_utils.print_group_type_list(gtypes)
 
 
