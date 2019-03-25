@@ -1,6 +1,6 @@
-=========================
-CINDERCLIENT Using noauth
-=========================
+============
+Using noauth
+============
 
 Cinder Server side API setup
 ============================

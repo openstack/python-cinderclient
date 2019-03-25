@@ -34,41 +34,25 @@ API::
     []
 
 User Guides
-===========
-
-In order to use the CLI, you must provide your OpenStack username, password,
-tenant, and auth endpoint. Use the corresponding configuration options
-(``--os-username``, ``--os-password``, ``--os-tenant-id``, and
-``--os-auth-url``) or set them in environment variables::
-
-    export OS_USERNAME=user
-    export OS_PASSWORD=pass
-    export OS_TENANT_ID=b363706f891f48019483f8bd6503c54b
-    export OS_AUTH_URL=http://auth.example.com:5000/v2.0
-
-Once you've configured your authentication parameters, you can run ``cinder
-help`` to see a complete listing of available commands.
-
-See also :doc:`/cli/index` for detailed documentation.
+~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 2
 
-   user/cinder
+   user/shell
+   user/no_auth
 
 Command-Line Reference
-======================
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 2
 
    cli/index
    cli/details
-   user/shell
-   user/no_auth
 
 Developer Guides
-================
+~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 2
@@ -77,7 +61,7 @@ Developer Guides
    contributor/unit_tests
 
 Release Notes
-=============
+~~~~~~~~~~~~~
 
 All python-cinderclient release notes can now be found on the `release notes`_
 page.
