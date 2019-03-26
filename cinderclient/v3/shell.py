@@ -72,6 +72,19 @@ def do_type_list(cs, args):
     vtypes = cs.volume_types.list(search_opts=search_opts)
     shell_utils.print_volume_type_list(vtypes)
 
+    with cs.volume_types.completion_cache(
+            'uuid',
+            cinderclient.v3.volume_types.VolumeType,
+            mode="w"):
+        for vtype in vtypes:
+            cs.volume_types.write_to_completion_cache('uuid', vtype.id)
+    with cs.volume_types.completion_cache(
+            'name',
+            cinderclient.v3.volume_types.VolumeType,
+            mode="w"):
+        for vtype in vtypes:
+            cs.volume_types.write_to_completion_cache('name', vtype.name)
+
 
 @utils.arg('--all-tenants',
            metavar='<all_tenants>',
@@ -183,6 +196,13 @@ def do_backup_list(cs, args):
             mode="w"):
         for backup in backups:
             cs.backups.write_to_completion_cache('uuid', backup.id)
+    with cs.backups.completion_cache(
+            'name',
+            cinderclient.v3.volume_backups.VolumeBackup,
+            mode='w'):
+        for backup in backups:
+            if backup.name is not None:
+                cs.backups.write_to_completion_cache('name', backup.name)
 
 
 @utils.arg('--detail',
@@ -405,6 +425,14 @@ def do_list(cs, args):
                                      mode="w"):
         for vol in volumes:
             cs.volumes.write_to_completion_cache('uuid', vol.id)
+
+    with cs.volumes.completion_cache('name',
+                                     cinderclient.v3.volumes.Volume,
+                                     mode="w"):
+        for vol in volumes:
+            if vol.name is None:
+                continue
+            cs.volumes.write_to_completion_cache('name', vol.name)
 
     if field_titles:
         # Remove duplicate fields
@@ -659,6 +687,11 @@ def do_create(cs, args):
                                      cinderclient.v3.volumes.Volume,
                                      mode="a"):
         cs.volumes.write_to_completion_cache('uuid', volume.id)
+    if volume.name is not None:
+        with cs.volumes.completion_cache('name',
+                                         cinderclient.v3.volumes.Volume,
+                                         mode="a"):
+            cs.volumes.write_to_completion_cache('name', volume.name)
 
 
 @utils.arg('volume',
@@ -2042,6 +2075,13 @@ def do_snapshot_list(cs, args):
                          sortby_index=sortby_index)
     if show_count:
         print("Snapshot in total: %s" % total_count)
+
+    with cs.volume_snapshots.completion_cache(
+            'uuid',
+            cinderclient.v3.volume_snapshots.Snapshot,
+            mode='w'):
+        for snapshot in snapshots:
+            cs.volume_snapshots.write_to_completion_cache('uuid', snapshot.id)
 
 
 @api_versions.wraps('3.27')
