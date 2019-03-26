@@ -236,12 +236,12 @@ class DiscoverVersionTestCase(utils.TestCase):
         api_versions.MIN_VERSION = client_min
 
         if exp_range:
-            self.assertRaisesRegexp(exceptions.UnsupportedVersion,
-                                    ".*range is '%s' to '%s'.*" %
-                                    (server_min, server_max),
-                                    api_versions.discover_version,
-                                    self.fake_client,
-                                    api_versions.APIVersion(requested_version))
+            self.assertRaisesRegex(exceptions.UnsupportedVersion,
+                                   ".*range is '%s' to '%s'.*" %
+                                   (server_min, server_max),
+                                   api_versions.discover_version,
+                                   self.fake_client,
+                                   api_versions.APIVersion(requested_version))
         else:
             discovered_version = api_versions.discover_version(
                 self.fake_client,
