@@ -37,6 +37,7 @@ class Volume(volumes.Volume):
                            3.1-latest).
         :param protected: Boolean to decide whether prevents image from being
                           deleted (allowed for 3.1-latest).
+        :returns: tuple (response, body)
         """
         if self.manager.api_version >= api_versions.APIVersion("3.1"):
             visibility = 'private' if visibility is None else visibility
