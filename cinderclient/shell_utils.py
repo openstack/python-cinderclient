@@ -26,12 +26,13 @@ _quota_resources = ['volumes', 'snapshots', 'gigabytes',
 _quota_infos = ['Type', 'In_use', 'Reserved', 'Limit', 'Allocated']
 
 
-def print_volume_image(image):
-    if 'volume_type' in image[1]['os-volume_upload_image']:
-        volume_type_name = (
-            image[1]['os-volume_upload_image']['volume_type']['name'])
-        image[1]['os-volume_upload_image']['volume_type'] = volume_type_name
-    utils.print_dict(image[1]['os-volume_upload_image'])
+def print_volume_image(image_resp_tuple):
+    # image_resp_tuple = tuple (response, body)
+    image = image_resp_tuple[1]
+    vt = image['os-volume_upload_image'].get('volume_type')
+    if vt is not None:
+        image['os-volume_upload_image']['volume_type'] = vt.get('name')
+    utils.print_dict(image['os-volume_upload_image'])
 
 
 def poll_for_status(poll_fn, obj_id, action, final_ok_states,
