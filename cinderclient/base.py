@@ -91,12 +91,8 @@ class Manager(common_base.HookableMixin):
             except KeyError:
                 pass
 
-        # FIXME(eharney): This is probably a bug - we should only call
-        # completion_cache for the shell, not here.
-        with self.completion_cache('human_id', obj_class, mode="w"):
-            with self.completion_cache('uuid', obj_class, mode="w"):
-                items_new = [obj_class(self, res, loaded=True)
-                             for res in data if res]
+        items_new = [obj_class(self, res, loaded=True)
+                     for res in data if res]
         if limit:
             limit = int(limit)
             margin = limit - len(items)
@@ -330,9 +326,7 @@ class Manager(common_base.HookableMixin):
         if return_raw:
             return common_base.DictWithMeta(body[response_key], resp)
 
-        with self.completion_cache('human_id', self.resource_class, mode="a"):
-            with self.completion_cache('uuid', self.resource_class, mode="a"):
-                return self.resource_class(self, body[response_key], resp=resp)
+        return self.resource_class(self, body[response_key], resp=resp)
 
     def _delete(self, url):
         resp, body = self.api.client.delete(url)
