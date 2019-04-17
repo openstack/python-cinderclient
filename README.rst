@@ -28,7 +28,7 @@ command-line tool. You may also want to look at the
 The project is hosted on `Launchpad`_, where bugs can be filed. The code is
 hosted on `OpenStack`_. Patches must be submitted using `Gerrit`_.
 
-.. _OpenStack: https://git.openstack.org/cgit/openstack/python-cinderclient
+.. _OpenStack: https://opendev.org/openstack/python-cinderclient
 .. _Launchpad: https://launchpad.net/python-cinderclient
 .. _Gerrit: https://docs.openstack.org/infra/manual/developers.html#development-workflow
 
@@ -51,7 +51,7 @@ __ https://github.com/rackerlabs/python-cloudservers
 .. _Online Documentation: https://docs.openstack.org/python-cinderclient/latest/
 .. _Blueprints: https://blueprints.launchpad.net/python-cinderclient
 .. _Bugs: https://bugs.launchpad.net/python-cinderclient
-.. _Source: https://git.openstack.org/cgit/openstack/python-cinderclient
+.. _Source: https://opendev.org/openstack/python-cinderclient
 .. _How to Contribute: https://docs.openstack.org/infra/manual/developers.html
 .. _Specs: https://specs.openstack.org/openstack/cinder-specs/
 
