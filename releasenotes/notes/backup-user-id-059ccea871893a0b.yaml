@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Starting with API microversion 3.56, ``backup-list`` and ``backup-show``
+    will include the ``User ID`` denoting the user that created the backup.
