@@ -1,0 +1,22 @@
+---
+prelude: >
+    This release fixes the issue that functionality had been implemented
+    in the previous release to handle up to microversion 3.55 of the Block
+    Storage API, but the cinderclient was under the impression that it
+    could only handle up to microversion 3.52.
+issues:
+  - |
+    There is a possible backward incompatability issue that could affect
+    consumers of the
+    ``cinderclient.client.get_highest_client_server_version(url)`` method.
+    It might have been expected that the 4.0.x series of releases would be
+    capped at microversion 3.52; however, in this release, that method may
+    return up to microversion 3.55.  Ordinarily, this would be signaled by
+    incrementing the minor version of the cinderclient; however, that cannot
+    be done for this release because the 4.1.x series has already been
+    released from the stein branch.
+upgrade:
+  - |
+    This version of the cinderclient can communicate with the Block Storage
+    API up to microversion 3.55.  The previous release could only handle up
+    to microversion 3.52.
