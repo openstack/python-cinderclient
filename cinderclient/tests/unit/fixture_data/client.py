@@ -13,7 +13,6 @@
 from keystoneauth1 import fixture
 
 from cinderclient.tests.unit.fixture_data import base
-from cinderclient.v1 import client as v1client
 from cinderclient.v2 import client as v2client
 
 
@@ -32,21 +31,6 @@ class Base(base.Fixture):
         self.requests.register_uri('POST', auth_url,
                                    json=self.token,
                                    headers=self.json_headers)
-
-
-class V1(Base):
-
-    def __init__(self, *args, **kwargs):
-        super(V1, self).__init__(*args, **kwargs)
-
-        svc = self.token.add_service('volume')
-        svc.add_endpoint(self.volume_url)
-
-    def new_client(self):
-        return v1client.Client(username='xx',
-                               api_key='xx',
-                               project_id='xx',
-                               auth_url=self.identity_url)
 
 
 class V2(Base):

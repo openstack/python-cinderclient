@@ -57,12 +57,10 @@ try:
 except ImportError:
     import simplejson as json
 
-_VALID_VERSIONS = ['v1', 'v2', 'v3']
+_VALID_VERSIONS = ['v2', 'v3']
 V3_SERVICE_TYPE = 'volumev3'
 V2_SERVICE_TYPE = 'volumev2'
-V1_SERVICE_TYPE = 'volume'
-SERVICE_TYPES = {'1': V1_SERVICE_TYPE,
-                 '2': V2_SERVICE_TYPE,
+SERVICE_TYPES = {'2': V2_SERVICE_TYPE,
                  '3': V3_SERVICE_TYPE}
 REQ_ID_HEADER = 'X-OpenStack-Request-ID'
 
@@ -89,11 +87,11 @@ def get_server_version(url):
 
         # NOTE(andreykurilin): endpoint URL has at least 2 formats:
         #   1. The classic (legacy) endpoint:
-        #       http://{host}:{optional_port}/v{1 or 2 or 3}/{project-id}
-        #       http://{host}:{optional_port}/v{1 or 2 or 3}
+        #       http://{host}:{optional_port}/v{2 or 3}/{project-id}
+        #       http://{host}:{optional_port}/v{2 or 3}
         #   3. Under wsgi:
-        #       http://{host}:{optional_port}/volume/v{1 or 2 or 3}
-        for ver in ['v1', 'v2', 'v3']:
+        #       http://{host}:{optional_port}/volume/v{2 or 3}
+        for ver in ['v2', 'v3']:
             if u.path.endswith(ver) or "/{0}/".format(ver) in u.path:
                 path = u.path[:u.path.rfind(ver)]
                 version_url = '%s://%s%s' % (u.scheme, u.netloc, path)
@@ -114,6 +112,11 @@ def get_server_version(url):
                 min_version = version['min_version']
                 current_version = version['version']
                 break
+            else:
+                # Set the values, but don't break out the loop here in case v3
+                # comes later
+                min_version = '2.0'
+                current_version = '2.0'
     except exceptions.ClientException as e:
         logger.warning("Error in server version query:%s\n"
                        "Returning APIVersion 2.0", six.text_type(e.message))
@@ -740,7 +743,6 @@ def _get_client_class_and_version(version):
 
 def get_client_class(version):
     version_map = {
-        '1': 'cinderclient.v1.client.Client',
         '2': 'cinderclient.v2.client.Client',
         '3': 'cinderclient.v3.client.Client',
     }
@@ -808,8 +810,7 @@ def Client(version, *args, **kwargs):
 
     Here ``VERSION`` can be a string or
     ``cinderclient.api_versions.APIVersion`` obj. If you prefer string value,
-    you can use ``1`` (deprecated now), ``2``, or ``3.X``
-    (where X is a microversion).
+    you can use ``2`` (deprecated now) or ``3.X`` (where X is a microversion).
 
 
     Alternatively, you can create a client instance using the keystoneclient
