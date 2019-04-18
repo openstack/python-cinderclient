@@ -20,7 +20,7 @@ variables by setting two environment variables:
 
     Your password.
 
-.. envvar:: OS_TENANT_NAME or CINDER_PROJECT_ID
+.. envvar:: OS_PROJECT_NAME or CINDER_PROJECT_ID
 
     Project for work.
 
@@ -36,7 +36,7 @@ For example, in Bash you'd use::
 
     export OS_USERNAME=yourname
     export OS_PASSWORD=yadayadayada
-    export OS_TENANT_NAME=myproject
+    export OS_PROJECT_NAME=myproject
     export OS_AUTH_URL=http://auth.example.com:5000/v3
     export OS_VOLUME_API_VERSION=3
 

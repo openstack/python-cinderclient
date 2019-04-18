@@ -6,7 +6,7 @@ and identify which endpoint you wish to speak to. Once you have done so, you
 can use the API like so::
 
     >>> from cinderclient import client
-    >>> cinder = client.Client('1', $OS_USER_NAME, $OS_PASSWORD, $OS_TENANT_NAME, $OS_AUTH_URL)
+    >>> cinder = client.Client('1', $OS_USER_NAME, $OS_PASSWORD, $OS_PROJECT_NAME, $OS_AUTH_URL)
     >>> cinder.volumes.list()
     []
     >>> myvol = cinder.volumes.create(display_name="test-vol", size=1)
@@ -91,7 +91,7 @@ The following are kept for historical purposes.
 
 * Fixed usage of the --debug option.
 * Documentation and API example improvements.
-* Set max volume size limit for the tenant.
+* Set max volume size limit for the project.
 * Added encryption-type-update to cinderclient.
 * Added volume multi attach support.
 * Support host-attach of volumes.
