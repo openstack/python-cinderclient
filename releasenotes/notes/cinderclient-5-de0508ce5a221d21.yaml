@@ -10,3 +10,9 @@ upgrade:
     This version of the python-cinderclient no longer supports the Cinder v1
     API. Ensure all mananaged services have at least the v2 API available prior
     to upgrading this client.
+  - |
+    The ``cinder endpoints`` command was deprecated and has now been removed.
+    The command ``openstack catalog list`` should be used instead.
+  - |
+    The ``cinder credentials`` command was deprecated and has now been removed.
+    The command ``openstack token issue`` should be used instead.

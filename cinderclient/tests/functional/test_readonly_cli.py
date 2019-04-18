@@ -47,14 +47,6 @@ class CinderClientReadOnlyTests(base.ClientTestBase):
                                                'Cipher', 'Key Size',
                                                'Control Location'])
 
-    def test_endpoints(self):
-        out = self.cinder('endpoints')
-        tables = self.parser.tables(out)
-        for table in tables:
-            headers = table['headers']
-            self.assertGreaterEqual(2, len(headers))
-            self.assertEqual('Value', headers[1])
-
     def test_extra_specs_list(self):
         extra_specs_list = self.cinder('extra-specs-list')
         self.assertTableHeaders(extra_specs_list, ['ID', 'Name',
