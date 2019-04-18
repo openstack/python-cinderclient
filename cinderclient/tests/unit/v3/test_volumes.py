@@ -83,7 +83,6 @@ class VolumesTest(utils.TestCase):
                                'volume_type': '5678',
                                'metadata': {},
                                'consistencygroup_id': None,
-                               'multiattach': False,
                                'group_id': '1234',
                                'backup_id': None}}
         cs.assert_called('POST', '/volumes', body=expected)

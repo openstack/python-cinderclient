@@ -22,3 +22,7 @@ upgrade:
     for several releases and have now been removed. After upgrading, use the
     equivalent ``--os_project_name``, ``--os_project_id``, ``OS_PROJECT_NAME``
     and ``OS_PROJECT_ID``.
+  - |
+    The deprecated volume create option ``--allow-multiattach`` has now been
+    removed. Multiattach capability is now controlled using `volume-type extra
+    specs <https://docs.openstack.org/cinder/latest/admin/blockstorage-volume-multiattach.html>`_.

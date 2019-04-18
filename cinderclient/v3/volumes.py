@@ -14,7 +14,6 @@
 #    under the License.
 
 """Volume interface (v3 extension)."""
-import warnings
 
 from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
@@ -78,7 +77,7 @@ class VolumeManager(volumes.VolumeManager):
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
                metadata=None, imageRef=None, scheduler_hints=None,
-               multiattach=False, backup_id=None):
+               backup_id=None):
         """Create a volume.
 
         :param size: Size of volume in GB
@@ -96,8 +95,6 @@ class VolumeManager(volumes.VolumeManager):
         :param source_volid: ID of source volume to clone from
         :param scheduler_hints: (optional extension) arbitrary key-value pairs
                             specified by the client to help boot an instance
-        :param multiattach: Allow the volume to be attached to more than
-                            one instance (deprecated)
         :param backup_id: ID of the backup
         :rtype: :class:`Volume`
         """
@@ -105,13 +102,6 @@ class VolumeManager(volumes.VolumeManager):
             volume_metadata = {}
         else:
             volume_metadata = metadata
-
-        if multiattach:
-            warnings.warn('The ``multiattach`` volume create flag is '
-                          'deprecated and will be removed in a future '
-                          'release. Multiattach capability is now controlled '
-                          'using volume type extra specs.',
-                          DeprecationWarning)
 
         body = {'volume': {'size': size,
                            'consistencygroup_id': consistencygroup_id,
@@ -123,7 +113,6 @@ class VolumeManager(volumes.VolumeManager):
                            'metadata': volume_metadata,
                            'imageRef': imageRef,
                            'source_volid': source_volid,
-                           'multiattach': multiattach,
                            'backup_id': backup_id
                            }}
 

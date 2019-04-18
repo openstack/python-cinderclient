@@ -100,7 +100,7 @@ class VolumesTest(utils.TestCase):
                                'volume_type': None,
                                'metadata': {},
                                'consistencygroup_id': None,
-                               'multiattach': False},
+                               },
                     'OS-SCH-HNT:scheduler_hints': 'uuid'}
         cs.assert_called('POST', '/volumes', body=expected)
         self._assert_request_id(vol)

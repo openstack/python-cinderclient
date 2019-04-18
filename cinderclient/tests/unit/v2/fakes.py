@@ -56,7 +56,6 @@ def _stub_volume(*args, **kwargs):
         "metadata": {},
         "status": "available",
         'description': None,
-        "multiattach": "false",
         "os-volume-replication:driver_data": None,
         "source_volid": None,
         "consistencygroup_id": None,

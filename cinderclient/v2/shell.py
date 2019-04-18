@@ -292,12 +292,6 @@ class CheckSizeArgForCreate(argparse.Action):
            help='Scheduler hint, similar to nova. Repeat option to set '
                 'multiple hints. Values with the same key will be stored '
                 'as a list.')
-@utils.arg('--allow-multiattach',
-           dest='multiattach',
-           action="store_true",
-           help=('Allow volume to be attached more than once. (DEPRECATED)'
-                 ' Default=False'),
-           default=False)
 def do_create(cs, args):
     """Creates a volume."""
     # NOTE(thingee): Backwards-compatibility with v1 args
@@ -339,8 +333,7 @@ def do_create(cs, args):
                                availability_zone=args.availability_zone,
                                imageRef=image_ref,
                                metadata=volume_metadata,
-                               scheduler_hints=hints,
-                               multiattach=args.multiattach)
+                               scheduler_hints=hints)
 
     info = dict()
     volume = cs.volumes.get(volume.id)

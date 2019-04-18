@@ -15,8 +15,6 @@
 
 """Volume interface (v2 extension)."""
 
-import warnings
-
 from cinderclient.apiclient import base as common_base
 from cinderclient import base
 
@@ -233,8 +231,7 @@ class VolumeManager(base.ManagerWithFind):
                source_volid=None, name=None, description=None,
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
-               metadata=None, imageRef=None, scheduler_hints=None,
-               multiattach=False):
+               metadata=None, imageRef=None, scheduler_hints=None):
         """Create a volume.
 
         :param size: Size of volume in GB
@@ -251,21 +248,12 @@ class VolumeManager(base.ManagerWithFind):
         :param source_volid: ID of source volume to clone from
         :param scheduler_hints: (optional extension) arbitrary key-value pairs
                             specified by the client to help boot an instance
-        :param multiattach: Allow the volume to be attached to more than
-                            one instance (deprecated)
         :rtype: :class:`Volume`
         """
         if metadata is None:
             volume_metadata = {}
         else:
             volume_metadata = metadata
-
-        if multiattach:
-            warnings.warn('The ``multiattach`` volume create flag is '
-                          'deprecated and will be removed in a future '
-                          'release. Multiattach capability is now controlled '
-                          'using volume type extra specs.',
-                          DeprecationWarning)
 
         body = {'volume': {'size': size,
                            'consistencygroup_id': consistencygroup_id,
@@ -277,7 +265,6 @@ class VolumeManager(base.ManagerWithFind):
                            'metadata': volume_metadata,
                            'imageRef': imageRef,
                            'source_volid': source_volid,
-                           'multiattach': multiattach,
                            }}
 
         if scheduler_hints:
