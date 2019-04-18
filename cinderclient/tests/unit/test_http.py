@@ -21,6 +21,28 @@ from cinderclient import exceptions
 from cinderclient.tests.unit import utils
 
 
+fake_auth_response = {
+    "access": {
+        "token": {
+            "expires": "2014-11-01T03:32:15-05:00",
+            "id": "FAKE_ID",
+        },
+        "serviceCatalog": [
+            {
+                "type": "volumev2",
+                "endpoints": [
+                    {
+                        "adminURL": "http://localhost:8776/v2",
+                        "region": "RegionOne",
+                        "internalURL": "http://localhost:8776/v2",
+                        "publicURL": "http://localhost:8776/v2",
+                    },
+                ],
+            },
+        ],
+    },
+}
+
 fake_response = utils.TestResponse({
     "status_code": 200,
     "text": '{"hi": "there"}',
@@ -29,7 +51,7 @@ mock_request = mock.Mock(return_value=(fake_response))
 
 fake_201_response = utils.TestResponse({
     "status_code": 201,
-    "text": '{"hi": "there"}',
+    "text": json.dumps(fake_auth_response),
 })
 mock_201_request = mock.Mock(return_value=(fake_201_response))
 
@@ -329,7 +351,6 @@ class ClientTest(utils.TestCase):
         cl = get_authed_client()
         cl.auth_url = 'http://example.com:5000/v3'
 
-        @mock.patch.object(cl, "_extract_service_catalog", mock.Mock())
         @mock.patch.object(requests, "request", mock_201_request)
         def test_auth_call():
             cl.authenticate()
