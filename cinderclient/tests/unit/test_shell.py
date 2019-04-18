@@ -43,7 +43,7 @@ class ShellTest(utils.TestCase):
     FAKE_ENV = {
         'OS_USERNAME': 'username',
         'OS_PASSWORD': 'password',
-        'OS_TENANT_NAME': 'tenant_name',
+        'OS_PROJECT_NAME': 'tenant_name',
         'OS_AUTH_URL': 'http://no.where/v2.0',
     }
 
@@ -227,7 +227,7 @@ class ShellTest(utils.TestCase):
             self.FAKE_ENV['OS_AUTH_URL'],
             password=mock_getpass.return_value,
             tenant_id='',
-            tenant_name=self.FAKE_ENV['OS_TENANT_NAME'],
+            tenant_name=self.FAKE_ENV['OS_PROJECT_NAME'],
             username=self.FAKE_ENV['OS_USERNAME'])
 
     @requests_mock.Mocker()

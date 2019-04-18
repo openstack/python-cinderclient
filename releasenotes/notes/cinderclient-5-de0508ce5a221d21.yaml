@@ -16,3 +16,9 @@ upgrade:
   - |
     The ``cinder credentials`` command was deprecated and has now been removed.
     The command ``openstack token issue`` should be used instead.
+  - |
+    The use of ``--os_tenant_name``, ``--os_tenant_id`` and the environment
+    variables ``OS_TENANT_NAME`` and ``OS_TENANT_ID`` have been deprecated
+    for several releases and have now been removed. After upgrading, use the
+    equivalent ``--os_project_name``, ``--os_project_id``, ``OS_PROJECT_NAME``
+    and ``OS_PROJECT_ID``.

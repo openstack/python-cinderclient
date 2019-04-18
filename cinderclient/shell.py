@@ -255,24 +255,14 @@ class OpenStackCinderShell(object):
         parser.add_argument('--os_password',
                             help=argparse.SUPPRESS)
 
-        # tenant_name is deprecated by project_name in keystoneauth
         parser.set_defaults(os_project_name=utils.env('OS_PROJECT_NAME',
-                                                      'OS_TENANT_NAME',
                                                       'CINDER_PROJECT_ID'))
-        parser.add_argument('--os_tenant_name',
-                            dest='os_project_name',
-                            help=argparse.SUPPRESS)
         parser.add_argument(
             '--os_project_name',
             help=argparse.SUPPRESS)
 
-        # tenant_id is deprecated by project_id in keystoneauth
         parser.set_defaults(os_project_id=utils.env('OS_PROJECT_ID',
-                                                    'OS_TENANT_ID',
-                                                    'CINDER_TENANT_ID'))
-        parser.add_argument('--os_tenant_id',
-                            dest='os_project_id',
-                            help=argparse.SUPPRESS)
+                                                    'CINDER_PROJECT_ID'))
         parser.add_argument(
             '--os_project_id',
             help=argparse.SUPPRESS)
@@ -635,11 +625,8 @@ class OpenStackCinderShell(object):
 
             if not project_info_provided:
                 raise exc.CommandError(_(
-                    "You must provide a tenant_name, tenant_id, "
-                    "project_id or project_name (with "
+                    "You must provide a project_id or project_name (with "
                     "project_domain_name or project_domain_id) via "
-                    "  --os-tenant-name (env[OS_TENANT_NAME]),"
-                    "  --os-tenant-id (env[OS_TENANT_ID]),"
                     "  --os-project-id (env[OS_PROJECT_ID])"
                     "  --os-project-name (env[OS_PROJECT_NAME]),"
                     "  --os-project-domain-id "
@@ -655,11 +642,8 @@ class OpenStackCinderShell(object):
 
         if not project_info_provided:
             raise exc.CommandError(_(
-                "You must provide a tenant_name, tenant_id, "
-                "project_id or project_name (with "
+                "You must provide a project_id or project_name (with "
                 "project_domain_name or project_domain_id) via "
-                "  --os-tenant-name (env[OS_TENANT_NAME]),"
-                "  --os-tenant-id (env[OS_TENANT_ID]),"
                 "  --os-project-id (env[OS_PROJECT_ID])"
                 "  --os-project-name (env[OS_PROJECT_NAME]),"
                 "  --os-project-domain-id "
@@ -976,7 +960,7 @@ class OpenStackHelpFormatter(argparse.HelpFormatter):
 
     def start_section(self, heading):
         # Title-case the headings
-        heading = '%s%s' % (heading[0].upper(), heading[1:])
+        heading = heading.title()
         super(OpenStackHelpFormatter, self).start_section(heading)
 
 
