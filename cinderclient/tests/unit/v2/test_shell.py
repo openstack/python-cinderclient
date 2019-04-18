@@ -219,36 +219,10 @@ class ShellTest(utils.TestCase):
         mock_print.assert_called_once_with(mock.ANY, key_list,
             exclude_unavailable=True, sortby_index=0)
 
-    def test_list_sort_valid(self):
-        self.run_command('list --sort_key=id --sort_dir=asc')
-        self.assert_called('GET', '/volumes/detail?sort_dir=asc&sort_key=id')
-
-    def test_list_sort_key_name(self):
-        # Client 'name' key is mapped to 'display_name'
-        self.run_command('list --sort_key=name')
-        self.assert_called('GET', '/volumes/detail?sort_key=display_name')
-
     def test_list_sort_name(self):
         # Client 'name' key is mapped to 'display_name'
         self.run_command('list --sort=name')
         self.assert_called('GET', '/volumes/detail?sort=display_name')
-
-    def test_list_sort_key_invalid(self):
-        self.assertRaises(ValueError,
-                          self.run_command,
-                          'list --sort_key=foo --sort_dir=asc')
-
-    def test_list_sort_dir_invalid(self):
-        self.assertRaises(ValueError,
-                          self.run_command,
-                          'list --sort_key=id --sort_dir=foo')
-
-    def test_list_mix_sort_args(self):
-        cmds = ['list --sort name:desc --sort_key=status',
-                'list --sort name:desc --sort_dir=asc',
-                'list --sort name:desc --sort_key=status --sort_dir=asc']
-        for cmd in cmds:
-            self.assertRaises(exceptions.CommandError, self.run_command, cmd)
 
     def test_list_sort_single_key_only(self):
         self.run_command('list --sort=id')
@@ -277,10 +251,7 @@ class ShellTest(utils.TestCase):
 
     def test_list_reorder_with_sort(self):
         # sortby_index is None if there is sort information
-        for cmd in ['list --sort_key=name',
-                    'list --sort_dir=asc',
-                    'list --sort_key=name --sort_dir=asc',
-                    'list --sort=name',
+        for cmd in ['list --sort=name',
                     'list --sort=name:asc']:
             with mock.patch('cinderclient.utils.print_list') as mock_print:
                 self.run_command(cmd)

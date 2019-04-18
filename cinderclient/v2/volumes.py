@@ -281,7 +281,7 @@ class VolumeManager(base.ManagerWithFind):
         return self._get("/volumes/%s" % volume_id, "volume")
 
     def list(self, detailed=True, search_opts=None, marker=None, limit=None,
-             sort_key=None, sort_dir=None, sort=None):
+             sort=None):
         """Lists all volumes.
 
         :param detailed: Whether to return detailed volume info.
@@ -289,9 +289,6 @@ class VolumeManager(base.ManagerWithFind):
         :param marker: Begin returning volumes that appear later in the volume
                        list than that represented by this volume id.
         :param limit: Maximum number of volumes to return.
-        :param sort_key: Key to be sorted; deprecated in kilo
-        :param sort_dir: Sort direction, should be 'desc' or 'asc'; deprecated
-                         in kilo
         :param sort: Sort information
         :rtype: list of :class:`Volume`
         """
@@ -299,8 +296,7 @@ class VolumeManager(base.ManagerWithFind):
         resource_type = "volumes"
         url = self._build_list_url(resource_type, detailed=detailed,
                                    search_opts=search_opts, marker=marker,
-                                   limit=limit, sort_key=sort_key,
-                                   sort_dir=sort_dir, sort=sort)
+                                   limit=limit, sort=sort)
         return self._list(url, resource_type, limit=limit)
 
     def delete(self, volume, cascade=False):

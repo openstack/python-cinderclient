@@ -62,14 +62,12 @@ class VolumeTransferManager(volume_transfers.VolumeTransferManager):
 
         return self._get("/os-volume-transfer/%s" % transfer_id, "transfer")
 
-    def list(self, detailed=True, search_opts=None, sort_key=None,
-             sort_dir=None):
+    def list(self, detailed=True, search_opts=None, sort=None):
         """Get a list of all volume transfer.
 
         :param detailed: Get detailed object information.
         :param search_opts: Filtering options.
-        :param sort_key: Optional key to sort on.
-        :param sort_dir: Optional direction to sort.
+        :param sort: Sort information
         :rtype: list of :class:`VolumeTransfer`
         """
         resource_type = 'os-volume-transfer'
@@ -78,7 +76,7 @@ class VolumeTransferManager(volume_transfers.VolumeTransferManager):
 
         url = self._build_list_url(resource_type, detailed=detailed,
                                    search_opts=search_opts,
-                                   sort_key=sort_key, sort_dir=sort_dir)
+                                   sort=sort)
         return self._list(url, 'transfers')
 
     def delete(self, transfer_id):

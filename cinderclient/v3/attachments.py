@@ -45,7 +45,7 @@ class VolumeAttachmentManager(base.ManagerWithFind):
 
     @api_versions.wraps('3.27')
     def list(self, detailed=False, search_opts=None, marker=None, limit=None,
-             sort_key=None, sort_dir=None, sort=None):
+             sort=None):
         """List all attachments."""
         resource_type = "attachments"
         url = self._build_list_url(resource_type,
@@ -53,8 +53,7 @@ class VolumeAttachmentManager(base.ManagerWithFind):
                                    search_opts=search_opts,
                                    marker=marker,
                                    limit=limit,
-                                   sort_key=sort_key,
-                                   sort_dir=sort_dir, sort=sort)
+                                   sort=sort)
         return self._list(url, resource_type, limit=limit)
 
     @api_versions.wraps('3.27')

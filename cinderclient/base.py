@@ -131,8 +131,7 @@ class Manager(common_base.HookableMixin):
             return common_base.ListWithMeta(items, resp)
 
     def _build_list_url(self, resource_type, detailed=True, search_opts=None,
-                        marker=None, limit=None, sort_key=None, sort_dir=None,
-                        sort=None, offset=None):
+                        marker=None, limit=None, sort=None, offset=None):
 
         if search_opts is None:
             search_opts = {}
@@ -151,16 +150,6 @@ class Manager(common_base.HookableMixin):
         if sort:
             query_params['sort'] = self._format_sort_param(sort,
                                                            resource_type)
-        else:
-            # sort_key and sort_dir deprecated in kilo, prefer sort
-            if sort_key:
-                query_params['sort_key'] = self._format_sort_key_param(
-                    sort_key,
-                    resource_type)
-
-            if sort_dir:
-                query_params['sort_dir'] = self._format_sort_dir_param(
-                    sort_dir)
 
         if offset:
             query_params['offset'] = offset
@@ -179,7 +168,7 @@ class Manager(common_base.HookableMixin):
                  "query_string": query_string})
 
     def _format_sort_param(self, sort, resource_type=None):
-        '''Formats the sort information into the sort query string parameter.
+        """Formats the sort information into the sort query string parameter.
 
         The input sort information can be any of the following:
         - Comma-separated string in the form of <key[:dir]>
@@ -195,7 +184,7 @@ class Manager(common_base.HookableMixin):
         :returns: Formatted query string parameter or None
         :raise ValueError: If an invalid sort direction or invalid sort key is
                            given
-        '''
+        """
         if not sort:
             return None
 
@@ -205,11 +194,7 @@ class Manager(common_base.HookableMixin):
 
         sort_array = []
         for sort_item in sort:
-            if isinstance(sort_item, tuple):
-                sort_key = sort_item[0]
-                sort_dir = sort_item[1]
-            else:
-                sort_key, _sep, sort_dir = sort_item.partition(':')
+            sort_key, _sep, sort_dir = sort_item.partition(':')
             sort_key = sort_key.strip()
             sort_key = self._format_sort_key_param(sort_key, resource_type)
             if sort_dir:
@@ -235,14 +220,6 @@ class Manager(common_base.HookableMixin):
 
         msg = ('sort_key must be one of the following: %s.' %
                ', '.join(valid_sort_keys))
-        raise ValueError(msg)
-
-    def _format_sort_dir_param(self, sort_dir):
-        if sort_dir in SORT_DIR_VALUES:
-            return sort_dir
-
-        msg = ('sort_dir must be one of the following: %s.'
-               % ', '.join(SORT_DIR_VALUES))
         raise ValueError(msg)
 
     @contextlib.contextmanager

@@ -323,14 +323,6 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
                 'Use the show command to see which fields are available. '
                 'Unavailable/non-existent fields will be ignored. '
                 'Default=None.')
-@utils.arg('--sort_key',
-           metavar='<sort_key>',
-           default=None,
-           help=argparse.SUPPRESS)
-@utils.arg('--sort_dir',
-           metavar='<sort_dir>',
-           default=None,
-           help=argparse.SUPPRESS)
 @utils.arg('--sort',
            metavar='<key>[:<direction>]',
            default=None,
@@ -397,24 +389,15 @@ def do_list(cs, args):
         for field_title in args.fields.split(','):
             field_titles.append(field_title)
 
-    # --sort_key and --sort_dir deprecated in kilo and is not supported
-    # with --sort
-    if args.sort and (args.sort_key or args.sort_dir):
-        raise exceptions.CommandError(
-            'The --sort_key and --sort_dir arguments are deprecated and are '
-            'not supported with --sort.')
-
     total_count = 0
     if show_count:
         search_opts['with_count'] = args.with_count
         volumes, total_count = cs.volumes.list(
             search_opts=search_opts, marker=args.marker,
-            limit=args.limit, sort_key=args.sort_key,
-            sort_dir=args.sort_dir, sort=args.sort)
+            limit=args.limit, sort=args.sort)
     else:
         volumes = cs.volumes.list(search_opts=search_opts, marker=args.marker,
-                                  limit=args.limit, sort_key=args.sort_key,
-                                  sort_dir=args.sort_dir, sort=args.sort)
+                                  limit=args.limit, sort=args.sort)
     shell_utils.translate_volume_keys(volumes)
 
     # Create a list of servers to which the volume is attached
@@ -450,7 +433,7 @@ def do_list(cs, args):
         if search_opts['all_tenants']:
             key_list.insert(1, 'Tenant ID')
 
-    if args.sort_key or args.sort_dir or args.sort:
+    if args.sort:
         sortby_index = None
     else:
         sortby_index = 0
@@ -2563,25 +2546,13 @@ def do_transfer_list(cs, args):
     }
 
     sort = getattr(args, 'sort', None)
-    sort_key = None
-    sort_dir = None
     if sort:
-        # We added this feature with sort_key and sort_dir, but that was a
-        # mistake as we've deprecated that construct a long time ago and should
-        # be removing it in favor of --sort. Too late for the service side, but
-        # to make the client experience consistent, we handle the compatibility
-        # here.
         sort_args = sort.split(':')
         if len(sort_args) > 2:
             raise exceptions.CommandError(
                 'Invalid sort parameter provided. Argument must be in the '
                 'form "key[:<asc|desc>]".')
 
-        sort_key = sort_args[0]
-        if len(sort_args) == 2:
-            sort_dir = sort_args[1]
-
-    transfers = cs.transfers.list(
-        search_opts=search_opts, sort_key=sort_key, sort_dir=sort_dir)
+    transfers = cs.transfers.list(search_opts=search_opts, sort=sort)
     columns = ['ID', 'Volume ID', 'Name']
     utils.print_list(transfers, columns)
