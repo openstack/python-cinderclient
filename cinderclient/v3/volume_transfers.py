@@ -16,7 +16,6 @@
 """Volume transfer interface (v3 extension)."""
 
 from cinderclient import base
-from cinderclient import utils
 from cinderclient.v2 import volume_transfers
 
 
@@ -63,25 +62,24 @@ class VolumeTransferManager(volume_transfers.VolumeTransferManager):
 
         return self._get("/os-volume-transfer/%s" % transfer_id, "transfer")
 
-    def list(self, detailed=True, search_opts=None):
+    def list(self, detailed=True, search_opts=None, sort_key=None,
+             sort_dir=None):
         """Get a list of all volume transfer.
 
         :param detailed: Get detailed object information.
         :param search_opts: Filtering options.
+        :param sort_key: Optional key to sort on.
+        :param sort_dir: Optional direction to sort.
         :rtype: list of :class:`VolumeTransfer`
         """
-        query_string = utils.build_query_param(search_opts)
-
-        detail = ""
-        if detailed:
-            detail = "/detail"
-
+        resource_type = 'os-volume-transfer'
         if self.api_version.matches('3.55'):
-            return self._list("/volume-transfers%s%s" % (detail, query_string),
-                              "transfers")
+            resource_type = 'volume-transfers'
 
-        return self._list("/os-volume-transfer%s%s" % (detail, query_string),
-                          "transfers")
+        url = self._build_list_url(resource_type, detailed=detailed,
+                                   search_opts=search_opts,
+                                   sort_key=sort_key, sort_dir=sort_dir)
+        return self._list(url, 'transfers')
 
     def delete(self, transfer_id):
         """Delete a volume transfer.

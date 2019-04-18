@@ -1351,3 +1351,24 @@ class ShellTest(utils.TestCase):
                                  'no_snapshots': True
                                  }}
         self.assert_called('POST', '/volume-transfers', body=expected)
+
+    def test_list_transfer_sort_key(self):
+        self.run_command(
+            '--os-volume-api-version 3.59 transfer-list --sort=id')
+        url = ('/volume-transfers/detail?%s' %
+               parse.urlencode([('sort_key', 'id')]))
+        self.assert_called('GET', url)
+
+    def test_list_transfer_sort_key_dir(self):
+        self.run_command(
+            '--os-volume-api-version 3.59 transfer-list --sort=id:asc')
+        url = ('/volume-transfers/detail?%s' %
+               parse.urlencode([('sort_dir', 'asc'),
+                                ('sort_key', 'id')]))
+        self.assert_called('GET', url)
+
+    def test_list_transfer_sorty_not_sorty(self):
+        self.run_command(
+            '--os-volume-api-version 3.59 transfer-list')
+        url = ('/volume-transfers/detail')
+        self.assert_called('GET', url)
