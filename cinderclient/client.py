@@ -286,7 +286,7 @@ class HTTPClient(object):
                 raise exceptions.EndpointNotFound()
 
         self.auth_url = auth_url.rstrip('/') if auth_url else None
-        self.version = 'v1'
+        self.ks_version = 'v1'
         self.region_name = region_name
         self.endpoint_type = endpoint_type
         self.service_type = service_type
@@ -486,6 +486,7 @@ class HTTPClient(object):
 
     def _extract_service_catalog(self, url, resp, body, extract_token=True):
         """See what the auth service told us and process the response.
+
         We may get redirected to another site, fail or actually get
         back a service catalog with a token and our endpoints.
         """
@@ -520,7 +521,7 @@ class HTTPClient(object):
                 raise
 
         elif resp.status_code == 305:
-            return resp['location']
+            return resp.headers['location']
         else:
             raise exceptions.from_response(resp, body)
 
@@ -557,7 +558,7 @@ class HTTPClient(object):
         path_parts = path.split('/')
         for part in path_parts:
             if len(part) > 0 and part[0] == 'v':
-                self.version = part
+                self.ks_version = part
                 break
 
         # TODO(sandy): Assume admin endpoint is 35357 for now.
@@ -567,7 +568,7 @@ class HTTPClient(object):
                                          path, query, frag))
 
         auth_url = self.auth_url
-        if self.version == "v2.0" or self.version == "v3":
+        if 'v2' in self.ks_version or 'v3' in self.ks_version:
             while auth_url:
                 if not self.auth_system or self.auth_system == 'keystone':
                     auth_url = self._v2_or_v3_auth(auth_url)
@@ -626,7 +627,7 @@ class HTTPClient(object):
 
     def _v2_or_v3_auth(self, url):
         """Authenticate against a v2.0 auth service."""
-        if self.version == "v3":
+        if self.ks_version == "v3":
             body = {
                 "auth": {
                     "identity": {
@@ -653,11 +654,11 @@ class HTTPClient(object):
                 body['auth']['tenantName'] = self.projectid
             elif self.tenant_id:
                 body['auth']['tenantId'] = self.tenant_id
-        self._authenticate(url, body)
+        return self._authenticate(url, body)
 
     def _authenticate(self, url, body):
         """Authenticate and extract the service catalog."""
-        if self.version == 'v3':
+        if self.ks_version == 'v3':
             token_url = url + "/auth/tokens"
         else:
             token_url = url + "/tokens"
