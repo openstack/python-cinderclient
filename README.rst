@@ -32,12 +32,6 @@ hosted on `OpenStack`_. Patches must be submitted using `Gerrit`_.
 .. _Launchpad: https://launchpad.net/python-cinderclient
 .. _Gerrit: https://docs.openstack.org/infra/manual/developers.html#development-workflow
 
-This code is a fork of `Jacobian's python-cloudservers`__. If you need API support
-for the Rackspace API solely or the BSD license, you should use that repository.
-python-cinderclient is licensed under the Apache License like the rest of OpenStack.
-
-__ https://github.com/rackerlabs/python-cloudservers
-
 * License: Apache License, Version 2.0
 * `PyPi`_ - package installation
 * `Online Documentation`_
