@@ -181,6 +181,9 @@ def do_backup_list(cs, args):
     shell_utils.translate_volume_snapshot_keys(backups)
     columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'Object Count',
                'Container']
+    if cs.api_version >= api_versions.APIVersion('3.56'):
+        columns.append('User ID')
+
     if args.sort:
         sortby_index = None
     else:
