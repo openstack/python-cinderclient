@@ -275,19 +275,32 @@ def discover_version(client, requested_version):
     server_start_version, server_end_version = _get_server_version_range(
         client)
 
-    valid_version = requested_version
     if not server_start_version and not server_end_version:
         msg = ("Server does not support microversions. Changing server "
                "version to %(min_version)s.")
         LOG.debug(msg, {"min_version": DEPRECATED_VERSION})
-        valid_version = APIVersion(DEPRECATED_VERSION)
-    else:
-        valid_version = _validate_requested_version(
-            requested_version,
-            server_start_version,
-            server_end_version)
+        return APIVersion(DEPRECATED_VERSION)
 
-        _validate_server_version(server_start_version, server_end_version)
+    _validate_server_version(server_start_version, server_end_version)
+
+    # get the highest version the server can handle relative to the
+    # requested version
+    valid_version = _validate_requested_version(
+        requested_version,
+        server_start_version,
+        server_end_version)
+
+    # see if we need to downgrade for the client
+    client_max = APIVersion(MAX_VERSION)
+    if client_max < valid_version:
+        msg = _("Requested version %(requested_version)s is "
+                "not supported. Downgrading requested version "
+                "to %(actual_version)s.")
+        LOG.debug(msg, {
+            "requested_version": requested_version,
+            "actual_version": client_max})
+        valid_version = client_max
+
     return valid_version
 
 
