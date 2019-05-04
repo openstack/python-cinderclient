@@ -216,7 +216,12 @@ class DiscoverVersionTestCase(utils.TestCase):
         ("3.1", "3.3", "3.4", "3.7", "3.3", True),   # Server too new
         ("3.9", "3.10", "3.0", "3.3", "3.10", True),   # Server too old
         ("3.3", "3.9", "3.7", "3.17", "3.9", False),  # Requested < server
-        ("3.5", "3.8", "3.0", "3.7", "3.8", False, "3.7"),  # downgraded
+        # downgraded because of server:
+        ("3.5", "3.8", "3.0", "3.7", "3.8", False, "3.7"),
+        # downgraded because of client:
+        ("3.5", "3.8", "3.0", "3.9", "3.9", False, "3.8"),
+        # downgraded because of both:
+        ("3.5", "3.7", "3.0", "3.8", "3.9", False, "3.7"),
         ("3.5", "3.5", "3.0", "3.5", "3.5", False),  # Server & client same
         ("3.5", "3.5", "3.0", "3.5", "3.5", False, "2.0", []),  # Pre-micro
         ("3.1", "3.11", "3.4", "3.7", "3.7", False),  # Requested in range

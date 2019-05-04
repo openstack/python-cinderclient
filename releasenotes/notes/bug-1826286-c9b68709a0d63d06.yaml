@@ -1,0 +1,9 @@
+---
+fixes:
+  - |
+    The ``discover_version`` function in the ``cinderclient.api_versions``
+    module was documented to return the most recent API version supported
+    by both the client and the target Block Storage API endpoint, but it
+    was not taking into account the highest API version supported by the
+    client.  Its behavior has been corrected in this release.
+    [Bug `1826286 <https://bugs.launchpad.net/bugs/1826286>`_]
