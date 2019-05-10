@@ -693,14 +693,6 @@ cinder usage
 ``rename``
   Renames a volume.
 
-``replication-promote``
-  Promote a secondary volume to primary for a
-  relationship.
-
-``replication-reenable``
-  Sync the secondary volume with primary for a
-  relationship.
-
 ``reset-state``
   Explicitly updates the entity state in the Cinder
   database.

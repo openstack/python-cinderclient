@@ -531,10 +531,6 @@ class FakeHTTPClient(base_client.HTTPClient):
             assert list(body[action]) == ['bootable']
         elif action == 'os-unmanage':
             assert body[action] is None
-        elif action == 'os-promote-replica':
-            assert body[action] is None
-        elif action == 'os-reenable-replica':
-            assert body[action] is None
         elif action == 'os-set_image_metadata':
             assert list(body[action]) == ['metadata']
         elif action == 'os-unset_image_metadata':
@@ -1240,12 +1236,6 @@ class FakeHTTPClient(base_client.HTTPClient):
         snapshot = _stub_snapshot(id='1234', volume_id='volume_id1')
         snapshot.update(kw['body']['snapshot'])
         return (202, {}, {'snapshot': snapshot})
-
-    def post_os_promote_replica_1234(self, **kw):
-        return (202, {}, {})
-
-    def post_os_reenable_replica_1234(self, **kw):
-        return (202, {}, {})
 
     def get_scheduler_stats_get_pools(self, **kw):
         stats = [
