@@ -51,6 +51,7 @@ from cinderclient import client
 from cinderclient import exceptions
 from cinderclient import shell
 from cinderclient import utils as cinderclient_utils
+from cinderclient.v3 import attachments
 from cinderclient.v3 import volume_snapshots
 from cinderclient.v3 import volumes
 
@@ -401,6 +402,21 @@ class ShellTest(utils.TestCase):
         command += cmd
         self.run_command(command)
         self.assert_called('GET', '/attachments%s' % expected)
+
+    @mock.patch('cinderclient.utils.print_list')
+    @mock.patch.object(cinderclient.v3.attachments.VolumeAttachmentManager,
+            'list')
+    def test_attachment_list_setattr(self, mock_list, mock_print):
+        command = '--os-volume-api-version 3.27 attachment-list '
+        fake_attachment = [attachments.VolumeAttachment(mock.ANY, attachment)
+                for attachment in fakes.fake_attachment_list['attachments']]
+        mock_list.return_value = fake_attachment
+        self.run_command(command)
+        for attach in fake_attachment:
+            setattr(attach, 'server_id', getattr(attach, 'instance'))
+        columns = ['ID', 'Volume ID', 'Status', 'Server ID']
+        mock_print.assert_called_once_with(fake_attachment, columns,
+                sortby_index=0)
 
     def test_revert_to_snapshot(self):
         original = cinderclient_utils.find_resource
