@@ -352,6 +352,8 @@ class VolumeManager(base.ManagerWithFind):
 
     def _action(self, action, volume, info=None, **kwargs):
         """Perform a volume "action."
+
+        :returns: tuple (response, body)
         """
         body = {action: info}
         self.run_hooks('modify_body_for_action', body, **kwargs)

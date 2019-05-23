@@ -513,3 +513,31 @@ class TestLoadVersionedActions(utils.TestCase):
                          mock_add_arg.call_args_list)
         self.assertIn(mock.call('--foo', help="second foo"),
                       mock_add_arg.call_args_list)
+
+
+class ShellUtilsTest(utils.TestCase):
+
+    @mock.patch.object(cinderclient.utils, 'print_dict')
+    def test_print_volume_image(self, mock_print_dict):
+        response = {'os-volume_upload_image': {'name': 'myimg1'}}
+        image_resp_tuple = (202, response)
+        cinderclient.shell_utils.print_volume_image(image_resp_tuple)
+
+        response = {'os-volume_upload_image':
+                    {'name': 'myimg2',
+                     'volume_type': None}}
+        image_resp_tuple = (202, response)
+        cinderclient.shell_utils.print_volume_image(image_resp_tuple)
+
+        response = {'os-volume_upload_image':
+                    {'name': 'myimg3',
+                     'volume_type': {'id': '1234', 'name': 'sometype'}}}
+        image_resp_tuple = (202, response)
+        cinderclient.shell_utils.print_volume_image(image_resp_tuple)
+
+        mock_print_dict.assert_has_calls(
+            (mock.call({'name': 'myimg1'}),
+             mock.call({'name': 'myimg2',
+                        'volume_type': None}),
+             mock.call({'name': 'myimg3',
+                        'volume_type': 'sometype'})))
