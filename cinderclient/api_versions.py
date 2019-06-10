@@ -160,6 +160,9 @@ class APIVersion(object):
             return "%s.%s" % (self.ver_major, "latest")
         return "%s.%s" % (self.ver_major, self.ver_minor)
 
+    def get_major_version(self):
+        return "%s" % self.ver_major
+
 
 class VersionedMethod(object):
 
