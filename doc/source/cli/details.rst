@@ -23,8 +23,6 @@ Block Storage service (cinder) command-line client
 The cinder client is the command-line interface (CLI) for
 the Block Storage service (cinder) API and its extensions.
 
-This chapter documents :command:`cinder` version ``2.2.0``.
-
 For help on a specific :command:`cinder` command, enter:
 
 .. code-block:: console
