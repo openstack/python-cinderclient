@@ -14,7 +14,7 @@
 
 import os
 import sys
-import pbr.version
+import openstackdocstheme
 
 sys.setrecursionlimit(4000)
 
@@ -48,17 +48,12 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'python-cinderclient'
 copyright = 'OpenStack Contributors'
 
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
-version_info = pbr.version.VersionInfo('python-cinderclient')
-# The short X.Y version.
-version = version_info.version_string()
-# The full version, including alpha/beta/rc tags.
-release = version_info.release_string()
+# done by the openstackdocstheme ext
+# project = 'python-cinderclient'
+# version = version_info.version_string()
+# release = version_info.release_string()
 
 # List of directories, relative to source directory, that shouldn't be searched
 # for source files.
@@ -84,7 +79,7 @@ html_theme = 'openstackdocs'
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 # html_last_updated_fmt = '%b %d, %Y'
-html_last_updated_fmt = '%Y-%m-%d %H:%M'
+# html_last_updated_fmt = '%Y-%m-%d %H:%M'
 
 # -- Options for manual page output ------------------------------------------
 
