@@ -1,0 +1,4 @@
+---
+prelude: >
+    The replication v1 have been removed from cinder, the volume promote/reenable
+    replication on the command line have now been removed.

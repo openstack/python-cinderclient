@@ -193,12 +193,6 @@ You'll find complete documentation on the shell by running
         readonly-mode-update
                             Updates volume read-only access-mode flag.
         rename              Renames a volume.
-        replication-promote
-                            Promote a secondary volume to primary for a
-                            relationship.
-        replication-reenable
-                            Sync the secondary volume with primary for a
-                            relationship.
         reset-state         Explicitly updates the volume state in the Cinder
                             database.
         retype              Changes the volume type for a volume.

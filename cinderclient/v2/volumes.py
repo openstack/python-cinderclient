@@ -219,14 +219,6 @@ class Volume(base.Resource):
         """Unmanage a volume."""
         return self.manager.unmanage(volume)
 
-    def promote(self, volume):
-        """Promote secondary to be primary in relationship."""
-        return self.manager.promote(volume)
-
-    def reenable(self, volume):
-        """Sync the secondary volume with primary for a relationship."""
-        return self.manager.reenable(volume)
-
     def get_pools(self, detail):
         """Show pool information for backends."""
         return self.manager.get_pools(detail)
@@ -638,14 +630,6 @@ class VolumeManager(base.ManagerWithFind):
     def unmanage(self, volume):
         """Unmanage a volume."""
         return self._action('os-unmanage', volume, None)
-
-    def promote(self, volume):
-        """Promote secondary to be primary in relationship."""
-        return self._action('os-promote-replica', volume, None)
-
-    def reenable(self, volume):
-        """Sync the secondary volume with primary for a relationship."""
-        return self._action('os-reenable-replica', volume, None)
 
     def get_pools(self, detail):
         """Show pool information for backends."""
