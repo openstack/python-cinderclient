@@ -23,7 +23,7 @@ command-line tool. You may also want to look at the
 `OpenStack API documentation`_.
 
 .. _OpenStack CLI Reference: https://docs.openstack.org/python-openstackclient/latest/cli/
-.. _OpenStack API documentation: https://developer.openstack.org/api-guide/quick-start/
+.. _OpenStack API documentation: https://docs.openstack.org/api-quick-start/
 
 The project is hosted on `Launchpad`_, where bugs can be filed. The code is
 hosted on `OpenStack`_. Patches must be submitted using `Gerrit`_.
