@@ -1,18 +1,16 @@
 - job:
-    name: cinderclient-dsvm-functional
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/cinderclient-dsvm-functional/run.yaml
-    post-run: playbooks/legacy/cinderclient-dsvm-functional/post.yaml
-    timeout: 4200
-    voting: false
+    name: python-cinderclient-functional
+    parent: devstack
+    run: playbooks/python-cinderclient-functional.yaml
+    post-run: playbooks/post.yaml
+    timeout: 4500
     required-projects:
-      - openstack/devstack-gate
       - openstack/cinder
       - openstack/python-cinderclient
-    irrelevant-files:
-      - ^.*\.rst$
-      - ^doc/.*$
-      - ^releasenotes/.*$
+    vars:
+      devstack_localrc:
+        USE_PYTHON3: true
+        VOLUME_BACKING_FILE_SIZE: 16G
 
 - project:
     templates:
@@ -27,6 +25,6 @@
       - release-notes-jobs-python3
     check:
       jobs:
-        - cinderclient-dsvm-functional
+        - python-cinderclient-functional
         - openstack-tox-pylint:
             voting: false
