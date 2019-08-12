@@ -72,10 +72,14 @@ for svc in ('volume', 'volumev2', 'volumev3'):
     discover.add_catalog_discover_hack(svc, re.compile(r'/v[12]/\w+/?$'), '/')
 
 
-def get_server_version(url):
+def get_server_version(url, insecure=False, cacert=None):
     """Queries the server via the naked endpoint and gets version info.
 
     :param url: url of the cinder endpoint
+    :param insecure: Explicitly allow client to perform "insecure" TLS
+                     (https) requests
+    :param cacert: Specify a CA bundle file to use in verifying a TLS
+                            (https) server certificate
     :returns: APIVersion object for min and max version supported by
               the server
     """
@@ -106,7 +110,14 @@ def get_server_version(url):
             # leave as is without cropping.
             version_url = url
 
-        response = requests.get(version_url)
+        if insecure:
+            verify_cert = False
+        else:
+            if cacert:
+                verify_cert = cacert
+            else:
+                verify_cert = True
+        response = requests.get(version_url, verify=verify_cert)
         data = json.loads(response.text)
         versions = data['versions']
         for version in versions:
@@ -121,9 +132,9 @@ def get_server_version(url):
             api_versions.APIVersion(current_version))
 
 
-def get_highest_client_server_version(url):
+def get_highest_client_server_version(url, insecure=False, cacert=None):
     """Returns highest supported version by client and server as a string."""
-    min_server, max_server = get_server_version(url)
+    min_server, max_server = get_server_version(url, insecure, cacert)
     max_client = api_versions.APIVersion(api_versions.MAX_VERSION)
     return min(max_server, max_client).get_string()
 

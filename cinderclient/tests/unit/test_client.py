@@ -361,6 +361,41 @@ class GetAPIVersionTestCase(utils.TestCase):
         self.assertEqual(max_version, api_versions.APIVersion('3.16'))
 
     @mock.patch('cinderclient.client.requests.get')
+    def test_get_server_version_insecure(self, mock_request):
+        mock_response = utils.TestResponse({
+            "status_code": 200,
+            "text": json.dumps(fakes.fake_request_get_no_v3())
+        })
+
+        mock_request.return_value = mock_response
+
+        url = (
+            "https://192.168.122.127:8776/v3/e5526285ebd741b1819393f772f11fc3")
+        expected_url = "https://192.168.122.127:8776/"
+
+        cinderclient.client.get_server_version(url, True)
+
+        mock_request.assert_called_once_with(expected_url, verify=False)
+
+    @mock.patch('cinderclient.client.requests.get')
+    def test_get_server_version_cacert(self, mock_request):
+        mock_response = utils.TestResponse({
+            "status_code": 200,
+            "text": json.dumps(fakes.fake_request_get_no_v3())
+        })
+
+        mock_request.return_value = mock_response
+
+        url = (
+            "https://192.168.122.127:8776/v3/e5526285ebd741b1819393f772f11fc3")
+        expected_url = "https://192.168.122.127:8776/"
+
+        cacert = '/path/to/cert'
+        cinderclient.client.get_server_version(url, cacert=cacert)
+
+        mock_request.assert_called_once_with(expected_url, verify=cacert)
+
+    @mock.patch('cinderclient.client.requests.get')
     @ddt.data('3.12', '3.40')
     def test_get_highest_client_server_version(self, version, mock_request):
 
