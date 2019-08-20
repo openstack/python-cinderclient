@@ -93,3 +93,50 @@ man_pages = [
 repository_name = 'openstack/python-cinderclient'
 bug_project = 'cinderclient'
 bug_tag = ''
+
+
+# -- Options for LaTeX output -------------------------------------------------
+
+# The paper size ('letter' or 'a4').
+# latex_paper_size = 'letter'
+
+# The font size ('10pt', '11pt' or '12pt').
+# latex_font_size = '10pt'
+
+# Grouping the document tree into LaTeX files. List of tuples
+# (source start file, target name, title, author, documentclass
+# [howto/manual]).
+latex_documents = [
+    ('index', 'python-cinderclient.tex', u'Cinder Client Documentation',
+     u'Cinder Contributors', 'manual'),
+]
+
+# The name of an image file (relative to this directory) to place at the top of
+# the title page.
+# latex_logo = None
+
+# For "manual" documents, if this is true, then toplevel headings are parts,
+# not chapters.
+# latex_use_parts = False
+
+# Additional stuff for the LaTeX preamble.
+# latex_preamble = ''
+
+# Documents to append as an appendix to all manuals.
+# latex_appendices = []
+
+# If false, no module index is generated.
+# latex_use_modindex = True
+
+# Disable usage of xindy https://bugzilla.redhat.com/show_bug.cgi?id=1643664
+latex_use_xindy = False
+
+latex_domain_indices = False
+
+latex_elements = {
+    'makeindex': '',
+    'printindex': '',
+    'preamble': r'\setcounter{tocdepth}{3}',
+}
+
+latex_additional_files = ['cinderclient.sty']
