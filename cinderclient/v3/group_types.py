@@ -16,6 +16,8 @@
 
 """Group Type interface."""
 
+from six.moves.urllib import parse
+
 from cinderclient import api_versions
 from cinderclient import base
 
@@ -84,9 +86,14 @@ class GroupTypeManager(base.ManagerWithFind):
 
         :rtype: list of :class:`GroupType`.
         """
+        if not search_opts:
+            search_opts = dict()
+
         query_string = ''
-        if not is_public:
-            query_string = '?is_public=%s' % is_public
+        if 'is_public' not in search_opts:
+            search_opts['is_public'] = is_public
+
+        query_string = "?%s" % parse.urlencode(search_opts)
         return self._list("/group_types%s" % (query_string), "group_types")
 
     @api_versions.wraps("3.11")

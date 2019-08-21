@@ -266,7 +266,17 @@ class ShellTest(utils.TestCase):
                     {six.text_type('key'): six.text_type('value')}}))
         self.assert_call_contained(parse.urlencode({'is_public': None}))
 
-    def test_type_list_no_filters(self):
+    def test_type_list_public(self):
+        self.run_command('--os-volume-api-version 3.52 type-list '
+                         '--filters is_public=True')
+        self.assert_called('GET', '/types?is_public=True')
+
+    def test_type_list_private(self):
+        self.run_command('--os-volume-api-version 3.52 type-list '
+                         '--filters is_public=False')
+        self.assert_called('GET', '/types?is_public=False')
+
+    def test_type_list_public_private(self):
         self.run_command('--os-volume-api-version 3.52 type-list')
         self.assert_called('GET', '/types?is_public=None')
 
@@ -570,6 +580,20 @@ class ShellTest(utils.TestCase):
     def test_group_type_list(self):
         self.run_command('--os-volume-api-version 3.11 group-type-list')
         self.assert_called_anytime('GET', '/group_types?is_public=None')
+
+    def test_group_type_list_public(self):
+        self.run_command('--os-volume-api-version 3.52 group-type-list '
+                         '--filters is_public=True')
+        self.assert_called('GET', '/group_types?is_public=True')
+
+    def test_group_type_list_private(self):
+        self.run_command('--os-volume-api-version 3.52 group-type-list '
+                         '--filters is_public=False')
+        self.assert_called('GET', '/group_types?is_public=False')
+
+    def test_group_type_list_public_private(self):
+        self.run_command('--os-volume-api-version 3.52 group-type-list')
+        self.assert_called('GET', '/group_types?is_public=None')
 
     def test_group_type_show(self):
         self.run_command('--os-volume-api-version 3.11 '

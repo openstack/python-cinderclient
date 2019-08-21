@@ -1,0 +1,13 @@
+---
+upgrade:
+  - |
+    Adding ``is_public`` support in ``--filters`` option for ``type-list``
+    and ``group-type-list`` command.
+    This option is used to filter volume types and group types on the basis
+    of visibility.
+    This option has 3 possible values : True, False, None with details as
+    follows :
+
+    * True: List public types only
+    * False: List private types only
+    * None: List both public and private types
