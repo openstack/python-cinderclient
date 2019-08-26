@@ -265,7 +265,7 @@ class Manager(common_base.HookableMixin):
         # pair
         username = utils.env('OS_USERNAME', 'CINDER_USERNAME')
         url = utils.env('OS_URL', 'CINDER_URL')
-        uniqifier = hashlib.sha1(username.encode('utf-8') +
+        uniqifier = hashlib.sha1(username.encode('utf-8') +        # nosec
                                  url.encode('utf-8')).hexdigest()
 
         cache_dir = os.path.expanduser(os.path.join(base_dir, uniqifier))
