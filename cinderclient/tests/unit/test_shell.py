@@ -201,6 +201,12 @@ class ShellTest(utils.TestCase):
         _shell = shell.OpenStackCinderShell()
         _shell.main(['list'])
 
+    def test_duplicate_filters(self):
+        _shell = shell.OpenStackCinderShell()
+        self.assertRaises(exceptions.CommandError,
+                          _shell.main,
+                          ['list', '--name', 'abc', '--filters', 'name=xyz'])
+
     @unittest.skip("Skip cuz I broke it")
     def test_cinder_service_name(self):
         # Failing with 'No mock address' means we are not

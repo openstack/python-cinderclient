@@ -54,6 +54,33 @@ V3_SHELL = 'cinderclient.v3.shell'
 HINT_HELP_MSG = (" [hint: use '--os-volume-api-version' flag to show help "
                  "message for proper version]")
 
+FILTER_CHECK = ["type-list",
+                "backup-list",
+                "get-pools",
+                "list",
+                "group-list",
+                "group-snapshot-list",
+                "message-list",
+                "snapshot-list",
+                "attachment-list"]
+
+RESOURCE_FILTERS = {
+    "list": ["name", "status", "metadata",
+             "bootable", "migration_status", "availability_zone",
+             "group_id", "size"],
+    "backup-list": ["name", "status", "volume_id"],
+    "snapshot-list": ["name", "status", "volume_id", "metadata",
+                      "availability_zone"],
+    "group-list": ["name"],
+    "group-snapshot-list": ["name", "status", "group_id"],
+    "attachment-list": ["volume_id", "status", "instance_id", "attach_status"],
+    "message-list": ["resource_uuid", "resource_type", "event_id",
+                     "request_id", "message_level"],
+    "get-pools": ["name", "volume_type"],
+    "type-list": ["is_public"]
+}
+
+
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
@@ -531,8 +558,28 @@ class OpenStackCinderShell(object):
         logger.warning("downgrading to %s based on server support." %
                        discovered.get_string())
 
+    def check_duplicate_filters(self, argv, filter):
+        resource = RESOURCE_FILTERS[filter]
+        filters = []
+        for opt in range(len(argv)):
+            if argv[opt].startswith('--'):
+                if argv[opt] == '--filters':
+                    key, __ = argv[opt + 1].split('=')
+                    if key in resource:
+                        filters.append(key)
+                elif argv[opt][2:] in resource:
+                    filters.append(argv[opt][2:])
+
+        if len(set(filters)) != len(filters):
+            raise exc.CommandError(
+                "Filters are only allowed to be passed once.")
+
     def main(self, argv):
         # Parse args once to find version and debug settings
+        for filter in FILTER_CHECK:
+            if filter in argv:
+                self.check_duplicate_filters(argv, filter)
+                break
         parser = self.get_base_parser()
         (options, args) = parser.parse_known_args(argv)
         self.setup_debugging(options.debug)
