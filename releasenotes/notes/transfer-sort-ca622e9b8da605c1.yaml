@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Starting with microversion 3.59, the ``cinder transfer-list`` command now
+    supports the ``--sort`` argument to sort the returned results. This
+    argument takes either just the attribute to sort on, or the attribute and
+    the sort direction. Examples include ``cinder transfer-list --sort=id`` and
+    ``cinder transfer-list --sort=name:asc``.

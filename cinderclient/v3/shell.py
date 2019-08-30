@@ -2542,3 +2542,53 @@ def do_transfer_create(cs, args):
 
     info.pop('links', None)
     utils.print_dict(info)
+
+
+@utils.arg('--all-tenants',
+           dest='all_tenants',
+           metavar='<0|1>',
+           nargs='?',
+           type=int,
+           const=1,
+           default=0,
+           help='Shows details for all tenants. Admin only.')
+@utils.arg('--all_tenants',
+           nargs='?',
+           type=int,
+           const=1,
+           help=argparse.SUPPRESS)
+@utils.arg('--sort',
+           metavar='<key>[:<direction>]',
+           default=None,
+           help='Sort keys and directions in the form of <key>[:<asc|desc>].',
+           start_version='3.59')
+def do_transfer_list(cs, args):
+    """Lists all transfers."""
+    all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
+    search_opts = {
+        'all_tenants': all_tenants,
+    }
+
+    sort = getattr(args, 'sort', None)
+    sort_key = None
+    sort_dir = None
+    if sort:
+        # We added this feature with sort_key and sort_dir, but that was a
+        # mistake as we've deprecated that construct a long time ago and should
+        # be removing it in favor of --sort. Too late for the service side, but
+        # to make the client experience consistent, we handle the compatibility
+        # here.
+        sort_args = sort.split(':')
+        if len(sort_args) > 2:
+            raise exceptions.CommandError(
+                'Invalid sort parameter provided. Argument must be in the '
+                'form "key[:<asc|desc>]".')
+
+        sort_key = sort_args[0]
+        if len(sort_args) == 2:
+            sort_dir = sort_args[1]
+
+    transfers = cs.transfers.list(
+        search_opts=search_opts, sort_key=sort_key, sort_dir=sort_dir)
+    columns = ['ID', 'Volume ID', 'Name']
+    utils.print_list(transfers, columns)
