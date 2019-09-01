@@ -247,6 +247,9 @@ def quota_update(manager, identifier, args):
         if not skip_validation:
             updates['skip_validation'] = skip_validation
         quota_show(manager.update(identifier, **updates))
+    else:
+        msg = 'Must supply at least one quota field to update.'
+        raise exceptions.ClientException(code=1, message=msg)
 
 
 def find_volume_type(cs, vtype):
