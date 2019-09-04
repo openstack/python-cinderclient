@@ -46,6 +46,7 @@ import six
 from six.moves.urllib import parse
 
 import cinderclient
+from cinderclient import api_versions
 from cinderclient import base
 from cinderclient import client
 from cinderclient import exceptions
@@ -92,7 +93,12 @@ class ShellTest(utils.TestCase):
         self.cs = mock.Mock()
 
     def run_command(self, cmd):
-        self.shell.main(cmd.split())
+        # Ensure the version negotiation indicates that
+        # all versions are supported
+        with mock.patch('cinderclient.api_versions._get_server_version_range',
+                return_value=(api_versions.APIVersion('3.0'),
+                              api_versions.APIVersion('3.99'))):
+            self.shell.main(cmd.split())
 
     def assert_called(self, method, url, body=None,
                       partial_body=None, **kwargs):
@@ -294,6 +300,14 @@ class ShellTest(utils.TestCase):
         key_list = ['ID', 'Status', 'Size']
         mock_print.assert_called_once_with(mock.ANY, key_list,
             exclude_unavailable=True, sortby_index=0)
+
+    @mock.patch("cinderclient.shell.OpenStackCinderShell.downgrade_warning")
+    def test_list_version_downgrade(self, mock_warning):
+        self.run_command('--os-volume-api-version 3.998 list')
+        mock_warning.assert_called_once_with(
+            api_versions.APIVersion('3.998'),
+            api_versions.APIVersion(api_versions.MAX_VERSION)
+        )
 
     def test_list_availability_zone(self):
         self.run_command('availability-zone-list')

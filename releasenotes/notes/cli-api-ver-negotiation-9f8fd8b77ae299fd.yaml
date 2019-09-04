@@ -1,0 +1,12 @@
+---
+features:
+  - |
+    Automatic version negotiation for the cinderclient CLI.
+    If an API version is not specified, the CLI will use the newest
+    supported by the client and the server.
+    If an API version newer than the server supports is requested,
+    the CLI will fall back to the newest version supported by the server
+    and issue a warning message.
+    This does not affect cinderclient library usage.
+
+

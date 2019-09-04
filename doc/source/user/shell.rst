@@ -40,6 +40,14 @@ For example, in Bash you'd use::
     export OS_AUTH_URL=http://auth.example.com:5000/v3
     export OS_VOLUME_API_VERSION=3
 
+If OS_VOLUME_API_VERSION is not set, the highest version
+supported by the server will be used.
+
+If OS_VOLUME_API_VERSION exceeds the highest version
+supported by the server, the highest version supported by
+both the client and server will be used.  A warning
+message is printed when this occurs.
+
 From there, all shell commands take the form::
 
     cinder <command> [arguments...]

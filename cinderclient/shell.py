@@ -516,6 +516,21 @@ class OpenStackCinderShell(object):
         else:
             return argv
 
+    @staticmethod
+    def _validate_input_api_version(options):
+        if not options.os_volume_api_version:
+            api_version = api_versions.APIVersion(api_versions.MAX_VERSION)
+        else:
+            api_version = api_versions.get_api_version(
+                options.os_volume_api_version)
+        return api_version
+
+    @staticmethod
+    def downgrade_warning(requested, discovered):
+        logger.warning("API version %s requested, " % requested.get_string())
+        logger.warning("downgrading to %s based on server support." %
+                       discovered.get_string())
+
     def main(self, argv):
         # Parse args once to find version and debug settings
         parser = self.get_base_parser()
@@ -527,14 +542,7 @@ class OpenStackCinderShell(object):
         do_help = ('help' in argv) or (
             '--help' in argv) or ('-h' in argv) or not argv
 
-        if not options.os_volume_api_version:
-            use_version = DEFAULT_MAJOR_OS_VOLUME_API_VERSION
-            if do_help:
-                use_version = api_versions.MAX_VERSION
-            api_version = api_versions.get_api_version(use_version)
-        else:
-            api_version = api_versions.get_api_version(
-                options.os_volume_api_version)
+        api_version = self._validate_input_api_version(options)
 
         # build available subcommands based on version
         major_version_string = "%s" % api_version.ver_major
@@ -670,9 +678,7 @@ class OpenStackCinderShell(object):
 
         insecure = self.options.insecure
 
-        self.cs = client.Client(
-            api_version, os_username,
-            os_password, os_project_name, os_auth_url,
+        client_args = dict(
             region_name=os_region_name,
             tenant_id=os_project_id,
             endpoint_type=endpoint_type,
@@ -688,6 +694,11 @@ class OpenStackCinderShell(object):
             auth_plugin=auth_plugin,
             session=auth_session,
             logger=self.ks_logger if auth_session else self.client_logger)
+
+        self.cs = client.Client(
+            api_version, os_username,
+            os_password, os_project_name, os_auth_url,
+            **client_args)
 
         try:
             if not utils.isunauthenticated(args.func):
@@ -718,6 +729,28 @@ class OpenStackCinderShell(object):
                                "to the default API version: %s",
                                endpoint_api_version)
 
+        API_MAX_VERSION = api_versions.APIVersion(api_versions.MAX_VERSION)
+        if endpoint_api_version[0] == '3':
+            disc_client = client.Client(API_MAX_VERSION,
+                                        os_username,
+                                        os_password,
+                                        os_project_name,
+                                        os_auth_url,
+                                        **client_args)
+            self.cs, discovered_version = self._discover_client(
+                disc_client,
+                api_version,
+                args.os_endpoint_type,
+                args.service_type,
+                os_username,
+                os_password,
+                os_project_name,
+                os_auth_url,
+                client_args)
+
+            if discovered_version < api_version:
+                self.downgrade_warning(api_version, discovered_version)
+
         profile = osprofiler_profiler and options.profile
         if profile:
             osprofiler_profiler.init(options.profile)
@@ -730,6 +763,56 @@ class OpenStackCinderShell(object):
                 print("Trace ID: %s" % trace_id)
                 print("To display trace use next command:\n"
                       "osprofiler trace show --html %s " % trace_id)
+
+    def _discover_client(self,
+                         current_client,
+                         os_api_version,
+                         os_endpoint_type,
+                         os_service_type,
+                         os_username,
+                         os_password,
+                         os_project_name,
+                         os_auth_url,
+                         client_args):
+
+        if (os_api_version.get_major_version() in
+                api_versions.DEPRECATED_VERSIONS):
+            discovered_version = api_versions.DEPRECATED_VERSION
+            os_service_type = 'volume'
+        else:
+            discovered_version = api_versions.discover_version(
+                current_client,
+                os_api_version)
+
+        if not os_endpoint_type:
+            os_endpoint_type = DEFAULT_CINDER_ENDPOINT_TYPE
+
+        if not os_service_type:
+            os_service_type = self._discover_service_type(discovered_version)
+
+        API_MAX_VERSION = api_versions.APIVersion(api_versions.MAX_VERSION)
+
+        if (discovered_version != API_MAX_VERSION or
+                os_service_type != 'volume' or
+                os_endpoint_type != DEFAULT_CINDER_ENDPOINT_TYPE):
+            client_args['service_type'] = os_service_type
+            client_args['endpoint_type'] = os_endpoint_type
+
+            return (client.Client(discovered_version,
+                                  os_username,
+                                  os_password,
+                                  os_project_name,
+                                  os_auth_url,
+                                  **client_args),
+                    discovered_version)
+        else:
+            return current_client, discovered_version
+
+    def _discover_service_type(self, discovered_version):
+        SERVICE_TYPES = {'1': 'volume', '2': 'volumev2', '3': 'volumev3'}
+        major_version = discovered_version.get_major_version()
+        service_type = SERVICE_TYPES[major_version]
+        return service_type
 
     def _run_extension_hooks(self, hook_type, *args, **kwargs):
         """Runs hooks for all registered extensions."""
