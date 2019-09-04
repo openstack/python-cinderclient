@@ -107,7 +107,7 @@ bug_tag = ''
 # (source start file, target name, title, author, documentclass
 # [howto/manual]).
 latex_documents = [
-    ('index', 'python-cinderclient.tex', u'Cinder Client Documentation',
+    ('index', 'doc-python-cinderclient.tex', u'Cinder Client Documentation',
      u'Cinder Contributors', 'manual'),
 ]
 
