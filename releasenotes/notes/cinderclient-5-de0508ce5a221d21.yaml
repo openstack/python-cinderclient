@@ -1,0 +1,7 @@
+---
+prelude: >
+    This is a major version release of python-cinderclient. Backwards
+    compatibility has been removed for some long standing deprecations and
+    support for the Cinder v1 API has been removed. Prior to upgrading to this
+    release, ensure all Cinder services that need to be managed are 13.0.0
+    (Rocky) or later.
