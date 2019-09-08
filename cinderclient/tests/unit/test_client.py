@@ -25,7 +25,6 @@ import six
 from cinderclient import api_versions
 import cinderclient.client
 from cinderclient import exceptions
-import cinderclient.v1.client
 import cinderclient.v2.client
 
 from cinderclient.tests.unit import utils
@@ -34,10 +33,6 @@ from cinderclient.tests.unit.v3 import fakes
 
 @ddt.ddt
 class ClientTest(utils.TestCase):
-
-    def test_get_client_class_v1(self):
-        output = cinderclient.client.get_client_class('1')
-        self.assertEqual(cinderclient.v1.client.Client, output)
 
     def test_get_client_class_v2(self):
         output = cinderclient.client.get_client_class('2')
@@ -87,12 +82,9 @@ class ClientTest(utils.TestCase):
         self.assertIn("fakeUser", output[1])
 
     def test_versions(self):
-        v1_url = 'http://fakeurl/v1/tenants'
         v2_url = 'http://fakeurl/v2/tenants'
         unknown_url = 'http://fakeurl/v9/tenants'
 
-        self.assertEqual('1',
-                         cinderclient.client.get_volume_api_from_url(v1_url))
         self.assertEqual('2',
                          cinderclient.client.get_volume_api_from_url(v2_url))
         self.assertRaises(cinderclient.exceptions.UnsupportedVersion,

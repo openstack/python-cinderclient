@@ -5,3 +5,8 @@ prelude: >
     support for the Cinder v1 API has been removed. Prior to upgrading to this
     release, ensure all Cinder services that need to be managed are 13.0.0
     (Rocky) or later.
+upgrade:
+  - |
+    This version of the python-cinderclient no longer supports the Cinder v1
+    API. Ensure all mananaged services have at least the v2 API available prior
+    to upgrading this client.

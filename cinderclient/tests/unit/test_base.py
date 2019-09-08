@@ -25,7 +25,7 @@ from cinderclient.v3 import volumes
 
 from cinderclient.tests.unit import test_utils
 from cinderclient.tests.unit import utils
-from cinderclient.tests.unit.v1 import fakes
+from cinderclient.tests.unit.v2 import fakes
 
 
 cs = fakes.FakeClient()
