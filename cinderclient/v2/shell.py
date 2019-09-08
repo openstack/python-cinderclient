@@ -20,7 +20,6 @@ import argparse
 import collections
 import copy
 import os
-import warnings
 
 from oslo_utils import strutils
 import six
@@ -921,24 +920,6 @@ def do_type_access_remove(cs, args):
     vtype = shell_utils.find_volume_type(cs, args.volume_type)
     cs.volume_type_access.remove_project_access(
         vtype, args.project_id)
-
-
-def do_endpoints(cs, args):
-    """Discovers endpoints registered by authentication service."""
-    warnings.warn(
-        "``cinder endpoints`` is deprecated, use ``openstack catalog list`` "
-        "instead. The ``cinder endpoints`` command may be removed in the P "
-        "release or next major release of cinderclient (v2.0.0 or greater).")
-    catalog = cs.client.service_catalog.catalog
-    for e in catalog:
-        utils.print_dict(e['endpoints'][0], e['name'])
-
-
-def do_credentials(cs, args):
-    """Shows user credentials returned from auth."""
-    warnings.warn(
-        "``cinder credentials`` is deprecated, use ``openstack token issue`` "
-        "indead.")
 
 
 @utils.arg('tenant',
