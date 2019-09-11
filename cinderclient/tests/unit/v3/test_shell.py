@@ -692,7 +692,6 @@ class ShellTest(utils.TestCase):
                                'metadata': {},
                                'volume_type': '4321',
                                'description': None,
-                               'multiattach': False,
                                'backup_id': None}}
         self.assert_called_anytime('POST', '/volumes', expected)
 
@@ -715,7 +714,6 @@ class ShellTest(utils.TestCase):
                                'metadata': {},
                                'volume_type': None,
                                'description': None,
-                               'multiattach': False,
                                'backup_id': None}}
         expected['volume'].update(update)
         self.assert_called_anytime('POST', '/volumes', body=expected)

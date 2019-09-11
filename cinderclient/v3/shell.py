@@ -622,12 +622,6 @@ def do_reset_state(cs, args):
            help='Scheduler hint, similar to nova. Repeat option to set '
                 'multiple hints. Values with the same key will be stored '
                 'as a list.')
-@utils.arg('--allow-multiattach',
-           dest='multiattach',
-           action="store_true",
-           help=('Allow volume to be attached more than once. (DEPRECATED)'
-                 ' Default=False'),
-           default=False)
 @utils.arg('--poll',
            action="store_true",
            help=('Wait for volume creation until it completes.'))
@@ -682,7 +676,6 @@ def do_create(cs, args):
                                imageRef=image_ref,
                                metadata=volume_metadata,
                                scheduler_hints=hints,
-                               multiattach=args.multiattach,
                                backup_id=backup_id)
 
     info = dict()

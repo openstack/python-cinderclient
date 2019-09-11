@@ -17,12 +17,13 @@ from cinderclient.tests.functional import base
 class CinderVolumeTests(base.ClientTestBase):
     """Check of base cinder volume commands."""
 
-    CREATE_VOLUME_PROPERTY = ('attachments', 'multiattach',
-                       'os-vol-tenant-attr:tenant_id',
-                       'availability_zone', 'bootable',
-                       'created_at', 'description', 'encrypted', 'id',
-                       'metadata', 'name', 'size', 'status',
-                       'user_id', 'volume_type')
+    CREATE_VOLUME_PROPERTY = (
+        'attachments',
+        'os-vol-tenant-attr:tenant_id',
+        'availability_zone', 'bootable',
+        'created_at', 'description', 'encrypted', 'id',
+        'metadata', 'name', 'size', 'status',
+        'user_id', 'volume_type')
 
     SHOW_VOLUME_PROPERTY = ('attachment_ids', 'attached_servers',
                        'availability_zone', 'bootable',

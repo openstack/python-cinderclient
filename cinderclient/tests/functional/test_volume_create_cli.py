@@ -10,11 +10,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import unittest
-
 import ddt
 import six
-
 from tempest.lib import exceptions
 
 from cinderclient.tests.functional import base
@@ -90,17 +87,6 @@ class CinderVolumeTestsWithParameters(base.ClientTestBase):
                                     params='--description {0} 1'.
                                     format(volume_description))
         self.assertEqual(volume_description, volume['description'])
-
-    @unittest.skip("Skip until multiattach will be supported")
-    def test_volume_create_multiattach(self):
-        """Test steps:
-
-        1) create volume and allow multiattach
-        2) check that multiattach is true
-        """
-        volume = self.object_create('volume',
-                                    params='--allow-multiattach 1')
-        self.assertEqual('True', volume['multiattach'])
 
     def test_volume_create_metadata(self):
         """Test steps:
