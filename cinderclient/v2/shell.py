@@ -100,14 +100,6 @@ def _translate_attachments(info):
                 'Use the show command to see which fields are available. '
                 'Unavailable/non-existent fields will be ignored. '
                 'Default=None.')
-@utils.arg('--sort_key',
-           metavar='<sort_key>',
-           default=None,
-           help=argparse.SUPPRESS)
-@utils.arg('--sort_dir',
-           metavar='<sort_dir>',
-           default=None,
-           help=argparse.SUPPRESS)
 @utils.arg('--sort',
            metavar='<key>[:<direction>]',
            default=None,
@@ -147,16 +139,8 @@ def do_list(cs, args):
         for field_title in args.fields.split(','):
             field_titles.append(field_title)
 
-    # --sort_key and --sort_dir deprecated in kilo and is not supported
-    # with --sort
-    if args.sort and (args.sort_key or args.sort_dir):
-        raise exceptions.CommandError(
-            'The --sort_key and --sort_dir arguments are deprecated and are '
-            'not supported with --sort.')
-
     volumes = cs.volumes.list(search_opts=search_opts, marker=args.marker,
-                              limit=args.limit, sort_key=args.sort_key,
-                              sort_dir=args.sort_dir, sort=args.sort)
+                              limit=args.limit, sort=args.sort)
     shell_utils.translate_volume_keys(volumes)
 
     # Create a list of servers to which the volume is attached
@@ -178,7 +162,7 @@ def do_list(cs, args):
         if search_opts['all_tenants']:
             key_list.insert(1, 'Tenant ID')
 
-    if args.sort_key or args.sort_dir or args.sort:
+    if args.sort:
         sortby_index = None
     else:
         sortby_index = 0

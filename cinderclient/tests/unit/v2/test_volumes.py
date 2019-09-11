@@ -29,19 +29,6 @@ class VolumesTest(utils.TestCase):
         cs.assert_called('GET', '/volumes/detail?limit=2&marker=1234')
         self._assert_request_id(lst)
 
-    def test_list_volumes_with_sort_key_dir(self):
-        lst = cs.volumes.list(sort_key='id', sort_dir='asc')
-        cs.assert_called('GET', '/volumes/detail?sort_dir=asc&sort_key=id')
-        self._assert_request_id(lst)
-
-    def test_list_volumes_with_invalid_sort_key(self):
-        self.assertRaises(ValueError,
-                          cs.volumes.list, sort_key='invalid', sort_dir='asc')
-
-    def test_list_volumes_with_invalid_sort_dir(self):
-        self.assertRaises(ValueError,
-                          cs.volumes.list, sort_key='id', sort_dir='invalid')
-
     def test__list(self):
         # There only 2 volumes available for our tests, so we set limit to 2.
         limit = 2
@@ -345,21 +332,10 @@ class FormatSortParamTestCase(utils.TestCase):
         self.assertEqual('id:asc,status,size:desc',
                          cs.volumes._format_sort_param(s))
 
-    def test_format_sort_list_of_tuples(self):
-        s = [('id', 'asc'), 'status', ('size', 'desc')]
-        self.assertEqual('id:asc,status,size:desc',
-                         cs.volumes._format_sort_param(s))
-
-    def test_format_sort_list_of_strings_and_tuples(self):
-        s = [('id', 'asc'), 'status', 'size:desc']
-        self.assertEqual('id:asc,status,size:desc',
-                         cs.volumes._format_sort_param(s))
-
     def test_format_sort_invalid_direction(self):
         for s in ['id:foo',
                   'id:asc,status,size:foo',
-                  ['id', 'status', 'size:foo'],
-                  ['id', 'status', ('size', 'foo')]]:
+                  ['id', 'status', 'size:foo']]:
             self.assertRaises(ValueError,
                               cs.volumes._format_sort_param,
                               s)

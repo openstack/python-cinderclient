@@ -26,3 +26,6 @@ upgrade:
     The deprecated volume create option ``--allow-multiattach`` has now been
     removed. Multiattach capability is now controlled using `volume-type extra
     specs <https://docs.openstack.org/cinder/latest/admin/blockstorage-volume-multiattach.html>`_.
+  - |
+    Support for the deprecated ``--sort_key`` and ``--sort_dir`` arguments have
+    now been dropped. Use the supported ``--sort`` argument instead.
