@@ -37,6 +37,14 @@ FILTER_DEPRECATED = ("This option is deprecated and will be removed in "
                      "is introduced since 3.33 instead.")
 
 
+class AppendFilters(argparse.Action):
+
+    filters = []
+
+    def __call__(self, parser, namespace, values, option_string):
+        AppendFilters.filters.append(values[0])
+
+
 @api_versions.wraps('3.33')
 @utils.arg('--resource',
            metavar='<resource>',
@@ -52,6 +60,7 @@ def do_list_filters(cs, args):
 
 
 @utils.arg('--filters',
+           action=AppendFilters,
            type=six.text_type,
            nargs='*',
            start_version='3.52',
@@ -66,8 +75,8 @@ def do_type_list(cs, args):
     # pylint: disable=function-redefined
     search_opts = {}
     # Update search option with `filters`
-    if hasattr(args, 'filters') and args.filters is not None:
-        search_opts.update(shell_utils.extract_filters(args.filters))
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
     vtypes = cs.volume_types.list(search_opts=search_opts)
     shell_utils.print_volume_type_list(vtypes)
 
@@ -83,6 +92,7 @@ def do_type_list(cs, args):
             mode="w"):
         for vtype in vtypes:
             cs.volume_types.write_to_completion_cache('name', vtype.name)
+    AppendFilters.filters = []
 
 
 @utils.arg('--all-tenants',
@@ -132,6 +142,7 @@ def do_type_list(cs, args):
                   'Valid keys: %s. '
                   'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
 @utils.arg('--filters',
+           action=AppendFilters,
            type=six.text_type,
            nargs='*',
            start_version='3.33',
@@ -163,8 +174,8 @@ def do_backup_list(cs, args):
     }
 
     # Update search option with `filters`
-    if hasattr(args, 'filters') and args.filters is not None:
-        search_opts.update(shell_utils.extract_filters(args.filters))
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
 
     total_count = 0
     if show_count:
@@ -205,12 +216,14 @@ def do_backup_list(cs, args):
         for backup in backups:
             if backup.name is not None:
                 cs.backups.write_to_completion_cache('name', backup.name)
+    AppendFilters.filters = []
 
 
 @utils.arg('--detail',
            action='store_true',
            help='Show detailed information about pools.')
 @utils.arg('--filters',
+           action=AppendFilters,
            type=six.text_type,
            nargs='*',
            start_version='3.33',
@@ -223,8 +236,8 @@ def do_get_pools(cs, args):
     # pylint: disable=function-redefined
     search_opts = {}
     # Update search option with `filters`
-    if hasattr(args, 'filters') and args.filters is not None:
-        search_opts.update(shell_utils.extract_filters(args.filters))
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
     if cs.api_version >= api_versions.APIVersion("3.33"):
         pools = cs.volumes.get_pools(args.detail, search_opts)
     else:
@@ -238,6 +251,7 @@ def do_get_pools(cs, args):
         if args.detail:
             backend.update(info['capabilities'])
         utils.print_dict(backend)
+    AppendFilters.filters = []
 
 
 RESET_STATE_RESOURCES = {'volume': utils.find_volume,
@@ -345,6 +359,7 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
            metavar='<tenant>',
            help='Display information from single tenant (Admin only).')
 @utils.arg('--filters',
+           action=AppendFilters,
            type=six.text_type,
            nargs='*',
            start_version='3.33',
@@ -387,8 +402,8 @@ def do_list(cs, args):
         'group_id': getattr(args, 'group_id', None),
     }
     # Update search option with `filters`
-    if hasattr(args, 'filters') and args.filters is not None:
-        search_opts.update(shell_utils.extract_filters(args.filters))
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
 
     # If unavailable/non-existent fields are specified, these fields will
     # be removed from key_list at the print_list() during key validation.
@@ -458,6 +473,7 @@ def do_list(cs, args):
                      sortby_index=sortby_index)
     if show_count:
         print("Volume in total: %s" % total_count)
+    AppendFilters.filters = []
 
 
 @utils.arg('entity', metavar='<entity>', nargs='+',
@@ -754,6 +770,7 @@ def do_summary(cs, args):
 
 @api_versions.wraps('3.11')
 @utils.arg('--filters',
+           action=AppendFilters,
            type=six.text_type,
            nargs='*',
            start_version='3.52',
@@ -764,10 +781,11 @@ def do_group_type_list(cs, args):
     """Lists available 'group types'. (Admin only will see private types)"""
     search_opts = {}
     # Update search option with `filters`
-    if hasattr(args, 'filters') and args.filters is not None:
-        search_opts.update(shell_utils.extract_filters(args.filters))
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
     gtypes = cs.group_types.list(search_opts=search_opts)
     shell_utils.print_group_type_list(gtypes)
+    AppendFilters.filters = []
 
 
 @api_versions.wraps('3.11')
@@ -1342,6 +1360,7 @@ def do_manageable_list(cs, args):
            default=utils.env('ALL_TENANTS', default=None),
            help='Shows details for all tenants. Admin only.')
 @utils.arg('--filters',
+           action=AppendFilters,
            type=six.text_type,
            nargs='*',
            start_version='3.33',
@@ -1355,8 +1374,8 @@ def do_group_list(cs, args):
     search_opts = {'all_tenants': args.all_tenants}
 
     # Update search option with `filters`
-    if hasattr(args, 'filters') and args.filters is not None:
-        search_opts.update(shell_utils.extract_filters(args.filters))
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
 
     groups = cs.groups.list(search_opts=search_opts)
 
@@ -1376,6 +1395,7 @@ def do_group_list(cs, args):
             if group.name is None:
                 continue
             cs.groups.write_to_completion_cache('name', group.name)
+    AppendFilters.filters = []
 
 
 @api_versions.wraps('3.13')
@@ -1652,6 +1672,7 @@ def do_group_list_replication_targets(cs, args):
            help="Filters results by a group ID. Default=None. "
                 "%s" % FILTER_DEPRECATED)
 @utils.arg('--filters',
+           action=AppendFilters,
            type=six.text_type,
            nargs='*',
            start_version='3.33',
@@ -1669,13 +1690,14 @@ def do_group_snapshot_list(cs, args):
         'group_id': args.group_id,
     }
     # Update search option with `filters`
-    if hasattr(args, 'filters') and args.filters is not None:
-        search_opts.update(shell_utils.extract_filters(args.filters))
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
 
     group_snapshots = cs.group_snapshots.list(search_opts=search_opts)
 
     columns = ['ID', 'Status', 'Name']
     utils.print_list(group_snapshots, columns)
+    AppendFilters.filters = []
 
 
 @api_versions.wraps('3.14')
@@ -1902,6 +1924,7 @@ def do_revert_to_snapshot(cs, args):
            help="Filters results by the message level. Default=None. "
                 "%s" % FILTER_DEPRECATED)
 @utils.arg('--filters',
+           action=AppendFilters,
            type=six.text_type,
            nargs='*',
            start_version='3.33',
@@ -1918,8 +1941,8 @@ def do_message_list(cs, args):
         'request_id': args.request_id,
     }
     # Update search option with `filters`
-    if hasattr(args, 'filters') and args.filters is not None:
-        search_opts.update(shell_utils.extract_filters(args.filters))
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
     if args.resource_type:
         search_opts['resource_type'] = args.resource_type.upper()
     if args.level:
@@ -1941,6 +1964,7 @@ def do_message_list(cs, args):
     else:
         sortby_index = 0
     utils.print_list(messages, columns, sortby_index=sortby_index)
+    AppendFilters.filters = []
 
 
 @api_versions.wraps("3.3")
@@ -2040,6 +2064,7 @@ def do_message_delete(cs, args):
                 "volume api version >=3.22. Default=None. "
                 "%s" % FILTER_DEPRECATED)
 @utils.arg('--filters',
+           action=AppendFilters,
            type=six.text_type,
            nargs='*',
            start_version='3.33',
@@ -2085,8 +2110,8 @@ def do_snapshot_list(cs, args):
     }
 
     # Update search option with `filters`
-    if hasattr(args, 'filters') and args.filters is not None:
-        search_opts.update(shell_utils.extract_filters(args.filters))
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
 
     total_count = 0
     if show_count:
@@ -2122,6 +2147,7 @@ def do_snapshot_list(cs, args):
             mode='w'):
         for snapshot in snapshots:
             cs.volume_snapshots.write_to_completion_cache('uuid', snapshot.id)
+    AppendFilters.filters = []
 
 
 @api_versions.wraps('3.27')
@@ -2167,6 +2193,7 @@ def do_snapshot_list(cs, args):
            metavar='<tenant>',
            help='Display information from single tenant (Admin only).')
 @utils.arg('--filters',
+           action=AppendFilters,
            type=six.text_type,
            nargs='*',
            start_version='3.33',
@@ -2184,8 +2211,8 @@ def do_attachment_list(cs, args):
         'volume_id': args.volume_id,
     }
     # Update search option with `filters`
-    if hasattr(args, 'filters') and args.filters is not None:
-        search_opts.update(shell_utils.extract_filters(args.filters))
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
 
     attachments = cs.attachments.list(search_opts=search_opts,
                                       marker=args.marker,
@@ -2199,6 +2226,7 @@ def do_attachment_list(cs, args):
     else:
         sortby_index = 0
     utils.print_list(attachments, columns, sortby_index=sortby_index)
+    AppendFilters.filters = []
 
 
 @api_versions.wraps('3.27')
