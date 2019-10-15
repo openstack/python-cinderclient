@@ -715,6 +715,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
         # FIXME(jamielennox): username and password are now optional. Need
         # to test that they were provided in this mode.
         logger = kwargs.get('logger')
+        user_domain_name = kwargs.get('user_domain_name', 'Default')
         return HTTPClient(username,
                           password,
                           projectid=project_id,
@@ -736,7 +737,8 @@ def _construct_http_client(username=None, password=None, project_id=None,
                           auth_system=auth_system,
                           auth_plugin=auth_plugin,
                           logger=logger,
-                          api_version=api_version
+                          api_version=api_version,
+                          user_domain_name = user_domain_name
                           )
 
 
