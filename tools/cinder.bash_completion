@@ -10,7 +10,7 @@ _cinder()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     if [ "x$_cinder_opts" == "x" ] ; then
-                cbc="`cinder bash-completion | sed -e "s/  *-h  */ /" -e "s/  *-i  */ /"`"
+                cbc="`cinder bash-completion 2>/dev/null | sed -e "s/  *-h  */ /" -e "s/  *-i  */ /"`"
                 _cinder_opts="`echo "$cbc" | sed -e "s/--[a-z0-9_-]*//g" -e "s/  */ /g"`"
                 _cinder_flags="`echo " $cbc" | sed -e "s/ [^-][^-][a-z0-9_-]*//g" -e "s/  */ /g"`"
      fi
