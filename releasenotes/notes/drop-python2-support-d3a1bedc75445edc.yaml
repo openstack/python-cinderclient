@@ -1,0 +1,7 @@
+---
+upgrade:
+  - |
+    Python 2.7 support has been dropped.  Beginning with release 6.0.0,
+    the minimum version of Python supported by python-cinderclient is
+    Python 3.6.  The last version of python-cinderclient to support
+    Python 2.7 is the 5.x series from the Train release.

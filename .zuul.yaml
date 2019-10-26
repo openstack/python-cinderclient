@@ -1,5 +1,6 @@
 - job:
-    name: python-cinderclient-functional
+    name: python-cinderclient-functional-base
+    abstract: true
     parent: devstack
     run: playbooks/python-cinderclient-functional.yaml
     post-run: playbooks/post.yaml
@@ -12,19 +13,47 @@
         USE_PYTHON3: true
         VOLUME_BACKING_FILE_SIZE: 16G
 
+- job:
+    name: python-cinderclient-functional-py36
+    parent: python-cinderclient-functional-base
+    vars:
+      python_version: 3.6
+      tox_envlist: functional-py36
+
+- job:
+    name: python-cinderclient-functional-py37
+    parent: python-cinderclient-functional-base
+    # Just to be clear what's going on here: which python is used by
+    # tox is controlled by tox.ini.  But, that python needs to
+    # actually be available on the node running the job in order for
+    # the job to succeed.  At this point, we can assume that 3.6 will
+    # be available everywhere (this is guaranteed by openstack-infra).
+    # But 3.7 is still problematic (don't ask me why).  So for this
+    # job that we want running in py3.7, we need to (a) specify a
+    # nodeset for which py3.7 is available, and (b) tell the job to
+    # make sure it's available (i.e., install it if necessary).
+    # (a) is handled by the 'nodeset' specification below.
+    # (b) is handled by the setting the 'python_version' variable
+    #     below, although by itself that doesn't do anything: it also
+    #     requires that the 'ensure-python' role is included in the
+    #     job playbook.
+    nodeset: openstack-single-node-bionic
+    vars:
+      python_version: 3.7
+      tox_envlist: functional-py37
+
 - project:
     templates:
       - check-requirements
-      - lib-forward-testing
       - lib-forward-testing-python3
       - openstack-cover-jobs
       - openstack-lower-constraints-jobs
-      - openstack-python-jobs
-      - openstack-python3-train-jobs
+      - openstack-python3-ussuri-jobs
       - publish-openstack-docs-pti
       - release-notes-jobs-python3
     check:
       jobs:
-        - python-cinderclient-functional
+        - python-cinderclient-functional-py36
+        - python-cinderclient-functional-py37
         - openstack-tox-pylint:
             voting: false
