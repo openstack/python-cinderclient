@@ -675,6 +675,8 @@ def do_create(cs, args):
         shell_utils._poll_for_status(
             cs.volumes.get, volume.id, info, 'creating', ['available'],
             timeout_period, cs.client.global_request_id, cs.messages)
+        volume = cs.volumes.get(volume.id)
+        info.update(volume._info)
 
     utils.print_dict(info)
 
