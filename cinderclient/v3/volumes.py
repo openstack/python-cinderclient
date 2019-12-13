@@ -129,11 +129,11 @@ class VolumeManager(volumes.VolumeManager):
         """Revert a volume to a snapshot.
 
         The snapshot must be the most recent one known to cinder.
-        :param volume: volume object.
-        :param snapshot: snapshot object.
+        :param volume: volume object or volume id.
+        :param snapshot: snapshot object or snapshot id.
         """
         return self._action('revert', volume,
-                            info={'snapshot_id': base.getid(snapshot.id)})
+                            info={'snapshot_id': base.getid(snapshot)})
 
     @api_versions.wraps('3.12')
     def summary(self, all_tenants):
