@@ -1560,3 +1560,35 @@ class ShellTest(utils.TestCase):
 
         for e in expected_commands:
             self.assertIn('    ' + e, help_text)
+
+    @ddt.data(
+        # testcases for list transfers
+        {'command':
+            'transfer-list --filters volume_id=456',
+         'expected':
+             '/os-volume-transfer/detail?volume_id=456'},
+        {'command':
+             'transfer-list --filters id=123',
+         'expected':
+             '/os-volume-transfer/detail?id=123'},
+        {'command':
+             'transfer-list --filters name=abc',
+         'expected':
+             '/os-volume-transfer/detail?name=abc'},
+        {'command':
+             'transfer-list --filters name=abc --filters volume_id=456',
+         'expected':
+             '/os-volume-transfer/detail?name=abc&volume_id=456'},
+        {'command':
+             'transfer-list --filters id=123 --filters volume_id=456',
+         'expected':
+             '/os-volume-transfer/detail?id=123&volume_id=456'},
+        {'command':
+             'transfer-list --filters id=123 --filters name=abc',
+         'expected':
+             '/os-volume-transfer/detail?id=123&name=abc'},
+    )
+    @ddt.unpack
+    def test_transfer_list_with_filters(self, command, expected):
+        self.run_command('--os-volume-api-version 3.52 %s' % command)
+        self.assert_called('GET', expected)

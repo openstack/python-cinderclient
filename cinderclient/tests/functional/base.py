@@ -156,7 +156,9 @@ class ClientTestBase(base.ClientTestBase):
         output = self.cinder(cmd, params=params)
         object = self._get_property_from_output(output)
         self.addCleanup(self.object_delete, object_name, object['id'])
-        self.wait_for_object_status(object_name, object['id'], 'available')
+        if object_name in ('volume', 'snapshot', 'backup'):
+            self.wait_for_object_status(
+                object_name, object['id'], 'available')
         return object
 
     def object_delete(self, object_name, object_id):

@@ -2569,12 +2569,22 @@ def do_transfer_create(cs, args):
            default=None,
            help='Sort keys and directions in the form of <key>[:<asc|desc>].',
            start_version='3.59')
+@utils.arg('--filters',
+           action=AppendFilters,
+           type=six.text_type,
+           nargs='*',
+           start_version='3.52',
+           metavar='<key=value>',
+           default=None,
+           help="Filter key and value pairs.")
 def do_transfer_list(cs, args):
     """Lists all transfers."""
     all_tenants = int(os.environ.get("ALL_TENANTS", args.all_tenants))
     search_opts = {
         'all_tenants': all_tenants,
     }
+    if AppendFilters.filters:
+        search_opts.update(shell_utils.extract_filters(AppendFilters.filters))
 
     sort = getattr(args, 'sort', None)
     if sort:
@@ -2587,3 +2597,4 @@ def do_transfer_list(cs, args):
     transfers = cs.transfers.list(search_opts=search_opts, sort=sort)
     columns = ['ID', 'Volume ID', 'Name']
     utils.print_list(transfers, columns)
+    AppendFilters.filters = []

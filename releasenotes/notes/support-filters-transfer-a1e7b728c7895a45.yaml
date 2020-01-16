@@ -1,0 +1,6 @@
+---
+features:
+  - New command option ``--filters`` is added to ``transfer-list``
+    command to support filtering.
+    The ``transfer-list`` command can be used with filters when
+    communicating with the Block Storage API version 3.52 and higher.
