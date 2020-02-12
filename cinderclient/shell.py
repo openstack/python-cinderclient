@@ -135,6 +135,7 @@ class OpenStackCinderShell(object):
     def __init__(self):
         self.ks_logger = None
         self.client_logger = None
+        self.extensions = []
 
     def get_base_parser(self):
         parser = CinderClientArgumentParser(
