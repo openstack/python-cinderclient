@@ -1165,7 +1165,6 @@ class ShellTest(utils.TestCase):
         volume = self.shell.cs.volumes.get('1234')
         info = dict()
         info.update(volume._info)
-        info.pop('links', None)
         self.assertEqual(1, poll_method.call_count)
         timeout_period = 3600
         poll_method.assert_has_calls([mock.call(self.shell.cs.volumes.get,
