@@ -118,10 +118,10 @@ class ShellTest(utils.TestCase):
     def test_help(self):
         # Some expected help output, including microversioned commands
         required = [
-            '.*?^usage: ',
-            '.*?(?m)^\s+create\s+Creates a volume.',
-            '.*?(?m)^\s+summary\s+Get volumes summary.',
-            '.*?(?m)^Run "cinder help SUBCOMMAND" for help on a subcommand.',
+            r'.*?^usage: ',
+            r'.*?(?m)^\s+create\s+Creates a volume.',
+            r'.*?(?m)^\s+summary\s+Get volumes summary.',
+            r'.*?(?m)^Run "cinder help SUBCOMMAND" for help on a subcommand.',
         ]
         help_text = self.shell('help')
         for r in required:
@@ -130,8 +130,8 @@ class ShellTest(utils.TestCase):
 
     def test_help_on_subcommand(self):
         required = [
-            '.*?^usage: cinder list',
-            '.*?(?m)^Lists all volumes.',
+            r'.*?^usage: cinder list',
+            r'.*?(?m)^Lists all volumes.',
         ]
         help_text = self.shell('help list')
         for r in required:
@@ -140,8 +140,8 @@ class ShellTest(utils.TestCase):
 
     def test_help_on_subcommand_mv(self):
         required = [
-            '.*?^usage: cinder summary',
-            '.*?(?m)^Get volumes summary.',
+            r'.*?^usage: cinder summary',
+            r'.*?(?m)^Get volumes summary.',
         ]
         help_text = self.shell('help summary')
         for r in required:

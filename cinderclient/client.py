@@ -14,9 +14,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-"""
-OpenStack Client interface. Handles the REST calls and responses.
-"""
+"""OpenStack Client interface. Handles the REST calls and responses."""
 
 from __future__ import print_function
 
@@ -429,7 +427,7 @@ class HTTPClient(object):
                     url = self.management_url + url
                 resp, body = self.request(url, method, **kwargs)
                 return resp, body
-            except exceptions.BadRequest as e:
+            except exceptions.BadRequest:
                 if attempts > self.retries:
                     raise
             except exceptions.Unauthorized:

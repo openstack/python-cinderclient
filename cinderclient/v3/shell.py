@@ -52,12 +52,12 @@ class AppendFilters(argparse.Action):
            default=None,
            help='Show enabled filters for specified resource. Default=None.')
 def do_list_filters(cs, args):
-        """List enabled filters.
+    """List enabled filters.
 
-        Symbol '~' after filter key means it supports inexact filtering.
-        """
-        filters = cs.resource_filters.list(resource=args.resource)
-        shell_utils.print_resource_filter_list(filters)
+    Symbol '~' after filter key means it supports inexact filtering.
+    """
+    filters = cs.resource_filters.list(resource=args.resource)
+    shell_utils.print_resource_filter_list(filters)
 
 
 @utils.arg('--filters',

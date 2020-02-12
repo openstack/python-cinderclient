@@ -33,60 +33,61 @@ def _get_default_RateLimit(verb="verb1", uri="uri1", regex="regex1",
 
 class TestLimits(utils.TestCase):
     def test_repr(self):
-        l = limits.Limits(None, {"foo": "bar"}, resp=REQUEST_ID)
-        self.assertEqual("<Limits>", repr(l))
-        self._assert_request_id(l)
+        limit = limits.Limits(None, {"foo": "bar"}, resp=REQUEST_ID)
+        self.assertEqual("<Limits>", repr(limit))
+        self._assert_request_id(limit)
 
     def test_absolute(self):
-        l = limits.Limits(None,
-                          {"absolute": {"name1": "value1", "name2": "value2"}},
-                          resp=REQUEST_ID)
+        limit = limits.Limits(
+            None,
+            {"absolute": {"name1": "value1", "name2": "value2"}},
+            resp=REQUEST_ID)
         l1 = limits.AbsoluteLimit("name1", "value1")
         l2 = limits.AbsoluteLimit("name2", "value2")
-        for item in l.absolute:
+        for item in limit.absolute:
             self.assertIn(item, [l1, l2])
-        self._assert_request_id(l)
+        self._assert_request_id(limit)
 
     def test_rate(self):
-        l = limits.Limits(None,
-                          {
-                              "rate": [
-                                  {
-                                      "uri": "uri1",
-                                      "regex": "regex1",
-                                      "limit": [
-                                          {
-                                              "verb": "verb1",
-                                              "value": "value1",
-                                              "remaining": "remain1",
-                                              "unit": "unit1",
-                                              "next-available": "next1",
-                                          },
-                                      ],
-                                  },
-                                  {
-                                      "uri": "uri2",
-                                      "regex": "regex2",
-                                      "limit": [
-                                          {
-                                              "verb": "verb2",
-                                              "value": "value2",
-                                              "remaining": "remain2",
-                                              "unit": "unit2",
-                                              "next-available": "next2",
-                                          },
-                                      ],
-                                  },
-                              ],
-                          },
-                          resp=REQUEST_ID)
+        limit = limits.Limits(
+            None,
+            {
+                "rate": [
+                    {
+                        "uri": "uri1",
+                        "regex": "regex1",
+                        "limit": [
+                            {
+                                "verb": "verb1",
+                                "value": "value1",
+                                "remaining": "remain1",
+                                "unit": "unit1",
+                                "next-available": "next1",
+                            },
+                        ],
+                    },
+                    {
+                        "uri": "uri2",
+                        "regex": "regex2",
+                        "limit": [
+                            {
+                                "verb": "verb2",
+                                "value": "value2",
+                                "remaining": "remain2",
+                                "unit": "unit2",
+                                "next-available": "next2",
+                            },
+                     ],
+                }, ],
+            },
+            resp=REQUEST_ID)
         l1 = limits.RateLimit("verb1", "uri1", "regex1", "value1", "remain1",
                               "unit1", "next1")
         l2 = limits.RateLimit("verb2", "uri2", "regex2", "value2", "remain2",
                               "unit2", "next2")
-        for item in l.rate:
+        for item in limit.rate:
             self.assertIn(item, [l1, l2])
-        self._assert_request_id(l)
+        self._assert_request_id(limit)
 
 
 class TestRateLimit(utils.TestCase):
