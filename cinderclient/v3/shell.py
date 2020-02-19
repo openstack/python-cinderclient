@@ -2069,6 +2069,8 @@ def do_attachment_list(cs, args):
                                       marker=args.marker,
                                       limit=args.limit,
                                       sort=args.sort)
+    for attachment in attachments:
+        setattr(attachment, 'server_id', getattr(attachment, 'instance', None))
     columns = ['ID', 'Volume ID', 'Status', 'Server ID']
     if args.sort:
         sortby_index = None

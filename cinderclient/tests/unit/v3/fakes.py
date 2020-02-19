@@ -30,6 +30,18 @@ fake_attachment = {'attachment': {
     'instance': 'e84fda45-4de4-4ce4-8f39-fc9d3b0aa05e',
     'volume_id': '557ad76c-ce54-40a3-9e91-c40d21665cc3', }}
 
+fake_attachment_list = {'attachments': [
+    {'instance': 'instance_1',
+     'name': 'attachment-1',
+     'volume_id': 'fake_volume_1',
+     'status': 'reserved',
+     'id': 'attachmentid_1'},
+    {'instance': 'instance_2',
+     'name': 'attachment-2',
+     'volume_id': 'fake_volume_2',
+     'status': 'reserverd',
+     'id': 'attachmentid_2'}]}
+
 fake_connection_info = {
     'auth_password': 'i6h9E5HQqSkcGX3H',
     'attachment_id': 'a232e9ae',
@@ -289,15 +301,7 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         return (200, {}, fake_attachment)
 
     def get_attachments(self, **kw):
-        return (200, {}, {
-            'attachments': [{'instance': 1,
-                             'name': 'attachment-1',
-                             'volume_id': 'fake_volume_1',
-                             'status': 'reserved'},
-                            {'instance': 2,
-                             'name': 'attachment-2',
-                             'volume_id': 'fake_volume_2',
-                             'status': 'reserverd'}]})
+        return (200, {}, fake_attachment_list)
 
     def post_attachments_a232e9ae_action(self, **kw):  # noqa: E501
         attached_fake = fake_attachment
