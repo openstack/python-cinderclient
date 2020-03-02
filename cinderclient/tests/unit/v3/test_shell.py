@@ -149,6 +149,24 @@ class ShellTest(utils.TestCase):
              u'list --filters name=abc --filters size=1',
          'expected':
              '/volumes/detail?name=abc&size=1'},
+        {'command':
+             u'list --filters created_at=lt:2020-01-15T00:00:00',
+         'expected':
+             '/volumes/detail?created_at=lt%3A2020-01-15T00%3A00%3A00'},
+        {'command':
+             u'list --filters updated_at=gte:2020-02-01T00:00:00,'
+             u'lt:2020-03-01T00:00:00',
+         'expected':
+             '/volumes/detail?updated_at=gte%3A2020-02-01T00%3A00%3A00%2C'
+             'lt%3A2020-03-01T00%3A00%3A00'},
+        {'command':
+             u'list --filters updated_at=gte:2020-02-01T00:00:00,'
+             u'lt:2020-03-01T00:00:00 --filters created_at='
+             u'lt:2020-01-15T00:00:00',
+         'expected':
+             '/volumes/detail?created_at=lt%3A2020-01-15T00%3A00%3A00'
+             '&updated_at=gte%3A2020-02-01T00%3A00%3A00%2C'
+             'lt%3A2020-03-01T00%3A00%3A00'},
         # testcases for list group
         {'command':
              'group-list --filters name=456',

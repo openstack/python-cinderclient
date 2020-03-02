@@ -2749,24 +2749,66 @@ Lists all volumes.
 ``--tenant [<tenant>]``
   Display information from single tenant (Admin only).
 
+.. _cinder-list-filters-usage:
+
 ``--filters [<key=value> [<key=value> ...]]``
-  Filter
-  key
-  and
-  value
-  pairs.
-  Please
-  use
-  'cinder
-  list-filters'
-  to
-  check
-  enabled
-  filters
-  from
-  server,
-  Default=None. (Supported by API version 3.33 and
-  later)
+  Filter key and value pairs.
+  Please use the ``cinder list-filters`` command to check enabled filters
+  from server.
+  Default=None.
+  (Supported by API version 3.33 and later)
+
+  **Time Comparison Filters**
+
+  Beginning with API version 3.60, you can apply time comparison filtering
+  to the ``created_at`` and ``updated at`` fields.  Time must be
+  expressed in ISO 8601 format: CCYY-MM-DDThh:mm:ss±hh:mm.  The
+  ±hh:mm value, if included, returns the time zone as an offset from
+  UTC.
+
+  To use time comparison filtering, use the standard ``key=value`` syntax
+  for the ``--filters`` option.  The allowable keys are:
+
+  * ``created_at``
+  * ``updated_at``
+
+  The value is a *time comparison statement*, which is specified as follows:
+  a comparison operator, followed immediately by a colon (``:``), followed
+  immediately by a time expressed in ISO 8601 format.  You can filter by a
+  *time range* by appending a comma (``,``) followed a second time
+  comparison statement.
+
+  Six *comparison operators* are supported:
+
+  * ``gt`` (greater than) - return results more recent than the specified
+    time
+  * ``gte`` (greater than or equal) - return any results matching the
+    specified time and also any more recent results
+  * ``eq`` (equal) - return any results matching the specified time
+    exactly
+  * ``neq`` (not equal) - return any results that do not match the
+    specified time
+  * ``lt`` (less than) - return results older than the specified time
+  * ``lte`` (less than or equal) - return any results matching the
+    specified time and also any older results
+
+  **Examples**
+
+  To filter the response to volumes created before 15 January 2020:
+
+  .. code-block:: console
+
+      cinder list --filters created_at=lt:2020-01-15T00:00:00
+
+  To filter the response to those volumes updated in February 2020:
+
+  .. code-block:: console
+
+      cinder list --filters updated_at=gte:2020-02-01T00:00:00,lt:2020-03-01T00:00:00
+
+  See the `Block Storage API v3 Reference
+  <https://docs.openstack.org/api-ref/block-storage/v3/index.html>`_ for
+  more information.
 
 .. _cinder_list-extensions:
 
