@@ -57,6 +57,7 @@ Developer Guides
 .. toctree::
    :maxdepth: 2
 
+   contributor/contributing
    contributor/functional_tests
    contributor/unit_tests
 
