@@ -91,8 +91,8 @@ man_pages = [
 # -- Options for openstackdocstheme -------------------------------------------
 
 repository_name = 'openstack/python-cinderclient'
-bug_project = 'cinderclient'
-bug_tag = ''
+bug_project = 'python-cinderclient'
+bug_tag = 'doc'
 
 
 # -- Options for LaTeX output -------------------------------------------------
