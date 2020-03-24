@@ -718,7 +718,7 @@ class OpenStackCinderShell(object):
             service_type=service_type,
             service_name=service_name,
             volume_service_name=volume_service_name,
-            bypass_url=os_endpoint,
+            os_endpoint=os_endpoint,
             retries=options.retries,
             http_log_debug=args.debug,
             insecure=insecure,

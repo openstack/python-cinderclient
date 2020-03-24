@@ -49,10 +49,10 @@ class ClientTest(utils.TestCase):
         os_endpoint = 'http://example.com/'
         httpclient_mock.return_value = None
         cinderclient.client._construct_http_client(
-            bypass_url=os_endpoint)
+            os_endpoint=os_endpoint)
         self.assertTrue(httpclient_mock.called)
         self.assertEqual(os_endpoint,
-                         httpclient_mock.call_args[1].get('bypass_url'))
+                         httpclient_mock.call_args[1].get('os_endpoint'))
         session_mock.assert_not_called()
 
     def test_log_req(self):

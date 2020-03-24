@@ -61,7 +61,7 @@ class Client(object):
                  proxy_tenant_id=None, proxy_token=None, region_name=None,
                  endpoint_type='publicURL', extensions=None,
                  service_type='volumev3', service_name=None,
-                 volume_service_name=None, bypass_url=None, retries=0,
+                 volume_service_name=None, os_endpoint=None, retries=0,
                  http_log_debug=False, cacert=None, auth_system='keystone',
                  auth_plugin=None, session=None, api_version=None,
                  logger=None, **kwargs):
@@ -125,7 +125,7 @@ class Client(object):
             service_type=service_type,
             service_name=service_name,
             volume_service_name=volume_service_name,
-            bypass_url=bypass_url,
+            os_endpoint=os_endpoint,
             retries=retries,
             http_log_debug=http_log_debug,
             cacert=cacert,
