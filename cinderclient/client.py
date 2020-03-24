@@ -485,9 +485,8 @@ class HTTPClient(object):
             version = get_volume_api_from_url(self.management_url)
         except exceptions.UnsupportedVersion as e:
             if self.management_url == self.bypass_url:
-                msg = (_("Invalid url was specified in --os-endpoint or "
-                         "environment variable CINDERCLIENT_BYPASS_URL.\n"
-                         "%s") % six.text_type(e))
+                msg = (_("Invalid url was specified in --os-endpoint %s")
+                       % six.text_type(e))
             else:
                 msg = (_("Service catalog returned invalid url.\n"
                          "%s") % six.text_type(e))

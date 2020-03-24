@@ -90,7 +90,7 @@ You'll find complete documentation on the shell by running
                   [--os-endpoint-type <os-endpoint-type>]
                   [--endpoint-type <endpoint-type>]
                   [--os-volume-api-version <volume-api-ver>]
-                  [--bypass-url <bypass-url>] [--retries <retries>]
+                  [--retries <retries>]
                   [--profile HMAC_KEY] [--os-auth-strategy <auth-strategy>]
                   [--os-username <auth-user-name>] [--os-password <auth-password>]
                   [--os-tenant-name <auth-tenant-name>]
@@ -254,6 +254,9 @@ You'll find complete documentation on the shell by running
       --volume-service-name <volume-service-name>
                             Volume service name.
                             Default=env[CINDER_VOLUME_SERVICE_NAME].
+      --os-endpoint
+                            Use this API endpoint instead of the Service Catalog.
+                            Default=env[CINDER_ENDPOINT]
       --os-endpoint-type <os-endpoint-type>
                             Endpoint type, which is publicURL or internalURL.
                             Default=env[OS_ENDPOINT_TYPE] or nova
@@ -264,9 +267,6 @@ You'll find complete documentation on the shell by running
                             Block Storage API version. Accepts X, X.Y (where X is
                             major and Y is minor
                             part).Default=env[OS_VOLUME_API_VERSION].
-      --bypass-url <bypass-url>
-                            Use this API endpoint instead of the Service Catalog.
-                            Defaults to env[CINDERCLIENT_BYPASS_URL].
       --retries <retries>   Number of retries.
       --profile HMAC_KEY    HMAC key to use for encrypting context data for
                             performance profiling of operation. This key needs to

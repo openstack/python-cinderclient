@@ -43,7 +43,7 @@ cinder usage
                  [--os-endpoint-type <os-endpoint-type>]
                  [--endpoint-type <endpoint-type>]
                  [--os-volume-api-version <volume-api-ver>]
-                 [--bypass-url <bypass-url>] [--os-endpoint <os-endpoint>]
+                 [--os-endpoint <os-endpoint>]
                  [--retries <retries>] [--profile HMAC_KEY]
                  [--os-auth-strategy <auth-strategy>]
                  [--os-username <auth-user-name>] [--os-password <auth-password>]
@@ -877,14 +877,9 @@ cinder optional arguments
   major and Y is minor
   part).Default= ``env[OS_VOLUME_API_VERSION]``.
 
-``--bypass-url <bypass-url>``
-  **DEPRECATED!** Use os_endpoint. Use this API endpoint
-  instead of the Service Catalog. Defaults to
-  ``env[CINDERCLIENT_BYPASS_URL]``.
-
 ``--os-endpoint <os-endpoint>``
   Use this API endpoint instead of the Service Catalog.
-  Defaults to ``env[CINDER_ENDPOINT]``.
+  Default=``env[CINDER_ENDPOINT]``
 
 ``--retries <retries>``
   Number of retries.
