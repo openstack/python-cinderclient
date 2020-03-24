@@ -701,6 +701,8 @@ def _construct_http_client(username=None, password=None, project_id=None,
     if session:
         kwargs.setdefault('user_agent', 'python-cinderclient')
         kwargs.setdefault('interface', endpoint_type)
+        kwargs.setdefault('endpoint_override', bypass_url)
+
         return SessionClient(session=session,
                              auth=auth,
                              service_type=service_type,

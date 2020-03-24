@@ -240,7 +240,7 @@ class ShellTest(utils.TestCase):
     def test_noauth_plugin(self, mocker):
         os_auth_url = "http://example.com/v2"
         mocker.register_uri('GET',
-                            "%s/admin/volumes/detail"
+                            "%s/volumes/detail"
                             % os_auth_url, text='{"volumes": []}')
         _shell = shell.OpenStackCinderShell()
         args = ['--os-endpoint', os_auth_url,
