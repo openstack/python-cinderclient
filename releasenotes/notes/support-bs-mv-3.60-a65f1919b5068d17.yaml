@@ -1,0 +1,13 @@
+---
+features:
+  - |
+    When communicating with the Block Storage API version 3.60 and higher,
+    you can apply time comparison filtering to the volume list command
+    on the ``created_at`` or ``updated_at`` fields.  Time must be
+    expressed in ISO 8601 format: CCYY-MM-DDThh:mm:ss±hh:mm.  The
+    ±hh:mm value, if included, returns the time zone as an offset from
+    UTC.
+
+    See the `Block Storage service (cinder) command-line client
+    <https://docs.openstack.org/python-cinderclient/latest/cli/details.html#cinder-list-filters-usage>`_
+    documentation for usage details.
