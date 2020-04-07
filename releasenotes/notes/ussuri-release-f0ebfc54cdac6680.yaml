@@ -1,0 +1,28 @@
+---
+prelude: |
+    The Ussuri release of the python-cinderclient supports Block Storage
+    API version 2 and Block Storage API version 3 through microversion
+    3.60.  (The maximum microversion of the Block Storage API in the
+    Ussuri release is 3.60.)
+
+    In addition to the features and bugfixes described below, this release
+    includes some documentation updates.
+
+    Note that this release corresponds to a major bump in the version
+    number.  See the "Upgrade Notes" section of this document for details.
+
+    Please keep in mind that the minimum version of Python supported by
+    this release is Python 3.6.
+upgrade:
+  - |
+    The ``--bypass-url`` command line argument, having been deprecated in
+    version 2.10, was removed in version 4.0.0.  It was replaced by the
+    command line argument ``--os-endpoint`` for consistency with other
+    OpenStack clients.  In this release, the initializer functions for
+    client objects no longer recognize ``bypass_url`` as a parameter name.
+    Instead, use ``os_endpoint``.  This keeps the cinderclient consistent
+    both internally and with respect to other OpenStack clients.
+fixes:
+  - |
+    Fixed an issue where the ``os_endpoint`` was not being passed to the
+    keystone session as the ``endpoint_override`` argument.
