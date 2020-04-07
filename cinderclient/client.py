@@ -277,7 +277,7 @@ class HTTPClient(object):
                  proxy_tenant_id=None, proxy_token=None, region_name=None,
                  endpoint_type='publicURL', service_type=None,
                  service_name=None, volume_service_name=None,
-                 bypass_url=None, retries=None,
+                 os_endpoint=None, retries=None,
                  http_log_debug=False, cacert=None,
                  auth_system='keystone', auth_plugin=None, api_version=None,
                  logger=None, user_domain_name='Default',
@@ -304,11 +304,12 @@ class HTTPClient(object):
         self.service_type = service_type
         self.service_name = service_name
         self.volume_service_name = volume_service_name
-        self.bypass_url = bypass_url.rstrip('/') if bypass_url else bypass_url
+        self.os_endpoint = os_endpoint.rstrip('/') \
+            if os_endpoint else os_endpoint
         self.retries = int(retries or 0)
         self.http_log_debug = http_log_debug
 
-        self.management_url = self.bypass_url or None
+        self.management_url = self.os_endpoint or None
         self.auth_token = None
         self.proxy_token = proxy_token
         self.proxy_tenant_id = proxy_tenant_id
@@ -484,7 +485,7 @@ class HTTPClient(object):
         try:
             version = get_volume_api_from_url(self.management_url)
         except exceptions.UnsupportedVersion as e:
-            if self.management_url == self.bypass_url:
+            if self.management_url == self.os_endpoint:
                 msg = (_("Invalid url was specified in --os-endpoint %s")
                        % six.text_type(e))
             else:
@@ -588,8 +589,8 @@ class HTTPClient(object):
             # existing token? If so, our actual endpoints may
             # be different than that of the admin token.
             if self.proxy_token:
-                if self.bypass_url:
-                    self.set_management_url(self.bypass_url)
+                if self.os_endpoint:
+                    self.set_management_url(self.os_endpoint)
                 else:
                     self._fetch_endpoints_from_auth(admin_url)
                 # Since keystone no longer returns the user token
@@ -608,8 +609,8 @@ class HTTPClient(object):
                     auth_url = auth_url + '/v2.0'
                 self._v2_or_v3_auth(auth_url)
 
-        if self.bypass_url:
-            self.set_management_url(self.bypass_url)
+        if self.os_endpoint:
+            self.set_management_url(self.os_endpoint)
         elif not self.management_url:
             raise exceptions.Unauthorized('Cinder Client')
 
@@ -689,7 +690,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                            region_name=None, endpoint_type='publicURL',
                            service_type='volume',
                            service_name=None, volume_service_name=None,
-                           bypass_url=None, retries=None,
+                           os_endpoint=None, retries=None,
                            http_log_debug=False,
                            auth_system='keystone', auth_plugin=None,
                            cacert=None, tenant_id=None,
@@ -700,7 +701,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
     if session:
         kwargs.setdefault('user_agent', 'python-cinderclient')
         kwargs.setdefault('interface', endpoint_type)
-        kwargs.setdefault('endpoint_override', bypass_url)
+        kwargs.setdefault('endpoint_override', os_endpoint)
 
         return SessionClient(session=session,
                              auth=auth,
@@ -728,7 +729,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                           service_type=service_type,
                           service_name=service_name,
                           volume_service_name=volume_service_name,
-                          bypass_url=bypass_url,
+                          os_endpoint=os_endpoint,
                           retries=retries,
                           http_log_debug=http_log_debug,
                           cacert=cacert,

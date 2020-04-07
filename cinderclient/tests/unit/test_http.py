@@ -110,7 +110,7 @@ def get_authed_client(retries=0, **kwargs):
 def get_authed_endpoint_url(retries=0):
     cl = client.HTTPClient("username", "password",
                            "project_id", "auth_test",
-                           bypass_url="volume/v100/", retries=retries)
+                           os_endpoint="volume/v100/", retries=retries)
     cl.auth_token = "token"
     return cl
 
@@ -333,7 +333,7 @@ class ClientTest(utils.TestCase):
 
     def test_os_endpoint_url(self):
         cl = get_authed_endpoint_url()
-        self.assertEqual("volume/v100", cl.bypass_url)
+        self.assertEqual("volume/v100", cl.os_endpoint)
         self.assertEqual("volume/v100", cl.management_url)
 
     def test_auth_failure(self):
