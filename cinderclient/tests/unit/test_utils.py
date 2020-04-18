@@ -12,10 +12,10 @@
 # limitations under the License.
 
 import collections
-import ddt
 import sys
+from unittest import mock
 
-import mock
+import ddt
 import six
 from six import moves
 
@@ -24,10 +24,9 @@ from cinderclient.apiclient import base as common_base
 from cinderclient import base
 from cinderclient import exceptions
 from cinderclient import shell_utils
-from cinderclient import utils
-
 from cinderclient.tests.unit import utils as test_utils
 from cinderclient.tests.unit.v2 import fakes
+from cinderclient import utils
 
 UUID = '8e8ec658-c7b0-4243-bdf8-6f7f2952c0d0'
 

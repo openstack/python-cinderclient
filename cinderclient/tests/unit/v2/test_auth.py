@@ -15,14 +15,13 @@
 #    under the License.
 
 import json
+from unittest import mock
 
-import mock
 import requests
 
 from cinderclient import exceptions
-from cinderclient.v2 import client
-
 from cinderclient.tests.unit import utils
+from cinderclient.v2 import client
 
 
 class AuthenticateAgainstKeystoneTests(utils.TestCase):

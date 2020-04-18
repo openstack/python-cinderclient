@@ -15,6 +15,7 @@ import argparse
 import re
 import sys
 import unittest
+from unittest import mock
 
 import ddt
 import fixtures
@@ -22,7 +23,6 @@ import keystoneauth1.exceptions as ks_exc
 from keystoneauth1.exceptions import DiscoveryFailure
 from keystoneauth1.identity.generic.password import Password as ks_password
 from keystoneauth1 import session
-import mock
 import requests_mock
 from six import moves
 from testtools import matchers

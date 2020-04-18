@@ -12,30 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import mock
-from requests import Response
+from unittest import mock
+
+import requests
 import six
 
 from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
 from cinderclient import base
 from cinderclient import exceptions
-from cinderclient.v3 import client
-from cinderclient.v3 import volumes
-
 from cinderclient.tests.unit import test_utils
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v2 import fakes
-
+from cinderclient.v3 import client
+from cinderclient.v3 import volumes
 
 cs = fakes.FakeClient()
-
 
 REQUEST_ID = 'req-test-request-id'
 
 
 def create_response_obj_with_header():
-    resp = Response()
+    resp = requests.Response()
     resp.headers['x-openstack-request-id'] = REQUEST_ID
     resp.headers['Etag'] = 'd5103bf7b26ff0310200d110da3ed186'
     resp.status_code = 200

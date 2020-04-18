@@ -12,9 +12,10 @@
 # limitations under the License.
 
 import json
-import mock
-import requests
+from unittest import mock
 import uuid
+
+import requests
 
 from cinderclient import client
 from cinderclient import exceptions

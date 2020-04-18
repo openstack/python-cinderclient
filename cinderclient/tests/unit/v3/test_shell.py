@@ -38,9 +38,10 @@
 #                                                   'volume_id': '1234'})
 #             return original(manager, name_or_id, **kwargs)
 
+from unittest import mock
+
 import ddt
 import fixtures
-import mock
 from requests_mock.contrib import fixture as requests_mock_fixture
 import six
 from six.moves.urllib import parse
