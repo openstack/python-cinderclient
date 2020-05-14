@@ -221,6 +221,11 @@ The following are kept for historical purposes.
 * Use Adapter from keystoneclient
 * Add support for Replication feature
 * Add pagination for Volume List
+* Note Connection refused --> Connection error commit:
+  c9e7818f3f90ce761ad8ccd09181c705880a4266
+* Note Mask Passwords in log output commit:
+  80582f2b860b2dadef7ae07bdbd8395bf03848b1
+
 
 .. _1325773: http://bugs.launchpad.net/python-cinderclient/+bug/1325773
 .. _1333257: http://bugs.launchpad.net/python-cinderclient/+bug/1333257
@@ -233,9 +238,6 @@ The following are kept for historical purposes.
 .. _1200214: http://bugs.launchpad.net/python-cinderclient/+bug/1200214
 .. _1130572: http://bugs.launchpad.net/python-cinderclient/+bug/1130572
 .. _1156994: http://bugs.launchpad.net/python-cinderclient/+bug/1156994
-
-** Note Connection refused --> Connection error commit: c9e7818f3f90ce761ad8ccd09181c705880a4266
-** Note Mask Passwords in log output commit: 80582f2b860b2dadef7ae07bdbd8395bf03848b1
 
 1.0.9
 ------
