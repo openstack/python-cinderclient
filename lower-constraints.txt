@@ -9,9 +9,7 @@ debtcollector==1.2.0
 extras==1.0.0
 fasteners==0.7.0
 fixtures==3.0.0
-flake8==2.5.5
 future==0.16.0
-hacking==2.0.0
 idna==2.6
 iso8601==0.1.11
 jsonschema==2.6.0
@@ -33,11 +31,9 @@ oslo.serialization==2.18.0
 oslo.utils==3.33.0
 paramiko==2.0.0
 pbr==2.0.0
-pep8==1.5.7
 prettytable==0.7.1
 pyasn1==0.1.8
 pycparser==2.18
-pyflakes==0.8.1
 pyinotify==0.9.6
 pyparsing==2.1.0
 pyperclip==1.5.27
