@@ -14,7 +14,6 @@
 
 import os
 import sys
-import openstackdocstheme
 
 sys.setrecursionlimit(4000)
 
@@ -67,7 +66,7 @@ add_function_parentheses = True
 add_module_names = True
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # -- Options for HTML output --------------------------------------------------
 
@@ -90,10 +89,10 @@ man_pages = [
 
 # -- Options for openstackdocstheme -------------------------------------------
 
-repository_name = 'openstack/python-cinderclient'
-bug_project = 'python-cinderclient'
-bug_tag = 'doc'
-
+openstackdocs_repo_name = 'openstack/python-cinderclient'
+openstackdocs_bug_project = 'python-cinderclient'
+openstackdocs_bug_tag = 'doc'
+openstackdocs_pdf_link = True
 
 # -- Options for LaTeX output -------------------------------------------------
 
