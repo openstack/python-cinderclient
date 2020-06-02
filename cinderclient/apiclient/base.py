@@ -16,9 +16,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""
-Base utilities to build API operation managers and objects on top of.
-"""
+"""Base utilities to build API operation managers and objects on top of."""
 
 # E1102: %s is not callable
 # pylint: disable=E1102
@@ -26,13 +24,13 @@ Base utilities to build API operation managers and objects on top of.
 import abc
 import copy
 
+from oslo_utils import encodeutils
+from oslo_utils import strutils
 from requests import Response
 
 
 from cinderclient.apiclient import exceptions
 from cinderclient import utils
-from oslo_utils import encodeutils
-from oslo_utils import strutils
 
 
 def getid(obj):

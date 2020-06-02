@@ -13,10 +13,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient.v2.pools import Pool
-
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v2 import fakes
+from cinderclient.v2.pools import Pool
 
 cs = fakes.FakeClient()
 

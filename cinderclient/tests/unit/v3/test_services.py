@@ -14,10 +14,9 @@
 #    under the License.
 
 from cinderclient import api_versions
-from cinderclient.v3 import services
-
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
+from cinderclient.v3 import services
 
 
 class ServicesTest(utils.TestCase):
