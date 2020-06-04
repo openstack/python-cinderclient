@@ -2410,6 +2410,7 @@ def do_version_list(cs, args):
            default='',
            help='Prefix for the log. ie: "cinder.volume.drivers.".')
 def do_service_set_log(cs, args):
+    """Sets the service log level."""
     cs.services.set_log_levels(args.level, args.binary, args.server,
                                args.prefix)
 
@@ -2427,6 +2428,7 @@ def do_service_set_log(cs, args):
            default='',
            help='Prefix for the log. ie: "sqlalchemy.".')
 def do_service_get_log(cs, args):
+    """Gets the service log level."""
     log_levels = cs.services.get_log_levels(args.binary, args.server,
                                             args.prefix)
     columns = ('Binary', 'Host', 'Prefix', 'Level')

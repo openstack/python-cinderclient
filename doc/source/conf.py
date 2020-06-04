@@ -21,10 +21,7 @@ sys.setrecursionlimit(4000)
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #    sys.path.append(os.path.abspath('.'))
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
-sys.path.insert(0, ROOT)
+sys.path.insert(0, os.path.join(os.path.abspath('..'), 'ext'))
 
 # -- General configuration ----------------------------------------------------
 
@@ -35,6 +32,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'openstackdocstheme',
     'reno.sphinxext',
+    'cli',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

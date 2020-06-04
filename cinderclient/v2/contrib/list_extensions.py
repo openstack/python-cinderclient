@@ -38,9 +38,7 @@ class ListExtManager(base.Manager):
 
 
 def do_list_extensions(client, _args):
-    """
-    Lists all available os-api extensions.
-    """
+    """Lists all available os-api extensions."""
     extensions = client.list_extensions.show_all()
     fields = ["Name", "Summary", "Alias", "Updated"]
     utils.print_list(extensions, fields)
