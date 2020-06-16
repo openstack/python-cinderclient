@@ -1079,7 +1079,7 @@ def do_backup_update(cs, args):
            help='Cluster binary. Default=None.')
 @utils.arg('--is-up', metavar='<True|true|False|false>', default=None,
            choices=('True', 'true', 'False', 'false'),
-           help='Filter by up/dow status. Default=None.')
+           help='Filter by up/down status. Default=None.')
 @utils.arg('--disabled', metavar='<True|true|False|false>', default=None,
            choices=('True', 'true', 'False', 'false'),
            help='Filter by disabled status. Default=None.')
