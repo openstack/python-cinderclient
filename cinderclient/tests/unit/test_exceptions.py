@@ -15,7 +15,8 @@
 """Tests the cinderclient.exceptions module."""
 
 import datetime
-import mock
+from unittest import mock
+
 import requests
 
 from cinderclient import exceptions

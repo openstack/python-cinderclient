@@ -13,9 +13,9 @@
 
 import json
 import os
+from unittest import mock
 
 import fixtures
-import mock
 import requests
 from requests_mock.contrib import fixture as requests_mock_fixture
 import six

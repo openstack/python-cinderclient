@@ -13,22 +13,22 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from unittest import mock
+
 import ddt
 import fixtures
-import mock
 from requests_mock.contrib import fixture as requests_mock_fixture
 from six.moves.urllib import parse
 
 from cinderclient import client
 from cinderclient import exceptions
 from cinderclient import shell
-from cinderclient.v2 import shell as test_shell
-from cinderclient.v2 import volume_backups
-from cinderclient.v2 import volumes
-
 from cinderclient.tests.unit.fixture_data import keystone_client
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v2 import fakes
+from cinderclient.v2 import shell as test_shell
+from cinderclient.v2 import volume_backups
+from cinderclient.v2 import volumes
 
 
 @ddt.ddt
