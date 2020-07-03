@@ -269,6 +269,12 @@ class SessionClient(adapter.LegacyJsonAdapter):
     def get_with_base_url(self, url, **kwargs):
         return self._cs_request_base_url(url, 'GET', **kwargs)
 
+    def create_update_with_base_url(self, url, **kwargs):
+        return self._cs_request_base_url(url, 'PUT', **kwargs)
+
+    def delete_with_base_url(self, url, **kwargs):
+        return self._cs_request_base_url(url, 'DELETE', **kwargs)
+
 
 class HTTPClient(object):
 

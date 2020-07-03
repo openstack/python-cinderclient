@@ -331,6 +331,26 @@ class Manager(common_base.HookableMixin):
         else:
             return self.resource_class(self, body, loaded=True)
 
+    def _get_all_with_base_url(self, url, response_key=None):
+        resp, body = self.api.client.get_with_base_url(url)
+        if response_key:
+            if isinstance(body[response_key], list):
+                return [self.resource_class(self, res, loaded=True)
+                        for res in body[response_key] if res]
+            return self.resource_class(self, body[response_key],
+                                       loaded=True)
+        return self.resource_class(self, body, loaded=True)
+
+    def _create_update_with_base_url(self, url, body, response_key=None):
+        resp, body = self.api.client.create_update_with_base_url(
+            url, body=body)
+        if response_key:
+            return self.resource_class(self, body[response_key], loaded=True)
+        return self.resource_class(self, body, loaded=True)
+
+    def _delete_with_base_url(self, url, response_key=None):
+        self.api.client.delete_with_base_url(url)
+
 
 class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):
     """

@@ -1611,3 +1611,33 @@ class ShellTest(utils.TestCase):
     def test_transfer_list_with_filters(self, command, expected):
         self.run_command('--os-volume-api-version 3.52 %s' % command)
         self.assert_called('GET', expected)
+
+    def test_default_type_set(self):
+        self.run_command('--os-volume-api-version 3.62 default-type-set '
+                         '4c298f16-e339-4c80-b934-6cbfcb7525a0 '
+                         '629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
+        body = {
+            'default_type':
+                {
+                    'volume_type': '4c298f16-e339-4c80-b934-6cbfcb7525a0'
+                }
+            }
+        self.assert_called(
+            'PUT', 'v3/default-types/629632e7-99d2-4c40-9ae3-106fa3b1c9b7',
+            body=body)
+
+    def test_default_type_list_project(self):
+        self.run_command('--os-volume-api-version 3.62 default-type-list '
+                         '--project-id 629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
+        self.assert_called(
+            'GET', 'v3/default-types/629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
+
+    def test_default_type_list(self):
+        self.run_command('--os-volume-api-version 3.62 default-type-list')
+        self.assert_called('GET', 'v3/default-types')
+
+    def test_default_type_delete(self):
+        self.run_command('--os-volume-api-version 3.62 default-type-unset '
+                         '629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
+        self.assert_called(
+            'DELETE', 'v3/default-types/629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
