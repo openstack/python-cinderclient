@@ -17,13 +17,13 @@ from __future__ import print_function
 import collections
 
 import os
-import pkg_resources
 import sys
 import uuid
 
 import prettytable
 import six
 from six.moves.urllib import parse
+import stevedore
 
 from cinderclient import exceptions
 from oslo_utils import encodeutils
@@ -332,11 +332,16 @@ def safe_issubclass(*args):
 
 def _load_entry_point(ep_name, name=None):
     """Try to load the entry point ep_name that matches name."""
-    for ep in pkg_resources.iter_entry_points(ep_name, name=name):
-        try:
-            return ep.load()
-        except (ImportError, pkg_resources.UnknownExtra, AttributeError):
-            continue
+    mgr = stevedore.NamedExtensionManager(
+        namespace=ep_name,
+        names=[name],
+        # Ignore errors on load
+        on_load_failure_callback=lambda mgr, entry_point, error: None,
+    )
+    try:
+        return mgr[name].plugin
+    except KeyError:
+        pass
 
 
 def get_function_name(func):
