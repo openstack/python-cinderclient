@@ -199,7 +199,7 @@ def unicode_key_value_to_string(src):
                     _encode(unicode_key_value_to_string(v)))
                     for k, v in src.items())
     if isinstance(src, list):
-        return [unicode_key_value_to_string(l) for l in src]
+        return [unicode_key_value_to_string(item) for item in src]
     return _encode(src)
 
 

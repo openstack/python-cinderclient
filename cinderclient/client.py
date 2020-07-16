@@ -35,7 +35,10 @@ from keystoneauth1.identity import base
 from oslo_utils import encodeutils
 from oslo_utils import importutils
 from oslo_utils import strutils
-osprofiler_web = importutils.try_import("osprofiler.web")  # noqa
+try:
+    osprofiler_web = importutils.try_import("osprofiler.web")
+except Exception:
+    pass
 import requests
 from six.moves import urllib
 import six.moves.urllib.parse as urlparse

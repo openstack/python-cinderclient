@@ -177,5 +177,5 @@ class TestLimitsManager(utils.TestCase):
         api.client.get.assert_called_once_with('/limits%s' % query_str)
 
         self.assertIsInstance(lim, limits.Limits)
-        for l in lim.absolute:
-            self.assertEqual(l1, l)
+        for limit in lim.absolute:
+            self.assertEqual(l1, limit)

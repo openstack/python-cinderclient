@@ -33,7 +33,10 @@ from keystoneauth1 import loading
 from keystoneauth1 import session
 from oslo_utils import encodeutils
 from oslo_utils import importutils
-osprofiler_profiler = importutils.try_import("osprofiler.profiler")  # noqa
+try:
+    osprofiler_profiler = importutils.try_import("osprofiler.profiler")
+except Exception:
+    pass
 import requests
 import six
 import six.moves.urllib.parse as urlparse
