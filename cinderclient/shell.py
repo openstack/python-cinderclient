@@ -31,10 +31,6 @@ from keystoneauth1 import loading
 from keystoneauth1 import session
 from oslo_utils import encodeutils
 from oslo_utils import importutils
-try:
-    osprofiler_profiler = importutils.try_import("osprofiler.profiler")
-except Exception:
-    pass
 import requests
 import six
 import six.moves.urllib.parse as urlparse
@@ -45,6 +41,11 @@ from cinderclient import api_versions
 from cinderclient import client
 from cinderclient import exceptions as exc
 from cinderclient import utils
+
+try:
+    osprofiler_profiler = importutils.try_import("osprofiler.profiler")
+except Exception:
+    pass
 
 
 DEFAULT_MAJOR_OS_VOLUME_API_VERSION = "3"

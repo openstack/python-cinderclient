@@ -72,7 +72,7 @@ class FakeManagerWithApi(base.Manager):
         return '3.1'
 
     @api_versions.wraps('3.2')  # noqa: F811
-    def return_api_version(self):
+    def return_api_version(self):  # noqa
         return '3.2'
 
 

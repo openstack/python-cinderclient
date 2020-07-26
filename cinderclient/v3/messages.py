@@ -52,7 +52,7 @@ class MessageManager(base.ManagerWithFind):
         return self._list(url, resource_type)
 
     @api_versions.wraps('3.5')  # noqa: F811
-    def list(self, search_opts=None, marker=None, limit=None, sort=None):
+    def list(self, search_opts=None, marker=None, limit=None, sort=None):  # noqa
         """Lists all messages.
 
         :param search_opts: Search options to filter out volumes.

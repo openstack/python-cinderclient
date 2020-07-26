@@ -33,10 +33,6 @@ from keystoneauth1.identity import base
 from oslo_utils import encodeutils
 from oslo_utils import importutils
 from oslo_utils import strutils
-try:
-    osprofiler_web = importutils.try_import("osprofiler.web")
-except Exception:
-    pass
 import requests
 from six.moves import urllib
 import six.moves.urllib.parse as urlparse
@@ -55,6 +51,12 @@ try:
     import json
 except ImportError:
     import simplejson as json
+
+try:
+    osprofiler_web = importutils.try_import("osprofiler.web")
+except Exception:
+    pass
+
 
 _VALID_VERSIONS = ['v2', 'v3']
 V3_SERVICE_TYPE = 'volumev3'
