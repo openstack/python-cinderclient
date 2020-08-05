@@ -16,8 +16,6 @@
 #    under the License.
 """OpenStack Client interface. Handles the REST calls and responses."""
 
-from __future__ import print_function
-
 import glob
 import hashlib
 import imp
