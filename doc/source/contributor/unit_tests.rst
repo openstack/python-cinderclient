@@ -36,7 +36,7 @@ Or all tests in the test_volumes.py file::
     tox -epy27 -- -n cinderclient.tests.unit.v2.test_volumes
 
 For more information on these options and how to run tests, please see the
-`ostestr documentation <https://docs.openstack.org/os-testr/latest/>`_.
+`stestr documentation <https://stestr.readthedocs.io/en/latest/index.html>`_.
 
 Gotchas
 -------

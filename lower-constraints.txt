@@ -20,7 +20,6 @@ monotonic==0.6
 msgpack-python==0.4.0
 netaddr==0.7.18
 netifaces==0.10.4
-os-testr==1.0.0
 oslo.concurrency==3.25.0
 oslo.config==5.2.0
 oslo.context==2.19.2
