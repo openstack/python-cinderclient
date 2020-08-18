@@ -1,14 +1,13 @@
 - job:
     name: python-cinderclient-functional-base
     abstract: true
-    parent: devstack
-    run: playbooks/python-cinderclient-functional.yaml
-    post-run: playbooks/post.yaml
+    parent: devstack-tox-functional
     timeout: 4500
     required-projects:
       - openstack/cinder
       - openstack/python-cinderclient
     vars:
+      openrc_enable_export: true
       devstack_localrc:
         USE_PYTHON3: true
         VOLUME_BACKING_FILE_SIZE: 16G
