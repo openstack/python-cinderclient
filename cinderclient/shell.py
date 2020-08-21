@@ -49,7 +49,6 @@ from cinderclient import utils
 
 DEFAULT_MAJOR_OS_VOLUME_API_VERSION = "3"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
-V1_SHELL = 'cinderclient.v1.shell'
 V2_SHELL = 'cinderclient.v2.shell'
 V3_SHELL = 'cinderclient.v3.shell'
 HINT_HELP_MSG = (" [hint: use '--os-volume-api-version' flag to show help "
@@ -355,12 +354,10 @@ class OpenStackCinderShell(object):
         self.subcommands = {}
         subparsers = parser.add_subparsers(metavar='<subcommand>')
 
-        if version.ver_major == 2:
-            actions_module = importutils.import_module(V2_SHELL)
-        elif version.ver_major == 3:
+        if version.ver_major == 3:
             actions_module = importutils.import_module(V3_SHELL)
         else:
-            actions_module = importutils.import_module(V1_SHELL)
+            actions_module = importutils.import_module(V2_SHELL)
 
         self._find_actions(subparsers, actions_module, version, do_help,
                            input_args)
