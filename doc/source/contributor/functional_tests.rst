@@ -40,7 +40,9 @@ For more information on these options and how to run tests, please see the
 Gotchas
 -------
 
-The cinderclient.tests.functional.test_cli.CinderBackupTests.test_backup_create_and_delete
-test will fail in Devstack without c-bak service running, which requires Swift.
-Make sure Swift is enabled when you stack.sh by putting this in local.conf :
-enable_service s-proxy s-object s-container s-account
+The cinderclient.tests.functional.test_cli.CinderBackupTests.test_backup_create
+and_delete test will fail in Devstack without c-bak service running, which
+requires Swift. Make sure Swift is enabled when you stack.sh by putting this in
+local.conf::
+
+    enable_service s-proxy s-object s-container s-account
