@@ -61,7 +61,7 @@ class VolumeBackupManager(volume_backups.VolumeBackupManager):
                                    incremental, force, snapshot_id)
 
     @api_versions.wraps("3.43")  # noqa: F811
-    def create(self, volume_id, container=None,
+    def create(self, volume_id, container=None,  # noqa
                name=None, description=None,
                incremental=False, force=False,
                snapshot_id=None,
@@ -85,7 +85,7 @@ class VolumeBackupManager(volume_backups.VolumeBackupManager):
                                    incremental, force, snapshot_id, metadata)
 
     @api_versions.wraps("3.51")  # noqa: F811
-    def create(self, volume_id, container=None, name=None, description=None,
+    def create(self, volume_id, container=None, name=None, description=None,  # noqa
                incremental=False, force=False, snapshot_id=None, metadata=None,
                availability_zone=None):
         return self._create_backup(volume_id, container, name, description,
