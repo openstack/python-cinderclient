@@ -18,7 +18,7 @@
 
 import glob
 import hashlib
-import imp
+import importlib.util
 import itertools
 import logging
 import os
@@ -793,6 +793,15 @@ def _discover_via_python_path():
             yield name, module
 
 
+def load_module(name, path):
+    module_spec = importlib.util.spec_from_file_location(
+        name, path
+    )
+    module = importlib.util.module_from_spec(module_spec)
+    module_spec.loader.exec_module(module)
+    return module
+
+
 def _discover_via_contrib_path(version):
     module_path = os.path.dirname(os.path.abspath(__file__))
     version_str = "v%s" % version.replace('.', '_')
@@ -805,7 +814,7 @@ def _discover_via_contrib_path(version):
         if name == "__init__":
             continue
 
-        module = imp.load_source(name, ext_path)
+        module = load_module(name, ext_path)
         yield name, module
 
 
