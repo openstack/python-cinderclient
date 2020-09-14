@@ -1,0 +1,11 @@
+---
+prelude: |
+    The Victoria release of the python-cinderclient supports Block Storage
+    API version 2 and Block Storage API version 3 through microversion
+    3.62.  (The maximum microversion of the Block Storage API in the
+    Victoria release is 3.62.)
+features:
+  - |
+    Added support to display the ``cluster_name`` attribute in volume
+    detail output for admin users with Block Storage API version 3.61
+    and higher.
