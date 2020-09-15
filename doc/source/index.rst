@@ -14,7 +14,7 @@ can use the API like so::
     ce06d0a8-5c1b-4e2c-81d2-39eca6bbfb70
     >>> cinder.volumes.list()
     [<Volume: ce06d0a8-5c1b-4e2c-81d2-39eca6bbfb70>]
-    >>>myvol.delete
+    >>> myvol.delete()
 
 Alternatively, you can create a client instance using the keystoneauth session
 API::
