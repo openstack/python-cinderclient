@@ -21,26 +21,12 @@
       tox_envlist: functional-py36
 
 - job:
-    name: python-cinderclient-functional-py37
+    name: python-cinderclient-functional-py38
     parent: python-cinderclient-functional-base
-    # Just to be clear what's going on here: which python is used by
-    # tox is controlled by tox.ini.  But, that python needs to
-    # actually be available on the node running the job in order for
-    # the job to succeed.  At this point, we can assume that 3.6 will
-    # be available everywhere (this is guaranteed by openstack-infra).
-    # But 3.7 is still problematic (don't ask me why).  So for this
-    # job that we want running in py3.7, we need to (a) specify a
-    # nodeset for which py3.7 is available, and (b) tell the job to
-    # make sure it's available (i.e., install it if necessary).
-    # (a) is handled by the 'nodeset' specification below.
-    # (b) is handled by the setting the 'python_version' variable
-    #     below, although by itself that doesn't do anything: it also
-    #     requires that the 'ensure-python' role is included in the
-    #     job playbook.
-    nodeset: openstack-single-node-bionic
+    nodeset: openstack-single-node-focal
     vars:
-      python_version: 3.7
-      tox_envlist: functional-py37
+      python_version: 3.8
+      tox_envlist: functional-py38
 
 - project:
     templates:
@@ -54,6 +40,6 @@
     check:
       jobs:
         - python-cinderclient-functional-py36
-        - python-cinderclient-functional-py37
+        - python-cinderclient-functional-py38
         - openstack-tox-pylint:
             voting: false
