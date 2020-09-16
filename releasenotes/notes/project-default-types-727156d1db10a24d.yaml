@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Added support to set, get, and unset the default volume type for
+    projects with Block Storage API version 3.62 and higher.
+

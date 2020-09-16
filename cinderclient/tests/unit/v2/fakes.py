@@ -309,6 +309,30 @@ def _stub_server_versions():
     ]
 
 
+def stub_default_type():
+    return {
+        'default_type': {
+            'project_id': '629632e7-99d2-4c40-9ae3-106fa3b1c9b7',
+            'volume_type_id': '4c298f16-e339-4c80-b934-6cbfcb7525a0'
+        }
+    }
+
+
+def stub_default_types():
+    return {
+        'default_types': [
+            {
+                'project_id': '629632e7-99d2-4c40-9ae3-106fa3b1c9b7',
+                'volume_type_id': '4c298f16-e339-4c80-b934-6cbfcb7525a0'
+            },
+            {
+                'project_id': 'a0c01994-1245-416e-8fc9-1aca86329bfd',
+                'volume_type_id': 'ff094b46-f82a-4a74-9d9e-d3d08116ad93'
+            }
+        ]
+    }
+
+
 class FakeClient(fakes.FakeClient, client.Client):
 
     def __init__(self, api_version=None, *args, **kwargs):
@@ -1055,8 +1079,34 @@ class FakeHTTPClient(base_client.HTTPClient):
                 {'transfer': _stub_transfer(transfer1, base_uri, tenant_id)})
 
     def get_with_base_url(self, url, **kw):
+        if 'default-types' in url:
+            return self._cs_request(url, 'GET', **kw)
         server_versions = _stub_server_versions()
         return (200, {'versions': server_versions})
+
+    def create_update_with_base_url(self, url, **kwargs):
+        return self._cs_request(url, 'PUT', **kwargs)
+
+    def put_v3_default_types_629632e7_99d2_4c40_9ae3_106fa3b1c9b7(
+            self, **kwargs):
+        default_type = stub_default_type()
+        return (200, {}, default_type)
+
+    def get_v3_default_types_629632e7_99d2_4c40_9ae3_106fa3b1c9b7(
+            self, **kw):
+        default_types = stub_default_type()
+        return (200, {}, default_types)
+
+    def get_v3_default_types(self, **kw):
+        default_types = stub_default_types()
+        return (200, {}, default_types)
+
+    def delete_with_base_url(self, url, **kwargs):
+        return self._cs_request(url, 'DELETE', **kwargs)
+
+    def delete_v3_default_types_629632e7_99d2_4c40_9ae3_106fa3b1c9b7(
+            self, **kwargs):
+        return (204, {}, {})
 
     #
     # Services

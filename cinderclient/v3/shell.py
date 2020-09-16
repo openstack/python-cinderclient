@@ -2598,3 +2598,54 @@ def do_transfer_list(cs, args):
     columns = ['ID', 'Volume ID', 'Name']
     utils.print_list(transfers, columns)
     AppendFilters.filters = []
+
+
+@api_versions.wraps('3.62')
+@utils.arg('volume_type',
+           metavar='<volume_type>',
+           help='Name or ID of the volume type.')
+@utils.arg('project',
+           metavar='<project_id>',
+           help='ID of project for which to set default type.')
+def do_default_type_set(cs, args):
+    """Sets a default volume type for a project."""
+    volume_type = args.volume_type
+    project = args.project
+
+    default_type = cs.default_types.create(volume_type, project)
+    utils.print_dict(default_type._info)
+
+
+@api_versions.wraps('3.62')
+@utils.arg('--project-id',
+           metavar='<project_id>',
+           default=None,
+           help='ID of project for which to show the default type.')
+def do_default_type_list(cs, args):
+    """Lists all default volume types."""
+
+    project_id = args.project_id
+    default_types = cs.default_types.list(project_id)
+    columns = ['Volume Type ID', 'Project ID']
+    if project_id:
+        utils.print_dict(default_types._info)
+    else:
+        utils.print_list(default_types, columns)
+
+
+@api_versions.wraps('3.62')
+@utils.arg('project_id',
+           metavar='<project_id>',
+           nargs='+',
+           help='ID of project for which to unset default type.')
+def do_default_type_unset(cs, args):
+    """Unset default volume types."""
+
+    for project_id in args.project_id:
+        try:
+            cs.default_types.delete(project_id)
+            print("Default volume type for project %s has been unset "
+                  "successfully." % (project_id))
+        except Exception as e:
+            print("Unset for default volume type for project %s failed: %s"
+                  % (project_id, e))
