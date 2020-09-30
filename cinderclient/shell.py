@@ -32,8 +32,7 @@ from keystoneauth1 import session
 from oslo_utils import encodeutils
 from oslo_utils import importutils
 import requests
-import six
-import six.moves.urllib.parse as urlparse
+from urllib import parse as urlparse
 
 import cinderclient
 from cinderclient._i18n import _
@@ -395,7 +394,7 @@ class OpenStackCinderShell(object):
         else:
             msg = (_(" (Supported until API version %(end)s)")
                 % {"end": end_version.get_string()})
-        return six.text_type(msg)
+        return str(msg)
 
     def _find_actions(self, subparsers, actions_module, version,
                       do_help, input_args):
@@ -1026,7 +1025,7 @@ def main():
         sys.exit(130)
     except Exception as e:
         logger.debug(e, exc_info=1)
-        print("ERROR: %s" % six.text_type(e), file=sys.stderr)
+        print("ERROR: %s" % str(e), file=sys.stderr)
         sys.exit(1)
 
 

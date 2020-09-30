@@ -15,7 +15,6 @@
 from unittest import mock
 
 import requests
-import six
 
 from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
@@ -110,20 +109,6 @@ class BaseTest(utils.TestCase):
         manager = test_utils.FakeManagerWithApi(api)
         r1 = base.Resource(manager, {'id': 1})
         self.assertEqual(version, r1.api_version)
-
-    @mock.patch('cinderclient.utils.unicode_key_value_to_string',
-                side_effect=lambda x: x)
-    def test_build_list_url_failed(self, fake_encode):
-        # NOTE(mdovgal): This test is reasonable only for py27 version,
-        #                due to issue with parse.urlencode method only in py27
-        if six.PY2:
-            arguments = dict(resource_type = 'volumes',
-                             search_opts = {'all_tenants': 1,
-                                            'name': u'ффф'})
-            manager = base.Manager(None)
-            self.assertRaises(UnicodeEncodeError,
-                              manager._build_list_url,
-                              **arguments)
 
     def test__list_no_link(self):
         api = mock.Mock()

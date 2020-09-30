@@ -11,7 +11,6 @@
 #    under the License.
 
 import ddt
-import six
 from tempest.lib import exceptions
 
 from cinderclient.tests.functional import base
@@ -32,9 +31,9 @@ class CinderVolumeNegativeTests(base.ClientTestBase):
     )
     @ddt.unpack
     def test_volume_create_with_incorrect_size(self, value, ex_text):
-
-        six.assertRaisesRegex(self, exceptions.CommandFailed, ex_text,
-                              self.object_create, 'volume', params=value)
+        self.assertRaisesRegex(exceptions.CommandFailed,
+                               ex_text, self.object_create,
+                               'volume', params=value)
 
 
 class CinderVolumeTests(base.ClientTestBase):
@@ -96,5 +95,5 @@ class CinderVolumeTestsWithParameters(base.ClientTestBase):
         """
         volume = self.object_create(
             'volume', params='--metadata test_metadata=test_date 1')
-        self.assertEqual(six.text_type({u'test_metadata': u'test_date'}),
+        self.assertEqual(str({'test_metadata': 'test_date'}),
                          volume['metadata'])

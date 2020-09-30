@@ -16,7 +16,7 @@
 
 """Group Type interface."""
 
-from six.moves.urllib import parse
+from urllib import parse
 
 from cinderclient import api_versions
 from cinderclient import base

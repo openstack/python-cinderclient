@@ -18,10 +18,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import configparser
 import os
 import sys
-
-from six.moves import configparser
 
 import install_venv_common as install_venv
 

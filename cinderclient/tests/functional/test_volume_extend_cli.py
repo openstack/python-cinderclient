@@ -11,8 +11,6 @@
 #    under the License.
 
 import ddt
-import six
-
 from tempest.lib import exceptions
 
 from cinderclient.tests.functional import base
@@ -39,9 +37,8 @@ class CinderVolumeExtendNegativeTests(base.ClientTestBase):
     )
     @ddt.unpack
     def test_volume_extend_with_incorrect_size(self, value, ex_text):
-
-        six.assertRaisesRegex(
-            self, exceptions.CommandFailed, ex_text, self.cinder, 'extend',
+        self.assertRaisesRegex(
+            exceptions.CommandFailed, ex_text, self.cinder, 'extend',
             params='{0} {1}'.format(self.volume['id'], value))
 
     @ddt.data(
@@ -52,7 +49,6 @@ class CinderVolumeExtendNegativeTests(base.ClientTestBase):
     )
     @ddt.unpack
     def test_volume_extend_with_incorrect_volume_id(self, value, ex_text):
-
-        six.assertRaisesRegex(
-            self, exceptions.CommandFailed, ex_text, self.cinder, 'extend',
+        self.assertRaisesRegex(
+            exceptions.CommandFailed, ex_text, self.cinder, 'extend',
             params='{0} 2'.format(value))

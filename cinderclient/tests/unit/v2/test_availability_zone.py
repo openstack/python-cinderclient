@@ -14,8 +14,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import six
-
 from cinderclient.v2 import availability_zones
 from cinderclient.v2 import shell
 
@@ -44,8 +42,8 @@ class AvailabilityZoneTest(utils.FixturedTestCase):
 
         self.assertEqual(2, len(zones))
 
-        l0 = [six.u('zone-1'), six.u('available')]
-        l1 = [six.u('zone-2'), six.u('not available')]
+        l0 = ['zone-1', 'available']
+        l1 = ['zone-2', 'not available']
 
         z0 = shell.treeizeAvailabilityZone(zones[0])
         z1 = shell.treeizeAvailabilityZone(zones[1])
@@ -66,15 +64,15 @@ class AvailabilityZoneTest(utils.FixturedTestCase):
 
         self.assertEqual(3, len(zones))
 
-        l0 = [six.u('zone-1'), six.u('available')]
-        l1 = [six.u('|- fake_host-1'), six.u('')]
-        l2 = [six.u('| |- cinder-volume'),
-              six.u('enabled :-) 2012-12-26 14:45:25')]
-        l3 = [six.u('internal'), six.u('available')]
-        l4 = [six.u('|- fake_host-1'), six.u('')]
-        l5 = [six.u('| |- cinder-sched'),
-              six.u('enabled :-) 2012-12-26 14:45:24')]
-        l6 = [six.u('zone-2'), six.u('not available')]
+        l0 = ['zone-1', 'available']
+        l1 = ['|- fake_host-1', '']
+        l2 = ['| |- cinder-volume',
+              'enabled :-) 2012-12-26 14:45:25']
+        l3 = ['internal', 'available']
+        l4 = ['|- fake_host-1', '']
+        l5 = ['| |- cinder-sched',
+              'enabled :-) 2012-12-26 14:45:24']
+        l6 = ['zone-2', 'not available']
 
         z0 = shell.treeizeAvailabilityZone(zones[0])
         z1 = shell.treeizeAvailabilityZone(zones[1])

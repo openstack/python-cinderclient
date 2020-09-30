@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import argparse
+import io
 import re
 import sys
 import unittest
@@ -24,7 +25,6 @@ from keystoneauth1.exceptions import DiscoveryFailure
 from keystoneauth1.identity.generic.password import Password as ks_password
 from keystoneauth1 import session
 import requests_mock
-from six import moves
 from testtools import matchers
 
 import cinderclient
@@ -64,7 +64,7 @@ class ShellTest(utils.TestCase):
     def shell(self, argstr):
         orig = sys.stdout
         try:
-            sys.stdout = moves.StringIO()
+            sys.stdout = io.StringIO()
             _shell = shell.OpenStackCinderShell()
             _shell.main(argstr.split())
         except SystemExit:

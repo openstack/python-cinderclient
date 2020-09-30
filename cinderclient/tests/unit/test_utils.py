@@ -12,12 +12,11 @@
 # limitations under the License.
 
 import collections
+import io
 import sys
 from unittest import mock
 
 import ddt
-import six
-from six import moves
 
 from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
@@ -151,7 +150,7 @@ class CaptureStdout(object):
     """Context manager for capturing stdout from statements in its block."""
     def __enter__(self):
         self.real_stdout = sys.stdout
-        self.stringio = moves.StringIO()
+        self.stringio = io.StringIO()
         sys.stdout = self.stringio
         return self
 
@@ -308,16 +307,6 @@ class PrintListTestCase(test_utils.TestCase):
 | 3 | a   |
 +---+-----+
 """, cso.read())
-
-    def test_unicode_key_value_to_string(self):
-        src = {u'key': u'\u70fd\u7231\u5a77'}
-        expected = {'key': '\xe7\x83\xbd\xe7\x88\xb1\xe5\xa9\xb7'}
-        if six.PY2:
-            self.assertEqual(expected, utils.unicode_key_value_to_string(src))
-        else:
-            # u'xxxx' in PY3 is str, we will not get extra 'u' from cli
-            # output in PY3
-            self.assertEqual(src, utils.unicode_key_value_to_string(src))
 
 
 class PrintDictTestCase(test_utils.TestCase):

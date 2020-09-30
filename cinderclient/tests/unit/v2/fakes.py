@@ -14,7 +14,7 @@
 
 from datetime import datetime
 
-import six.moves.urllib.parse as urlparse
+from urllib import parse as urlparse
 
 from cinderclient import client as base_client
 from cinderclient.tests.unit import fakes

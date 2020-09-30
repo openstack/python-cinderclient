@@ -24,7 +24,8 @@ import logging
 import os
 import pkgutil
 import re
-import six
+import urllib
+from urllib import parse as urlparse
 
 from keystoneauth1 import access
 from keystoneauth1 import adapter
@@ -34,8 +35,6 @@ from oslo_utils import encodeutils
 from oslo_utils import importutils
 from oslo_utils import strutils
 import requests
-from six.moves import urllib
-import six.moves.urllib.parse as urlparse
 
 from cinderclient._i18n import _
 from cinderclient import api_versions
@@ -131,7 +130,7 @@ def get_server_version(url, insecure=False, cacert=None):
                 current_version = '2.0'
     except exceptions.ClientException as e:
         logger.warning("Error in server version query:%s\n"
-                       "Returning APIVersion 2.0", six.text_type(e.message))
+                       "Returning APIVersion 2.0", str(e.message))
     return (api_versions.APIVersion(min_version),
             api_versions.APIVersion(current_version))
 
@@ -239,7 +238,7 @@ class SessionClient(adapter.LegacyJsonAdapter):
             version = get_volume_api_from_url(self.get_endpoint())
         except exceptions.UnsupportedVersion as e:
             msg = (_("Service catalog returned invalid url.\n"
-                     "%s") % six.text_type(e))
+                     "%s") % str(e))
             raise exceptions.UnsupportedVersion(msg)
 
         return version
@@ -496,10 +495,10 @@ class HTTPClient(object):
         except exceptions.UnsupportedVersion as e:
             if self.management_url == self.os_endpoint:
                 msg = (_("Invalid url was specified in --os-endpoint %s")
-                       % six.text_type(e))
+                       % str(e))
             else:
                 msg = (_("Service catalog returned invalid url.\n"
-                         "%s") % six.text_type(e))
+                         "%s") % str(e))
 
             raise exceptions.UnsupportedVersion(msg)
 

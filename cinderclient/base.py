@@ -23,8 +23,6 @@ import contextlib
 import hashlib
 import os
 
-import six
-
 from cinderclient.apiclient import base as common_base
 from cinderclient import exceptions
 from cinderclient import utils
@@ -153,7 +151,7 @@ class Manager(common_base.HookableMixin):
 
         if offset:
             query_params['offset'] = offset
-        query_params = utils.unicode_key_value_to_string(query_params)
+        query_params = query_params
         # Transform the dict to a sequence of two-element tuples in fixed
         # order, then the encoded string will be consistent in Python 2&3.
 
@@ -188,7 +186,7 @@ class Manager(common_base.HookableMixin):
         if not sort:
             return None
 
-        if isinstance(sort, six.string_types):
+        if isinstance(sort, str):
             # Convert the string into a list for consistent validation
             sort = [s for s in sort.split(',') if s]
 
@@ -352,7 +350,7 @@ class Manager(common_base.HookableMixin):
         self.api.client.delete_with_base_url(url)
 
 
-class ManagerWithFind(six.with_metaclass(abc.ABCMeta, Manager)):
+class ManagerWithFind(Manager, metaclass=abc.ABCMeta):
     """
     Like a `Manager`, but with additional `find()`/`findall()` methods.
     """

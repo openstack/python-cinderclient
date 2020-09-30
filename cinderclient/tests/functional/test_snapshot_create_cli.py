@@ -10,7 +10,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import six
+
 
 from cinderclient.tests.functional import base
 
@@ -47,7 +47,7 @@ class CinderSnapshotTests(base.ClientTestBase):
             'snapshot',
             params='--metadata test_metadata=test_date {0}'.format(
                 self.volume['id']))
-        self.assertEqual(six.text_type({u'test_metadata': u'test_date'}),
+        self.assertEqual(str({'test_metadata': 'test_date'}),
                          snapshot['metadata'])
         self.object_delete('snapshot', snapshot['id'])
         self.check_object_deleted('snapshot', snapshot['id'])

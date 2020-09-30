@@ -46,7 +46,6 @@ import subunit
 import sys
 import unittest
 
-import six
 import testtools
 
 
@@ -277,7 +276,7 @@ class NovaTestResult(testtools.TestResult):
         self.stopTestRun()
 
     def stopTestRun(self):
-        for cls in list(six.iterkeys(self.results)):
+        for cls in list(self.results.keys()):
             self.writeTestCase(cls)
         self.stream.writeln()
         self.writeSlowTests()

@@ -15,7 +15,7 @@
 
 
 """Volume Type interface."""
-from six.moves.urllib import parse
+from urllib import parse
 
 from cinderclient.apiclient import base as common_base
 from cinderclient import base
