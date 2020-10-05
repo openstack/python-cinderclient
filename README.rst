@@ -1,5 +1,5 @@
 ========================
-Team and repository tags
+Team and Repository Tags
 ========================
 
 .. image:: https://governance.openstack.org/tc/badges/python-cinderclient.svg
@@ -53,7 +53,7 @@ hosted on `OpenStack`_. Patches must be submitted using `Gerrit`_.
 .. contents:: Contents:
    :local:
 
-Command-line API
+Command-line in API
 ----------------
 
 Installing this package gets you a shell command, ``cinder``, that you
