@@ -225,6 +225,9 @@ class OpenStackCinderShell(object):
                             default=0,
                             help=_('Number of retries.'))
 
+        parser.set_defaults(func=self.do_help)
+        parser.set_defaults(command='')
+
         if osprofiler_profiler:
             parser.add_argument('--profile',
                                 metavar='HMAC_KEY',

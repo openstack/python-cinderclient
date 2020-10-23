@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    `Bug #1867061 <https://bugs.launchpad.net/python-cinderclient/+bug/1867061>`_:
+    Fixed raw Python error message when using ``cinder`` without
+    a subcommand while passing an optional argument, such as
+    ``--os-volume-api-version``.

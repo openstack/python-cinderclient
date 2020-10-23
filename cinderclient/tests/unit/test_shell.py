@@ -148,6 +148,18 @@ class ShellTest(utils.TestCase):
             self.assertThat(help_text,
                             matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
 
+    def test_help_arg_no_subcommand(self):
+        required = [
+            r'.*?^usage: ',
+            r'.*?(?m)^\s+create\s+Creates a volume.',
+            r'.*?(?m)^\s+summary\s+Get volumes summary.',
+            r'.*?(?m)^Run "cinder help SUBCOMMAND" for help on a subcommand.',
+        ]
+        help_text = self.shell('--os-volume-api-version 3.40')
+        for r in required:
+            self.assertThat(help_text,
+                            matchers.MatchesRegex(r, re.DOTALL | re.MULTILINE))
+
     @ddt.data('backup-create --help', '--help backup-create')
     def test_dash_dash_help_on_subcommand(self, cmd):
         required = ['.*?^Creates a volume backup.']
