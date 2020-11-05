@@ -25,6 +25,12 @@ from cinderclient import utils
 class GroupSnapshot(base.Resource):
     """A group snapshot is a snapshot of a group."""
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<group_snapshot: %s>" % self.id
 
     def delete(self):

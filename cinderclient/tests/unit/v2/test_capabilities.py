@@ -39,6 +39,12 @@ FAKE_CAPABILITY = {
 class CapabilitiesTest(utils.TestCase):
 
     def test_get_capabilities(self):
+        """
+        Get capabilities.
+
+        Args:
+            self: (todo): write your description
+        """
         capabilities = cs.capabilities.get('host')
         cs.assert_called('GET', '/capabilities/host')
         self.assertEqual(FAKE_CAPABILITY, capabilities._info)
@@ -55,6 +61,12 @@ class CapabilitiesTest(utils.TestCase):
             "<Capabilities: %s>" % FAKE_CAPABILITY['namespace'], repr(cap))
 
     def test__repr__when_empty(self):
+        """
+        Test if the test test.
+
+        Args:
+            self: (todo): write your description
+        """
         cap = Capabilities(None, {})
         self.assertEqual(
             "<Capabilities: None>", repr(cap))

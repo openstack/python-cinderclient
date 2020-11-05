@@ -179,6 +179,12 @@ class CLIDocsDirective(rst.Directive):
 
 
 def setup(app):
+    """
+    Setup sphinx extension.
+
+    Args:
+        app: (todo): write your description
+    """
     app.add_directive('cli-docs', CLIDocsDirective)
     return {
         'version': '1.0',

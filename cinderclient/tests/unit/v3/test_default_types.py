@@ -22,6 +22,12 @@ defaults = fakes.FakeClient(api_versions.APIVersion('3.62'))
 class VolumeTypeDefaultTest(utils.TestCase):
 
     def test_set(self):
+        """
+        Sets the test test variables.
+
+        Args:
+            self: (todo): write your description
+        """
         defaults.default_types.create('4c298f16-e339-4c80-b934-6cbfcb7525a0',
                                       '629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
         defaults.assert_called(
@@ -31,16 +37,34 @@ class VolumeTypeDefaultTest(utils.TestCase):
         )
 
     def test_get(self):
+        """
+        Returns the default test value
+
+        Args:
+            self: (todo): write your description
+        """
         defaults.default_types.list('629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
         defaults.assert_called(
             'GET', 'v3/default-types/629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
 
     def test_get_all(self):
+        """
+        Returns the default values
+
+        Args:
+            self: (todo): write your description
+        """
         defaults.default_types.list()
         defaults.assert_called(
             'GET', 'v3/default-types')
 
     def test_unset(self):
+        """
+        Set the test test set.
+
+        Args:
+            self: (todo): write your description
+        """
         defaults.default_types.delete('629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
         defaults.assert_called(
             'DELETE', 'v3/default-types/629632e7-99d2-4c40-9ae3-106fa3b1c9b7')

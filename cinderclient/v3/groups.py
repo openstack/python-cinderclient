@@ -23,6 +23,12 @@ from cinderclient import utils
 class Group(base.Resource):
     """A Group of volumes."""
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<Group: %s>" % self.id
 
     def delete(self, delete_volumes=False):

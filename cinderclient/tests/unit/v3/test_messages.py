@@ -22,6 +22,12 @@ from cinderclient.tests.unit.v3 import fakes
 class MessagesTest(utils.TestCase):
 
     def test_list_messages(self):
+        """
+        Lists all messages.
+
+        Args:
+            self: (todo): write your description
+        """
         cs = fakes.FakeClient(api_versions.APIVersion('3.3'))
         cs.messages.list()
         cs.assert_called('GET', '/messages')
@@ -30,6 +36,13 @@ class MessagesTest(utils.TestCase):
               'resource_uuid', 'message_level', 'guaranteed_until',
               'request_id')
     def test_list_messages_with_sort(self, sort_string):
+        """
+        List test list.
+
+        Args:
+            self: (todo): write your description
+            sort_string: (str): write your description
+        """
         cs = fakes.FakeClient(api_versions.APIVersion('3.5'))
         cs.messages.list(sort=sort_string)
         cs.assert_called('GET', '/messages?sort=%s' % parse.quote(sort_string))
@@ -37,6 +50,13 @@ class MessagesTest(utils.TestCase):
     @ddt.data('id', 'resource_type', 'event_id', 'resource_uuid',
               'message_level', 'guaranteed_until', 'request_id')
     def test_list_messages_with_filters(self, filter_string):
+        """
+        Returns a list of messages.
+
+        Args:
+            self: (todo): write your description
+            filter_string: (str): write your description
+        """
         cs = fakes.FakeClient(api_versions.APIVersion('3.5'))
         cs.messages.list(search_opts={filter_string: 'value'})
         cs.assert_called('GET', '/messages?%s=value' % parse.quote(
@@ -44,16 +64,35 @@ class MessagesTest(utils.TestCase):
 
     @ddt.data('fake', 'fake:asc', 'fake:desc')
     def test_list_messages_with_invalid_sort(self, sort_string):
+        """
+        List the list of a list of the valid api.
+
+        Args:
+            self: (todo): write your description
+            sort_string: (str): write your description
+        """
         cs = fakes.FakeClient(api_versions.APIVersion('3.5'))
         self.assertRaises(ValueError, cs.messages.list, sort=sort_string)
 
     def test_get_messages(self):
+        """
+        Get all the messages.
+
+        Args:
+            self: (todo): write your description
+        """
         cs = fakes.FakeClient(api_versions.APIVersion('3.3'))
         fake_id = '1234'
         cs.messages.get(fake_id)
         cs.assert_called('GET', '/messages/%s' % fake_id)
 
     def test_delete_messages(self):
+        """
+        Deletes all messages.
+
+        Args:
+            self: (todo): write your description
+        """
         cs = fakes.FakeClient(api_versions.APIVersion('3.3'))
         fake_id = '1234'
         cs.messages.delete(fake_id)

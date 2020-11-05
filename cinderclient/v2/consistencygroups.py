@@ -23,6 +23,12 @@ from cinderclient import utils
 class Consistencygroup(base.Resource):
     """A Consistencygroup of volumes."""
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<Consistencygroup: %s>" % self.id
 
     def delete(self, force='False'):

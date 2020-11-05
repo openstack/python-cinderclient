@@ -24,6 +24,12 @@ class QuotaSet(base.Resource):
         return self.tenant_id
 
     def update(self, *args, **kwargs):
+        """
+        Update a tenant.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.manager.update(self.tenant_id, *args, **kwargs)
 
 
@@ -31,12 +37,28 @@ class QuotaSetManager(base.Manager):
     resource_class = QuotaSet
 
     def get(self, tenant_id, usage=False):
+        """
+        Get a tenant.
+
+        Args:
+            self: (todo): write your description
+            tenant_id: (str): write your description
+            usage: (int): write your description
+        """
         if hasattr(tenant_id, 'tenant_id'):
             tenant_id = tenant_id.tenant_id
         return self._get("/os-quota-sets/%s?usage=%s" % (tenant_id, usage),
                          "quota_set")
 
     def update(self, tenant_id, **updates):
+        """
+        Updates a tenant.
+
+        Args:
+            self: (todo): write your description
+            tenant_id: (str): write your description
+            updates: (dict): write your description
+        """
         body = {'quota_set': {'tenant_id': tenant_id}}
 
         for update in updates:
@@ -47,10 +69,24 @@ class QuotaSetManager(base.Manager):
                                    resp=result.request_ids)
 
     def defaults(self, tenant_id):
+        """
+        Retrieves the default tenant.
+
+        Args:
+            self: (dict): write your description
+            tenant_id: (str): write your description
+        """
         return self._get('/os-quota-sets/%s/defaults' % tenant_id,
                          'quota_set')
 
     def delete(self, tenant_id):
+        """
+        Deletes a tenant.
+
+        Args:
+            self: (todo): write your description
+            tenant_id: (str): write your description
+        """
         if hasattr(tenant_id, 'tenant_id'):
             tenant_id = tenant_id.tenant_id
         return self._delete("/os-quota-sets/%s" % tenant_id)

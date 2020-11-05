@@ -22,6 +22,12 @@ from cinderclient.tests.unit.v3 import fakes
 class VolumesTest(utils.TestCase):
 
     def test_update(self):
+        """
+        Update the version information.
+
+        Args:
+            self: (todo): write your description
+        """
         cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.9'))
         b = cs.backups.get('1234')
         backup = b.update(name='new-name')
@@ -31,6 +37,12 @@ class VolumesTest(utils.TestCase):
         self._assert_request_id(backup)
 
     def test_pre_version(self):
+        """
+        Test if the api version.
+
+        Args:
+            self: (todo): write your description
+        """
         cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.8'))
         b = cs.backups.get('1234')
         self.assertRaises(exc.VersionNotFoundForAPIMethod,

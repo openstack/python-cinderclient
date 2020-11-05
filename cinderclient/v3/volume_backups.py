@@ -88,6 +88,21 @@ class VolumeBackupManager(volume_backups.VolumeBackupManager):
     def create(self, volume_id, container=None, name=None, description=None,  # noqa
                incremental=False, force=False, snapshot_id=None, metadata=None,
                availability_zone=None):
+        """
+        Creates a backup.
+
+        Args:
+            self: (todo): write your description
+            volume_id: (str): write your description
+            container: (str): write your description
+            name: (str): write your description
+            description: (str): write your description
+            incremental: (str): write your description
+            force: (bool): write your description
+            snapshot_id: (str): write your description
+            metadata: (dict): write your description
+            availability_zone: (int): write your description
+        """
         return self._create_backup(volume_id, container, name, description,
                                    incremental, force, snapshot_id, metadata,
                                    availability_zone)

@@ -26,6 +26,12 @@ Service = services.Service
 
 class LogLevel(base.Resource):
     def __repr__(self):
+        """
+        Return a representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return '<LogLevel: binary=%s host=%s prefix=%s level=%s>' % (
             self.binary, self.host, self.prefix, self.level)
 

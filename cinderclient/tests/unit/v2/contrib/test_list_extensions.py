@@ -30,6 +30,12 @@ cs = fakes.FakeClient(extensions=extensions)
 
 class ListExtensionsTests(utils.TestCase):
     def test_list_extensions(self):
+        """
+        List all extensions in the extensions
+
+        Args:
+            self: (todo): write your description
+        """
         all_exts = cs.list_extensions.show_all()
         cs.assert_called('GET', '/extensions')
         self.assertGreater(len(all_exts), 0)

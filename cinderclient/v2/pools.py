@@ -22,6 +22,12 @@ class Pool(base.Resource):
     NAME_ATTR = 'name'
 
     def __repr__(self):
+        """
+        Return a human - friendly name.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<Pool: %s>" % self.name
 
 

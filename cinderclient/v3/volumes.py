@@ -249,6 +249,19 @@ class VolumeManager(volumes.VolumeManager):
     @api_versions.wraps('3.8')
     def list_manageable(self, host, detailed=True, marker=None, limit=None,
                         offset=None, sort=None, cluster=None):
+        """
+        Return a list.
+
+        Args:
+            self: (todo): write your description
+            host: (str): write your description
+            detailed: (str): write your description
+            marker: (str): write your description
+            limit: (int): write your description
+            offset: (int): write your description
+            sort: (str): write your description
+            cluster: (todo): write your description
+        """
         search_opts = {'cluster': cluster} if cluster else {'host': host}
         url = self._build_list_url("manageable_volumes", detailed=detailed,
                                    search_opts=search_opts, marker=marker,

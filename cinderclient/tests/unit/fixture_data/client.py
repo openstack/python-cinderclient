@@ -19,12 +19,24 @@ from cinderclient.v2 import client as v2client
 class Base(base.Fixture):
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the scope.
+
+        Args:
+            self: (todo): write your description
+        """
         super(Base, self).__init__(*args, **kwargs)
 
         self.token = fixture.V2Token()
         self.token.set_scope()
 
     def setUp(self):
+        """
+        Authenticate the token.
+
+        Args:
+            self: (todo): write your description
+        """
         super(Base, self).setUp()
 
         auth_url = '%s/tokens' % self.identity_url
@@ -36,12 +48,24 @@ class Base(base.Fixture):
 class V2(Base):
 
     def __init__(self, *args, **kwargs):
+        """
+        Create a service
+
+        Args:
+            self: (todo): write your description
+        """
         super(V2, self).__init__(*args, **kwargs)
 
         svc = self.token.add_service('volumev2')
         svc.add_endpoint(self.volume_url)
 
     def new_client(self):
+        """
+        Create a new client.
+
+        Args:
+            self: (todo): write your description
+        """
         return v2client.Client(username='xx',
                                api_key='xx',
                                project_id='xx',

@@ -23,6 +23,12 @@ class CinderVolumeExtendNegativeTests(base.ClientTestBase):
     """Check of cinder volume extend command."""
 
     def setUp(self):
+        """
+        Sets the volume.
+
+        Args:
+            self: (todo): write your description
+        """
         super(CinderVolumeExtendNegativeTests, self).setUp()
         self.volume = self.object_create('volume', params='1')
 
@@ -39,6 +45,14 @@ class CinderVolumeExtendNegativeTests(base.ClientTestBase):
     )
     @ddt.unpack
     def test_volume_extend_with_incorrect_size(self, value, ex_text):
+        """
+        Extend volume size.
+
+        Args:
+            self: (todo): write your description
+            value: (int): write your description
+            ex_text: (str): write your description
+        """
 
         six.assertRaisesRegex(
             self, exceptions.CommandFailed, ex_text, self.cinder, 'extend',
@@ -52,6 +66,14 @@ class CinderVolumeExtendNegativeTests(base.ClientTestBase):
     )
     @ddt.unpack
     def test_volume_extend_with_incorrect_volume_id(self, value, ex_text):
+        """
+        Extend volume id with a volume.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+            ex_text: (str): write your description
+        """
 
         six.assertRaisesRegex(
             self, exceptions.CommandFailed, ex_text, self.cinder, 'extend',

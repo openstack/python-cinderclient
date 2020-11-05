@@ -66,6 +66,36 @@ class Client(object):
                  http_log_debug=False, cacert=None, auth_system='keystone',
                  auth_plugin=None, session=None, api_version=None,
                  logger=None, **kwargs):
+        """
+        Initializes a quotas instance.
+
+        Args:
+            self: (todo): write your description
+            username: (str): write your description
+            api_key: (str): write your description
+            project_id: (str): write your description
+            auth_url: (str): write your description
+            insecure: (bool): write your description
+            timeout: (int): write your description
+            tenant_id: (str): write your description
+            proxy_tenant_id: (str): write your description
+            proxy_token: (str): write your description
+            region_name: (str): write your description
+            endpoint_type: (str): write your description
+            extensions: (todo): write your description
+            service_type: (str): write your description
+            service_name: (str): write your description
+            volume_service_name: (str): write your description
+            os_endpoint: (str): write your description
+            retries: (todo): write your description
+            http_log_debug: (bool): write your description
+            cacert: (str): write your description
+            auth_system: (todo): write your description
+            auth_plugin: (str): write your description
+            session: (todo): write your description
+            api_version: (str): write your description
+            logger: (todo): write your description
+        """
         # FIXME(comstud): Rename the api_key argument above when we
         # know it's not being used as keyword argument
         password = api_key
@@ -150,4 +180,10 @@ class Client(object):
         self.client.authenticate()
 
     def get_volume_api_version_from_endpoint(self):
+        """
+        Get volume volume information.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.client.get_volume_api_version_from_endpoint()

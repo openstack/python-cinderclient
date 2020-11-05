@@ -24,6 +24,12 @@ class SnapshotActionsTest(utils.FixturedTestCase):
     data_fixture_class = snapshots.Fixture
 
     def test_update_snapshot_status(self):
+        """
+        Update snapshot status.
+
+        Args:
+            self: (todo): write your description
+        """
         snap = self.cs.volume_snapshots.get('1234')
         self._assert_request_id(snap)
         stat = {'status': 'available'}
@@ -32,6 +38,12 @@ class SnapshotActionsTest(utils.FixturedTestCase):
         self._assert_request_id(stats)
 
     def test_update_snapshot_status_with_progress(self):
+        """
+        Update snapshot status.
+
+        Args:
+            self: (todo): write your description
+        """
         s = self.cs.volume_snapshots.get('1234')
         self._assert_request_id(s)
         stat = {'status': 'available', 'progress': '73%'}
@@ -40,16 +52,34 @@ class SnapshotActionsTest(utils.FixturedTestCase):
         self._assert_request_id(stats)
 
     def test_list_snapshots_with_marker_limit(self):
+        """
+        Test for snapshot list snapshots
+
+        Args:
+            self: (todo): write your description
+        """
         lst = self.cs.volume_snapshots.list(marker=1234, limit=2)
         self.assert_called('GET', '/snapshots/detail?limit=2&marker=1234')
         self._assert_request_id(lst)
 
     def test_list_snapshots_with_sort(self):
+        """
+        Test if snapshot list snapshots
+
+        Args:
+            self: (todo): write your description
+        """
         lst = self.cs.volume_snapshots.list(sort="id")
         self.assert_called('GET', '/snapshots/detail?sort=id')
         self._assert_request_id(lst)
 
     def test_snapshot_unmanage(self):
+        """
+        Test if snapshot has been metrics.
+
+        Args:
+            self: (todo): write your description
+        """
         s = self.cs.volume_snapshots.get('1234')
         self._assert_request_id(s)
         snap = self.cs.volume_snapshots.unmanage(s)

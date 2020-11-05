@@ -19,6 +19,14 @@ from cinderclient.v2 import quotas
 class QuotaSetManager(quotas.QuotaSetManager):
 
     def update(self, tenant_id, **updates):
+        """
+        Updates the tenant.
+
+        Args:
+            self: (todo): write your description
+            tenant_id: (str): write your description
+            updates: (dict): write your description
+        """
         skip_validation = updates.pop('skip_validation', True)
 
         body = {'quota_set': {'tenant_id': tenant_id}}

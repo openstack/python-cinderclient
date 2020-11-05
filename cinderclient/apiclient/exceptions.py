@@ -33,6 +33,13 @@ class ClientException(Exception):
 class MissingArgs(ClientException):
     """Supplied arguments are not sufficient for calling a function."""
     def __init__(self, missing):
+        """
+        Initialize the state.
+
+        Args:
+            self: (todo): write your description
+            missing: (todo): write your description
+        """
         self.missing = missing
         msg = "Missing argument(s): %s" % ", ".join(missing)
         super(MissingArgs, self).__init__(msg)
@@ -66,6 +73,13 @@ class ConnectionRefused(ClientException):
 class AuthPluginOptionsMissing(AuthorizationFailure):
     """Auth plugin misses some options."""
     def __init__(self, opt_names):
+        """
+        Initialize the option list.
+
+        Args:
+            self: (todo): write your description
+            opt_names: (str): write your description
+        """
         super(AuthPluginOptionsMissing, self).__init__(
             "Authentication failed. Missing options: %s" %
             ", ".join(opt_names))
@@ -75,6 +89,13 @@ class AuthPluginOptionsMissing(AuthorizationFailure):
 class AuthSystemNotFound(AuthorizationFailure):
     """User has specified a AuthSystem that is not installed."""
     def __init__(self, auth_system):
+        """
+        Initialize a system.
+
+        Args:
+            self: (todo): write your description
+            auth_system: (todo): write your description
+        """
         super(AuthSystemNotFound, self).__init__(
             "AuthSystemNotFound: %s" % repr(auth_system))
         self.auth_system = auth_system
@@ -98,6 +119,13 @@ class EndpointNotFound(EndpointException):
 class AmbiguousEndpoints(EndpointException):
     """Found more than one matching endpoint in Service Catalog."""
     def __init__(self, endpoints=None):
+        """
+        Initialize endpoints.
+
+        Args:
+            self: (todo): write your description
+            endpoints: (list): write your description
+        """
         super(AmbiguousEndpoints, self).__init__(
             "AmbiguousEndpoints: %s" % repr(endpoints))
         self.endpoints = endpoints
@@ -112,6 +140,19 @@ class HttpError(ClientException):
     def __init__(self, message=None, details=None,
                  response=None, request_id=None,
                  url=None, method=None, http_status=None):
+        """
+        Initialize a message.
+
+        Args:
+            self: (todo): write your description
+            message: (str): write your description
+            details: (todo): write your description
+            response: (list): write your description
+            request_id: (str): write your description
+            url: (str): write your description
+            method: (str): write your description
+            http_status: (str): write your description
+        """
         self.http_status = http_status or self.http_status
         self.message = message or self.message
         self.details = details
@@ -277,6 +318,12 @@ class RequestEntityTooLarge(HTTPClientError):
     message = "Request Entity Too Large"
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the request.
+
+        Args:
+            self: (todo): write your description
+        """
         try:
             self.retry_after = int(kwargs.pop('retry_after'))
         except (KeyError, ValueError):

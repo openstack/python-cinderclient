@@ -22,6 +22,12 @@ from cinderclient import base
 
 class Cluster(base.Resource):
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<Cluster: %s (id: %s)>" % (self.name, self.id)
 
 
@@ -30,6 +36,13 @@ class ClusterManager(base.ManagerWithFind):
     base_url = '/clusters'
 
     def _build_url(self, url_path=None, **kwargs):
+        """
+        Builds the url.
+
+        Args:
+            self: (todo): write your description
+            url_path: (str): write your description
+        """
         url = self.base_url + ('/' + url_path if url_path else '')
         filters = {'%s=%s' % (k, v) for k, v in kwargs.items() if v}
         if filters:

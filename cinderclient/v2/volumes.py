@@ -22,6 +22,12 @@ from cinderclient import base
 class Volume(base.Resource):
     """A volume is an extra block level storage to the OpenStack instances."""
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<Volume: %s>" % self.id
 
     def delete(self, cascade=False):
@@ -209,6 +215,18 @@ class Volume(base.Resource):
 
     def list_manageable(self, host, detailed=True, marker=None, limit=None,
                         offset=None, sort=None):
+        """
+        Returns a list of volumes.
+
+        Args:
+            self: (todo): write your description
+            host: (str): write your description
+            detailed: (str): write your description
+            marker: (str): write your description
+            limit: (int): write your description
+            offset: (int): write your description
+            sort: (str): write your description
+        """
         return self.manager.list_manageable(host, detailed=detailed,
                                             marker=marker, limit=limit,
                                             offset=offset, sort=sort)
@@ -567,6 +585,14 @@ class VolumeManager(base.ManagerWithFind):
                             body)
 
     def update_readonly_flag(self, volume, flag):
+        """
+        Updates the readonly flag.
+
+        Args:
+            self: (todo): write your description
+            volume: (str): write your description
+            flag: (todo): write your description
+        """
         return self._action('os-update_readonly_flag',
                             base.getid(volume),
                             {'readonly': flag})
@@ -584,6 +610,14 @@ class VolumeManager(base.ManagerWithFind):
                              'migration_policy': policy})
 
     def set_bootable(self, volume, flag):
+        """
+        Enable / get_bootable.
+
+        Args:
+            self: (todo): write your description
+            volume: (todo): write your description
+            flag: (todo): write your description
+        """
         return self._action('os-set_bootable',
                             base.getid(volume),
                             {'bootable': flag})
@@ -605,6 +639,18 @@ class VolumeManager(base.ManagerWithFind):
 
     def list_manageable(self, host, detailed=True, marker=None, limit=None,
                         offset=None, sort=None):
+        """
+        List volumes
+
+        Args:
+            self: (todo): write your description
+            host: (str): write your description
+            detailed: (str): write your description
+            marker: (str): write your description
+            limit: (int): write your description
+            offset: (int): write your description
+            sort: (str): write your description
+        """
         url = self._build_list_url("os-volume-manage", detailed=detailed,
                                    search_opts={'host': host}, marker=marker,
                                    limit=limit, offset=offset, sort=sort)

@@ -31,9 +31,21 @@ class QoSSpecs(base.Resource):
     volume.
     """
     def __repr__(self):
+        """
+        Return a human - friendly name.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<QoSSpecs: %s>" % self.name
 
     def delete(self):
+        """
+        Deletes the resource.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.manager.delete(self)
 
 

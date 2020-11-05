@@ -24,6 +24,12 @@ class QuotaClassSet(base.Resource):
         return self.class_name
 
     def update(self, *args, **kwargs):
+        """
+        Updates this instance.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.manager.update(self.class_name, *args, **kwargs)
 
 
@@ -31,10 +37,25 @@ class QuotaClassSetManager(base.Manager):
     resource_class = QuotaClassSet
 
     def get(self, class_name):
+        """
+        Returns a specific class by name.
+
+        Args:
+            self: (todo): write your description
+            class_name: (str): write your description
+        """
         return self._get("/os-quota-class-sets/%s" % (class_name),
                          "quota_class_set")
 
     def update(self, class_name, **updates):
+        """
+        Updates an update class.
+
+        Args:
+            self: (todo): write your description
+            class_name: (str): write your description
+            updates: (dict): write your description
+        """
         quota_class_set = {}
 
         for update in updates:

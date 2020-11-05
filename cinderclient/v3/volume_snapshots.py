@@ -24,6 +24,12 @@ class Snapshot(base.Resource):
     """A Snapshot is a point-in-time snapshot of an openstack volume."""
 
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<Snapshot: %s>" % self.id
 
     def delete(self, force=False):
@@ -36,10 +42,22 @@ class Snapshot(base.Resource):
 
     @property
     def progress(self):
+        """
+        The progress.
+
+        Args:
+            self: (todo): write your description
+        """
         return self._info.get('os-extended-snapshot-attributes:progress')
 
     @property
     def project_id(self):
+        """
+        The project id.
+
+        Args:
+            self: (todo): write your description
+        """
         return self._info.get('os-extended-snapshot-attributes:project_id')
 
     def reset_state(self, state):
@@ -66,6 +84,19 @@ class Snapshot(base.Resource):
 
     def list_manageable(self, host, detailed=True, marker=None, limit=None,
                         offset=None, sort=None, cluster=None):
+        """
+        Return a list of dependable clusters.
+
+        Args:
+            self: (todo): write your description
+            host: (str): write your description
+            detailed: (str): write your description
+            marker: (str): write your description
+            limit: (int): write your description
+            offset: (int): write your description
+            sort: (str): write your description
+            cluster: (todo): write your description
+        """
         return self.manager.list_manageable(host, detailed=detailed,
                                             marker=marker, limit=limit,
                                             offset=offset, sort=sort,
@@ -163,6 +194,14 @@ class SnapshotManager(base.ManagerWithFind):
         return common_base.TupleWithMeta((resp, body), resp)
 
     def update_snapshot_status(self, snapshot, update_dict):
+        """
+        Updates a snapshot.
+
+        Args:
+            self: (todo): write your description
+            snapshot: (bool): write your description
+            update_dict: (dict): write your description
+        """
         return self._action('os-update_snapshot_status',
                             base.getid(snapshot), update_dict)
 
@@ -216,6 +255,19 @@ class SnapshotManager(base.ManagerWithFind):
     @api_versions.wraps('3.8')
     def list_manageable(self, host, detailed=True, marker=None, limit=None,
                         offset=None, sort=None, cluster=None):
+        """
+        Return a list.
+
+        Args:
+            self: (todo): write your description
+            host: (str): write your description
+            detailed: (str): write your description
+            marker: (str): write your description
+            limit: (int): write your description
+            offset: (int): write your description
+            sort: (str): write your description
+            cluster: (todo): write your description
+        """
         search_opts = {'cluster': cluster} if cluster else {'host': host}
         url = self._build_list_url("manageable_snapshots", detailed=detailed,
                                    search_opts=search_opts, marker=marker,

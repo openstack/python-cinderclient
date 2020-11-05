@@ -23,6 +23,12 @@ from cinderclient import utils
 class Cgsnapshot(base.Resource):
     """A cgsnapshot is snapshot of a consistency group."""
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<cgsnapshot: %s>" % self.id
 
     def delete(self):

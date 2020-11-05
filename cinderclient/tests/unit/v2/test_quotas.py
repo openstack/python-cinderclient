@@ -23,18 +23,36 @@ cs = fakes.FakeClient()
 class QuotaSetsTest(utils.TestCase):
 
     def test_tenant_quotas_get(self):
+        """
+        Set the tenant for a tenant.
+
+        Args:
+            self: (todo): write your description
+        """
         tenant_id = 'test'
         quota = cs.quotas.get(tenant_id)
         cs.assert_called('GET', '/os-quota-sets/%s?usage=False' % tenant_id)
         self._assert_request_id(quota)
 
     def test_tenant_quotas_defaults(self):
+        """
+        Set the default tenant.
+
+        Args:
+            self: (todo): write your description
+        """
         tenant_id = 'test'
         quota = cs.quotas.defaults(tenant_id)
         cs.assert_called('GET', '/os-quota-sets/%s/defaults' % tenant_id)
         self._assert_request_id(quota)
 
     def test_update_quota(self):
+        """
+        Updates quota.
+
+        Args:
+            self: (todo): write your description
+        """
         q = cs.quotas.get('test')
         q.update(volumes=2)
         q.update(snapshots=2)
@@ -46,6 +64,12 @@ class QuotaSetsTest(utils.TestCase):
         self._assert_request_id(q)
 
     def test_refresh_quota(self):
+        """
+        Test whether the quota.
+
+        Args:
+            self: (todo): write your description
+        """
         q = cs.quotas.get('test')
         q2 = cs.quotas.get('test')
         self.assertEqual(q.volumes, q2.volumes)
@@ -77,6 +101,12 @@ class QuotaSetsTest(utils.TestCase):
         self._assert_request_id(q2)
 
     def test_delete_quota(self):
+        """
+        Deletes the quota.
+
+        Args:
+            self: (todo): write your description
+        """
         tenant_id = 'test'
         quota = cs.quotas.delete(tenant_id)
         cs.assert_called('DELETE', '/os-quota-sets/test')

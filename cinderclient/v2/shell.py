@@ -30,6 +30,12 @@ from cinderclient.v2 import availability_zones
 
 
 def _translate_attachments(info):
+    """
+    Translate attachments into attachments.
+
+    Args:
+        info: (todo): write your description
+    """
     attachments = []
     attached_servers = []
     for attachment in info['attachments']:
@@ -189,6 +195,15 @@ def do_show(cs, args):
 
 class CheckSizeArgForCreate(argparse.Action):
     def __call__(self, parser, args, values, option_string=None):
+        """
+        Calls the specified parser.
+
+        Args:
+            self: (todo): write your description
+            parser: (todo): write your description
+            values: (array): write your description
+            option_string: (str): write your description
+        """
         if ((args.snapshot_id or args.source_volid)
                 is None and values is None):
             if not hasattr(args, 'backup_id') or args.backup_id is None:

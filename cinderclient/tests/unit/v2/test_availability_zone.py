@@ -30,10 +30,25 @@ class AvailabilityZoneTest(utils.FixturedTestCase):
     data_fixture_class = azfixture.Fixture
 
     def _assertZone(self, zone, name, status):
+        """
+        Assign a zone todo zone.
+
+        Args:
+            self: (todo): write your description
+            zone: (todo): write your description
+            name: (str): write your description
+            status: (str): write your description
+        """
         self.assertEqual(name, zone.zoneName)
         self.assertEqual(status, zone.zoneState)
 
     def test_list_availability_zone(self):
+        """
+        List all availability zones.
+
+        Args:
+            self: (todo): write your description
+        """
         zones = self.cs.availability_zones.list(detailed=False)
         self.assert_called('GET', '/os-availability-zone')
         self._assert_request_id(zones)
@@ -56,6 +71,12 @@ class AvailabilityZoneTest(utils.FixturedTestCase):
         self._assertZone(z1[0], l1[0], l1[1])
 
     def test_detail_availability_zone(self):
+        """
+        Test for all availability zone exist.
+
+        Args:
+            self: (todo): write your description
+        """
         zones = self.cs.availability_zones.list(detailed=True)
         self.assert_called('GET', '/os-availability-zone/detail')
         self._assert_request_id(zones)

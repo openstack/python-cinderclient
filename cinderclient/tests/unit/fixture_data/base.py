@@ -24,12 +24,29 @@ class Fixture(fixtures.Fixture):
     def __init__(self, requests,
                  volume_url=VOLUME_URL,
                  identity_url=IDENTITY_URL):
+        """
+        Initialize the volume.
+
+        Args:
+            self: (todo): write your description
+            requests: (todo): write your description
+            volume_url: (str): write your description
+            VOLUME_URL: (str): write your description
+            identity_url: (str): write your description
+            IDENTITY_URL: (str): write your description
+        """
         super(Fixture, self).__init__()
         self.requests = requests
         self.volume_url = volume_url
         self.identity_url = identity_url
 
     def url(self, *args):
+        """
+        Generate url for the url.
+
+        Args:
+            self: (todo): write your description
+        """
         url_args = [self.volume_url]
 
         if self.base_url:

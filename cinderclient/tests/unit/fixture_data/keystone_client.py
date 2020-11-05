@@ -57,10 +57,22 @@ WRONG_VERSION_RESPONSE = {'id': 'v2.0',
 
 
 def _create_version_list(versions):
+    """
+    Create a list of versions of the given versions.
+
+    Args:
+        versions: (str): write your description
+    """
     return json.dumps({'versions': {'values': versions}})
 
 
 def _create_single_version(version):
+    """
+    Create a version of the version.
+
+    Args:
+        version: (str): write your description
+    """
     return json.dumps({'version': version})
 
 
@@ -74,6 +86,11 @@ CINDER_ENDPOINT = 'http://www.cinder.com/v1'
 
 
 def _get_normalized_token_data(**kwargs):
+    """
+    Retrieve the token data dicts for the salt.
+
+    Args:
+    """
     ref = copy.deepcopy(kwargs)
     # normalized token data
     ref['user_id'] = ref.get('user_id', uuidutils.generate_uuid(dashed=False))
@@ -241,6 +258,13 @@ def generate_v3_project_scoped_token(**kwargs):
 
 
 def keystone_request_callback(request, context):
+    """
+    The callback for the oauth
+
+    Args:
+        request: (todo): write your description
+        context: (todo): write your description
+    """
     context.headers['Content-Type'] = 'application/json'
 
     if request.url == BASE_URL:

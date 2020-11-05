@@ -20,6 +20,12 @@ from cinderclient import utils
 class ListExtResource(base.Resource):
     @property
     def summary(self):
+        """
+        Return the summary of the summary report.
+
+        Args:
+            self: (todo): write your description
+        """
         descr = self.description.strip()
         if not descr:
             return '??'
@@ -34,6 +40,12 @@ class ListExtManager(base.Manager):
     resource_class = ListExtResource
 
     def show_all(self):
+        """
+        Returns a list of all all of the ips
+
+        Args:
+            self: (todo): write your description
+        """
         return self._list("/extensions", 'extensions')
 
 

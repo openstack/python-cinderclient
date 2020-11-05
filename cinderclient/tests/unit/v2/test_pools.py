@@ -24,6 +24,12 @@ cs = fakes.FakeClient()
 class PoolsTest(utils.TestCase):
 
     def test_get_pool_stats(self):
+        """
+        Get a list of the pool.
+
+        Args:
+            self: (todo): write your description
+        """
         sl = cs.pools.list()
         cs.assert_called('GET', '/scheduler-stats/get_pools')
         self._assert_request_id(sl)
@@ -36,6 +42,12 @@ class PoolsTest(utils.TestCase):
             self.assertFalse(hasattr(s, "volume_backend_name"))
 
     def test_get_detail_pool_stats(self):
+        """
+        Returns a list of each pool.
+
+        Args:
+            self: (todo): write your description
+        """
         sl = cs.pools.list(detailed=True)
         self._assert_request_id(sl)
         cs.assert_called('GET', '/scheduler-stats/get_pools?detail=True')

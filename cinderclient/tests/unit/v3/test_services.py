@@ -23,6 +23,12 @@ from cinderclient.tests.unit.v3 import fakes
 class ServicesTest(utils.TestCase):
 
     def test_list_services_with_cluster_info(self):
+        """
+        Return a list of services with services. services.
+
+        Args:
+            self: (todo): write your description
+        """
         cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.7'))
         services_list = cs.services.list()
         cs.assert_called('GET', '/os-services')
@@ -34,11 +40,23 @@ class ServicesTest(utils.TestCase):
         self._assert_request_id(services_list)
 
     def test_api_version(self):
+        """
+        Return the api version.
+
+        Args:
+            self: (todo): write your description
+        """
         client = fakes.FakeClient(version_header='3.0')
         svs = client.services.server_api_version()
         [self.assertIsInstance(s, services.Service) for s in svs]
 
     def test_set_log_levels(self):
+        """
+        Configure the log levels.
+
+        Args:
+            self: (todo): write your description
+        """
         expected = {'level': 'debug', 'binary': 'cinder-api',
                     'server': 'host1', 'prefix': 'sqlalchemy.'}
 
@@ -49,6 +67,12 @@ class ServicesTest(utils.TestCase):
         cs.assert_called('PUT', '/os-services/set-log', body=expected)
 
     def test_get_log_levels(self):
+        """
+        Generate log levels.
+
+        Args:
+            self: (todo): write your description
+        """
         expected = {'binary': 'cinder-api', 'server': 'host1',
                     'prefix': 'sqlalchemy.'}
 
@@ -81,6 +105,12 @@ class ServicesTest(utils.TestCase):
         self.assertListEqual(expected, result)
 
     def test_list_services_with_backend_state(self):
+        """
+        Return a list of services are enabled.
+
+        Args:
+            self: (todo): write your description
+        """
         cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.49'))
         services_list = cs.services.list()
         cs.assert_called('GET', '/os-services')

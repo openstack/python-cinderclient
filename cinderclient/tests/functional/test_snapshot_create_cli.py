@@ -18,6 +18,12 @@ from cinderclient.tests.functional import base
 class CinderSnapshotTests(base.ClientTestBase):
     """Check of cinder snapshot commands."""
     def setUp(self):
+        """
+        Make a new snapshot.
+
+        Args:
+            self: (todo): write your description
+        """
         super(CinderSnapshotTests, self).setUp()
         self.volume = self.object_create('volume', params='1')
 

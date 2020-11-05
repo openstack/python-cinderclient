@@ -27,6 +27,12 @@ class VolumeEncryptionType(base.Resource):
     encryption for a specific volume type.
     """
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<VolumeEncryptionType: %s>" % self.encryption_id
 
 

@@ -25,6 +25,12 @@ from cinderclient import base
 class GroupType(base.Resource):
     """A Group Type is the type of group to be created."""
     def __repr__(self):
+        """
+        Return a human - friendly name.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<GroupType: %s>" % self.name
 
     @property

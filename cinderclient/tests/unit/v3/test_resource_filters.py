@@ -26,6 +26,14 @@ class ResourceFilterTests(utils.TestCase):
               {'resource': 'group', 'query_url': '?resource=group'})
     @ddt.unpack
     def test_list_resource_filters(self, resource, query_url):
+        """
+        Test if a list of resource.
+
+        Args:
+            self: (todo): write your description
+            resource: (todo): write your description
+            query_url: (str): write your description
+        """
         cs.resource_filters.list(resource)
         url = '/resource_filters'
         if resource is not None:

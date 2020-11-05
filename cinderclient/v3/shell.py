@@ -41,6 +41,16 @@ class AppendFilters(argparse.Action):
     filters = []
 
     def __call__(self, parser, namespace, values, option_string):
+        """
+        Add an argparse option to the parser.
+
+        Args:
+            self: (todo): write your description
+            parser: (todo): write your description
+            namespace: (str): write your description
+            values: (array): write your description
+            option_string: (str): write your description
+        """
         AppendFilters.filters.append(values[0])
 
 

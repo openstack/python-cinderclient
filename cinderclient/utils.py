@@ -30,6 +30,12 @@ from oslo_utils import encodeutils
 def arg(*args, **kwargs):
     """Decorator for CLI args."""
     def _decorator(func):
+        """
+        Decorator to add a function to a function.
+
+        Args:
+            func: (todo): write your description
+        """
         add_arg(func, *args, **kwargs)
         return func
     return _decorator
@@ -38,6 +44,12 @@ def arg(*args, **kwargs):
 def exclusive_arg(group_name, *args, **kwargs):
     """Decorator for CLI mutually exclusive args."""
     def _decorator(func):
+        """
+        Decorator that adds a function to a function.
+
+        Args:
+            func: (todo): write your description
+        """
         required = kwargs.pop('required', None)
         add_exclusive_arg(func, group_name, required, *args, **kwargs)
         return func
@@ -110,6 +122,13 @@ def isunauthenticated(f):
 
 
 def _print(pt, order):
+    """
+    Print a string in - printby.
+
+    Args:
+        pt: (todo): write your description
+        order: (int): write your description
+    """
     if sys.version_info >= (3, 0):
         print(pt.get_string(sortby=order))
     else:
@@ -232,6 +251,12 @@ def build_query_param(params, sort=False):
 
 
 def _pretty_format_dict(data_dict):
+    """
+    Pretty print a dictionary of data
+
+    Args:
+        data_dict: (dict): write your description
+    """
     formatted_data = []
 
     for k in sorted(data_dict):
@@ -241,6 +266,14 @@ def _pretty_format_dict(data_dict):
 
 
 def print_dict(d, property="Property", formatters=None):
+    """
+    Print a dict
+
+    Args:
+        d: (dict): write your description
+        property: (str): write your description
+        formatters: (str): write your description
+    """
     pt = prettytable.PrettyTable([property, 'Value'], caching=False)
     pt.align = 'l'
     formatters = formatters or {}
@@ -343,6 +376,12 @@ def _load_entry_point(ep_name, name=None):
 
 
 def get_function_name(func):
+    """
+    Returns the name of a function.
+
+    Args:
+        func: (todo): write your description
+    """
     if six.PY2:
         if hasattr(func, "im_class"):
             return "%s.%s" % (func.im_class, func.__name__)

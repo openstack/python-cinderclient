@@ -20,6 +20,12 @@ from cinderclient import base
 
 class VolumeTypeAccess(base.Resource):
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<VolumeTypeAccess: %s>" % self.project_id
 
 
@@ -30,6 +36,13 @@ class VolumeTypeAccessManager(base.ManagerWithFind):
     resource_class = VolumeTypeAccess
 
     def list(self, volume_type):
+        """
+        List all volumes
+
+        Args:
+            self: (todo): write your description
+            volume_type: (str): write your description
+        """
         return self._list(
             '/types/%s/os-volume-type-access' % base.getid(volume_type),
             'volume_type_access')

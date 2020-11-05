@@ -33,6 +33,18 @@ class InstallVenv(object):
     def __init__(self, root, venv, requirements,
                  test_requirements, py_version,
                  project):
+        """
+        Initialize a new requirements.
+
+        Args:
+            self: (todo): write your description
+            root: (str): write your description
+            venv: (todo): write your description
+            requirements: (list): write your description
+            test_requirements: (todo): write your description
+            py_version: (str): write your description
+            project: (todo): write your description
+        """
         self.root = root
         self.venv = venv
         self.requirements = requirements
@@ -41,10 +53,23 @@ class InstallVenv(object):
         self.project = project
 
     def die(self, message, *args):
+        """
+        Prints a message.
+
+        Args:
+            self: (todo): write your description
+            message: (str): write your description
+        """
         print(message % args, file=sys.stderr)
         sys.exit(1)
 
     def check_python_version(self):
+        """
+        Check if the python version.
+
+        Args:
+            self: (todo): write your description
+        """
         if sys.version_info < (2, 6):
             self.die("Need Python Version >= 2.6")
 
@@ -66,10 +91,25 @@ class InstallVenv(object):
         return (output, proc.returncode)
 
     def run_command(self, cmd, redirect_output=True, check_exit_code=True):
+        """
+        Run a command on the output.
+
+        Args:
+            self: (todo): write your description
+            cmd: (str): write your description
+            redirect_output: (str): write your description
+            check_exit_code: (todo): write your description
+        """
         return self.run_command_with_code(cmd, redirect_output,
                                           check_exit_code)[0]
 
     def get_distro(self):
+        """
+        Return a tuple of the requirements.
+
+        Args:
+            self: (todo): write your description
+        """
         if (os.path.exists('/etc/fedora-release') or
                 os.path.exists('/etc/redhat-release')):
             return Fedora(
@@ -81,6 +121,12 @@ class InstallVenv(object):
                 self.test_requirements, self.py_version, self.project)
 
     def check_dependencies(self):
+        """
+        Check if the dependencies
+
+        Args:
+            self: (todo): write your description
+        """
         self.get_distro().install_virtualenv()
 
     def create_virtualenv(self, no_site_packages=True):
@@ -102,11 +148,23 @@ class InstallVenv(object):
             pass
 
     def pip_install(self, *args):
+        """
+        Install pip packages.
+
+        Args:
+            self: (todo): write your description
+        """
         self.run_command(['tools/with_venv.sh',
                          'pip', 'install', '--upgrade'] + list(args),
                          redirect_output=False)
 
     def install_dependencies(self):
+        """
+        Install pip dependencies.
+
+        Args:
+            self: (todo): write your description
+        """
         print('Installing dependencies with pip (this can take a while)...')
 
         # First things first, make sure our venv has the latest pip and
@@ -127,16 +185,35 @@ class InstallVenv(object):
         return parser.parse_args(argv[1:])[0]
 
     def post_process(self, **kwargs):
+        """
+        Post - process process.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
 
 class Distro(InstallVenv):
 
     def check_cmd(self, cmd):
+        """
+        Run a command and return the exit code.
+
+        Args:
+            self: (todo): write your description
+            cmd: (str): write your description
+        """
         return bool(self.run_command(['which', cmd],
                     check_exit_code=False).strip())
 
     def install_virtualenv(self):
+        """
+        Install the virtualenv
+
+        Args:
+            self: (todo): write your description
+        """
         if self.check_cmd('virtualenv'):
             return
 
@@ -160,10 +237,23 @@ class Fedora(Distro):
     """
 
     def check_pkg(self, pkg):
+        """
+        Check if a package is installed
+
+        Args:
+            self: (todo): write your description
+            pkg: (todo): write your description
+        """
         return self.run_command_with_code(['rpm', '-q', pkg],
                                           check_exit_code=False)[1] == 0
 
     def install_virtualenv(self):
+        """
+        Install a virtualenv
+
+        Args:
+            self: (todo): write your description
+        """
         if self.check_cmd('virtualenv'):
             return
 

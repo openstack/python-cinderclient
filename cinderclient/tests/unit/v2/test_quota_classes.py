@@ -23,12 +23,24 @@ cs = fakes.FakeClient()
 class QuotaClassSetsTest(utils.TestCase):
 
     def test_class_quotas_get(self):
+        """
+        Return the test class for this class.
+
+        Args:
+            self: (todo): write your description
+        """
         class_name = 'test'
         cls = cs.quota_classes.get(class_name)
         cs.assert_called('GET', '/os-quota-class-sets/%s' % class_name)
         self._assert_request_id(cls)
 
     def test_update_quota(self):
+        """
+        Update quota quota.
+
+        Args:
+            self: (todo): write your description
+        """
         q = cs.quota_classes.get('test')
         q.update(volumes=2, snapshots=2, gigabytes=2000,
                  backups=2, backup_gigabytes=2000,
@@ -37,6 +49,12 @@ class QuotaClassSetsTest(utils.TestCase):
         self._assert_request_id(q)
 
     def test_refresh_quota(self):
+        """
+        Test whether the quota
+
+        Args:
+            self: (todo): write your description
+        """
         q = cs.quota_classes.get('test')
         q2 = cs.quota_classes.get('test')
         self.assertEqual(q.volumes, q2.volumes)

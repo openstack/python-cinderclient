@@ -25,6 +25,12 @@ cs = fakes.FakeClient()
 class TypesTest(utils.TestCase):
 
     def test_list_types(self):
+        """
+        List all known types of this volume
+
+        Args:
+            self: (todo): write your description
+        """
         tl = cs.volume_types.list()
         cs.assert_called('GET', '/types?is_public=None')
         self._assert_request_id(tl)
@@ -32,11 +38,23 @@ class TypesTest(utils.TestCase):
             self.assertIsInstance(t, volume_types.VolumeType)
 
     def test_list_types_not_public(self):
+        """
+        Test if all public types are public.
+
+        Args:
+            self: (todo): write your description
+        """
         t1 = cs.volume_types.list(is_public=None)
         cs.assert_called('GET', '/types?is_public=None')
         self._assert_request_id(t1)
 
     def test_create(self):
+        """
+        Create a new volume
+
+        Args:
+            self: (todo): write your description
+        """
         t = cs.volume_types.create('test-type-3', 'test-type-3-desc')
         cs.assert_called('POST', '/types',
                          {'volume_type': {
@@ -48,6 +66,12 @@ class TypesTest(utils.TestCase):
         self._assert_request_id(t)
 
     def test_create_non_public(self):
+        """
+        Create public public public keys.
+
+        Args:
+            self: (todo): write your description
+        """
         t = cs.volume_types.create('test-type-3', 'test-type-3-desc', False)
         cs.assert_called('POST', '/types',
                          {'volume_type': {
@@ -59,6 +83,12 @@ class TypesTest(utils.TestCase):
         self._assert_request_id(t)
 
     def test_update(self):
+        """
+        Update the update of a volume.
+
+        Args:
+            self: (todo): write your description
+        """
         t = cs.volume_types.update('1', 'test_type_1', 'test_desc_1', False)
         cs.assert_called('PUT',
                          '/types/1',
@@ -90,18 +120,36 @@ class TypesTest(utils.TestCase):
         self.assertTrue(t1.is_public)
 
     def test_get(self):
+        """
+        Test if the volume exists.
+
+        Args:
+            self: (todo): write your description
+        """
         t = cs.volume_types.get('1')
         cs.assert_called('GET', '/types/1')
         self.assertIsInstance(t, volume_types.VolumeType)
         self._assert_request_id(t)
 
     def test_default(self):
+        """
+        Set the default test.
+
+        Args:
+            self: (todo): write your description
+        """
         t = cs.volume_types.default()
         cs.assert_called('GET', '/types/default')
         self.assertIsInstance(t, volume_types.VolumeType)
         self._assert_request_id(t)
 
     def test_set_key(self):
+        """
+        Set the test key.
+
+        Args:
+            self: (todo): write your description
+        """
         t = cs.volume_types.get(1)
         res = t.set_keys({'k': 'v'})
         cs.assert_called('POST',
@@ -110,12 +158,24 @@ class TypesTest(utils.TestCase):
         self._assert_request_id(res)
 
     def test_unset_keys(self):
+        """
+        Unset the unset keys for this volume.
+
+        Args:
+            self: (todo): write your description
+        """
         t = cs.volume_types.get(1)
         res = t.unset_keys(['k'])
         cs.assert_called('DELETE', '/types/1/extra_specs/k')
         self._assert_request_id(res)
 
     def test_unset_multiple_keys(self):
+        """
+        Test for multiple keys.
+
+        Args:
+            self: (todo): write your description
+        """
         t = cs.volume_types.get(1)
         res = t.unset_keys(['k', 'm'])
         cs.assert_called_anytime('DELETE', '/types/1/extra_specs/k')
@@ -123,6 +183,12 @@ class TypesTest(utils.TestCase):
         self._assert_request_id(res, count=2)
 
     def test_delete(self):
+        """
+        Deletes the test
+
+        Args:
+            self: (todo): write your description
+        """
         t = cs.volume_types.delete(1)
         cs.assert_called('DELETE', '/types/1')
         self._assert_request_id(t)

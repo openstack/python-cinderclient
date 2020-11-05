@@ -23,6 +23,12 @@ cs = fakes.FakeClient()
 class QuotaSetsTest(utils.TestCase):
 
     def test_update_quota_with_skip_(self):
+        """
+        Updates the quota for the quota.
+
+        Args:
+            self: (todo): write your description
+        """
         q = cs.quotas.get('test')
         q.update(skip_validation=False)
         cs.assert_called('PUT', '/os-quota-sets/test?skip_validation=False')

@@ -23,11 +23,25 @@ from cinderclient import base
 
 class Service(base.Resource):
     def __repr__(self):
+        """
+        Return a human - readable representation of this node.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<Service (%s): %s in cluster %s>" % (self.id, self.host,
                                                      self.cluster_name or '-')
 
     @classmethod
     def list_factory(cls, mngr, elements):
+        """
+        Return a new list of all of the given a list.
+
+        Args:
+            cls: (callable): write your description
+            mngr: (array): write your description
+            elements: (todo): write your description
+        """
         return [cls(mngr, element, loaded=True) for element in elements]
 
 
@@ -36,6 +50,13 @@ class WorkerManager(base.Manager):
 
     @api_versions.wraps('3.24')
     def clean(self, **filters):
+        """
+        Returns a service.
+
+        Args:
+            self: (todo): write your description
+            filters: (list): write your description
+        """
         url = self.base_url + '/cleanup'
         resp, body = self.api.client.post(url, body=filters)
 

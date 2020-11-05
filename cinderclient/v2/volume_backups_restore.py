@@ -24,6 +24,12 @@ from cinderclient import base
 class VolumeBackupsRestore(base.Resource):
     """A Volume Backups Restore represents a restore operation."""
     def __repr__(self):
+        """
+        Return a human - readable representation of this volume.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<VolumeBackupsRestore: %s>" % self.volume_id
 
 

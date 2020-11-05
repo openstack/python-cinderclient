@@ -28,6 +28,11 @@ def do_fake_action():
 
 @api_versions.wraps("3.2", "3.3")  # noqa: F811
 def do_fake_action():  # noqa
+    """
+    Determine action.
+
+    Args:
+    """
     return "fake_action 3.2 to 3.3"
 
 
@@ -36,6 +41,11 @@ def do_fake_action():  # noqa
     '--foo',
     start_version='3.7')
 def do_another_fake_action():
+    """
+    Return the action action.
+
+    Args:
+    """
     return "another_fake_action"
 
 
@@ -49,6 +59,11 @@ def do_another_fake_action():
     start_version='3.3',
     end_version='3.4')
 def do_fake_action2():
+    """
+    Return the action2 action.
+
+    Args:
+    """
     return "fake_action2"
 
 
@@ -62,4 +77,9 @@ def do_fake_action2():
     help='second foo',
     start_version='3.8')
 def do_fake_action3():
+    """
+    Return the action action.
+
+    Args:
+    """
     return "fake_action3"

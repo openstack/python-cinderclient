@@ -24,6 +24,12 @@ cs = fakes.FakeClient()
 class ServicesTest(utils.TestCase):
 
     def test_list_services(self):
+        """
+        Return a list of the services.
+
+        Args:
+            self: (todo): write your description
+        """
         svs = cs.services.list()
         cs.assert_called('GET', '/os-services')
         self.assertEqual(3, len(svs))
@@ -34,6 +40,12 @@ class ServicesTest(utils.TestCase):
         self._assert_request_id(svs)
 
     def test_list_services_with_hostname(self):
+        """
+        Check if a list of services in a list of services.
+
+        Args:
+            self: (todo): write your description
+        """
         svs = cs.services.list(host='host2')
         cs.assert_called('GET', '/os-services?host=host2')
         self.assertEqual(2, len(svs))
@@ -42,6 +54,12 @@ class ServicesTest(utils.TestCase):
         self._assert_request_id(svs)
 
     def test_list_services_with_binary(self):
+        """
+        Get a list of services.
+
+        Args:
+            self: (todo): write your description
+        """
         svs = cs.services.list(binary='cinder-volume')
         cs.assert_called('GET', '/os-services?binary=cinder-volume')
         self.assertEqual(2, len(svs))
@@ -50,6 +68,12 @@ class ServicesTest(utils.TestCase):
         self._assert_request_id(svs)
 
     def test_list_services_with_host_binary(self):
+        """
+        List all services in - enabled list of services.
+
+        Args:
+            self: (todo): write your description
+        """
         svs = cs.services.list('host2', 'cinder-volume')
         cs.assert_called('GET', '/os-services?host=host2&binary=cinder-volume')
         self.assertEqual(1, len(svs))
@@ -59,6 +83,12 @@ class ServicesTest(utils.TestCase):
         self._assert_request_id(svs)
 
     def test_services_enable(self):
+        """
+        Enable services that are enabled.
+
+        Args:
+            self: (todo): write your description
+        """
         s = cs.services.enable('host1', 'cinder-volume')
         values = {"host": "host1", 'binary': 'cinder-volume'}
         cs.assert_called('PUT', '/os-services/enable', values)
@@ -67,6 +97,12 @@ class ServicesTest(utils.TestCase):
         self._assert_request_id(s)
 
     def test_services_disable(self):
+        """
+        Disable services that services.
+
+        Args:
+            self: (todo): write your description
+        """
         s = cs.services.disable('host1', 'cinder-volume')
         values = {"host": "host1", 'binary': 'cinder-volume'}
         cs.assert_called('PUT', '/os-services/disable', values)
@@ -75,6 +111,12 @@ class ServicesTest(utils.TestCase):
         self._assert_request_id(s)
 
     def test_services_disable_log_reason(self):
+        """
+        Test for services that are enabled.
+
+        Args:
+            self: (todo): write your description
+        """
         s = cs.services.disable_log_reason(
             'host1', 'cinder-volume', 'disable bad host')
         values = {"host": "host1", 'binary': 'cinder-volume',

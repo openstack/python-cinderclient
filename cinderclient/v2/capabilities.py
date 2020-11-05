@@ -22,6 +22,12 @@ class Capabilities(base.Resource):
     NAME_ATTR = 'name'
 
     def __repr__(self):
+        """
+        Return a repr representation of - repr repr.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<Capabilities: %s>" % self._info.get('namespace')
 
 

@@ -31,6 +31,12 @@ class TestCase(testtools.TestCase):
     }
 
     def setUp(self):
+        """
+        Sets up the thread.
+
+        Args:
+            self: (todo): write your description
+        """
         super(TestCase, self).setUp()
         if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
                 os.environ.get('OS_STDOUT_CAPTURE') == '1'):
@@ -45,15 +51,39 @@ class TestCase(testtools.TestCase):
         self.mock_completion()
 
     def _assert_request_id(self, obj, count=1):
+        """
+        Asserts the request id.
+
+        Args:
+            self: (todo): write your description
+            obj: (todo): write your description
+            count: (todo): write your description
+        """
         self.assertTrue(hasattr(obj, 'request_ids'))
         self.assertEqual(REQUEST_ID * count, obj.request_ids)
 
     def assert_called_anytime(self, method, url, body=None,
                               partial_body=None):
+        """
+        Asserts if any of the specified method is called.
+
+        Args:
+            self: (todo): write your description
+            method: (str): write your description
+            url: (str): write your description
+            body: (todo): write your description
+            partial_body: (todo): write your description
+        """
         return self.shell.cs.assert_called_anytime(method, url, body,
                                                    partial_body)
 
     def mock_completion(self):
+        """
+        Starts the completion.
+
+        Args:
+            self: (todo): write your description
+        """
         patcher = mock.patch(
             'cinderclient.base.Manager.write_to_completion_cache')
         patcher.start()
@@ -70,6 +100,12 @@ class FixturedTestCase(TestCase):
     data_fixture_class = None
 
     def setUp(self):
+        """
+        Sets the client data.
+
+        Args:
+            self: (todo): write your description
+        """
         super(FixturedTestCase, self).setUp()
 
         self.requests = self.useFixture(requests_mock_fixture.Fixture())
@@ -87,6 +123,15 @@ class FixturedTestCase(TestCase):
             self.data_fixture = self.useFixture(fix)
 
     def assert_called(self, method, path, body=None):
+        """
+        Asserts that the provided method and returns the result.
+
+        Args:
+            self: (todo): write your description
+            method: (str): write your description
+            path: (str): write your description
+            body: (todo): write your description
+        """
         self.assertEqual(method, self.requests.last_request.method)
         self.assertEqual(path, self.requests.last_request.path_url)
 
@@ -107,6 +152,13 @@ class TestResponse(requests.Response):
     """
 
     def __init__(self, data):
+        """
+        Initialize the response.
+
+        Args:
+            self: (todo): write your description
+            data: (dict): write your description
+        """
         super(TestResponse, self).__init__()
         self._content = None
         self._text = None
@@ -123,12 +175,31 @@ class TestResponse(requests.Response):
             self.status_code = data
 
     def __eq__(self, other):
+        """
+        Return true if other objects.
+
+        Args:
+            self: (todo): write your description
+            other: (todo): write your description
+        """
         return self.__dict__ == other.__dict__
 
     @property
     def content(self):
+        """
+        The content of the content.
+
+        Args:
+            self: (todo): write your description
+        """
         return self._content
 
     @property
     def text(self):
+        """
+        Return the text
+
+        Args:
+            self: (todo): write your description
+        """
         return self._text

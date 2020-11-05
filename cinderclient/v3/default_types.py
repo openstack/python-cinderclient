@@ -20,6 +20,12 @@ from cinderclient import base
 class DefaultVolumeType(base.Resource):
     """Default volume types for projects."""
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<DefaultVolumeType: %s>" % self.project_id
 
 

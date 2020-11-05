@@ -23,6 +23,12 @@ from cinderclient import base
 class Service(base.Resource):
 
     def __repr__(self):
+        """
+        Return a human - readable representation of this node.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<Service: binary=%s host=%s>" % (self.binary, self.host)
 
 

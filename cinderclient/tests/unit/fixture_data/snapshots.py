@@ -17,6 +17,11 @@ REQUEST_ID = 'req-test-request-id'
 
 
 def _stub_snapshot(**kwargs):
+    """
+    Stub
+
+    Args:
+    """
     snapshot = {
         "created_at": "2012-08-28T16:30:31.000000",
         "display_description": None,
@@ -35,6 +40,12 @@ class Fixture(base.Fixture):
     base_url = 'snapshots'
 
     def setUp(self):
+        """
+        Initiate the registration command.
+
+        Args:
+            self: (todo): write your description
+        """
         super(Fixture, self).setUp()
 
         snapshot_1234 = _stub_snapshot(id='1234')
@@ -45,6 +56,13 @@ class Fixture(base.Fixture):
         )
 
         def action_1234(request, context):
+            """
+            Determine the action action.
+
+            Args:
+                request: (todo): write your description
+                context: (todo): write your description
+            """
             return ''
 
         self.requests.register_uri(

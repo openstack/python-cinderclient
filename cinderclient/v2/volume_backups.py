@@ -25,6 +25,12 @@ class VolumeBackup(base.Resource):
     """A volume backup is a block level backup of a volume."""
 
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<VolumeBackup: %s>" % self.id
 
     def delete(self, force=False):
@@ -32,6 +38,13 @@ class VolumeBackup(base.Resource):
         return self.manager.delete(self, force)
 
     def reset_state(self, state):
+        """
+        Reset the state of this is_state.
+
+        Args:
+            self: (todo): write your description
+            state: (dict): write your description
+        """
         return self.manager.reset_state(self, state)
 
     def update(self, **kwargs):

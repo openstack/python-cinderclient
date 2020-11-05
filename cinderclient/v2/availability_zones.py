@@ -22,6 +22,12 @@ class AvailabilityZone(base.Resource):
     NAME_ATTR = 'display_name'
 
     def __repr__(self):
+        """
+        Return a human - readable representation of this zone.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<AvailabilityZone: %s>" % self.zoneName
 
 

@@ -32,6 +32,14 @@ class CinderVolumeNegativeTests(base.ClientTestBase):
     )
     @ddt.unpack
     def test_volume_create_with_incorrect_size(self, value, ex_text):
+        """
+        Create a new volume size
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+            ex_text: (str): write your description
+        """
 
         six.assertRaisesRegex(self, exceptions.CommandFailed, ex_text,
                               self.object_create, 'volume', params=value)
@@ -40,6 +48,12 @@ class CinderVolumeNegativeTests(base.ClientTestBase):
 class CinderVolumeTests(base.ClientTestBase):
     """Check of cinder volume create commands."""
     def setUp(self):
+        """
+        Make a new volume.
+
+        Args:
+            self: (todo): write your description
+        """
         super(CinderVolumeTests, self).setUp()
         self.volume = self.object_create('volume', params='1')
 

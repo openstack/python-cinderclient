@@ -20,6 +20,12 @@ class ResourceFilter(base.Resource):
     NAME_ATTR = 'resource'
 
     def __repr__(self):
+        """
+        Return a representation of this method.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<ResourceFilter: %s>" % self.resource
 
 

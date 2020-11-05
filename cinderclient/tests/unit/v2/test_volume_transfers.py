@@ -23,22 +23,46 @@ cs = fakes.FakeClient()
 class VolumeTransfersTest(utils.TestCase):
 
     def test_create(self):
+        """
+        Create a new volume.
+
+        Args:
+            self: (todo): write your description
+        """
         vol = cs.transfers.create('1234')
         cs.assert_called('POST', '/os-volume-transfer')
         self._assert_request_id(vol)
 
     def test_get(self):
+        """
+        Get a transfer.
+
+        Args:
+            self: (todo): write your description
+        """
         transfer_id = '5678'
         vol = cs.transfers.get(transfer_id)
         cs.assert_called('GET', '/os-volume-transfer/%s' % transfer_id)
         self._assert_request_id(vol)
 
     def test_list(self):
+        """
+        Add a test list.
+
+        Args:
+            self: (todo): write your description
+        """
         lst = cs.transfers.list()
         cs.assert_called('GET', '/os-volume-transfer/detail')
         self._assert_request_id(lst)
 
     def test_delete(self):
+        """
+        Delete all volumes.
+
+        Args:
+            self: (todo): write your description
+        """
         b = cs.transfers.list()[0]
         vol = b.delete()
         cs.assert_called('DELETE', '/os-volume-transfer/5678')
@@ -51,6 +75,12 @@ class VolumeTransfersTest(utils.TestCase):
         self._assert_request_id(vol)
 
     def test_accept(self):
+        """
+        Accepts a transfer.
+
+        Args:
+            self: (todo): write your description
+        """
         transfer_id = '5678'
         auth_key = '12345'
         vol = cs.transfers.accept(transfer_id, auth_key)

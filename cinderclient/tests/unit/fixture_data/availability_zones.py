@@ -24,6 +24,12 @@ class Fixture(base.Fixture):
     base_url = 'os-availability-zone'
 
     def setUp(self):
+        """
+        Method to set_uri.
+
+        Args:
+            self: (todo): write your description
+        """
         super(Fixture, self).setUp()
 
         get_availability = {

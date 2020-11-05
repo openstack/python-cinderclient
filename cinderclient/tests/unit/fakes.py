@@ -21,6 +21,14 @@ places where actual behavior differs from the spec.
 
 
 def assert_has_keys(dict, required=None, optional=None):
+    """
+    Asserts that a dictionary exists.
+
+    Args:
+        dict: (todo): write your description
+        required: (todo): write your description
+        optional: (todo): write your description
+    """
     required = required or []
     optional = optional or []
 
@@ -36,6 +44,14 @@ def assert_has_keys(dict, required=None, optional=None):
 class FakeClient(object):
 
     def _dict_match(self, partial, real):
+        """
+        Return true if the given partial match.
+
+        Args:
+            self: (todo): write your description
+            partial: (dict): write your description
+            real: (bool): write your description
+        """
 
         result = True
         try:
@@ -122,7 +138,19 @@ class FakeClient(object):
                 raise
 
     def clear_callstack(self):
+        """
+        Clears callstack.
+
+        Args:
+            self: (todo): write your description
+        """
         self.client.callstack = []
 
     def authenticate(self):
+        """
+        Authenticate the request.
+
+        Args:
+            self: (todo): write your description
+        """
         pass

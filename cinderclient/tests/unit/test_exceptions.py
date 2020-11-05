@@ -26,6 +26,12 @@ from cinderclient.tests.unit import utils
 class ExceptionsTest(utils.TestCase):
 
     def test_from_response_no_body_message(self):
+        """
+        : return : class : requests. response.
+
+        Args:
+            self: (todo): write your description
+        """
         # Tests that we get ClientException back since we don't have 500 mapped
         response = requests.Response()
         response.status_code = 500
@@ -35,6 +41,12 @@ class ExceptionsTest(utils.TestCase):
         self.assertEqual('n/a', ex.message)
 
     def test_from_response_overlimit(self):
+        """
+        : return : none
+
+        Args:
+            self: (todo): write your description
+        """
         response = requests.Response()
         response.status_code = 413
         response.headers = {"Retry-After": '10'}
@@ -46,6 +58,13 @@ class ExceptionsTest(utils.TestCase):
     @mock.patch('oslo_utils.timeutils.utcnow',
                 return_value=datetime.datetime(2016, 6, 30, 12, 41, 55))
     def test_from_response_overlimit_gmt(self, mock_utcnow):
+        """
+        : param response_overlimit_overrpc is notlimit_gmt : : return :
+
+        Args:
+            self: (todo): write your description
+            mock_utcnow: (todo): write your description
+        """
         response = requests.Response()
         response.status_code = 413
         response.headers = {"Retry-After": "Thu, 30 Jun 2016 12:43:20 GMT"}
@@ -56,6 +75,12 @@ class ExceptionsTest(utils.TestCase):
         self.assertTrue(mock_utcnow.called)
 
     def test_from_response_overlimit_without_header(self):
+        """
+        : return : none
+
+        Args:
+            self: (todo): write your description
+        """
         response = requests.Response()
         response.status_code = 413
         response.headers = {}

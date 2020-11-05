@@ -19,25 +19,55 @@ from cinderclient.tests.unit import utils
 
 class CinderNoAuthPluginTest(utils.TestCase):
     def setUp(self):
+        """
+        Sets the plugin.
+
+        Args:
+            self: (todo): write your description
+        """
         super(CinderNoAuthPluginTest, self).setUp()
         self.plugin = noauth.CinderNoAuthPlugin('user', 'project',
                                                 endpoint='example.com')
 
     def test_auth_token(self):
+        """
+        Perform authentication token.
+
+        Args:
+            self: (todo): write your description
+        """
         auth_token = 'user:project'
         self.assertEqual(auth_token, self.plugin.auth_token)
 
     def test_auth_token_no_project(self):
+        """
+        Set the auth token.
+
+        Args:
+            self: (todo): write your description
+        """
         auth_token = 'user:user'
         plugin = noauth.CinderNoAuthPlugin('user')
         self.assertEqual(auth_token, plugin.auth_token)
 
     def test_get_headers(self):
+        """
+        Set headers for the request.
+
+        Args:
+            self: (todo): write your description
+        """
         headers = {'x-user-id': 'user',
                    'x-project-id': 'project',
                    'X-Auth-Token': 'user:project'}
         self.assertEqual(headers, self.plugin.get_headers(None))
 
     def test_get_endpoint(self):
+        """
+        Return the test endpoint.
+
+        Args:
+            self: (todo): write your description
+        """
         endpoint = 'example.com/project'
         self.assertEqual(endpoint, self.plugin.get_endpoint(None))

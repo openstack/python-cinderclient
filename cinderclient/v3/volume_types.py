@@ -24,6 +24,12 @@ from cinderclient import base
 class VolumeType(base.Resource):
     """A Volume Type is the type of volume to be created."""
     def __repr__(self):
+        """
+        Return a human - friendly name.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<VolumeType: %s>" % self.name
 
     @property

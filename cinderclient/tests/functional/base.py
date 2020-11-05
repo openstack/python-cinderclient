@@ -58,11 +58,23 @@ class ClientTestBase(base.ClientTestBase):
 
     """
     def setUp(self):
+        """
+        Sets the client transport.
+
+        Args:
+            self: (todo): write your description
+        """
         super(ClientTestBase, self).setUp()
         self.clients = self._get_clients()
         self.parser = output_parser
 
     def _get_clients(self):
+        """
+        Return clients.
+
+        Args:
+            self: (todo): write your description
+        """
         cli_dir = os.environ.get(
             'OS_CINDERCLIENT_EXEC_DIR',
             os.path.join(os.path.abspath('.'), '.tox/functional/bin'))
@@ -70,6 +82,12 @@ class ClientTestBase(base.ClientTestBase):
         return base.CLIClient(cli_dir=cli_dir, **credentials())
 
     def cinder(self, *args, **kwargs):
+        """
+        Create a cinder.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.clients.cinder(*args,
                                    **kwargs)
 
@@ -105,6 +123,14 @@ class ClientTestBase(base.ClientTestBase):
         return obj
 
     def object_cmd(self, object_name, cmd):
+        """
+        Return a command.
+
+        Args:
+            self: (todo): write your description
+            object_name: (str): write your description
+            cmd: (str): write your description
+        """
         return (object_name + '-' + cmd if object_name != 'volume' else cmd)
 
     def wait_for_object_status(self, object_name, object_id, status,

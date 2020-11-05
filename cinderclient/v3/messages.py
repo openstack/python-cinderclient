@@ -20,6 +20,12 @@ class Message(base.Resource):
     NAME_ATTR = 'id'
 
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<Message: %s>" % self.id
 
     def delete(self):

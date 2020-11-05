@@ -25,6 +25,12 @@ class VolumeTransfer(base.Resource):
     """Transfer a volume from one tenant to another"""
 
     def __repr__(self):
+        """
+        Return a human - readable representation of this object.
+
+        Args:
+            self: (todo): write your description
+        """
         return "<VolumeTransfer: %s>" % self.id
 
     def delete(self):

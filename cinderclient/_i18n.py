@@ -37,8 +37,18 @@ _P = _translators.plural_form
 
 
 def get_available_languages():
+    """
+    Return available languages.
+
+    Args:
+    """
     return oslo_i18n.get_available_languages(DOMAIN)
 
 
 def enable_lazy():
+    """
+    Set lazy :: 0.
+
+    Args:
+    """
     return oslo_i18n.enable_lazy()

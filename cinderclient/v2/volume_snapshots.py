@@ -22,6 +22,18 @@ from cinderclient.v3 import volume_snapshots
 class Snapshot(volume_snapshots.Snapshot):
     def list_manageable(self, host, detailed=True, marker=None, limit=None,
                         offset=None, sort=None):
+        """
+        Returns a list of volumes.
+
+        Args:
+            self: (todo): write your description
+            host: (str): write your description
+            detailed: (str): write your description
+            marker: (str): write your description
+            limit: (int): write your description
+            offset: (int): write your description
+            sort: (str): write your description
+        """
         return self.manager.list_manageable(host, detailed=detailed,
                                             marker=marker, limit=limit,
                                             offset=offset, sort=sort)
@@ -33,6 +45,18 @@ class SnapshotManager(volume_snapshots.SnapshotManager):
     @api_versions.wraps("2.0")
     def list_manageable(self, host, detailed=True, marker=None, limit=None,
                         offset=None, sort=None):
+        """
+        List volumes
+
+        Args:
+            self: (todo): write your description
+            host: (str): write your description
+            detailed: (str): write your description
+            marker: (str): write your description
+            limit: (int): write your description
+            offset: (int): write your description
+            sort: (str): write your description
+        """
         url = self._build_list_url("os-snapshot-manage", detailed=detailed,
                                    search_opts={'host': host}, marker=marker,
                                    limit=limit, offset=offset, sort=sort)

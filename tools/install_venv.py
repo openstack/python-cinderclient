@@ -27,6 +27,14 @@ import install_venv_common as install_venv
 
 
 def print_help(project, venv, root):
+    """
+    Print the help of a project.
+
+    Args:
+        project: (todo): write your description
+        venv: (todo): write your description
+        root: (todo): write your description
+    """
     help = """
     %(project)s development environment setup is complete.
 
@@ -47,6 +55,12 @@ def print_help(project, venv, root):
 
 
 def main(argv):
+    """
+    Main entry point.
+
+    Args:
+        argv: (str): write your description
+    """
     root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
     if os.environ.get('tools_path'):
