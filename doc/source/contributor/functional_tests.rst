@@ -5,13 +5,13 @@ Functional Tests
 Cinderclient contains a suite of functional tests, in the cinderclient/
 tests/functional directory.
 
-These are currently non-voting, meaning that Jenkins will not reject a
+These are currently non-voting, meaning that zuul will not reject a
 patched based on failure of the functional tests. It is highly recommended,
 however, that these tests are investigated in the case of a failure.
 
 Running the tests
 -----------------
-Run the tests using tox, which calls ostestr via the tox.ini file.  To run all
+Run the tests using tox, via the tox.ini file.  To run all
 tests simply run::
 
     tox -e functional
