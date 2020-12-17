@@ -125,6 +125,12 @@ class Manager(common_base.HookableMixin):
                 # till there is no more items.
                 items = self._list(next, response_key, obj_class, None,
                                    limit, items)
+                # If we use '--with-count' to get the resource count,
+                # the _list function will return the tuple result with
+                # (resources, count).
+                # So here, we must check the items' type then to do return.
+                if isinstance(items, tuple):
+                    items = items[0]
         if "count" in body:
             return common_base.ListWithMeta(items, resp), body['count']
         else:
