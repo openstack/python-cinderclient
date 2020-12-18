@@ -155,16 +155,6 @@ def get_volume_api_from_url(url):
     raise exceptions.UnsupportedVersion(msg)
 
 
-def _log_request_id(logger, resp, service_name):
-    request_id = resp.headers.get('x-openstack-request-id')
-    if request_id:
-        logger.debug('%(method)s call to %(service_type)s for %(url)s '
-                     'used request id %(response_request_id)s',
-                     {'method': resp.request.method,
-                      'service_type': service_name,
-                      'url': resp.url, 'response_request_id': request_id})
-
-
 class SessionClient(adapter.LegacyJsonAdapter):
 
     def __init__(self, *args, **kwargs):
@@ -377,10 +367,6 @@ class HTTPClient(object):
             resp.status_code,
             resp.headers,
             strutils.mask_password(resp.text))
-
-        # if service name is None then use service_type for logging
-        service = self.service_name or self.service_type
-        _log_request_id(self._logger, resp, service)
 
     def request(self, url, method, **kwargs):
         kwargs.setdefault('headers', kwargs.get('headers', {}))
