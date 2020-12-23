@@ -7,6 +7,7 @@ cryptography==2.7
 ddt==1.0.1
 debtcollector==1.2.0
 doc8==0.6.0
+dulwich==0.20.6
 extras==1.0.0
 fasteners==0.7.0
 fixtures==3.0.0
@@ -16,12 +17,12 @@ iso8601==0.1.11
 jsonschema==2.6.0
 keystoneauth1==3.4.0
 linecache2==1.0.0
-mccabe==0.2.1
+mccabe==0.6.0
 monotonic==0.6
 msgpack-python==0.4.0
 netaddr==0.7.18
 netifaces==0.10.4
-oslo.concurrency==3.25.0
+oslo.concurrency==3.26.0
 oslo.config==5.2.0
 oslo.context==2.19.2
 oslo.i18n==3.15.3
@@ -39,7 +40,7 @@ pyperclip==1.5.27
 python-dateutil==2.5.3
 python-mimeparse==1.6.0
 python-subunit==1.0.0
-pytz==2013.6
+pytz==2015.7
 PyYAML==3.13
 reno==3.1.0
 requests-mock==1.2.0
@@ -49,10 +50,10 @@ simplejson==3.5.1
 six==1.10.0
 stestr==1.0.0
 stevedore==1.20.0
-tempest==17.1.0
+tempest==24.0.0
 testrepository==0.0.18
 testtools==2.2.0
 traceback2==1.4.0
 unittest2==1.1.0
-urllib3==1.21.1
+urllib3==1.24.1
 wrapt==1.7.0
