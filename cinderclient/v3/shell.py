@@ -218,6 +218,74 @@ def do_backup_list(cs, args):
     AppendFilters.filters = []
 
 
+@utils.arg('backup', metavar='<backup>',
+           help='Name or ID of backup to restore.')
+@utils.arg('--volume', metavar='<volume>',
+           default=None,
+           help='Name or ID of existing volume to which to restore. '
+           'This is mutually exclusive with --name and takes priority. '
+           'Default=None.')
+@utils.arg('--name', metavar='<name>',
+           default=None,
+           help='Use the name for new volume creation to restore. '
+           'This is mutually exclusive with --volume and --volume '
+           'takes priority. '
+           'Default=None.')
+@utils.arg('--volume-type',
+           metavar='<volume-type>',
+           default=None,
+           start_version='3.47',
+           help='Volume type for the new volume creation to restore. This '
+           'option is not valid when used with the "volume" option. '
+           'Default=None.')
+@utils.arg('--availability-zone', metavar='<AZ>',
+           default=None,
+           start_version='3.47',
+           help='AZ for the new volume creation to restore. By default it '
+           'will be the same as backup AZ. This option is not valid when '
+           'used with the "volume" option. Default=None.')
+def do_backup_restore(cs, args):
+    """Restores a backup."""
+    if args.volume:
+        volume_id = utils.find_volume(cs, args.volume).id
+        if args.name:
+            args.name = None
+            print('Mutually exclusive options are specified simultaneously: '
+                  '"volume" and "name". The volume option takes priority.')
+    else:
+        volume_id = None
+
+    volume_type = getattr(args, 'volume_type', None)
+    az = getattr(args, 'availability_zone', None)
+    if (volume_type or az) and args.volume:
+        msg = ('The "volume-type" and "availability-zone" options are not '
+               'valid when used with the "volume" option.')
+        raise exceptions.ClientException(code=1, message=msg)
+
+    backup = shell_utils.find_backup(cs, args.backup)
+    info = {"backup_id": backup.id}
+
+    if volume_type or (az and az != backup.availability_zone):
+        # Implement restoring a backup to a newly created volume of a
+        # specific volume type or in a different AZ by using the
+        # volume-create API. The default volume name matches the pattern
+        # cinder uses (see I23730834058d88e30be62624ada3b24cdaeaa6f3).
+        volume_name = args.name or 'restore_backup_%s' % backup.id
+        volume = cs.volumes.create(size=backup.size,
+                                   name=volume_name,
+                                   volume_type=volume_type,
+                                   availability_zone=az,
+                                   backup_id=backup.id)
+        info['volume_id'] = volume._info['id']
+        info['volume_name'] = volume_name
+    else:
+        restore = cs.restores.restore(backup.id, volume_id, args.name)
+        info.update(restore._info)
+        info.pop('links', None)
+
+    utils.print_dict(info)
+
+
 @utils.arg('--detail',
            action='store_true',
            help='Show detailed information about pools.')

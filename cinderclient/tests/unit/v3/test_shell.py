@@ -1641,3 +1641,160 @@ class ShellTest(utils.TestCase):
                          '629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
         self.assert_called(
             'DELETE', 'v3/default-types/629632e7-99d2-4c40-9ae3-106fa3b1c9b7')
+
+    def test_restore(self):
+        self.run_command('backup-restore 1234')
+        self.assert_called('POST', '/backups/1234/restore')
+
+    def test_restore_with_name(self):
+        self.run_command('backup-restore 1234 --name restore_vol')
+        expected = {'restore': {'volume_id': None, 'name': 'restore_vol'}}
+        self.assert_called('POST', '/backups/1234/restore',
+                           body=expected)
+
+    def test_restore_with_name_error(self):
+        self.assertRaises(exceptions.CommandError, self.run_command,
+                          'backup-restore 1234 --volume fake_vol --name '
+                          'restore_vol')
+
+    def test_restore_with_az(self):
+        self.run_command('--os-volume-api-version 3.47 backup-restore 1234 '
+                         '--name restore_vol --availability-zone restore_az')
+        expected = {'volume': {'size': 10,
+                               'name': 'restore_vol',
+                               'availability_zone': 'restore_az',
+                               'backup_id': '1234',
+                               'metadata': {},
+                               'imageRef': None,
+                               'source_volid': None,
+                               'consistencygroup_id': None,
+                               'snapshot_id': None,
+                               'volume_type': None,
+                               'description': None}}
+        self.assert_called('POST', '/volumes', body=expected)
+
+    def test_restore_with_az_microversion_error(self):
+        self.assertRaises(exceptions.UnsupportedAttribute, self.run_command,
+                          '--os-volume-api-version 3.46 backup-restore 1234 '
+                          '--name restore_vol --availability-zone restore_az')
+
+    def test_restore_with_volume_type(self):
+        self.run_command('--os-volume-api-version 3.47 backup-restore 1234 '
+                         '--name restore_vol --volume-type restore_type')
+        expected = {'volume': {'size': 10,
+                               'name': 'restore_vol',
+                               'volume_type': 'restore_type',
+                               'backup_id': '1234',
+                               'metadata': {},
+                               'imageRef': None,
+                               'source_volid': None,
+                               'consistencygroup_id': None,
+                               'snapshot_id': None,
+                               'availability_zone': None,
+                               'description': None}}
+        self.assert_called('POST', '/volumes', body=expected)
+
+    def test_restore_with_volume_type_microversion_error(self):
+        self.assertRaises(exceptions.UnsupportedAttribute, self.run_command,
+                          '--os-volume-api-version 3.46 backup-restore 1234 '
+                          '--name restore_vol --volume-type restore_type')
+
+    def test_restore_with_volume_type_and_az_no_name(self):
+        self.run_command('--os-volume-api-version 3.47 backup-restore 1234 '
+                         '--volume-type restore_type '
+                         '--availability-zone restore_az')
+        expected = {'volume': {'size': 10,
+                               'name': 'restore_backup_1234',
+                               'volume_type': 'restore_type',
+                               'availability_zone': 'restore_az',
+                               'backup_id': '1234',
+                               'metadata': {},
+                               'imageRef': None,
+                               'source_volid': None,
+                               'consistencygroup_id': None,
+                               'snapshot_id': None,
+                               'description': None}}
+        self.assert_called('POST', '/volumes', body=expected)
+
+    @ddt.data(
+        {
+            'volume': '1234',
+            'name': None,
+            'volume_type': None,
+            'availability_zone': None,
+        }, {
+            'volume': '1234',
+            'name': 'ignored',
+            'volume_type': None,
+            'availability_zone': None,
+        }, {
+            'volume': None,
+            'name': 'sample-volume',
+            'volume_type': 'sample-type',
+            'availability_zone': None,
+        }, {
+            'volume': None,
+            'name': 'sample-volume',
+            'volume_type': None,
+            'availability_zone': 'az1',
+        }, {
+            'volume': None,
+            'name': 'sample-volume',
+            'volume_type': None,
+            'availability_zone': 'different-az',
+        }, {
+            'volume': None,
+            'name': None,
+            'volume_type': None,
+            'availability_zone': 'different-az',
+        },
+    )
+    @ddt.unpack
+    @mock.patch('cinderclient.utils.print_dict')
+    @mock.patch('cinderclient.tests.unit.v2.fakes._stub_restore')
+    def test_do_backup_restore(self,
+                               mock_stub_restore,
+                               mock_print_dict,
+                               volume,
+                               name,
+                               volume_type,
+                               availability_zone):
+
+        # Restore from the fake '1234' backup.
+        cmd = '--os-volume-api-version 3.47 backup-restore 1234'
+
+        if volume:
+            cmd += ' --volume %s' % volume
+        if name:
+            cmd += ' --name %s' % name
+        if volume_type:
+            cmd += ' --volume-type %s' % volume_type
+        if availability_zone:
+            cmd += ' --availability-zone %s' % availability_zone
+
+        if name or volume:
+            volume_name = 'sample-volume'
+        else:
+            volume_name = 'restore_backup_1234'
+
+        mock_stub_restore.return_value = {'volume_id': '1234',
+                                          'volume_name': volume_name}
+
+        self.run_command(cmd)
+
+        # Check whether mock_stub_restore was called in order to determine
+        # whether the restore command invoked the backup-restore API. If
+        # mock_stub_restore was not called then this indicates the command
+        # invoked the volume-create API to restore the backup to a new volume
+        # of a specific volume type, or in a different AZ (the fake '1234'
+        # backup is in az1).
+        if volume_type or availability_zone == 'different-az':
+            mock_stub_restore.assert_not_called()
+        else:
+            mock_stub_restore.assert_called_once()
+
+        mock_print_dict.assert_called_once_with({
+            'backup_id': '1234',
+            'volume_id': '1234',
+            'volume_name': volume_name,
+            })

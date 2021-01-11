@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Enhance the ``backup-restore`` shell command to support restoring to a new
+    volume created with a specific volume type and/or in a different AZ. New
+    ``--volume-type`` and ``--availability-zone`` arguments are compatible with
+    cinder API microversion v3.47 onward.
