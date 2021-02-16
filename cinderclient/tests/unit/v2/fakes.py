@@ -28,9 +28,9 @@ REQUEST_ID = 'req-test-request-id'
 def _stub_volume(*args, **kwargs):
     volume = {
         "migration_status": None,
-        "attachments": [{u'server_id': u'1234',
-                         u'id': u'3f88836f-adde-4296-9f6b-2c59a0bcda9a',
-                         u'attachment_id': u'5678'}],
+        "attachments": [{'server_id': '1234',
+                         'id': '3f88836f-adde-4296-9f6b-2c59a0bcda9a',
+                         'attachment_id': '5678'}],
         "links": [
             {
                 "href": "http://localhost/v2/fake/volumes/1234",
@@ -741,7 +741,7 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (200, {}, {'volume_type': {'id': 1,
                           'name': 'test-type-1',
                           'description': 'test_type-1-desc',
-                          'extra_specs': {u'key': u'value'}}})
+                          'extra_specs': {'key': 'value'}}})
 
     def get_types_2(self, **kw):
         return (200, {}, {'volume_type': {'id': 2,
@@ -1317,9 +1317,9 @@ class FakeHTTPClient(base_client.HTTPClient):
                 'storage_protocol': 'iSCSI',
                 'properties': {
                     'compression': {
-                        u'title': u'Compression',
-                        u'description': u'Enables compression.',
-                        u'type': u'boolean'},
+                        'title': 'Compression',
+                        'description': 'Enables compression.',
+                        'type': 'boolean'},
                 }
             }
         )

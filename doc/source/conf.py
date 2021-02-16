@@ -81,8 +81,8 @@ html_theme = 'openstackdocs'
 # -- Options for manual page output ------------------------------------------
 
 man_pages = [
-    ('cli/details', 'cinder', u'Client for OpenStack Block Storage API',
-     [u'OpenStack Contributors'], 1),
+    ('cli/details', 'cinder', 'Client for OpenStack Block Storage API',
+     ['OpenStack Contributors'], 1),
 ]
 
 # -- Options for openstackdocstheme -------------------------------------------
@@ -104,8 +104,8 @@ openstackdocs_pdf_link = True
 # (source start file, target name, title, author, documentclass
 # [howto/manual]).
 latex_documents = [
-    ('index', 'doc-python-cinderclient.tex', u'Cinder Client Documentation',
-     u'Cinder Contributors', 'manual'),
+    ('index', 'doc-python-cinderclient.tex', 'Cinder Client Documentation',
+     'Cinder Contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
