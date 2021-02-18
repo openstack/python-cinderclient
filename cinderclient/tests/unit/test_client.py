@@ -365,7 +365,9 @@ class GetAPIVersionTestCase(utils.TestCase):
 
         cinderclient.client.get_server_version(url, True)
 
-        mock_request.assert_called_once_with(expected_url, verify=False)
+        mock_request.assert_called_once_with(expected_url,
+                                             verify=False,
+                                             cert=None)
 
     @mock.patch('cinderclient.client.requests.get')
     def test_get_server_version_cacert(self, mock_request):
@@ -383,7 +385,29 @@ class GetAPIVersionTestCase(utils.TestCase):
         cacert = '/path/to/cert'
         cinderclient.client.get_server_version(url, cacert=cacert)
 
-        mock_request.assert_called_once_with(expected_url, verify=cacert)
+        mock_request.assert_called_once_with(expected_url,
+                                             verify=cacert,
+                                             cert=None)
+
+    @mock.patch('cinderclient.client.requests.get')
+    def test_get_server_version_cert(self, mock_request):
+        mock_response = utils.TestResponse({
+            "status_code": 200,
+            "text": json.dumps(fakes.fake_request_get_no_v3())
+        })
+
+        mock_request.return_value = mock_response
+
+        url = (
+            "https://192.168.122.127:8776/v3/e5526285ebd741b1819393f772f11fc3")
+        expected_url = "https://192.168.122.127:8776/"
+
+        client_cert = '/path/to/cert'
+        cinderclient.client.get_server_version(url, cert=client_cert)
+
+        mock_request.assert_called_once_with(expected_url,
+                                             verify=True,
+                                             cert=client_cert)
 
     @mock.patch('cinderclient.client.requests.get')
     @ddt.data('3.12', '3.40')

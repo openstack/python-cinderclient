@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    `Bug #1915996 <https://bugs.launchpad.net/python-cinderclient/+bug/1915996>`_:
+    Passing client certificates for mTLS connections was not supported
+    and now has been fixed.
+

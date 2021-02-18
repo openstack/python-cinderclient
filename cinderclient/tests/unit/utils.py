@@ -27,6 +27,7 @@ REQUEST_ID = ['req-test-request-id']
 class TestCase(testtools.TestCase):
     TEST_REQUEST_BASE = {
         'verify': True,
+        'cert': None
     }
 
     def setUp(self):

@@ -63,9 +63,9 @@ class Client(object):
                  endpoint_type='publicURL', extensions=None,
                  service_type='volumev3', service_name=None,
                  volume_service_name=None, os_endpoint=None, retries=0,
-                 http_log_debug=False, cacert=None, auth_system='keystone',
-                 auth_plugin=None, session=None, api_version=None,
-                 logger=None, **kwargs):
+                 http_log_debug=False, cacert=None, cert=None,
+                 auth_system='keystone', auth_plugin=None, session=None,
+                 api_version=None, logger=None, **kwargs):
         # FIXME(comstud): Rename the api_key argument above when we
         # know it's not being used as keyword argument
         password = api_key
@@ -131,6 +131,7 @@ class Client(object):
             retries=retries,
             http_log_debug=http_log_debug,
             cacert=cacert,
+            cert=cert,
             auth_system=auth_system,
             auth_plugin=auth_plugin,
             session=session,
