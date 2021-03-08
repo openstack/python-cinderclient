@@ -14,6 +14,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from urllib import parse
 
 import ddt
 
@@ -23,8 +24,6 @@ from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 from cinderclient.v3 import volume_snapshots
 from cinderclient.v3 import volumes
-
-from six.moves.urllib import parse
 
 
 @ddt.ddt

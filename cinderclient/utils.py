@@ -12,15 +12,14 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import collections
 
+import collections
 import os
 import sys
+from urllib import parse
 import uuid
 
 import prettytable
-import six
-from six.moves.urllib import parse
 import stevedore
 
 from cinderclient import exceptions
@@ -156,7 +155,7 @@ def print_list(objs, fields, exclude_unavailable=False, formatters=None,
                         data = getattr(o, field_name, '')
                 if data is None:
                     data = '-'
-                if isinstance(data, six.string_types) and "\r" in data:
+                if isinstance(data, str) and "\r" in data:
                     data = data.replace("\r", " ")
                 row.append(data)
         rows.append(row)
@@ -172,7 +171,6 @@ def print_list(objs, fields, exclude_unavailable=False, formatters=None,
         for part in row:
             count = count + 1
             if isinstance(part, dict):
-                part = unicode_key_value_to_string(part)
                 row[count - 1] = part
         pt.add_row(row)
 
@@ -181,24 +179,6 @@ def print_list(objs, fields, exclude_unavailable=False, formatters=None,
     else:
         order_by = fields[sortby_index]
     _print(pt, order_by)
-
-
-def _encode(src):
-    """remove extra 'u' in PY2."""
-    if six.PY2 and isinstance(src, six.text_type):
-        return src.encode('utf-8')
-    return src
-
-
-def unicode_key_value_to_string(src):
-    """Recursively converts dictionary keys to strings."""
-    if isinstance(src, dict):
-        return dict((_encode(k),
-                    _encode(unicode_key_value_to_string(v)))
-                    for k, v in src.items())
-    if isinstance(src, list):
-        return [unicode_key_value_to_string(item) for item in src]
-    return _encode(src)
 
 
 def build_query_param(params, sort=False):
@@ -249,10 +229,9 @@ def print_dict(d, property="Property", formatters=None):
         r = list(r)
 
         if r[0] in formatters:
-            r[1] = unicode_key_value_to_string(r[1])
             if isinstance(r[1], dict):
                 r[1] = _pretty_format_dict(r[1])
-        if isinstance(r[1], six.string_types) and "\r" in r[1]:
+        if isinstance(r[1], str) and "\r" in r[1]:
             r[1] = r[1].replace("\r", " ")
         pt.add_row(r)
     _print(pt, property)
@@ -343,10 +322,4 @@ def _load_entry_point(ep_name, name=None):
 
 
 def get_function_name(func):
-    if six.PY2:
-        if hasattr(func, "im_class"):
-            return "%s.%s" % (func.im_class, func.__name__)
-        else:
-            return "%s.%s" % (func.__module__, func.__name__)
-    else:
-        return "%s.%s" % (func.__module__, func.__qualname__)
+    return "%s.%s" % (func.__module__, func.__qualname__)

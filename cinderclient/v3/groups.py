@@ -137,7 +137,7 @@ class GroupManager(base.ManagerWithFind):
         :param group_id: The ID of the group to get.
         :rtype: :class:`Group`
         """
-        query_params = utils.unicode_key_value_to_string(kwargs)
+        query_params = kwargs
         query_string = utils.build_query_param(query_params, sort=True)
 
         return self._get("/groups/%s" % group_id + query_string,

@@ -16,13 +16,13 @@
 
 """pylint error checking."""
 
+from io import StringIO
 import json
 import re
 import sys
 
 from pylint import lint
 from pylint.reporters import text
-from six.moves import cStringIO as StringIO
 
 ignore_codes = [
     # Note(maoy): E1103 is error code related to partial type inference

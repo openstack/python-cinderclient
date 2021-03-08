@@ -52,7 +52,6 @@ requests-mock==1.2.0
 requests==2.23.0
 rfc3986==1.4.0
 simplejson==3.5.1
-six==1.15.0
 stestr==3.0.1
 stevedore==3.2.2
 tempest==26.0.0

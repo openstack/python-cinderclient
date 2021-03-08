@@ -27,7 +27,7 @@ import abc
 import copy
 
 from requests import Response
-import six
+
 
 from cinderclient.apiclient import exceptions
 from cinderclient import utils
@@ -199,8 +199,7 @@ class BaseManager(HookableMixin):
         return self.client.delete(url)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class ManagerWithFind(BaseManager):
+class ManagerWithFind(BaseManager, metaclass=abc.ABCMeta):
     """Manager with additional `find()`/`findall()` methods."""
 
     @abc.abstractmethod

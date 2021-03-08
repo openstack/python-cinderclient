@@ -10,10 +10,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import configparser
 import os
 import time
 
-import six
 from tempest.lib.cli import base
 from tempest.lib.cli import output_parser
 from tempest.lib import exceptions
@@ -38,7 +38,7 @@ def credentials():
                    os.environ.get('OS_PROJECT_NAME'))
     auth_url = os.environ.get('OS_AUTH_URL')
 
-    config = six.moves.configparser.RawConfigParser()
+    config = configparser.RawConfigParser()
     if config.read(_CREDS_FILE):
         username = username or config.get('admin', 'user')
         password = password or config.get('admin', 'pass')
@@ -101,7 +101,7 @@ class ClientTestBase(base.ClientTestBase):
         obj = {}
         items = self.parser.listing(output)
         for item in items:
-            obj[item['Property']] = six.text_type(item['Value'])
+            obj[item['Property']] = str(item['Value'])
         return obj
 
     def object_cmd(self, object_name, cmd):

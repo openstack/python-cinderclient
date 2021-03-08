@@ -20,7 +20,6 @@ import fixtures
 from keystoneauth1 import adapter
 from keystoneauth1 import exceptions as keystone_exception
 from oslo_serialization import jsonutils
-import six
 
 from cinderclient import api_versions
 import cinderclient.client
@@ -136,7 +135,7 @@ class ClientTest(utils.TestCase):
         request_id = "req-f551871a-4950-4225-9b2c-29a14c8f075e"
         mock_response = utils.TestResponse({
             "status_code": 202,
-            "text": six.b(json.dumps(resp)),
+            "text": json.dumps(resp).encode("latin-1"),
             "headers": {"x-openstack-request-id": request_id},
         })
 
@@ -176,7 +175,7 @@ class ClientTest(utils.TestCase):
 
         mock_response = utils.TestResponse({
             "status_code": 400,
-            "text": six.b(json.dumps(resp)),
+            "text": json.dumps(resp).encode("latin-1"),
         })
 
         # 'request' method of Adaptor will return 400 response
@@ -202,7 +201,7 @@ class ClientTest(utils.TestCase):
 
         mock_response = utils.TestResponse({
             "status_code": 413,
-            "text": six.b(json.dumps(resp)),
+            "text": json.dumps(resp).encode("latin-1"),
         })
 
         # 'request' method of Adaptor will return 413 response

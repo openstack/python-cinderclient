@@ -19,7 +19,6 @@ import collections
 import os
 
 from oslo_utils import strutils
-import six
 
 import cinderclient
 from cinderclient import api_versions
@@ -60,7 +59,7 @@ def do_list_filters(cs, args):
 
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.52',
            metavar='<key=value>',
@@ -142,7 +141,7 @@ def do_type_list(cs, args):
                   'Default=None.') % ', '.join(base.SORT_KEY_VALUES)))
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -291,7 +290,7 @@ def do_backup_restore(cs, args):
            help='Show detailed information about pools.')
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -419,7 +418,7 @@ RESET_STATE_RESOURCES = {'volume': utils.find_volume,
            help='Display information from single tenant (Admin only).')
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -697,7 +696,7 @@ def do_create(cs, args):
             # NOTE(vish): multiple copies of same hint will
             #             result in a list of values
             if key in hints:
-                if isinstance(hints[key], six.string_types):
+                if isinstance(hints[key], str):
                     hints[key] = [hints[key]]
                 hints[key] += [value]
             else:
@@ -816,7 +815,7 @@ def do_summary(cs, args):
 @api_versions.wraps('3.11')
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.52',
            metavar='<key=value>',
@@ -1099,7 +1098,7 @@ def do_migrate(cs, args):
         print("Request to migrate volume %s has been accepted." % (volume.id))
     except Exception as e:
         print("Migration for volume %s failed: %s." % (volume.id,
-                                                       six.text_type(e)))
+                                                       str(e)))
 
 
 @api_versions.wraps('3.9')
@@ -1406,7 +1405,7 @@ def do_manageable_list(cs, args):
            help='Shows details for all tenants. Admin only.')
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -1718,7 +1717,7 @@ def do_group_list_replication_targets(cs, args):
                 "%s" % FILTER_DEPRECATED)
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -1970,7 +1969,7 @@ def do_revert_to_snapshot(cs, args):
                 "%s" % FILTER_DEPRECATED)
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -2110,7 +2109,7 @@ def do_message_delete(cs, args):
                 "%s" % FILTER_DEPRECATED)
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -2239,7 +2238,7 @@ def do_snapshot_list(cs, args):
            help='Display information from single tenant (Admin only).')
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.33',
            metavar='<key=value>',
@@ -2639,7 +2638,7 @@ def do_transfer_create(cs, args):
            start_version='3.59')
 @utils.arg('--filters',
            action=AppendFilters,
-           type=six.text_type,
+           type=str,
            nargs='*',
            start_version='3.52',
            metavar='<key=value>',

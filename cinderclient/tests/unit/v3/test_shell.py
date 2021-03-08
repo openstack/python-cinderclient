@@ -39,12 +39,11 @@
 #             return original(manager, name_or_id, **kwargs)
 
 from unittest import mock
+from urllib import parse
 
 import ddt
 import fixtures
 from requests_mock.contrib import fixture as requests_mock_fixture
-import six
-from six.moves.urllib import parse
 
 import cinderclient
 from cinderclient import api_versions
@@ -322,7 +321,7 @@ class ShellTest(utils.TestCase):
         self.assert_call_contained(
             parse.urlencode(
                 {'extra_specs':
-                    {six.text_type('key'): six.text_type('value')}}))
+                    {'key': 'value'}}))
         self.assert_call_contained(parse.urlencode({'is_public': None}))
 
     def test_type_list_public(self):
@@ -1150,11 +1149,7 @@ class ShellTest(utils.TestCase):
                           self.run_command, '--os-volume-api-version 3.32 '
                           'service-set-log')
         set_levels_mock.assert_not_called()
-        # Different error message from argparse library in Python 2 and 3
-        if six.PY3:
-            msg = 'the following arguments are required: <log-level>'
-        else:
-            msg = 'too few arguments'
+        msg = 'the following arguments are required: <log-level>'
         error_mock.assert_called_once_with(msg)
 
     @ddt.data('debug', 'DEBUG', 'info', 'INFO', 'warning', 'WARNING', 'error',

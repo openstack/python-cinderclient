@@ -18,7 +18,7 @@ from unittest import mock
 import ddt
 import fixtures
 from requests_mock.contrib import fixture as requests_mock_fixture
-from six.moves.urllib import parse
+from urllib import parse
 
 from cinderclient import client
 from cinderclient import exceptions

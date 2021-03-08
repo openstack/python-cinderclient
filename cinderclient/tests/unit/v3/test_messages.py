@@ -9,9 +9,9 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from urllib import parse
 
 import ddt
-from six.moves.urllib import parse
 
 from cinderclient import api_versions
 from cinderclient.tests.unit import utils

@@ -20,7 +20,6 @@ import copy
 import os
 
 from oslo_utils import strutils
-import six
 
 from cinderclient import base
 from cinderclient import exceptions
@@ -295,7 +294,7 @@ def do_create(cs, args):
             # NOTE(vish): multiple copies of same hint will
             #             result in a list of values
             if key in hints:
-                if isinstance(hints[key], six.string_types):
+                if isinstance(hints[key], str):
                     hints[key] = [hints[key]]
                 hints[key] += [value]
             else:
@@ -1113,8 +1112,7 @@ def do_migrate(cs, args):
                               args.lock_volume)
         print("Request to migrate volume %s has been accepted." % (volume.id))
     except Exception as e:
-        print("Migration for volume %s failed: %s." % (volume.id,
-                                                       six.text_type(e)))
+        print("Migration for volume %s failed: %s." % (volume.id, e))
 
 
 @utils.arg('volume', metavar='<volume>',

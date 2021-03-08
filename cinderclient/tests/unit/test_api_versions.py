@@ -16,7 +16,6 @@
 from unittest import mock
 
 import ddt
-import six
 
 from cinderclient import api_versions
 from cinderclient import client as base_client
@@ -273,4 +272,4 @@ class DiscoverVersionTestCase(utils.TestCase):
         v2_client = base_client.Client('2.0')
         ex = self.assertRaises(exceptions.UnsupportedVersion,
                                api_versions.get_highest_version, v2_client)
-        self.assertIn('Invalid client version 2.0 to get', six.text_type(ex))
+        self.assertIn('Invalid client version 2.0 to get', str(ex))
