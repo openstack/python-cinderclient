@@ -15,7 +15,6 @@
 
 import collections
 import os
-import sys
 from urllib import parse
 import uuid
 
@@ -23,7 +22,6 @@ import prettytable
 import stevedore
 
 from cinderclient import exceptions
-from oslo_utils import encodeutils
 
 
 def arg(*args, **kwargs):
@@ -109,10 +107,7 @@ def isunauthenticated(f):
 
 
 def _print(pt, order):
-    if sys.version_info >= (3, 0):
-        print(pt.get_string(sortby=order))
-    else:
-        print(encodeutils.safe_encode(pt.get_string(sortby=order)))
+    print(pt.get_string(sortby=order))
 
 
 def print_list(objs, fields, exclude_unavailable=False, formatters=None,
@@ -257,9 +252,6 @@ def find_resource(manager, name_or_id, **kwargs):
             return manager.get(name_or_id)
         except (ValueError, exceptions.NotFound):
             pass
-
-    if sys.version_info <= (3, 0):
-        name_or_id = encodeutils.safe_decode(name_or_id)
 
     try:
         try:

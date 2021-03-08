@@ -29,7 +29,6 @@ from keystoneauth1.identity import v2 as v2_auth
 from keystoneauth1.identity import v3 as v3_auth
 from keystoneauth1 import loading
 from keystoneauth1 import session
-from oslo_utils import encodeutils
 from oslo_utils import importutils
 import requests
 from urllib import parse as urlparse
@@ -1015,11 +1014,7 @@ class OpenStackHelpFormatter(argparse.HelpFormatter):
 
 def main():
     try:
-        if sys.version_info >= (3, 0):
-            OpenStackCinderShell().main(sys.argv[1:])
-        else:
-            OpenStackCinderShell().main([encodeutils.safe_decode(item)
-                                        for item in sys.argv[1:]])
+        OpenStackCinderShell().main(sys.argv[1:])
     except KeyboardInterrupt:
         print("... terminating cinder client", file=sys.stderr)
         sys.exit(130)
