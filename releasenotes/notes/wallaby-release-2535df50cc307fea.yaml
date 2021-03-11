@@ -1,0 +1,16 @@
+---
+prelude: |
+    The Wallaby release of the python-cinderclient supports Block Storage
+    API version 2 and Block Storage API version 3 through microversion
+    3.64.  (The maximum microversion of the Block Storage API in the
+    Wallaby release is 3.64.)
+features:
+  - |
+    Added support to display the ``volume_type_id`` attribute in volume
+    detail output when used with Block Storage API microversion 3.63 and
+    higher.
+  - |
+    Added support to display the ``encryption_key_id`` attribute in
+    volume detail and backup detail output when used with Block Storage
+    API microversion 3.64 and higher.
+
