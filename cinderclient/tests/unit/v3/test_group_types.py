@@ -16,10 +16,9 @@
 
 from cinderclient import api_versions
 from cinderclient import exceptions as exc
-from cinderclient.v3 import group_types
-
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
+from cinderclient.v3 import group_types
 
 cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.11'))
 pre_cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.10'))

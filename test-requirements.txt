@@ -4,6 +4,8 @@
 # Hacking already pins down pep8, pyflakes and flake8
 
 hacking>=4.0.0,<4.1.0 # Apache-2.0
+flake8-import-order # LGPLv3
+
 docutils>=0.15.2
 coverage>=5.2.1 # Apache-2.0
 ddt>=1.4.1 # MIT

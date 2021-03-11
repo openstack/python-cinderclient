@@ -22,6 +22,7 @@ import collections
 import getpass
 import logging
 import sys
+from urllib import parse as urlparse
 
 from keystoneauth1 import discover
 from keystoneauth1 import exceptions
@@ -31,7 +32,6 @@ from keystoneauth1 import loading
 from keystoneauth1 import session
 from oslo_utils import importutils
 import requests
-from urllib import parse as urlparse
 
 import cinderclient
 from cinderclient._i18n import _

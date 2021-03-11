@@ -14,10 +14,9 @@
 
 from datetime import datetime
 
-from cinderclient.v3 import client
-
 from cinderclient.tests.unit import fakes
 from cinderclient.tests.unit.v2 import fakes as fake_v2
+from cinderclient.v3 import client
 
 
 fake_attachment = {'attachment': {

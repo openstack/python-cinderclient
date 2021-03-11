@@ -14,11 +14,11 @@
 #    under the License.
 
 from unittest import mock
+from urllib import parse
 
 import ddt
 import fixtures
 from requests_mock.contrib import fixture as requests_mock_fixture
-from urllib import parse
 
 from cinderclient import client
 from cinderclient import exceptions

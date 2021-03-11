@@ -26,8 +26,8 @@ def do_fake_action():
     return "fake_action 3.0 to 3.1"
 
 
-@api_versions.wraps("3.2", "3.3")  # noqa: F811
-def do_fake_action():  # noqa
+@api_versions.wraps("3.2", "3.3")
+def do_fake_action():  # noqa: F811
     return "fake_action 3.2 to 3.3"
 
 

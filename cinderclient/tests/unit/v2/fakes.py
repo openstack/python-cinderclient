@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from datetime import datetime
-
 from urllib import parse as urlparse
 
 from cinderclient import client as base_client
