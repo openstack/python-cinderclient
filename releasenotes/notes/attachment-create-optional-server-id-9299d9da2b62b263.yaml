@@ -1,0 +1,10 @@
+---
+fixes:
+  - |
+    When attaching to a host, we don't need a server id
+    so it shouldn't be mandatory to be supplied with
+    attachment-create operation.
+    The server_id parameter is made optional so we can
+    create attachments without passing it.
+    The backward compatibility is maintained so we can pass
+    it like how we currently do if required.
