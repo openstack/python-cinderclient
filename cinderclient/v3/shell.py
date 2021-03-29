@@ -2297,6 +2297,8 @@ def do_attachment_show(cs, args):
            help='Name or ID of volume or volumes to attach.')
 @utils.arg('server_id',
            metavar='<server_id>',
+           nargs='?',
+           default=None,
            help='ID of server attaching to.')
 @utils.arg('--connect',
            metavar='<connect>',

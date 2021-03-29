@@ -29,6 +29,16 @@ fake_attachment = {'attachment': {
     'instance': 'e84fda45-4de4-4ce4-8f39-fc9d3b0aa05e',
     'volume_id': '557ad76c-ce54-40a3-9e91-c40d21665cc3', }}
 
+fake_attachment_without_instance_id = {'attachment': {
+    'status': 'reserved',
+    'detached_at': '',
+    'connection_info': {},
+    'attached_at': '',
+    'attach_mode': None,
+    'id': 'a232e9ae',
+    'instance': None,
+    'volume_id': '557ad76c-ce54-40a3-9e91-c40d21665cc3', }}
+
 fake_attachment_list = {'attachments': [
     {'instance': 'instance_1',
      'name': 'attachment-1',
@@ -297,7 +307,9 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
     #
 
     def post_attachments(self, **kw):
-        return (200, {}, fake_attachment)
+        if kw['body']['attachment'].get('instance_uuid'):
+            return (200, {}, fake_attachment)
+        return (200, {}, fake_attachment_without_instance_id)
 
     def get_attachments(self, **kw):
         return (200, {}, fake_attachment_list)
