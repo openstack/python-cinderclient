@@ -35,12 +35,8 @@
       jobs:
         - cinderclient-dsvm-functional
         - cinderclient-dsvm-functional-identity-v3-only
-        - openstack-tox-lower-constraints
         - openstack-tox-pylint:
             voting: false
-    gate:
-      jobs:
-        - openstack-tox-lower-constraints
     post:
       jobs:
         - openstack-tox-cover
