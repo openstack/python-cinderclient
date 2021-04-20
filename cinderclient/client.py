@@ -70,7 +70,7 @@ for svc in ('volume', 'volumev2', 'volumev3'):
     discover.add_catalog_discover_hack(svc, re.compile(r'/v[12]/\w+/?$'), '/')
 
 
-def get_server_version(url, insecure=False, cacert=None):
+def get_server_version(url, insecure=False, cacert=None, cert=None):
     """Queries the server via the naked endpoint and gets version info.
 
     :param url: url of the cinder endpoint
@@ -78,6 +78,10 @@ def get_server_version(url, insecure=False, cacert=None):
                      (https) requests
     :param cacert: Specify a CA bundle file to use in verifying a TLS
                             (https) server certificate
+    :param cert: A client certificate to pass to requests. These are of the
+                 same form as requests expects. Either a single filename
+                 containing both the certificate and key or a tuple containing
+                 the path to the certificate then a path to the key. (optional)
     :returns: APIVersion object for min and max version supported by
               the server
     """
@@ -115,7 +119,7 @@ def get_server_version(url, insecure=False, cacert=None):
                 verify_cert = cacert
             else:
                 verify_cert = True
-        response = requests.get(version_url, verify=verify_cert)
+        response = requests.get(version_url, verify=verify_cert, cert=cert)
         data = json.loads(response.text)
         versions = data['versions']
         for version in versions:
@@ -135,9 +139,10 @@ def get_server_version(url, insecure=False, cacert=None):
             api_versions.APIVersion(current_version))
 
 
-def get_highest_client_server_version(url, insecure=False, cacert=None):
+def get_highest_client_server_version(url, insecure=False,
+                                      cacert=None, cert=None):
     """Returns highest supported version by client and server as a string."""
-    min_server, max_server = get_server_version(url, insecure, cacert)
+    min_server, max_server = get_server_version(url, insecure, cacert, cert)
     max_client = api_versions.APIVersion(api_versions.MAX_VERSION)
     return min(max_server, max_client).get_string()
 
@@ -286,7 +291,7 @@ class HTTPClient(object):
                  endpoint_type='publicURL', service_type=None,
                  service_name=None, volume_service_name=None,
                  os_endpoint=None, retries=None,
-                 http_log_debug=False, cacert=None,
+                 http_log_debug=False, cacert=None, cert=None,
                  auth_system='keystone', auth_plugin=None, api_version=None,
                  logger=None, user_domain_name='Default',
                  project_domain_name='Default', global_request_id=None):
@@ -324,7 +329,7 @@ class HTTPClient(object):
         self.timeout = timeout
         self.user_domain_name = user_domain_name
         self.project_domain_name = project_domain_name
-
+        self.cert = cert
         if insecure:
             self.verify_cert = False
         else:
@@ -405,6 +410,7 @@ class HTTPClient(object):
             method,
             url,
             verify=self.verify_cert,
+            cert=self.cert,
             **kwargs)
         self.http_log_resp(resp)
 
@@ -701,7 +707,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                            os_endpoint=None, retries=None,
                            http_log_debug=False,
                            auth_system='keystone', auth_plugin=None,
-                           cacert=None, tenant_id=None,
+                           cacert=None, cert=None, tenant_id=None,
                            session=None,
                            auth=None, api_version=None,
                            **kwargs):
@@ -741,6 +747,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                           retries=retries,
                           http_log_debug=http_log_debug,
                           cacert=cacert,
+                          cert=cert,
                           auth_system=auth_system,
                           auth_plugin=auth_plugin,
                           logger=logger,
