@@ -1318,12 +1318,14 @@ class ShellTest(utils.TestCase):
         self.assert_called('POST', '/backups', body=expected)
 
     @mock.patch("cinderclient.utils.print_list")
-    def test_snapshot_list_with_userid(self, mock_print_list):
-        """Ensure 3.41 provides User ID header."""
-        self.run_command('--os-volume-api-version 3.41 snapshot-list')
+    def test_snapshot_list(self, mock_print_list):
+        """Ensure we always present all existing fields when listing snaps."""
+        self.run_command('--os-volume-api-version 3.65 snapshot-list')
         self.assert_called('GET', '/snapshots/detail')
-        columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size', 'User ID']
+        columns = ['ID', 'Volume ID', 'Status', 'Name', 'Size',
+                   'Consumes Quota', 'User ID']
         mock_print_list.assert_called_once_with(mock.ANY, columns,
+                                                exclude_unavailable=True,
                                                 sortby_index=0)
 
     @mock.patch('cinderclient.v3.volumes.Volume.migrate_volume')

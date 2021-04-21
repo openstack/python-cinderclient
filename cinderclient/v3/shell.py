@@ -507,8 +507,8 @@ def do_list(cs, args):
             [x.title().strip() for x in field_titles]) if k != 'Id']
         key_list.extend(unique_titles)
     else:
-        key_list = ['ID', 'Status', 'Name', 'Size', 'Volume Type',
-                    'Bootable', 'Attached to']
+        key_list = ['ID', 'Status', 'Name', 'Size', 'Consumes Quota',
+                    'Volume Type', 'Bootable', 'Attached to']
         # If all_tenants is specified, print
         # Tenant ID as well.
         if search_opts['all_tenants']:
@@ -2173,15 +2173,14 @@ def do_snapshot_list(cs, args):
 
     shell_utils.translate_volume_snapshot_keys(snapshots)
     sortby_index = None if args.sort else 0
-    if cs.api_version >= api_versions.APIVersion("3.41"):
-        utils.print_list(snapshots,
-                         ['ID', 'Volume ID', 'Status',
-                          'Name', 'Size', 'User ID'],
-                         sortby_index=sortby_index)
-    else:
-        utils.print_list(snapshots,
-                         ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
-                         sortby_index=sortby_index)
+    # It's the server's responsibility to return the appropriate fields for the
+    # requested microversion, we present all known fields and skip those that
+    # are missing.
+    utils.print_list(snapshots,
+                     ['ID', 'Volume ID', 'Status', 'Name', 'Size',
+                      'Consumes Quota', 'User ID'],
+                     exclude_unavailable=True,
+                     sortby_index=sortby_index)
     if show_count:
         print("Snapshot in total: %s" % total_count)
 
