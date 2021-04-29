@@ -15,7 +15,6 @@
 - job:
     name: python-cinderclient-functional-py36
     parent: python-cinderclient-functional-base
-    nodeset: openstack-single-node-bionic
     vars:
       python_version: 3.6
       tox_envlist: functional-py36
@@ -23,7 +22,6 @@
 - job:
     name: python-cinderclient-functional-py38
     parent: python-cinderclient-functional-base
-    nodeset: openstack-single-node-focal
     vars:
       python_version: 3.8
       tox_envlist: functional-py38
