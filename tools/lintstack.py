@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) 2013, AT&T Labs, Yun Mao <yunmao@gmail.com>
 # All Rights Reserved.
 #
