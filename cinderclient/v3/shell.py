@@ -27,8 +27,8 @@ from cinderclient import exceptions
 from cinderclient import shell_utils
 from cinderclient import utils
 
-from cinderclient.v2.shell import *  # noqa
-from cinderclient.v2.shell import CheckSizeArgForCreate
+from cinderclient.v3.shell_base import *  # noqa
+from cinderclient.v3.shell_base import CheckSizeArgForCreate
 
 FILTER_DEPRECATED = ("This option is deprecated and will be removed in "
                      "newer release. Please use '--filters' option which "

@@ -18,7 +18,6 @@ from unittest import mock
 import ddt
 
 from cinderclient import api_versions
-from cinderclient import client as base_client
 from cinderclient import exceptions
 from cinderclient.tests.unit import test_utils
 from cinderclient.tests.unit import utils
@@ -212,6 +211,14 @@ class DiscoverVersionTestCase(utils.TestCase):
         self.fake_client.services.server_api_version.return_value = val
 
     @ddt.data(
+        # what the data mean:
+        # items 1, 2: client min, max
+        # items 3, 4: server min, max
+        # item 5: user's requested API version
+        # item 6: should this raise an exception?
+        # item 7: version that should be returned when no exception
+        # item 8: what client.services.server_api_version should return
+        #         when called by _get_server_version_range in discover_version
         ("3.1", "3.3", "3.4", "3.7", "3.3", True),   # Server too new
         ("3.9", "3.10", "3.0", "3.3", "3.10", True),   # Server too old
         ("3.3", "3.9", "3.7", "3.17", "3.9", False),  # Requested < server
@@ -222,9 +229,8 @@ class DiscoverVersionTestCase(utils.TestCase):
         # downgraded because of both:
         ("3.5", "3.7", "3.0", "3.8", "3.9", False, "3.7"),
         ("3.5", "3.5", "3.0", "3.5", "3.5", False),  # Server & client same
-        ("3.5", "3.5", "3.0", "3.5", "3.5", False, "2.0", []),  # Pre-micro
+        ("3.5", "3.5", None, None, "3.5", True, None, []),  # Pre-micro
         ("3.1", "3.11", "3.4", "3.7", "3.7", False),  # Requested in range
-        ("3.1", "3.11", None, None, "3.7", False),  # Server w/o support
         ("3.5", "3.5", "3.0", "3.5", "1.0", True)    # Requested too old
     )
     @ddt.unpack
@@ -240,21 +246,23 @@ class DiscoverVersionTestCase(utils.TestCase):
         api_versions.MIN_VERSION = client_min
 
         if exp_range:
-            self.assertRaisesRegex(exceptions.UnsupportedVersion,
-                                   ".*range is '%s' to '%s'.*" %
-                                   (server_min, server_max),
-                                   api_versions.discover_version,
-                                   self.fake_client,
-                                   api_versions.APIVersion(requested_version))
+            exc = self.assertRaises(exceptions.UnsupportedVersion,
+                                    api_versions.discover_version,
+                                    self.fake_client,
+                                    api_versions.APIVersion(requested_version))
+            if ret_val is not None:
+                self.assertIn("Server does not support microversions",
+                              str(exc))
+            else:
+                self.assertIn("range is '%s' to '%s'" %
+                              (server_min, server_max), str(exc))
         else:
             discovered_version = api_versions.discover_version(
                 self.fake_client,
                 api_versions.APIVersion(requested_version))
 
             version = requested_version
-            if server_min is None and server_max is None:
-                version = api_versions.DEPRECATED_VERSION
-            elif end_version is not None:
+            if end_version is not None:
                 version = end_version
             self.assertEqual(version,
                              discovered_version.get_string())
@@ -266,10 +274,3 @@ class DiscoverVersionTestCase(utils.TestCase):
         highest_version = api_versions.get_highest_version(self.fake_client)
         self.assertEqual("3.14", highest_version.get_string())
         self.assertTrue(self.fake_client.services.server_api_version.called)
-
-    def test_get_highest_version_bad_client(self):
-        """Tests that we gracefully handle the wrong version of client."""
-        v2_client = base_client.Client('2.0')
-        ex = self.assertRaises(exceptions.UnsupportedVersion,
-                               api_versions.get_highest_version, v2_client)
-        self.assertIn('Invalid client version 2.0 to get', str(ex))

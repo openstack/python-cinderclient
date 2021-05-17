@@ -33,8 +33,9 @@ import cinderclient.v2.client
 class ClientTest(utils.TestCase):
 
     def test_get_client_class_v2(self):
-        output = cinderclient.client.get_client_class('2')
-        self.assertEqual(cinderclient.v2.client.Client, output)
+        self.assertRaises(cinderclient.exceptions.UnsupportedVersion,
+                          cinderclient.client.get_client_class,
+                          '2')
 
     def test_get_client_class_unknown(self):
         self.assertRaises(cinderclient.exceptions.UnsupportedVersion,
@@ -81,10 +82,14 @@ class ClientTest(utils.TestCase):
 
     def test_versions(self):
         v2_url = 'http://fakeurl/v2/tenants'
+        v3_url = 'http://fakeurl/v3/tenants'
         unknown_url = 'http://fakeurl/v9/tenants'
 
-        self.assertEqual('2',
-                         cinderclient.client.get_volume_api_from_url(v2_url))
+        self.assertRaises(cinderclient.exceptions.UnsupportedVersion,
+                          cinderclient.client.get_volume_api_from_url,
+                          v2_url)
+        self.assertEqual('3',
+                         cinderclient.client.get_volume_api_from_url(v3_url))
         self.assertRaises(cinderclient.exceptions.UnsupportedVersion,
                           cinderclient.client.get_volume_api_from_url,
                           unknown_url)
@@ -318,6 +323,7 @@ class GetAPIVersionTestCase(utils.TestCase):
 
     @mock.patch('cinderclient.client.requests.get')
     def test_get_server_version_v2(self, mock_request):
+        # Why are we testing this? Because we can!
 
         mock_response = utils.TestResponse({
             "status_code": 200,
@@ -329,6 +335,7 @@ class GetAPIVersionTestCase(utils.TestCase):
         url = "http://192.168.122.127:8776/v2/e5526285ebd741b1819393f772f11fc3"
 
         min_version, max_version = cinderclient.client.get_server_version(url)
+
         self.assertEqual(api_versions.APIVersion('2.0'), min_version)
         self.assertEqual(api_versions.APIVersion('2.0'), max_version)
 
@@ -427,3 +434,21 @@ class GetAPIVersionTestCase(utils.TestCase):
                 cinderclient.client.get_highest_client_server_version(url))
         expected = version if version == '3.12' else '3.16'
         self.assertEqual(expected, highest)
+
+    @mock.patch('cinderclient.client.requests.get')
+    def test_get_highest_client_server_version_negative(self,
+                                                        mock_request):
+
+        mock_response = utils.TestResponse({
+            "status_code": 200,
+            "text": json.dumps(fakes.fake_request_get_no_v3())
+        })
+
+        mock_request.return_value = mock_response
+
+        url = "http://192.168.122.127:8776/v3/e5526285ebd741b1819393f772f11fc3"
+
+        self.assertRaises(exceptions.UnsupportedVersion,
+                          cinderclient.client.
+                          get_highest_client_server_version,
+                          url)

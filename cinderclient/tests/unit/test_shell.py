@@ -13,9 +13,9 @@
 
 import argparse
 import io
+import json
 import re
 import sys
-import unittest
 from unittest import mock
 
 import ddt
@@ -35,6 +35,7 @@ from cinderclient import shell
 from cinderclient.tests.unit import fake_actions_module
 from cinderclient.tests.unit.fixture_data import keystone_client
 from cinderclient.tests.unit import utils
+from cinderclient.tests.unit.v3 import fakes
 
 
 @ddt.ddt
@@ -205,8 +206,13 @@ class ShellTest(utils.TestCase):
         os_auth_url = "http://multiple.service.names/v2.0"
         mocker.register_uri('POST', os_auth_url + "/tokens",
                             text=keystone_client.keystone_request_callback)
+        # microversion support requires us to make a versions request
+        # to the endpoint to see exactly what is supported by the server
         mocker.register_uri('GET',
-                            "http://cinder%i.api.com/v2/volumes/detail"
+                            "http://cinder%i.api.com/"
+                            % count, text=json.dumps(fakes.fake_request_get()))
+        mocker.register_uri('GET',
+                            "http://cinder%i.api.com/v3/volumes/detail"
                             % count, text='{"volumes": []}')
         self.make_env(include={'OS_AUTH_URL': os_auth_url,
                                'CINDER_SERVICE_NAME': 'cinder%i' % count})
@@ -219,7 +225,6 @@ class ShellTest(utils.TestCase):
                           _shell.main,
                           ['list', '--name', 'abc', '--filters', 'name=xyz'])
 
-    @unittest.skip("Skip cuz I broke it")
     def test_cinder_service_name(self):
         # Failing with 'No mock address' means we are not
         # choosing the correct endpoint
@@ -248,14 +253,19 @@ class ShellTest(utils.TestCase):
             tenant_name=self.FAKE_ENV['OS_PROJECT_NAME'],
             username=self.FAKE_ENV['OS_USERNAME'])
 
+    @mock.patch('cinderclient.api_versions.discover_version',
+                return_value=api_versions.APIVersion("3.0"))
     @requests_mock.Mocker()
-    def test_noauth_plugin(self, mocker):
-        os_auth_url = "http://example.com/v2"
+    def test_noauth_plugin(self, mock_disco, mocker):
+        # just to prove i'm not crazy about the mock parameter ordering
+        self.assertTrue(requests_mock.mocker.Mocker, type(mocker))
+
+        os_volume_url = "http://example.com/volumes/v3"
         mocker.register_uri('GET',
                             "%s/volumes/detail"
-                            % os_auth_url, text='{"volumes": []}')
+                            % os_volume_url, text='{"volumes": []}')
         _shell = shell.OpenStackCinderShell()
-        args = ['--os-endpoint', os_auth_url,
+        args = ['--os-endpoint', os_volume_url,
                 '--os-auth-type', 'noauth', '--os-user-id',
                 'admin', '--os-project-id', 'admin', 'list']
         _shell.main(args)

@@ -48,7 +48,6 @@ except Exception:
 
 DEFAULT_MAJOR_OS_VOLUME_API_VERSION = "3"
 DEFAULT_CINDER_ENDPOINT_TYPE = 'publicURL'
-V2_SHELL = 'cinderclient.v2.shell'
 V3_SHELL = 'cinderclient.v3.shell'
 HINT_HELP_MSG = (" [hint: use '--os-volume-api-version' flag to show help "
                  "message for proper version]")
@@ -202,7 +201,8 @@ class OpenStackCinderShell(object):
                                               default=None),
                             help=_('Block Storage API version. '
                             'Accepts X, X.Y (where X is major and Y is minor '
-                            'part).'
+                            'part).  NOTE: this client accepts only \'3\' for '
+                            'the major version. '
                             'Default=env[OS_VOLUME_API_VERSION].'))
         parser.add_argument('--os_volume_api_version',
                             help=argparse.SUPPRESS)
@@ -356,10 +356,7 @@ class OpenStackCinderShell(object):
         self.subcommands = {}
         subparsers = parser.add_subparsers(metavar='<subcommand>')
 
-        if version.ver_major == 3:
-            actions_module = importutils.import_module(V3_SHELL)
-        else:
-            actions_module = importutils.import_module(V2_SHELL)
+        actions_module = importutils.import_module(V3_SHELL)
 
         self._find_actions(subparsers, actions_module, version, do_help,
                            input_args)
@@ -740,6 +737,10 @@ class OpenStackCinderShell(object):
         except exc.AuthorizationFailure:
             raise exc.CommandError("Unable to authorize user.")
 
+        # FIXME: this section figuring out the api version could use
+        # analysis and refactoring.  See
+        # https://review.opendev.org/c/openstack/python-cinderclient/+/766882/
+        # for some ideas.
         endpoint_api_version = None
         # Try to get the API version from the endpoint URL.  If that fails fall
         # back to trying to use what the user specified via
@@ -750,18 +751,26 @@ class OpenStackCinderShell(object):
                 self.cs.get_volume_api_version_from_endpoint()
         except exc.UnsupportedVersion:
             endpoint_api_version = options.os_volume_api_version
-            if api_version_input:
+            # FIXME: api_version_input is initialized as True at the beginning
+            # of this function and never modified
+            if api_version_input and endpoint_api_version:
                 logger.warning("Cannot determine the API version from "
                                "the endpoint URL. Falling back to the "
                                "user-specified version: %s",
                                endpoint_api_version)
-            else:
+            elif endpoint_api_version:
                 logger.warning("Cannot determine the API version from the "
                                "endpoint URL or user input. Falling back "
                                "to the default API version: %s",
                                endpoint_api_version)
+            else:
+                msg = _("Cannot determine API version.  Please specify by "
+                        "using --os-volume-api-version option.")
+                raise exc.UnsupportedVersion(msg)
 
         API_MAX_VERSION = api_versions.APIVersion(api_versions.MAX_VERSION)
+        # FIXME: the endpoint_api_version[0] can ONLY be '3' now, so the
+        # above line should probably be ripped out and this condition removed
         if endpoint_api_version[0] == '3':
             disc_client = client.Client(API_MAX_VERSION,
                                         os_username,
@@ -807,14 +816,9 @@ class OpenStackCinderShell(object):
                          os_auth_url,
                          client_args):
 
-        if (os_api_version.get_major_version() in
-                api_versions.DEPRECATED_VERSIONS):
-            discovered_version = api_versions.DEPRECATED_VERSION
-            os_service_type = 'volume'
-        else:
-            discovered_version = api_versions.discover_version(
-                current_client,
-                os_api_version)
+        discovered_version = api_versions.discover_version(
+            current_client,
+            os_api_version)
 
         if not os_endpoint_type:
             os_endpoint_type = DEFAULT_CINDER_ENDPOINT_TYPE
@@ -841,6 +845,11 @@ class OpenStackCinderShell(object):
             return current_client, discovered_version
 
     def _discover_service_type(self, discovered_version):
+        # FIXME: this function is either no longer needed or could use a
+        # refactoring.  The official service type is 'block-storage',
+        # which isn't even present here.  (Devstack creates 2 service
+        # types which it maps to v3: 'block-storage' and 'volumev3'.
+        # The default 'catalog_type' in tempest is 'volumev3'.)
         SERVICE_TYPES = {'1': 'volume', '2': 'volumev2', '3': 'volumev3'}
         major_version = discovered_version.get_major_version()
         service_type = SERVICE_TYPES[major_version]
