@@ -20,7 +20,7 @@ from cinderclient.tests.unit import utils
 
 class SnapshotActionsTest(utils.FixturedTestCase):
 
-    client_fixture_class = client.V2
+    client_fixture_class = client.V3
     data_fixture_class = snapshots.Fixture
 
     def test_update_snapshot_status(self):

@@ -16,10 +16,23 @@
 """Volume transfer interface (v3 extension)."""
 
 from cinderclient import base
-from cinderclient.v2 import volume_transfers
 
 
-class VolumeTransferManager(volume_transfers.VolumeTransferManager):
+class VolumeTransfer(base.Resource):
+    """Transfer a volume from one tenant to another"""
+
+    def __repr__(self):
+        return "<VolumeTransfer: %s>" % self.id
+
+    def delete(self):
+        """Delete this volume transfer."""
+        return self.manager.delete(self)
+
+
+class VolumeTransferManager(base.ManagerWithFind):
+    """Manage :class:`VolumeTransfer` resources."""
+    resource_class = VolumeTransfer
+
     def create(self, volume_id, name=None, no_snapshots=False):
         """Creates a volume transfer.
 

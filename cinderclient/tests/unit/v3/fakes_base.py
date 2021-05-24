@@ -18,7 +18,6 @@ from urllib import parse as urlparse
 from cinderclient import client as base_client
 from cinderclient.tests.unit import fakes
 import cinderclient.tests.unit.utils as utils
-from cinderclient.v2 import client
 
 
 REQUEST_ID = 'req-test-request-id'
@@ -330,19 +329,6 @@ def stub_default_types():
             }
         ]
     }
-
-
-class FakeClient(fakes.FakeClient, client.Client):
-
-    def __init__(self, api_version=None, *args, **kwargs):
-        client.Client.__init__(self, 'username', 'password',
-                               'project_id', 'auth_url',
-                               extensions=kwargs.get('extensions'))
-        self.api_version = api_version
-        self.client = FakeHTTPClient(**kwargs)
-
-    def get_volume_api_version_from_endpoint(self):
-        return self.client.get_volume_api_version_from_endpoint()
 
 
 class FakeHTTPClient(base_client.HTTPClient):

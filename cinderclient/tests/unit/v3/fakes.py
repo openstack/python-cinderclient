@@ -15,7 +15,7 @@
 from datetime import datetime
 
 from cinderclient.tests.unit import fakes
-from cinderclient.tests.unit.v2 import fakes as fake_v2
+from cinderclient.tests.unit.v3 import fakes_base
 from cinderclient.v3 import client
 
 
@@ -133,7 +133,7 @@ class FakeClient(fakes.FakeClient, client.Client):
         return self.client.get_volume_api_version_from_endpoint()
 
 
-class FakeHTTPClient(fake_v2.FakeHTTPClient):
+class FakeHTTPClient(fakes_base.FakeHTTPClient):
 
     def __init__(self, **kwargs):
         super(FakeHTTPClient, self).__init__()
@@ -193,6 +193,19 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
                 if svc['binary'] == 'cinder-volume':
                     del svc['backend_state']
         return (200, {}, {'services': services})
+
+    def put_os_services_enable(self, body, **kw):
+        return (200, {}, {'host': body['host'], 'binary': body['binary'],
+                'status': 'enabled'})
+
+    def put_os_services_disable(self, body, **kw):
+        return (200, {}, {'host': body['host'], 'binary': body['binary'],
+                'status': 'disabled'})
+
+    def put_os_services_disable_log_reason(self, body, **kw):
+        return (200, {}, {'host': body['host'], 'binary': body['binary'],
+                'status': 'disabled',
+                'disabled_reason': body['disabled_reason']})
 
     #
     # Clusters
@@ -285,7 +298,7 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
     # Backups
     #
     def put_backups_1234(self, **kw):
-        backup = fake_v2._stub_backup(
+        backup = fakes_base._stub_backup(
             id='1234',
             base_uri='http://localhost:8776',
             tenant_id='0fa851f6668144cf9cd8c8419c1646c1')
@@ -640,10 +653,10 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         transfer2 = 'f625ec3e-13dd-4498-a22a-50afd534cc41'
         return (200, {},
                 {'transfers': [
-                    fake_v2._stub_transfer_full(transfer1, base_uri,
-                                                tenant_id),
-                    fake_v2._stub_transfer_full(transfer2, base_uri,
-                                                tenant_id)]})
+                    fakes_base._stub_transfer_full(transfer1, base_uri,
+                                                   tenant_id),
+                    fakes_base._stub_transfer_full(transfer2, base_uri,
+                                                   tenant_id)]})
 
     def get_volume_transfers_5678(self, **kw):
         base_uri = 'http://localhost:8776'
@@ -651,7 +664,8 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         transfer1 = '5678'
         return (200, {},
                 {'transfer':
-                 fake_v2._stub_transfer_full(transfer1, base_uri, tenant_id)})
+                 fakes_base._stub_transfer_full(transfer1, base_uri,
+                                                tenant_id)})
 
     def delete_volume_transfers_5678(self, **kw):
         return (202, {}, None)
@@ -661,16 +675,16 @@ class FakeHTTPClient(fake_v2.FakeHTTPClient):
         tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
         transfer1 = '5678'
         return (202, {},
-                {'transfer': fake_v2._stub_transfer(transfer1, base_uri,
-                                                    tenant_id)})
+                {'transfer': fakes_base._stub_transfer(transfer1, base_uri,
+                                                       tenant_id)})
 
     def post_volume_transfers_5678_accept(self, **kw):
         base_uri = 'http://localhost:8776'
         tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
         transfer1 = '5678'
         return (200, {},
-                {'transfer': fake_v2._stub_transfer(transfer1, base_uri,
-                                                    tenant_id)})
+                {'transfer': fakes_base._stub_transfer(transfer1, base_uri,
+                                                       tenant_id)})
 
 
 def fake_request_get():

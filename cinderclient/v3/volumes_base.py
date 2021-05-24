@@ -13,7 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""Volume interface (v2 extension)."""
+"""Base Volume interface."""
 
 from cinderclient.apiclient import base as common_base
 from cinderclient import base
@@ -130,24 +130,6 @@ class Volume(base.Resource):
         """
         return self.manager.show_image_metadata(self)
 
-    def upload_to_image(self, force, image_name, container_format,
-                        disk_format, visibility=None,
-                        protected=None):
-        """Upload a volume to image service as an image.
-
-        :param force: Boolean to enables or disables upload of a volume that
-                      is attached to an instance.
-        :param image_name: The new image name.
-        :param container_format: Container format type.
-        :param disk_format: Disk format type.
-        :param visibility: The accessibility of image (allowed for
-                           3.1-latest).
-        :param protected: Boolean to decide whether prevents image from being
-                          deleted (allowed for 3.1-latest).
-        """
-        return self.manager.upload_to_image(self, force, image_name,
-                                            container_format, disk_format)
-
     def force_delete(self):
         """Delete the specified volume ignoring its current state.
 
@@ -175,11 +157,6 @@ class Volume(base.Resource):
         """
         return self.manager.extend(self, new_size)
 
-    def migrate_volume(self, host, force_host_copy, lock_volume):
-        """Migrate the volume to a new host."""
-        return self.manager.migrate_volume(self, host, force_host_copy,
-                                           lock_volume)
-
     def retype(self, volume_type, policy):
         """Change a volume's type."""
         return self.manager.retype(self, volume_type, policy)
@@ -196,16 +173,6 @@ class Volume(base.Resource):
             read-only access mode.
         """
         return self.manager.update_readonly_flag(self, read_only)
-
-    def manage(self, host, ref, name=None, description=None,
-               volume_type=None, availability_zone=None, metadata=None,
-               bootable=False):
-        """Manage an existing volume."""
-        return self.manager.manage(host=host, ref=ref, name=name,
-                                   description=description,
-                                   volume_type=volume_type,
-                                   availability_zone=availability_zone,
-                                   metadata=metadata, bootable=bootable)
 
     def list_manageable(self, host, detailed=True, marker=None, limit=None,
                         offset=None, sort=None):
@@ -225,52 +192,6 @@ class Volume(base.Resource):
 class VolumeManager(base.ManagerWithFind):
     """Manage :class:`Volume` resources."""
     resource_class = Volume
-
-    def create(self, size, consistencygroup_id=None,
-               snapshot_id=None,
-               source_volid=None, name=None, description=None,
-               volume_type=None, user_id=None,
-               project_id=None, availability_zone=None,
-               metadata=None, imageRef=None, scheduler_hints=None):
-        """Create a volume.
-
-        :param size: Size of volume in GB
-        :param consistencygroup_id: ID of the consistencygroup
-        :param snapshot_id: ID of the snapshot
-        :param name: Name of the volume
-        :param description: Description of the volume
-        :param volume_type: Type of volume
-        :param user_id: User id derived from context (IGNORED)
-        :param project_id: Project id derived from context (IGNORED)
-        :param availability_zone: Availability Zone to use
-        :param metadata: Optional metadata to set on volume creation
-        :param imageRef: reference to an image stored in glance
-        :param source_volid: ID of source volume to clone from
-        :param scheduler_hints: (optional extension) arbitrary key-value pairs
-                            specified by the client to help boot an instance
-        :rtype: :class:`Volume`
-        """
-        if metadata is None:
-            volume_metadata = {}
-        else:
-            volume_metadata = metadata
-
-        body = {'volume': {'size': size,
-                           'consistencygroup_id': consistencygroup_id,
-                           'snapshot_id': snapshot_id,
-                           'name': name,
-                           'description': description,
-                           'volume_type': volume_type,
-                           'availability_zone': availability_zone,
-                           'metadata': volume_metadata,
-                           'imageRef': imageRef,
-                           'source_volid': source_volid,
-                           }}
-
-        if scheduler_hints:
-            body['OS-SCH-HNT:scheduler_hints'] = scheduler_hints
-
-        return self._create('/volumes', body, 'volume')
 
     def get(self, volume_id):
         """Get a volume.
@@ -602,13 +523,6 @@ class VolumeManager(base.ManagerWithFind):
                            'bootable': bootable
                            }}
         return self._create('/os-volume-manage', body, 'volume')
-
-    def list_manageable(self, host, detailed=True, marker=None, limit=None,
-                        offset=None, sort=None):
-        url = self._build_list_url("os-volume-manage", detailed=detailed,
-                                   search_opts={'host': host}, marker=marker,
-                                   limit=limit, offset=offset, sort=sort)
-        return self._list(url, "manageable-volumes")
 
     def unmanage(self, volume):
         """Unmanage a volume."""

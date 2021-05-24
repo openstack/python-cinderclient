@@ -29,11 +29,11 @@ Running a subset of tests using tox
 One common activity is to just run a single test, you can do this with tox
 simply by specifying to just run py3 tests against a single test::
 
-    tox -e py3 -- -n cinderclient.tests.unit.v2.test_volumes.VolumesTest.test_attach
+    tox -e py3 -- -n cinderclient.tests.unit.v3.test_volumes.VolumesTest.test_create_volume
 
 Or all tests in the test_volumes.py file::
 
-    tox -e py3 -- -n cinderclient.tests.unit.v2.test_volumes
+    tox -e py3 -- -n cinderclient.tests.unit.v3.test_volumes
 
 For more information on these options and how to run tests, please see the
 `stestr documentation <https://stestr.readthedocs.io/en/latest/index.html>`_.

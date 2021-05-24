@@ -213,9 +213,17 @@ class SnapshotManager(base.ManagerWithFind):
                 }
         return self._create('/os-snapshot-manage', body, 'snapshot')
 
+    @api_versions.wraps("3.0")
+    def list_manageable(self, host, detailed=True, marker=None,
+                        limit=None, offset=None, sort=None):
+        url = self._build_list_url("os-snapshot-manage", detailed=detailed,
+                                   search_opts={'host': host}, marker=marker,
+                                   limit=limit, offset=offset, sort=sort)
+        return self._list(url, "manageable-snapshots")
+
     @api_versions.wraps('3.8')
-    def list_manageable(self, host, detailed=True, marker=None, limit=None,
-                        offset=None, sort=None, cluster=None):
+    def list_manageable(self, host, detailed=True, marker=None,  # noqa: F811
+                        limit=None, offset=None, sort=None, cluster=None):
         search_opts = {'cluster': cluster} if cluster else {'host': host}
         url = self._build_list_url("manageable_snapshots", detailed=detailed,
                                    search_opts=search_opts, marker=marker,

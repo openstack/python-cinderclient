@@ -21,7 +21,7 @@ import requests
 
 from cinderclient import exceptions
 from cinderclient.tests.unit import utils
-from cinderclient.v2 import client
+from cinderclient.v3 import client
 
 
 class AuthenticateAgainstKeystoneTests(utils.TestCase):

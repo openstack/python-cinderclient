@@ -13,10 +13,28 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient.v2 import quotas
+from cinderclient import base
 
 
-class QuotaSetManager(quotas.QuotaSetManager):
+class QuotaSet(base.Resource):
+
+    @property
+    def id(self):
+        """Needed by base.Resource to self-refresh and be indexed."""
+        return self.tenant_id
+
+    def update(self, *args, **kwargs):
+        return self.manager.update(self.tenant_id, *args, **kwargs)
+
+
+class QuotaSetManager(base.Manager):
+    resource_class = QuotaSet
+
+    def get(self, tenant_id, usage=False):
+        if hasattr(tenant_id, 'tenant_id'):
+            tenant_id = tenant_id.tenant_id
+        return self._get("/os-quota-sets/%s?usage=%s" % (tenant_id, usage),
+                         "quota_set")
 
     def update(self, tenant_id, **updates):
         skip_validation = updates.pop('skip_validation', True)
@@ -32,3 +50,12 @@ class QuotaSetManager(quotas.QuotaSetManager):
         result = self._update(request_url, body)
         return self.resource_class(self, result['quota_set'], loaded=True,
                                    resp=result.request_ids)
+
+    def defaults(self, tenant_id):
+        return self._get('/os-quota-sets/%s/defaults' % tenant_id,
+                         'quota_set')
+
+    def delete(self, tenant_id):
+        if hasattr(tenant_id, 'tenant_id'):
+            tenant_id = tenant_id.tenant_id
+        return self._delete("/os-quota-sets/%s" % tenant_id)

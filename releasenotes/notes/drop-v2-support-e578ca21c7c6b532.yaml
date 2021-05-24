@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    This release drops support of the Block Storage API v2.  The last version
+    of the python-cinderclient supporting that API is the 7.x series.

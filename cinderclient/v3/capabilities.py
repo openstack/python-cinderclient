@@ -16,4 +16,24 @@
 """Capabilities interface (v3 extension)"""
 
 
-from cinderclient.v2.capabilities import *  # noqa
+from cinderclient import base
+
+
+class Capabilities(base.Resource):
+    NAME_ATTR = 'name'
+
+    def __repr__(self):
+        return "<Capabilities: %s>" % self._info.get('namespace')
+
+
+class CapabilitiesManager(base.Manager):
+    """Manage :class:`Capabilities` resources."""
+    resource_class = Capabilities
+
+    def get(self, host):
+        """Show backend volume stats and properties.
+
+        :param host: Specified backend to obtain volume stats and properties.
+        :rtype: :class:`Capabilities`
+        """
+        return self._get('/capabilities/%s' % host, None)

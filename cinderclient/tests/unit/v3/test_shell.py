@@ -1745,7 +1745,7 @@ class ShellTest(utils.TestCase):
     )
     @ddt.unpack
     @mock.patch('cinderclient.utils.print_dict')
-    @mock.patch('cinderclient.tests.unit.v2.fakes._stub_restore')
+    @mock.patch('cinderclient.tests.unit.v3.fakes_base._stub_restore')
     def test_do_backup_restore(self,
                                mock_stub_restore,
                                mock_print_dict,

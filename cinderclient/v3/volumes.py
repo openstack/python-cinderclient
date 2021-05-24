@@ -18,10 +18,10 @@
 from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
 from cinderclient import base
-from cinderclient.v2 import volumes
+from cinderclient.v3 import volumes_base
 
 
-class Volume(volumes.Volume):
+class Volume(volumes_base.Volume):
 
     def upload_to_image(self, force, image_name, container_format,
                         disk_format, visibility=None,
@@ -68,7 +68,7 @@ class Volume(volumes.Volume):
                                    cluster=cluster)
 
 
-class VolumeManager(volumes.VolumeManager):
+class VolumeManager(volumes_base.VolumeManager):
     resource_class = Volume
 
     def create(self, size, consistencygroup_id=None,
@@ -246,16 +246,24 @@ class VolumeManager(volumes.VolumeManager):
             body['volume']['cluster'] = cluster
         return self._create('/os-volume-manage', body, 'volume')
 
+    @api_versions.wraps('3.0')
+    def list_manageable(self, host, detailed=True, marker=None,
+                        limit=None, offset=None, sort=None):
+        url = self._build_list_url("os-volume-manage", detailed=detailed,
+                                   search_opts={'host': host}, marker=marker,
+                                   limit=limit, offset=offset, sort=sort)
+        return self._list(url, "manageable-volumes")
+
     @api_versions.wraps('3.8')
-    def list_manageable(self, host, detailed=True, marker=None, limit=None,
-                        offset=None, sort=None, cluster=None):
+    def list_manageable(self, host, detailed=True, marker=None,  # noqa: F811
+                        limit=None, offset=None, sort=None, cluster=None):
         search_opts = {'cluster': cluster} if cluster else {'host': host}
         url = self._build_list_url("manageable_volumes", detailed=detailed,
                                    search_opts=search_opts, marker=marker,
                                    limit=limit, offset=offset, sort=sort)
         return self._list(url, "manageable-volumes")
 
-    @api_versions.wraps("2.0", "3.32")
+    @api_versions.wraps("3.0", "3.32")
     def get_pools(self, detail):
         """Show pool information for backends."""
         query_string = ""
