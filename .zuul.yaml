@@ -15,6 +15,8 @@
 - job:
     name: python-cinderclient-functional-py36
     parent: python-cinderclient-functional-base
+    # need to specify a platform that has python 3.6 available
+    nodeset: devstack-single-node-centos-8-stream
     vars:
       python_version: 3.6
       tox_envlist: functional-py36
