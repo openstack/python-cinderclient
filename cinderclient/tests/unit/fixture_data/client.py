@@ -14,6 +14,7 @@ from keystoneauth1 import fixture
 
 from cinderclient.tests.unit.fixture_data import base
 from cinderclient.v2 import client as v2client
+from cinderclient.v3 import client as v3client
 
 
 class Base(base.Fixture):
@@ -43,6 +44,21 @@ class V2(Base):
 
     def new_client(self):
         return v2client.Client(username='xx',
+                               api_key='xx',
+                               project_id='xx',
+                               auth_url=self.identity_url)
+
+
+class V3(Base):
+
+    def __init__(self, *args, **kwargs):
+        super(V3, self).__init__(*args, **kwargs)
+
+        svc = self.token.add_service('volumev3')
+        svc.add_endpoint(self.volume_url)
+
+    def new_client(self):
+        return v3client.Client(username='xx',
                                api_key='xx',
                                project_id='xx',
                                auth_url=self.identity_url)

@@ -153,7 +153,7 @@ def generate_v2_project_scoped_token(**kwargs):
         ],
         'endpoints_links': [],
         'name': None,
-        'type': 'volumev2'
+        'type': 'volumev3'
     }
 
     # Add multiple Cinder endpoints
@@ -163,7 +163,7 @@ def generate_v2_project_scoped_token(**kwargs):
         name = "cinder%i" % count
         # Assign the service name and a unique endpoint
         endpoint_copy['endpoints'][0]['publicURL'] = \
-            'http://%s.api.com/v2' % name
+            'http://%s.api.com/v3' % name
         endpoint_copy['name'] = name
 
         o['access']['serviceCatalog'].append(endpoint_copy)

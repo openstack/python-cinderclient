@@ -14,8 +14,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from cinderclient.v2 import availability_zones
-from cinderclient.v2 import shell
+from cinderclient.v3 import availability_zones
+from cinderclient.v3 import shell
 
 from cinderclient.tests.unit.fixture_data import availability_zones as azfixture  # noqa
 from cinderclient.tests.unit.fixture_data import client
@@ -24,7 +24,7 @@ from cinderclient.tests.unit import utils
 
 class AvailabilityZoneTest(utils.FixturedTestCase):
 
-    client_fixture_class = client.V2
+    client_fixture_class = client.V3
     data_fixture_class = azfixture.Fixture
 
     def _assertZone(self, zone, name, status):

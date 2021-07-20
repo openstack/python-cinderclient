@@ -13,8 +13,6 @@
 
 import functools
 import logging
-import os
-import pkgutil
 import re
 
 from oslo_utils import strutils
@@ -26,9 +24,8 @@ from cinderclient import utils
 LOG = logging.getLogger(__name__)
 
 
-# key is a deprecated version and value is an alternative version.
-DEPRECATED_VERSIONS = {"2": "3"}
-DEPRECATED_VERSION = "2.0"
+# key is unsupported version, value is appropriate supported alternative
+REPLACEMENT_VERSIONS = {"1": "3", "2": "3"}
 MAX_VERSION = "3.64"
 MIN_VERSION = "3.0"
 
@@ -190,14 +187,12 @@ class VersionedMethod(object):
 
 
 def get_available_major_versions():
-    # NOTE(andreykurilin): available clients version should not be
-    # hardcoded, so let's discover them.
-    matcher = re.compile(r"v[0-9]*$")
-    submodules = pkgutil.iter_modules([os.path.dirname(__file__)])
-    available_versions = [name[1:] for loader, name, ispkg in submodules
-                          if matcher.search(name)]
-
-    return available_versions
+    # NOTE: the discovery code previously here assumed that if a v2
+    # module exists, it must contain a client.  This will be False
+    # during the transition period when the v2 client is removed but
+    # we are still using other classes in that module.  Right now there's
+    # only one client version available, so we simply hard-code it.
+    return ['3']
 
 
 def check_major_version(api_version):
@@ -224,11 +219,11 @@ def check_major_version(api_version):
 def get_api_version(version_string):
     """Returns checked APIVersion object"""
     version_string = str(version_string)
-    if version_string in DEPRECATED_VERSIONS:
-        LOG.warning("Version %(deprecated_version)s is deprecated, use "
-                    "alternative version %(alternative)s instead.",
-                   {"deprecated_version": version_string,
-                    "alternative": DEPRECATED_VERSIONS[version_string]})
+    if version_string in REPLACEMENT_VERSIONS:
+        LOG.warning("Version %(old)s is not supported, use "
+                    "supported version %(now)s instead.",
+                   {"old": version_string,
+                    "now": REPLACEMENT_VERSIONS[version_string]})
     if strutils.is_int_like(version_string):
         version_string = "%s.0" % version_string
 
@@ -248,10 +243,19 @@ def _get_server_version_range(client):
             client.version)
 
     if not versions:
-        return APIVersion(), APIVersion()
+        msg = _("Server does not support microversions. You cannot use this "
+                "version of the cinderclient with the requested server. "
+                "Try using a cinderclient version less than 8.0.0.")
+        raise exceptions.UnsupportedVersion(msg)
+
     for version in versions:
         if '3.' in version.version:
             return APIVersion(version.min_version), APIVersion(version.version)
+
+    # if we're still here, there's nothing we understand in the versions
+    msg = _("You cannot use this version of the cinderclient with the "
+            "requested server.")
+    raise exceptions.UnsupportedVersion(msg)
 
 
 def get_highest_version(client):
@@ -277,12 +281,6 @@ def discover_version(client, requested_version):
 
     server_start_version, server_end_version = _get_server_version_range(
         client)
-
-    if not server_start_version and not server_end_version:
-        msg = ("Server does not support microversions. Changing server "
-               "version to %(min_version)s.")
-        LOG.debug(msg, {"min_version": DEPRECATED_VERSION})
-        return APIVersion(DEPRECATED_VERSION)
 
     _validate_server_version(server_start_version, server_end_version)
 

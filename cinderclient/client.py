@@ -57,16 +57,14 @@ except Exception:
     pass
 
 
-_VALID_VERSIONS = ['v2', 'v3']
+_VALID_VERSIONS = ['v3']
 V3_SERVICE_TYPE = 'volumev3'
-V2_SERVICE_TYPE = 'volumev2'
-SERVICE_TYPES = {'2': V2_SERVICE_TYPE,
-                 '3': V3_SERVICE_TYPE}
+SERVICE_TYPES = {'3': V3_SERVICE_TYPE}
 REQ_ID_HEADER = 'X-OpenStack-Request-ID'
 
 # tell keystoneclient that we can ignore the /v1|v2/{project_id} component of
 # the service catalog when doing discovery lookups
-for svc in ('volume', 'volumev2', 'volumev3'):
+for svc in ('volume', 'volumev3'):
     discover.add_catalog_discover_hack(svc, re.compile(r'/v[12]/\w+/?$'), '/')
 
 
@@ -85,6 +83,8 @@ def get_server_version(url, insecure=False, cacert=None, cert=None):
     :returns: APIVersion object for min and max version supported by
               the server
     """
+    # NOTE: we (the client) don't support v2 anymore, but this function
+    # is checking the server version
     min_version = "2.0"
     current_version = "2.0"
 
@@ -128,22 +128,37 @@ def get_server_version(url, insecure=False, cacert=None, cert=None):
                 current_version = version['version']
                 break
             else:
-                # Set the values, but don't break out the loop here in case v3
-                # comes later
-                min_version = '2.0'
-                current_version = '2.0'
+                # keep looking in case this cloud is running v2 and
+                # we haven't seen v3 yet
+                continue
     except exceptions.ClientException as e:
+        # NOTE: logging the warning but returning the lowest server API version
+        # supported in this OpenStack release is the legacy behavior, so that's
+        # what we do here
+        min_version = '3.0'
+        current_version = '3.0'
         logger.warning("Error in server version query:%s\n"
-                       "Returning APIVersion 2.0", str(e.message))
+                       "Returning APIVersion 3.0", str(e.message))
     return (api_versions.APIVersion(min_version),
             api_versions.APIVersion(current_version))
 
 
 def get_highest_client_server_version(url, insecure=False,
                                       cacert=None, cert=None):
-    """Returns highest supported version by client and server as a string."""
+    """Returns highest supported version by client and server as a string.
+
+    :raises: UnsupportedVersion if the maximum supported by the server
+             is less than the minimum supported by the client
+    """
     min_server, max_server = get_server_version(url, insecure, cacert, cert)
     max_client = api_versions.APIVersion(api_versions.MAX_VERSION)
+    min_client = api_versions.APIVersion(api_versions.MIN_VERSION)
+    if max_server < min_client:
+        msg = _("The maximum version supported by the server (%(srv)s) does "
+                "not meet the minimum version supported by this client "
+                "(%(cli)s)") % {"srv": str(max_server),
+                                "cli": api_versions.MIN_VERSION}
+        raise exceptions.UnsupportedVersion(msg)
     return min(max_server, max_client).get_string()
 
 
@@ -769,7 +784,6 @@ def _get_client_class_and_version(version):
 
 def get_client_class(version):
     version_map = {
-        '2': 'cinderclient.v2.client.Client',
         '3': 'cinderclient.v3.client.Client',
     }
     try:
@@ -797,10 +811,6 @@ def discover_extensions(version):
 def _discover_via_python_path():
     for (module_loader, name, ispkg) in pkgutil.iter_modules():
         if name.endswith('cinderclient_ext'):
-            if not hasattr(module_loader, 'load_module'):
-                # Python 2.6 compat: actually get an ImpImporter obj
-                module_loader = module_loader.find_module(name)
-
             module = module_loader.load_module(name)
             yield name, module
 
@@ -845,7 +855,7 @@ def Client(version, *args, **kwargs):
 
     Here ``VERSION`` can be a string or
     ``cinderclient.api_versions.APIVersion`` obj. If you prefer string value,
-    you can use ``2`` (deprecated now) or ``3.X`` (where X is a microversion).
+    you can use ``3`` or ``3.X`` (where X is a microversion).
 
 
     Alternatively, you can create a client instance using the keystoneclient
