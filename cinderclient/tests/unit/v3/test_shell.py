@@ -388,6 +388,25 @@ class ShellTest(utils.TestCase):
               {'cmd': 'abc 1233',
                'body': {'instance_uuid': '1233',
                         'connector': {},
+                        'volume_uuid': '1234'}},
+              {'cmd': '1234',
+               'body': {'connector': {},
+                        'volume_uuid': '1234'}},
+              {'cmd': '1234 '
+                      '--connect True '
+                      '--ip 10.23.12.23 --host server01 '
+                      '--platform x86_xx '
+                      '--ostype 123 '
+                      '--multipath true '
+                      '--mountpoint /123 '
+                      '--initiator aabbccdd',
+               'body': {'connector': {'ip': '10.23.12.23',
+                                      'host': 'server01',
+                                      'os_type': '123',
+                                      'multipath': 'true',
+                                      'mountpoint': '/123',
+                                      'initiator': 'aabbccdd',
+                                      'platform': 'x86_xx'},
                         'volume_uuid': '1234'}})
     @mock.patch('cinderclient.utils.find_resource')
     @ddt.unpack
@@ -428,6 +447,27 @@ class ShellTest(utils.TestCase):
               {'cmd': 'abc 1233',
                'body': {'instance_uuid': '1233',
                         'connector': {},
+                        'volume_uuid': '1234',
+                        'mode': 'ro'}},
+              {'cmd': '1234',
+               'body': {'connector': {},
+                        'volume_uuid': '1234',
+                        'mode': 'ro'}},
+              {'cmd': '1234 '
+                      '--connect True '
+                      '--ip 10.23.12.23 --host server01 '
+                      '--platform x86_xx '
+                      '--ostype 123 '
+                      '--multipath true '
+                      '--mountpoint /123 '
+                      '--initiator aabbccdd',
+               'body': {'connector': {'ip': '10.23.12.23',
+                                      'host': 'server01',
+                                      'os_type': '123',
+                                      'multipath': 'true',
+                                      'mountpoint': '/123',
+                                      'initiator': 'aabbccdd',
+                                      'platform': 'x86_xx'},
                         'volume_uuid': '1234',
                         'mode': 'ro'}})
     @mock.patch('cinderclient.utils.find_resource')
