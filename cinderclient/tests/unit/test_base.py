@@ -22,13 +22,13 @@ from cinderclient import base
 from cinderclient import exceptions
 from cinderclient.tests.unit import test_utils
 from cinderclient.tests.unit import utils
-from cinderclient.tests.unit.v2 import fakes
+from cinderclient.tests.unit.v3 import fakes
 from cinderclient.v3 import client
 from cinderclient.v3 import volumes
 
 cs = fakes.FakeClient()
 
-REQUEST_ID = 'req-test-request-id'
+REQUEST_ID = test_utils.REQUEST_ID
 
 
 def create_response_obj_with_header():

@@ -24,9 +24,9 @@ from cinderclient import base
 from cinderclient import exceptions
 from cinderclient import shell_utils
 from cinderclient.tests.unit import utils as test_utils
-from cinderclient.tests.unit.v2 import fakes
 from cinderclient import utils
 
+REQUEST_ID = 'req-test-request-id'
 UUID = '8e8ec658-c7b0-4243-bdf8-6f7f2952c0d0'
 
 
@@ -61,7 +61,7 @@ class FakeManager(base.ManagerWithFind):
         raise exceptions.NotFound(resource_id)
 
     def list(self, search_opts, **kwargs):
-        return common_base.ListWithMeta(self.resources, fakes.REQUEST_ID)
+        return common_base.ListWithMeta(self.resources, REQUEST_ID)
 
 
 class FakeManagerWithApi(base.Manager):

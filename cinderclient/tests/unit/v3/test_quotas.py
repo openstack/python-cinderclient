@@ -13,17 +13,78 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from cinderclient import api_versions
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
 
 
-cs = fakes.FakeClient()
+cs = fakes.FakeClient(api_versions.APIVersion('3.0'))
 
 
 class QuotaSetsTest(utils.TestCase):
+
+    def test_tenant_quotas_get(self):
+        tenant_id = 'test'
+        quota = cs.quotas.get(tenant_id)
+        cs.assert_called('GET', '/os-quota-sets/%s?usage=False' % tenant_id)
+        self._assert_request_id(quota)
+
+    def test_tenant_quotas_defaults(self):
+        tenant_id = 'test'
+        quota = cs.quotas.defaults(tenant_id)
+        cs.assert_called('GET', '/os-quota-sets/%s/defaults' % tenant_id)
+        self._assert_request_id(quota)
+
+    def test_update_quota(self):
+        q = cs.quotas.get('test')
+        q.update(volumes=2)
+        q.update(snapshots=2)
+        q.update(gigabytes=2000)
+        q.update(backups=2)
+        q.update(backup_gigabytes=2000)
+        q.update(per_volume_gigabytes=100)
+        cs.assert_called('PUT', '/os-quota-sets/test')
+        self._assert_request_id(q)
 
     def test_update_quota_with_skip_(self):
         q = cs.quotas.get('test')
         q.update(skip_validation=False)
         cs.assert_called('PUT', '/os-quota-sets/test?skip_validation=False')
         self._assert_request_id(q)
+
+    def test_refresh_quota(self):
+        q = cs.quotas.get('test')
+        q2 = cs.quotas.get('test')
+        self.assertEqual(q.volumes, q2.volumes)
+        self.assertEqual(q.snapshots, q2.snapshots)
+        self.assertEqual(q.gigabytes, q2.gigabytes)
+        self.assertEqual(q.backups, q2.backups)
+        self.assertEqual(q.backup_gigabytes, q2.backup_gigabytes)
+        self.assertEqual(q.per_volume_gigabytes, q2.per_volume_gigabytes)
+        q2.volumes = 0
+        self.assertNotEqual(q.volumes, q2.volumes)
+        q2.snapshots = 0
+        self.assertNotEqual(q.snapshots, q2.snapshots)
+        q2.gigabytes = 0
+        self.assertNotEqual(q.gigabytes, q2.gigabytes)
+        q2.backups = 0
+        self.assertNotEqual(q.backups, q2.backups)
+        q2.backup_gigabytes = 0
+        self.assertNotEqual(q.backup_gigabytes, q2.backup_gigabytes)
+        q2.per_volume_gigabytes = 0
+        self.assertNotEqual(q.per_volume_gigabytes, q2.per_volume_gigabytes)
+        q2.get()
+        self.assertEqual(q.volumes, q2.volumes)
+        self.assertEqual(q.snapshots, q2.snapshots)
+        self.assertEqual(q.gigabytes, q2.gigabytes)
+        self.assertEqual(q.backups, q2.backups)
+        self.assertEqual(q.backup_gigabytes, q2.backup_gigabytes)
+        self.assertEqual(q.per_volume_gigabytes, q2.per_volume_gigabytes)
+        self._assert_request_id(q)
+        self._assert_request_id(q2)
+
+    def test_delete_quota(self):
+        tenant_id = 'test'
+        quota = cs.quotas.delete(tenant_id)
+        cs.assert_called('DELETE', '/os-quota-sets/test')
+        self._assert_request_id(quota)

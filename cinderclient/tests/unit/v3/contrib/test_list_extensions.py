@@ -16,8 +16,8 @@
 
 from cinderclient import extension
 from cinderclient.tests.unit import utils
-from cinderclient.tests.unit.v2 import fakes
-from cinderclient.v2.contrib import list_extensions
+from cinderclient.tests.unit.v3 import fakes
+from cinderclient.v3.contrib import list_extensions
 
 extensions = [
     extension.Extension(list_extensions.__name__.split(".")[-1],

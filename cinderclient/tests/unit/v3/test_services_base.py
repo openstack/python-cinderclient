@@ -13,15 +13,17 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from cinderclient import api_versions
 from cinderclient.tests.unit import utils
-from cinderclient.tests.unit.v2 import fakes
-from cinderclient.v2 import services
+from cinderclient.tests.unit.v3 import fakes
+from cinderclient.v3 import services
 
 
-cs = fakes.FakeClient()
+cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.0'))
 
 
 class ServicesTest(utils.TestCase):
+    """Tests for v3.0 behavior"""
 
     def test_list_services(self):
         svs = cs.services.list()

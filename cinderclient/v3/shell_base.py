@@ -25,7 +25,7 @@ from cinderclient import base
 from cinderclient import exceptions
 from cinderclient import shell_utils
 from cinderclient import utils
-from cinderclient.v2 import availability_zones
+from cinderclient.v3 import availability_zones
 
 
 def _translate_attachments(info):

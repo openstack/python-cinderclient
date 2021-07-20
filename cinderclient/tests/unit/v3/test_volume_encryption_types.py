@@ -14,8 +14,8 @@
 #    under the License.
 
 from cinderclient.tests.unit import utils
-from cinderclient.tests.unit.v2 import fakes
-from cinderclient.v2.volume_encryption_types import VolumeEncryptionType
+from cinderclient.tests.unit.v3 import fakes
+from cinderclient.v3.volume_encryption_types import VolumeEncryptionType
 
 cs = fakes.FakeClient()
 

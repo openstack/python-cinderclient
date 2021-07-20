@@ -26,7 +26,6 @@ import cinderclient.client
 from cinderclient import exceptions
 from cinderclient.tests.unit import utils
 from cinderclient.tests.unit.v3 import fakes
-import cinderclient.v2.client
 
 
 @ddt.ddt

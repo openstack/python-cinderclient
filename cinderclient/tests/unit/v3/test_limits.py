@@ -18,7 +18,7 @@ from unittest import mock
 import ddt
 
 from cinderclient.tests.unit import utils
-from cinderclient.v2 import limits
+from cinderclient.v3 import limits
 
 
 REQUEST_ID = 'req-test-request-id'

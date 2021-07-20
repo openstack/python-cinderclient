@@ -15,14 +15,16 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from cinderclient import api_versions
 from cinderclient.tests.unit import utils
-from cinderclient.tests.unit.v2 import fakes
-from cinderclient.v2.volumes import Volume
+from cinderclient.tests.unit.v3 import fakes
+from cinderclient.v3.volumes import Volume
 
-cs = fakes.FakeClient()
+cs = fakes.FakeClient(api_version=api_versions.APIVersion('3.0'))
 
 
 class VolumesTest(utils.TestCase):
+    """Block Storage API v3.0"""
 
     def test_list_volumes_with_marker_limit(self):
         lst = cs.volumes.list(marker=1234, limit=2)
@@ -58,6 +60,11 @@ class VolumesTest(utils.TestCase):
         self._assert_request_id(volumes)
         cs.client.osapi_max_limit = 1000
 
+    def test_create_volume(self):
+        vol = cs.volumes.create(1)
+        cs.assert_called('POST', '/volumes')
+        self._assert_request_id(vol)
+
     def test_delete_volume(self):
         v = cs.volumes.list()[0]
         del_v = v.delete()
@@ -69,28 +76,6 @@ class VolumesTest(utils.TestCase):
         del_v = cs.volumes.delete(v)
         cs.assert_called('DELETE', '/volumes/1234')
         self._assert_request_id(del_v)
-
-    def test_create_volume(self):
-        vol = cs.volumes.create(1)
-        cs.assert_called('POST', '/volumes')
-        self._assert_request_id(vol)
-
-    def test_create_volume_with_hint(self):
-        vol = cs.volumes.create(1, scheduler_hints='uuid')
-        expected = {'volume': {'description': None,
-                               'availability_zone': None,
-                               'source_volid': None,
-                               'snapshot_id': None,
-                               'size': 1,
-                               'name': None,
-                               'imageRef': None,
-                               'volume_type': None,
-                               'metadata': {},
-                               'consistencygroup_id': None,
-                               },
-                    'OS-SCH-HNT:scheduler_hints': 'uuid'}
-        cs.assert_called('POST', '/volumes', body=expected)
-        self._assert_request_id(vol)
 
     def test_attach(self):
         v = cs.volumes.get('1234')

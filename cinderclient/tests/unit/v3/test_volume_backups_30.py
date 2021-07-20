@@ -14,8 +14,7 @@
 #    under the License.
 
 from cinderclient.tests.unit import utils
-from cinderclient.tests.unit.v2 import fakes
-from cinderclient.v2 import volume_backups_restore
+from cinderclient.tests.unit.v3 import fakes
 
 
 cs = fakes.FakeClient()
@@ -117,24 +116,6 @@ class VolumeBackupsTest(utils.TestCase):
         cs.assert_called('DELETE',
                          '/backups/76a17945-3c6f-435c-975b-b5685db10b62')
         self._assert_request_id(del_back)
-
-    def test_restore(self):
-        backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
-        info = cs.restores.restore(backup_id)
-        cs.assert_called('POST', '/backups/%s/restore' % backup_id)
-        self.assertIsInstance(info,
-                              volume_backups_restore.VolumeBackupsRestore)
-        self._assert_request_id(info)
-
-    def test_restore_with_name(self):
-        backup_id = '76a17945-3c6f-435c-975b-b5685db10b62'
-        name = 'restore_vol'
-        info = cs.restores.restore(backup_id, name=name)
-        expected_body = {'restore': {'volume_id': None, 'name': name}}
-        cs.assert_called('POST', '/backups/%s/restore' % backup_id,
-                         body=expected_body)
-        self.assertIsInstance(info,
-                              volume_backups_restore.VolumeBackupsRestore)
 
     def test_reset_state(self):
         b = cs.backups.list()[0]
