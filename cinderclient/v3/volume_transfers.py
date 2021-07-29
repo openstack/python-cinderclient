@@ -19,6 +19,10 @@ from cinderclient import base
 from cinderclient.v2 import volume_transfers
 
 
+class VolumeTransfer(volume_transfers.VolumeTransfer):
+    pass
+
+
 class VolumeTransferManager(volume_transfers.VolumeTransferManager):
     def create(self, volume_id, name=None, no_snapshots=False):
         """Creates a volume transfer.
