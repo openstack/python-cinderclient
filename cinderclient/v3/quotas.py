@@ -16,6 +16,10 @@
 from cinderclient.v2 import quotas
 
 
+class QuotaSet(quotas.QuotaSet):
+    pass
+
+
 class QuotaSetManager(quotas.QuotaSetManager):
 
     def update(self, tenant_id, **updates):
