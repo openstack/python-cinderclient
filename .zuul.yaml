@@ -11,6 +11,11 @@
       devstack_localrc:
         USE_PYTHON3: true
         VOLUME_BACKING_FILE_SIZE: 16G
+      devstack_local_conf:
+        post-config:
+          $CINDER_CONF:
+            DEFAULT:
+              quota_volumes: 25
 
 - job:
     name: python-cinderclient-functional-py36
