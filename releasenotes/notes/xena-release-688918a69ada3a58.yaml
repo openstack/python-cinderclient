@@ -1,0 +1,21 @@
+---
+prelude: |
+    The Xena release of the python-cinderclient supports Block Storage
+    API version 3 through microversion 3.66.  (The maximum microversion
+    of the Block Storage API in the Xena release is 3.66.)
+upgrade:
+  - |
+    The python-cinderclient no longer supports version 2 of the Block
+    Storage API.  The last version of the python-cinderclient supporting
+    that API is the 7.x series.
+features:
+  - |
+    Supports Block Storage API version 3.65, which displays a boolean
+    ``consumes_quota`` field on volume and snapshot detail responses
+    and which allows filtering volume and snapshot list responses using
+    the standard ``--filters [<key=value> [<key=value> ...]]`` option
+    to the ``cinder list`` or ``cinder snapshot-list`` commands.
+
+    Filtering by this field may not always be possible in a cloud.
+    Use the ``cinder list-filters`` command to see what filters are
+    available in the cloud you are using.
