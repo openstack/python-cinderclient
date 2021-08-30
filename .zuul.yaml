@@ -16,6 +16,11 @@
           $CINDER_CONF:
             DEFAULT:
               quota_volumes: 25
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*$
+      - ^releasenotes/.*$
+      - ^cinderclient/tests/unit/.*$
 
 - job:
     name: python-cinderclient-functional-py36
@@ -47,3 +52,7 @@
         - python-cinderclient-functional-py38
         - openstack-tox-pylint:
             voting: false
+    gate:
+      jobs:
+        - python-cinderclient-functional-py36
+        - python-cinderclient-functional-py38
