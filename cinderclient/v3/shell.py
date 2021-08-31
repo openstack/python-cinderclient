@@ -2193,6 +2193,144 @@ def do_snapshot_list(cs, args):
     AppendFilters.filters = []
 
 
+@api_versions.wraps("3.0", "3.65")
+@utils.arg('volume',
+           metavar='<volume>',
+           help='Name or ID of volume to snapshot.')
+@utils.arg('--force',
+           metavar='<True|False>',
+           const=True,
+           nargs='?',
+           default=False,
+           end_version='3.65',
+           help='Allows or disallows snapshot of '
+           'a volume when the volume is attached to an instance. '
+           'If set to True, ignores the current status of the '
+           'volume when attempting to snapshot it rather '
+           'than forcing it to be available. From microversion 3.66, '
+           'all snapshots are "forced" and this option is invalid. '
+           'Default=False.')
+@utils.arg('--force',
+           metavar='<True>',
+           nargs='?',
+           default=None,
+           start_version='3.66',
+           help=argparse.SUPPRESS)
+@utils.arg('--name',
+           metavar='<name>',
+           default=None,
+           help='Snapshot name. Default=None.')
+@utils.arg('--display-name',
+           help=argparse.SUPPRESS)
+@utils.arg('--display_name',
+           help=argparse.SUPPRESS)
+@utils.arg('--description',
+           metavar='<description>',
+           default=None,
+           help='Snapshot description. Default=None.')
+@utils.arg('--display-description',
+           help=argparse.SUPPRESS)
+@utils.arg('--display_description',
+           help=argparse.SUPPRESS)
+@utils.arg('--metadata',
+           nargs='*',
+           metavar='<key=value>',
+           default=None,
+           help='Snapshot metadata key and value pairs. Default=None.')
+def do_snapshot_create(cs, args):
+    """Creates a snapshot."""
+    if args.display_name is not None:
+        args.name = args.display_name
+
+    if args.display_description is not None:
+        args.description = args.display_description
+
+    snapshot_metadata = None
+    if args.metadata is not None:
+        snapshot_metadata = shell_utils.extract_metadata(args)
+
+    volume = utils.find_volume(cs, args.volume)
+    snapshot = cs.volume_snapshots.create(volume.id,
+                                          args.force,
+                                          args.name,
+                                          args.description,
+                                          metadata=snapshot_metadata)
+    shell_utils.print_volume_snapshot(snapshot)
+
+
+@api_versions.wraps("3.66")
+@utils.arg('volume',
+           metavar='<volume>',
+           help='Name or ID of volume to snapshot.')
+@utils.arg('--force',
+           nargs='?',
+           help=argparse.SUPPRESS)
+@utils.arg('--name',
+           metavar='<name>',
+           default=None,
+           help='Snapshot name. Default=None.')
+@utils.arg('--display-name',
+           help=argparse.SUPPRESS)
+@utils.arg('--display_name',
+           help=argparse.SUPPRESS)
+@utils.arg('--description',
+           metavar='<description>',
+           default=None,
+           help='Snapshot description. Default=None.')
+@utils.arg('--display-description',
+           help=argparse.SUPPRESS)
+@utils.arg('--display_description',
+           help=argparse.SUPPRESS)
+@utils.arg('--metadata',
+           nargs='*',
+           metavar='<key=value>',
+           default=None,
+           help='Snapshot metadata key and value pairs. Default=None.')
+def do_snapshot_create(cs, args):  # noqa: F811
+    """Creates a snapshot."""
+
+    # TODO(rosmaita): we really need to look into removing this v1
+    # compatibility code and the v1 options entirely.  Note that if you
+    # include the --name and also --display_name, the latter will be used.
+    # Not sure that's desirable, but it is consistent with all the other
+    # functions in this file, so we'll do it here too.
+    if args.display_name is not None:
+        args.name = args.display_name
+    if args.display_description is not None:
+        args.description = args.display_description
+
+    snapshot_metadata = None
+    if args.metadata is not None:
+        snapshot_metadata = shell_utils.extract_metadata(args)
+
+    force = getattr(args, 'force', None)
+
+    volume = utils.find_volume(cs, args.volume)
+
+    # this is a little weird, but for consistency with the API we
+    # will silently ignore the --force option when it's passed with
+    # a value that evaluates to True; otherwise, we report that the
+    # --force option is illegal for this call
+    try:
+        snapshot = cs.volume_snapshots.create(volume.id,
+                                              force=force,
+                                              name=args.name,
+                                              description=args.description,
+                                              metadata=snapshot_metadata)
+    except ValueError as ve:
+        # make sure it's the exception we expect
+        em = cinderclient.v3.volume_snapshots.MV_3_66_FORCE_FLAG_ERROR
+        if em == str(ve):
+            raise exceptions.UnsupportedAttribute(
+                'force',
+                start_version=None,
+                end_version=api_versions.APIVersion('3.65'))
+        else:
+            raise
+
+    shell_utils.print_volume_snapshot(snapshot)
+
+
 @api_versions.wraps('3.27')
 @utils.arg('--all-tenants',
            dest='all_tenants',

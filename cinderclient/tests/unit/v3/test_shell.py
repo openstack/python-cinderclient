@@ -900,6 +900,67 @@ class ShellTest(utils.TestCase):
                          'manageable-list --cluster dest')
         self.assert_called('GET', '/manageable_volumes/detail?cluster=dest')
 
+    @ddt.data(True, False, 'Nonboolean')
+    @mock.patch('cinderclient.utils.find_resource')
+    def test_snapshot_create_pre_3_66(self, force_value, mock_find_vol):
+        mock_find_vol.return_value = volumes.Volume(
+            self, {'id': '123456'}, loaded=True)
+        snap_body_3_65 = {
+            'snapshot': {
+                'volume_id': '123456',
+                'force': f'{force_value}',
+                'name': None,
+                'description': None,
+                'metadata': {}
+            }
+        }
+        self.run_command('--os-volume-api-version 3.65 '
+                         f'snapshot-create --force {force_value} 123456')
+        self.assert_called_anytime('POST', '/snapshots', body=snap_body_3_65)
+
+    SNAP_BODY_3_66 = {
+        'snapshot': {
+            'volume_id': '123456',
+            'name': None,
+            'description': None,
+            'metadata': {}
+        }
+    }
+
+    @ddt.data(True, 'true', 'on', '1')
+    @mock.patch('cinderclient.utils.find_resource')
+    def test_snapshot_create_3_66_with_force_true(self, f_val, mock_find_vol):
+        mock_find_vol.return_value = volumes.Volume(
+            self, {'id': '123456'}, loaded=True)
+        mock_find_vol.return_value = volumes.Volume(self,
+                                                    {'id': '123456'},
+                                                    loaded=True)
+        self.run_command('--os-volume-api-version 3.66 '
+                         f'snapshot-create --force {f_val} 123456')
+        self.assert_called_anytime('POST', '/snapshots',
+                                   body=self.SNAP_BODY_3_66)
+
+    @ddt.data(False, 'false', 'no', '0', 'whatever')
+    @mock.patch('cinderclient.utils.find_resource')
+    def test_snapshot_create_3_66_with_force_not_true(
+            self, f_val, mock_find_vol):
+        mock_find_vol.return_value = volumes.Volume(
+            self, {'id': '123456'}, loaded=True)
+        uae = self.assertRaises(exceptions.UnsupportedAttribute,
+                                self.run_command,
+                                '--os-volume-api-version 3.66 '
+                                f'snapshot-create --force {f_val} 123456')
+        self.assertIn('not allowed after microversion 3.65', str(uae))
+
+    @mock.patch('cinderclient.utils.find_resource')
+    def test_snapshot_create_3_66(self, mock_find_vol):
+        mock_find_vol.return_value = volumes.Volume(
+            self, {'id': '123456'}, loaded=True)
+        self.run_command('--os-volume-api-version 3.66 '
+                         'snapshot-create 123456')
+        self.assert_called_anytime('POST', '/snapshots',
+                                   body=self.SNAP_BODY_3_66)
+
     def test_snapshot_manageable_list(self):
         self.run_command('--os-volume-api-version 3.8 '
                          'snapshot-manageable-list fakehost')

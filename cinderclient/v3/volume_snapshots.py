@@ -15,9 +15,17 @@
 
 """Volume snapshot interface (v3 extension)."""
 
+from oslo_utils import strutils
+
 from cinderclient import api_versions
 from cinderclient.apiclient import base as common_base
 from cinderclient import base
+
+MV_3_66_FORCE_FLAG_ERROR = (
+    "Since microversion 3.66 of the Block Storage API,  the 'force' option is "
+    "invalid for this request.  For backward compatibility, however, when the "
+    "'force' flag is passed with a value evaluating to True, it is silently "
+    "ignored.")
 
 
 class Snapshot(base.Resource):
@@ -80,6 +88,7 @@ class SnapshotManager(base.ManagerWithFind):
     """Manage :class:`Snapshot` resources."""
     resource_class = Snapshot
 
+    @api_versions.wraps("3.0", "3.65")
     def create(self, volume_id, force=False,
                name=None, description=None, metadata=None):
 
@@ -104,6 +113,42 @@ class SnapshotManager(base.ManagerWithFind):
                              'name': name,
                              'description': description,
                              'metadata': snapshot_metadata}}
+        return self._create('/snapshots', body, 'snapshot')
+
+    @api_versions.wraps("3.66")
+    def create(self, volume_id, force=None,  # noqa: F811
+               name=None, description=None, metadata=None):
+
+        """Creates a snapshot of the given volume.
+
+        :param volume_id: The ID of the volume to snapshot.
+        :param force: This is technically not valid after mv 3.66, but the
+        API silently accepts force=True for backward compatibility, so this
+        function will, too
+        :param name: Name of the snapshot
+        :param description: Description of the snapshot
+        :param metadata: Metadata of the snapshot
+        :raises: ValueError if 'force' is not passed with a value that
+        evaluates to true
+        :rtype: :class:`Snapshot`
+        """
+
+        if metadata is None:
+            snapshot_metadata = {}
+        else:
+            snapshot_metadata = metadata
+
+        body = {'snapshot': {'volume_id': volume_id,
+                             'name': name,
+                             'description': description,
+                             'metadata': snapshot_metadata}}
+        if force is not None:
+            try:
+                force = strutils.bool_from_string(force, strict=True)
+                if not force:
+                    raise ValueError()
+            except ValueError:
+                raise ValueError(MV_3_66_FORCE_FLAG_ERROR)
         return self._create('/snapshots', body, 'snapshot')
 
     def get(self, snapshot_id):

@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    Adds support for Block Storage API version 3.66, which drops the
+    requirement of a 'force' flag to create a snapshot of an in-use
+    volume.  Although the 'force' flag is invalid for the ``snapshot-create``
+    call for API versions 3.66 and higher, for backward compatibility the
+    cinderclient follows the Block Storage API in silently ignoring the
+    flag when it is passed with a value that evaluates to True.

@@ -595,62 +595,6 @@ def do_snapshot_show(cs, args):
     shell_utils.print_volume_snapshot(snapshot)
 
 
-@utils.arg('volume',
-           metavar='<volume>',
-           help='Name or ID of volume to snapshot.')
-@utils.arg('--force',
-           metavar='<True|False>',
-           const=True,
-           nargs='?',
-           default=False,
-           help='Allows or disallows snapshot of '
-           'a volume when the volume is attached to an instance. '
-           'If set to True, ignores the current status of the '
-           'volume when attempting to snapshot it rather '
-           'than forcing it to be available. '
-           'Default=False.')
-@utils.arg('--name',
-           metavar='<name>',
-           default=None,
-           help='Snapshot name. Default=None.')
-@utils.arg('--display-name',
-           help=argparse.SUPPRESS)
-@utils.arg('--display_name',
-           help=argparse.SUPPRESS)
-@utils.arg('--description',
-           metavar='<description>',
-           default=None,
-           help='Snapshot description. Default=None.')
-@utils.arg('--display-description',
-           help=argparse.SUPPRESS)
-@utils.arg('--display_description',
-           help=argparse.SUPPRESS)
-@utils.arg('--metadata',
-           nargs='*',
-           metavar='<key=value>',
-           default=None,
-           help='Snapshot metadata key and value pairs. Default=None.')
-def do_snapshot_create(cs, args):
-    """Creates a snapshot."""
-    if args.display_name is not None:
-        args.name = args.display_name
-
-    if args.display_description is not None:
-        args.description = args.display_description
-
-    snapshot_metadata = None
-    if args.metadata is not None:
-        snapshot_metadata = shell_utils.extract_metadata(args)
-
-    volume = utils.find_volume(cs, args.volume)
-    snapshot = cs.volume_snapshots.create(volume.id,
-                                          args.force,
-                                          args.name,
-                                          args.description,
-                                          metadata=snapshot_metadata)
-    shell_utils.print_volume_snapshot(snapshot)
-
-
 @utils.arg('snapshot',
            metavar='<snapshot>', nargs='+',
            help='Name or ID of the snapshot(s) to delete.')
