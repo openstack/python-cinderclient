@@ -649,7 +649,10 @@ def do_reset_state(cs, args):
 @utils.arg('--volume-type',
            metavar='<volume-type>',
            default=None,
-           help='Volume type. Default=None.')
+           help='Volume type. Default=None, that is, use the default '
+                'volume type configured for the Block Storage API.  You '
+                "can see what type this is by using the 'cinder type-default'"
+                ' command.')
 @utils.arg('--volume_type',
            help=argparse.SUPPRESS)
 @utils.arg('--availability-zone',
