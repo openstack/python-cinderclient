@@ -11,11 +11,9 @@
       devstack_localrc:
         USE_PYTHON3: true
         VOLUME_BACKING_FILE_SIZE: 16G
-      devstack_local_conf:
-        post-config:
-          $CINDER_CONF:
-            DEFAULT:
-              quota_volumes: 25
+        CINDER_QUOTA_VOLUMES: 25
+        CINDER_QUOTA_BACKUPS: 25
+        CINDER_QUOTA_SNAPSHOTS: 25
     irrelevant-files:
       - ^.*\.rst$
       - ^doc/.*$
