@@ -30,11 +30,12 @@
       tox_envlist: functional-py36
 
 - job:
-    name: python-cinderclient-functional-py38
+    name: python-cinderclient-functional-py39
     parent: python-cinderclient-functional-base
+    nodeset: devstack-single-node-centos-9-stream
     vars:
-      python_version: 3.8
-      tox_envlist: functional-py38
+      python_version: 3.9
+      tox_envlist: functional-py39
 
 - project:
     templates:
@@ -47,10 +48,10 @@
     check:
       jobs:
         - python-cinderclient-functional-py36
-        - python-cinderclient-functional-py38
+        - python-cinderclient-functional-py39
         - openstack-tox-pylint:
             voting: false
     gate:
       jobs:
         - python-cinderclient-functional-py36
-        - python-cinderclient-functional-py38
+        - python-cinderclient-functional-py39
