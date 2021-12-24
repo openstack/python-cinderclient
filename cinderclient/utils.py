@@ -68,7 +68,7 @@ def add_arg(f, *args, **kwargs):
 
 
 def add_exclusive_arg(f, group_name, required, *args, **kwargs):
-    """Bind CLI mutally exclusive arguments to a shell.py `do_foo` function."""
+    """Bind CLI mutually exclusive arguments to a shell.py `do_foo` function."""
 
     if not hasattr(f, 'exclusive_args'):
         f.exclusive_args = collections.defaultdict(list)

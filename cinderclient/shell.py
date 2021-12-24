@@ -647,7 +647,7 @@ class OpenStackCinderShell(object):
 
         # NOTE(e0ne): if auth_session exists it means auth plugin created
         # session and we don't need to check for password and other
-        # authentification-related things.
+        # authentication-related things.
         if not utils.isunauthenticated(args.func) and not auth_session:
             if not os_password:
                 # No password, If we've got a tty, try prompting for it

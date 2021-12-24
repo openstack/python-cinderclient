@@ -108,7 +108,7 @@ class ShellTest(utils.TestCase):
         _shell = shell.OpenStackCinderShell()
 
         # We crash the command after Client instantiation because this test
-        # focuses only keystoneauth1 indentity cli opts parsing.
+        # focuses only keystoneauth1 identity cli opts parsing.
         self.assertRaises(RuntimeError, _shell.main, ['list'])
         self.assertIsInstance(_shell.cs.client.session.auth,
                               ks_password)
