@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    `Bug #1960337 <https://bugs.launchpad.net/cinder/+bug/1960337>`_: Added
+    support for ``collect-timing`` parameter to see the timings of REST API
+    requests from the client when using Keystone authentication.
