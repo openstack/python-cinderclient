@@ -26,7 +26,7 @@ LOG = logging.getLogger(__name__)
 
 # key is unsupported version, value is appropriate supported alternative
 REPLACEMENT_VERSIONS = {"1": "3", "2": "3"}
-MAX_VERSION = "3.66"
+MAX_VERSION = "3.68"
 MIN_VERSION = "3.0"
 
 _SUBSTITUTIONS = {}

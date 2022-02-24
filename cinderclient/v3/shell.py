@@ -2858,3 +2858,23 @@ def do_default_type_unset(cs, args):
         except Exception as e:
             print("Unset for default volume type for project %s failed: %s"
                   % (project_id, e))
+
+
+@api_versions.wraps('3.68')
+@utils.arg('volume',
+           metavar='<volume>',
+           help='Name or ID of volume to reimage')
+@utils.arg('image_id',
+           metavar='<image-id>',
+           help='The image id of the image that will be used to reimage '
+                'the volume.')
+@utils.arg('--reimage-reserved',
+           metavar='<True|False>',
+           default=False,
+           help='Enables or disables reimage for a volume that is in '
+                'reserved state otherwise only volumes in "available" '
+                ' or "error" status may be re-imaged. Default=False.')
+def do_reimage(cs, args):
+    """Rebuilds a volume, overwriting all content with the specified image"""
+    volume = utils.find_volume(cs, args.volume)
+    volume.reimage(args.image_id, args.reimage_reserved)
