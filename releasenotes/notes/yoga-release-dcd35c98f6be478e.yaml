@@ -1,0 +1,5 @@
+---
+prelude: |
+    The Yoga release of the python-cinderclient supports Block Storage
+    API version 3 through microversion 3.68.  (The maximum microversion
+    of the Block Storage API in the Yoga release is 3.68.)
