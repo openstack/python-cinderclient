@@ -21,13 +21,13 @@
       - ^cinderclient/tests/unit/.*$
 
 - job:
-    name: python-cinderclient-functional-py36
+    name: python-cinderclient-functional-py38
     parent: python-cinderclient-functional-base
-    # need to specify a platform that has python 3.6 available
-    nodeset: devstack-single-node-centos-8-stream
+    # need to specify a platform that has python 3.8 available
+    nodeset: openstack-single-node-focal
     vars:
-      python_version: 3.6
-      tox_envlist: functional-py36
+      python_version: 3.8
+      tox_envlist: functional-py38
 
 - job:
     name: python-cinderclient-functional-py39
@@ -42,16 +42,16 @@
       - check-requirements
       - lib-forward-testing-python3
       - openstack-cover-jobs
-      - openstack-python3-yoga-jobs
+      - openstack-python3-zed-jobs
       - publish-openstack-docs-pti
       - release-notes-jobs-python3
     check:
       jobs:
-        - python-cinderclient-functional-py36
+        - python-cinderclient-functional-py38
         - python-cinderclient-functional-py39
         - openstack-tox-pylint:
             voting: false
     gate:
       jobs:
-        - python-cinderclient-functional-py36
+        - python-cinderclient-functional-py38
         - python-cinderclient-functional-py39
