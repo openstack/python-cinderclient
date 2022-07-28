@@ -120,9 +120,9 @@ class ShellTest(utils.TestCase):
         # Some expected help output, including microversioned commands
         required = [
             r'.*?^usage: ',
-            r'.*?(?m)^\s+create\s+Creates a volume.',
-            r'.*?(?m)^\s+summary\s+Get volumes summary.',
-            r'.*?(?m)^Run "cinder help SUBCOMMAND" for help on a subcommand.',
+            r'.*?^\s+create\s+Creates a volume.',
+            r'.*?^\s+summary\s+Get volumes summary.',
+            r'.*?^Run "cinder help SUBCOMMAND" for help on a subcommand.',
         ]
         help_text = self.shell('help')
         for r in required:
@@ -132,7 +132,7 @@ class ShellTest(utils.TestCase):
     def test_help_on_subcommand(self):
         required = [
             r'.*?^usage: cinder list',
-            r'.*?(?m)^Lists all volumes.',
+            r'.*?^Lists all volumes.',
         ]
         help_text = self.shell('help list')
         for r in required:
@@ -142,7 +142,7 @@ class ShellTest(utils.TestCase):
     def test_help_on_subcommand_mv(self):
         required = [
             r'.*?^usage: cinder summary',
-            r'.*?(?m)^Get volumes summary.',
+            r'.*?^Get volumes summary.',
         ]
         help_text = self.shell('help summary')
         for r in required:
@@ -152,9 +152,9 @@ class ShellTest(utils.TestCase):
     def test_help_arg_no_subcommand(self):
         required = [
             r'.*?^usage: ',
-            r'.*?(?m)^\s+create\s+Creates a volume.',
-            r'.*?(?m)^\s+summary\s+Get volumes summary.',
-            r'.*?(?m)^Run "cinder help SUBCOMMAND" for help on a subcommand.',
+            r'.*?^\s+create\s+Creates a volume.',
+            r'.*?^\s+summary\s+Get volumes summary.',
+            r'.*?^Run "cinder help SUBCOMMAND" for help on a subcommand.',
         ]
         help_text = self.shell('--os-volume-api-version 3.40')
         for r in required:
