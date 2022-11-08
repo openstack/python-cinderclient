@@ -108,6 +108,20 @@ class SnapshotManager(base.ManagerWithFind):
         else:
             snapshot_metadata = metadata
 
+        # Bug #1995883: it's possible for the shell to use the user-
+        # specified 3.66 do_snapshot_create function, but if the server
+        # only supports < 3.66, the client will have been downgraded and
+        # will use this function.  In that case, the 'force' parameter will
+        # be None, which means that the user didn't specify a value for it,
+        # so we set it to the pre-3.66 default value of False.
+        #
+        # NOTE: we know this isn't a problem for current client consumers
+        # because a null value for 'force' has never been allowed by the
+        # Block Storage API v3, so there's no reason for anyone to directly
+        # call this method passing force=None.
+        if force is None:
+            force = False
+
         body = {'snapshot': {'volume_id': volume_id,
                              'force': force,
                              'name': name,

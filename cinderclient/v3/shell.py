@@ -2213,6 +2213,7 @@ def do_snapshot_list(cs, args):
            'than forcing it to be available. From microversion 3.66, '
            'all snapshots are "forced" and this option is invalid. '
            'Default=False.')
+# FIXME: is this second declaration of --force really necessary?
 @utils.arg('--force',
            metavar='<True>',
            nargs='?',
@@ -2253,6 +2254,7 @@ def do_snapshot_create(cs, args):
         snapshot_metadata = shell_utils.extract_metadata(args)
 
     volume = utils.find_volume(cs, args.volume)
+
     snapshot = cs.volume_snapshots.create(volume.id,
                                           args.force,
                                           args.name,

@@ -99,6 +99,14 @@ class ShellTest(utils.TestCase):
                               api_versions.APIVersion('3.99'))):
             self.shell.main(cmd.split())
 
+    def run_command_with_server_api_max(self, api_max, cmd):
+        # version negotiation will use the supplied api_max, which must be
+        # a string value, as the server's max supported version
+        with mock.patch('cinderclient.api_versions._get_server_version_range',
+                return_value=(api_versions.APIVersion('3.0'),
+                              api_versions.APIVersion(api_max))):
+            self.shell.main(cmd.split())
+
     def assert_called(self, method, url, body=None,
                       partial_body=None, **kwargs):
         return self.shell.cs.assert_called(method, url, body,
@@ -918,6 +926,41 @@ class ShellTest(utils.TestCase):
                          f'snapshot-create --force {force_value} 123456')
         self.assert_called_anytime('POST', '/snapshots', body=snap_body_3_65)
 
+    @mock.patch('cinderclient.shell.CinderClientArgumentParser.exit')
+    def test_snapshot_create_pre_3_66_with_naked_force(
+            self, mock_exit):
+        mock_exit.side_effect = Exception("mock exit")
+        try:
+            self.run_command('--os-volume-api-version 3.65 '
+                             'snapshot-create --force 123456')
+        except Exception as e:
+            # ignore the exception (it's raised to simulate an exit),
+            # but make sure it's the exception we expect
+            self.assertEqual('mock exit', str(e))
+
+        exit_code = mock_exit.call_args.args[0]
+        self.assertEqual(2, exit_code)
+
+    @mock.patch('cinderclient.utils.find_resource')
+    def test_snapshot_create_pre_3_66_with_force_None(
+            self, mock_find_vol):
+        """We will let the API detect the problematic value."""
+        mock_find_vol.return_value = volumes.Volume(
+            self, {'id': '123456'}, loaded=True)
+        snap_body_3_65 = {
+            'snapshot': {
+                'volume_id': '123456',
+                # note: this is a string, NOT None!
+                'force': 'None',
+                'name': None,
+                'description': None,
+                'metadata': {}
+            }
+        }
+        self.run_command('--os-volume-api-version 3.65 '
+                         'snapshot-create --force None 123456')
+        self.assert_called_anytime('POST', '/snapshots', body=snap_body_3_65)
+
     SNAP_BODY_3_66 = {
         'snapshot': {
             'volume_id': '123456',
@@ -953,6 +996,17 @@ class ShellTest(utils.TestCase):
         self.assertIn('not allowed after microversion 3.65', str(uae))
 
     @mock.patch('cinderclient.utils.find_resource')
+    def test_snapshot_create_3_66_with_force_None(
+            self, mock_find_vol):
+        mock_find_vol.return_value = volumes.Volume(
+            self, {'id': '123456'}, loaded=True)
+        uae = self.assertRaises(exceptions.UnsupportedAttribute,
+                                self.run_command,
+                                '--os-volume-api-version 3.66 '
+                                'snapshot-create --force None 123456')
+        self.assertIn('not allowed after microversion 3.65', str(uae))
+
+    @mock.patch('cinderclient.utils.find_resource')
     def test_snapshot_create_3_66(self, mock_find_vol):
         mock_find_vol.return_value = volumes.Volume(
             self, {'id': '123456'}, loaded=True)
@@ -960,6 +1014,28 @@ class ShellTest(utils.TestCase):
                          'snapshot-create 123456')
         self.assert_called_anytime('POST', '/snapshots',
                                    body=self.SNAP_BODY_3_66)
+
+    @mock.patch('cinderclient.utils.find_resource')
+    def test_snapshot_create_3_66_not_supported(self, mock_find_vol):
+        mock_find_vol.return_value = volumes.Volume(
+            self, {'id': '123456'}, loaded=True)
+        self.run_command_with_server_api_max(
+            '3.64',
+            '--os-volume-api-version 3.66 snapshot-create 123456')
+        # call should be made, but will use the pre-3.66 request body
+        # because the client in use has been downgraded to 3.64
+        pre_3_66_request_body = {
+            'snapshot': {
+                'volume_id': '123456',
+                # default value is False
+                'force': False,
+                'name': None,
+                'description': None,
+                'metadata': {}
+            }
+        }
+        self.assert_called_anytime('POST', '/snapshots',
+                                   body=pre_3_66_request_body)
 
     def test_snapshot_manageable_list(self):
         self.run_command('--os-volume-api-version 3.8 '
