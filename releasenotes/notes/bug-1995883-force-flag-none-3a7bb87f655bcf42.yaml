@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    `Bug #1995883
+    <https://bugs.launchpad.net/python-cinderclient/+bug/1995883>`_:
+    Fixed bad format request body generated for the snapshot-create
+    action when the client supports mv 3.66 or greater but the Block
+    Storage API being contacted supports < 3.66.
