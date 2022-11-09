@@ -163,7 +163,7 @@ def do_list(cs, args):
         sortby_index = None
     else:
         sortby_index = 0
-    utils.print_list(volumes, key_list, exclude_unavailable=True,
+    shell_utils.print_list(volumes, key_list, exclude_unavailable=True,
                      sortby_index=sortby_index)
 
 
@@ -181,9 +181,9 @@ def do_show(cs, args):
 
     info.pop('links', None)
     info = _translate_attachments(info)
-    utils.print_dict(info,
-                     formatters=['metadata', 'volume_image_metadata',
-                                 'attachment_ids', 'attached_servers'])
+    shell_utils.print_dict(info,
+                           formatters=['metadata', 'volume_image_metadata',
+                                       'attachment_ids', 'attached_servers'])
 
 
 class CheckSizeArgForCreate(argparse.Action):
@@ -325,7 +325,7 @@ def do_create(cs, args):
 
     info.pop('links', None)
     info = _translate_attachments(info)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('--cascade',
@@ -581,9 +581,9 @@ def do_snapshot_list(cs, args):
     else:
         sortby_index = 0
 
-    utils.print_list(snapshots,
-                     ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
-                     sortby_index=sortby_index)
+    shell_utils.print_list(snapshots,
+                           ['ID', 'Volume ID', 'Status', 'Name', 'Size'],
+                           sortby_index=sortby_index)
 
 
 @utils.arg('snapshot',
@@ -714,7 +714,7 @@ def do_type_show(cs, args):
     info.update(vtype._info)
 
     info.pop('links', None)
-    utils.print_dict(info, formatters=['extra_specs'])
+    shell_utils.print_dict(info, formatters=['extra_specs'])
 
 
 @utils.arg('id',
@@ -746,7 +746,7 @@ def do_type_update(cs, args):
 def do_extra_specs_list(cs, args):
     """Lists current volume types and extra specs."""
     vtypes = cs.volume_types.list()
-    utils.print_list(vtypes, ['ID', 'Name', 'extra_specs'])
+    shell_utils.print_list(vtypes, ['ID', 'Name', 'extra_specs'])
 
 
 @utils.arg('name',
@@ -821,7 +821,7 @@ def do_type_access_list(cs, args):
     access_list = cs.volume_type_access.list(volume_type)
 
     columns = ['Volume_type_ID', 'Project_ID']
-    utils.print_list(access_list, columns)
+    shell_utils.print_list(access_list, columns)
 
 
 @utils.arg('--volume-type', metavar='<volume_type>', required=True,
@@ -972,7 +972,7 @@ def do_absolute_limits(cs, args):
     """Lists absolute limits for a user."""
     limits = cs.limits.get(args.tenant).absolute
     columns = ['Name', 'Value']
-    utils.print_list(limits, columns)
+    shell_utils.print_list(limits, columns)
 
 
 @utils.arg('tenant',
@@ -984,7 +984,7 @@ def do_rate_limits(cs, args):
     """Lists rate limits for a user."""
     limits = cs.limits.get(args.tenant).rate
     columns = ['Verb', 'URI', 'Value', 'Remain', 'Unit', 'Next_Available']
-    utils.print_list(limits, columns)
+    shell_utils.print_list(limits, columns)
 
 
 @utils.arg('volume',
@@ -1133,7 +1133,7 @@ def do_backup_create(cs, args):
     if 'links' in info:
         info.pop('links')
 
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('backup', metavar='<backup>', help='Name or ID of backup.')
@@ -1144,7 +1144,7 @@ def do_backup_show(cs, args):
     info.update(backup._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('--all-tenants',
@@ -1211,7 +1211,7 @@ def do_backup_list(cs, args):
         sortby_index = None
     else:
         sortby_index = 0
-    utils.print_list(backups, columns, sortby_index=sortby_index)
+    shell_utils.print_list(backups, columns, sortby_index=sortby_index)
 
 
 @utils.arg('--force',
@@ -1273,7 +1273,7 @@ def do_backup_restore(cs, args):
 
     info.pop('links', None)
 
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('backup', metavar='<backup>',
@@ -1281,7 +1281,7 @@ def do_backup_restore(cs, args):
 def do_backup_export(cs, args):
     """Export backup metadata record."""
     info = cs.backups.export_record(args.backup)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('backup_service', metavar='<backup_service>',
@@ -1293,7 +1293,7 @@ def do_backup_import(cs, args):
     info = cs.backups.import_record(args.backup_service, args.backup_url)
     info.pop('links', None)
 
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('backup', metavar='<backup>', nargs='+',
@@ -1345,7 +1345,7 @@ def do_transfer_create(cs, args):
     info.update(transfer._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('transfer', metavar='<transfer>',
@@ -1367,7 +1367,7 @@ def do_transfer_accept(cs, args):
     info.update(transfer._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('--all-tenants',
@@ -1391,7 +1391,7 @@ def do_transfer_list(cs, args):
     }
     transfers = cs.transfers.list(search_opts=search_opts)
     columns = ['ID', 'Volume ID', 'Name']
-    utils.print_list(transfers, columns)
+    shell_utils.print_list(transfers, columns)
 
 
 @utils.arg('transfer', metavar='<transfer>',
@@ -1403,7 +1403,7 @@ def do_transfer_show(cs, args):
     info.update(transfer._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('volume', metavar='<volume>',
@@ -1441,7 +1441,7 @@ def do_service_list(cs, args):
     # so as not to add the column when the extended ext is not enabled.
     if result and hasattr(result[0], 'disabled_reason'):
         columns.append("Disabled Reason")
-    utils.print_list(result, columns)
+    shell_utils.print_list(result, columns)
 
 
 @utils.arg('host', metavar='<hostname>', help='Host name.')
@@ -1450,7 +1450,7 @@ def do_service_enable(cs, args):
     """Enables the service."""
     result = cs.services.enable(args.host, args.binary)
     columns = ["Host", "Binary", "Status"]
-    utils.print_list([result], columns)
+    shell_utils.print_list([result], columns)
 
 
 @utils.arg('host', metavar='<hostname>', help='Host name.')
@@ -1466,7 +1466,7 @@ def do_service_disable(cs, args):
                                                 args.reason)
     else:
         result = cs.services.disable(args.host, args.binary)
-    utils.print_list([result], columns)
+    shell_utils.print_list([result], columns)
 
 
 def treeizeAvailabilityZone(zone):
@@ -1525,13 +1525,13 @@ def do_availability_zone_list(cs, _args):
     for zone in availability_zones:
         result += treeizeAvailabilityZone(zone)
     shell_utils.translate_availability_zone_keys(result)
-    utils.print_list(result, ['Name', 'Status'])
+    shell_utils.print_list(result, ['Name', 'Status'])
 
 
 def do_encryption_type_list(cs, args):
     """Shows encryption type details for volume types. Admin only."""
     result = cs.volume_encryption_types.list()
-    utils.print_list(result, ['Volume Type ID', 'Provider', 'Cipher',
+    shell_utils.print_list(result, ['Volume Type ID', 'Provider', 'Cipher',
                               'Key Size', 'Control Location'])
 
 
@@ -1796,7 +1796,7 @@ def do_snapshot_metadata(cs, args):
 
     if args.action == 'set':
         metadata = snapshot.set_metadata(metadata)
-        utils.print_dict(metadata._info)
+        shell_utils.print_dict(metadata._info)
     elif args.action == 'unset':
         snapshot.delete_metadata(list(metadata.keys()))
 
@@ -1806,7 +1806,7 @@ def do_snapshot_metadata(cs, args):
 def do_snapshot_metadata_show(cs, args):
     """Shows snapshot metadata."""
     snapshot = shell_utils.find_volume_snapshot(cs, args.snapshot)
-    utils.print_dict(snapshot._info['metadata'], 'Metadata-property')
+    shell_utils.print_dict(snapshot._info['metadata'], 'Metadata-property')
 
 
 @utils.arg('volume', metavar='<volume>',
@@ -1814,7 +1814,7 @@ def do_snapshot_metadata_show(cs, args):
 def do_metadata_show(cs, args):
     """Shows volume metadata."""
     volume = utils.find_volume(cs, args.volume)
-    utils.print_dict(volume._info['metadata'], 'Metadata-property')
+    shell_utils.print_dict(volume._info['metadata'], 'Metadata-property')
 
 
 @utils.arg('volume', metavar='<volume>',
@@ -1823,7 +1823,7 @@ def do_image_metadata_show(cs, args):
     """Shows volume image metadata."""
     volume = utils.find_volume(cs, args.volume)
     resp, body = volume.show_image_metadata(volume)
-    utils.print_dict(body['metadata'], 'Metadata-property')
+    shell_utils.print_dict(body['metadata'], 'Metadata-property')
 
 
 @utils.arg('volume',
@@ -1839,7 +1839,7 @@ def do_metadata_update_all(cs, args):
     volume = utils.find_volume(cs, args.volume)
     metadata = shell_utils.extract_metadata(args)
     metadata = volume.update_all_metadata(metadata)
-    utils.print_dict(metadata['metadata'], 'Metadata-property')
+    shell_utils.print_dict(metadata['metadata'], 'Metadata-property')
 
 
 @utils.arg('snapshot',
@@ -1855,7 +1855,7 @@ def do_snapshot_metadata_update_all(cs, args):
     snapshot = shell_utils.find_volume_snapshot(cs, args.snapshot)
     metadata = shell_utils.extract_metadata(args)
     metadata = snapshot.update_all_metadata(metadata)
-    utils.print_dict(metadata)
+    shell_utils.print_dict(metadata)
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of volume to update.')
@@ -1954,7 +1954,7 @@ def do_manage(cs, args):
     volume = cs.volumes.get(volume.id)
     info.update(volume._info)
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('volume', metavar='<volume>',
@@ -1978,7 +1978,7 @@ def do_consisgroup_list(cs, args):
     consistencygroups = cs.consistencygroups.list()
 
     columns = ['ID', 'Status', 'Name']
-    utils.print_list(consistencygroups, columns)
+    shell_utils.print_list(consistencygroups, columns)
 
 
 @utils.arg('consistencygroup',
@@ -1992,7 +1992,7 @@ def do_consisgroup_show(cs, args):
     info.update(consistencygroup._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('volumetypes',
@@ -2023,7 +2023,7 @@ def do_consisgroup_create(cs, args):
     info.update(consistencygroup._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('--cgsnapshot',
@@ -2061,7 +2061,7 @@ def do_consisgroup_create_from_src(cs, args):
         args.description)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('consistencygroup',
@@ -2166,7 +2166,7 @@ def do_cgsnapshot_list(cs, args):
     cgsnapshots = cs.cgsnapshots.list(search_opts=search_opts)
 
     columns = ['ID', 'Status', 'Name']
-    utils.print_list(cgsnapshots, columns)
+    shell_utils.print_list(cgsnapshots, columns)
 
 
 @utils.arg('cgsnapshot',
@@ -2179,7 +2179,7 @@ def do_cgsnapshot_show(cs, args):
     info.update(cgsnapshot._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('consistencygroup',
@@ -2207,7 +2207,7 @@ def do_cgsnapshot_create(cs, args):
     info.update(cgsnapshot._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('cgsnapshot',
@@ -2241,7 +2241,7 @@ def do_get_pools(cs, args):
         backend['name'] = info['name']
         if args.detail:
             backend.update(info['capabilities'])
-        utils.print_dict(backend)
+        shell_utils.print_dict(backend)
 
 
 @utils.arg('host',
@@ -2256,9 +2256,9 @@ def do_get_capabilities(cs, args):
     infos.update(capabilities._info)
 
     prop = infos.pop('properties', None)
-    utils.print_dict(infos, "Volume stats")
-    utils.print_dict(prop, "Backend properties",
-                     formatters=sorted(prop.keys()))
+    shell_utils.print_dict(infos, "Volume stats")
+    shell_utils.print_dict(prop, "Backend properties",
+                           formatters=sorted(prop.keys()))
 
 
 @utils.arg('volume',
@@ -2308,7 +2308,7 @@ def do_snapshot_manage(cs, args):
     snapshot = cs.volume_snapshots.get(snapshot.id)
     info.update(snapshot._info)
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('snapshot', metavar='<snapshot>',
@@ -2378,7 +2378,7 @@ def do_manageable_list(cs, args):
     columns = ['reference', 'size', 'safe_to_manage']
     if detailed:
         columns.extend(['reason_not_safe', 'cinder_id', 'extra_info'])
-    utils.print_list(volumes, columns, sortby_index=None)
+    shell_utils.print_list(volumes, columns, sortby_index=None)
 
 
 @utils.arg('host',
@@ -2422,4 +2422,4 @@ def do_snapshot_manageable_list(cs, args):
     columns = ['reference', 'size', 'safe_to_manage', 'source_reference']
     if detailed:
         columns.extend(['reason_not_safe', 'cinder_id', 'extra_info'])
-    utils.print_list(snapshots, columns, sortby_index=None)
+    shell_utils.print_list(snapshots, columns, sortby_index=None)

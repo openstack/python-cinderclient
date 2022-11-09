@@ -14,7 +14,7 @@
 #    under the License.
 
 from cinderclient import base
-from cinderclient import utils
+from cinderclient import shell_utils
 
 
 class ListExtResource(base.Resource):
@@ -41,4 +41,4 @@ def do_list_extensions(client, _args):
     """Lists all available os-api extensions."""
     extensions = client.list_extensions.show_all()
     fields = ["Name", "Summary", "Alias", "Updated"]
-    utils.print_list(extensions, fields)
+    shell_utils.print_list(extensions, fields)

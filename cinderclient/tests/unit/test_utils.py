@@ -220,7 +220,7 @@ class PrintListTestCase(test_utils.TestCase):
         Row = collections.namedtuple('Row', ['a', 'b'])
         to_print = [Row(a=3, b=4), Row(a=1, b=2)]
         with CaptureStdout() as cso:
-            utils.print_list(to_print, ['a', 'b'])
+            shell_utils.print_list(to_print, ['a', 'b'])
         # Output should be sorted by the first key (a)
         self.assertEqual("""\
 +---+---+
@@ -235,7 +235,7 @@ class PrintListTestCase(test_utils.TestCase):
         Row = collections.namedtuple('Row', ['a', 'b'])
         to_print = [Row(a=3, b=None), Row(a=1, b=2)]
         with CaptureStdout() as cso:
-            utils.print_list(to_print, ['a', 'b'])
+            shell_utils.print_list(to_print, ['a', 'b'])
         # Output should be sorted by the first key (a)
         self.assertEqual("""\
 +---+---+
@@ -250,7 +250,7 @@ class PrintListTestCase(test_utils.TestCase):
         Row = collections.namedtuple('Row', ['a', 'b'])
         to_print = [Row(a=4, b=3), Row(a=2, b=1)]
         with CaptureStdout() as cso:
-            utils.print_list(to_print, ['a', 'b'], sortby_index=1)
+            shell_utils.print_list(to_print, ['a', 'b'], sortby_index=1)
         # Output should be sorted by the second key (b)
         self.assertEqual("""\
 +---+---+
@@ -265,7 +265,7 @@ class PrintListTestCase(test_utils.TestCase):
         Row = collections.namedtuple('Row', ['a', 'b'])
         to_print = [Row(a=3, b=4), Row(a=1, b=2)]
         with CaptureStdout() as cso:
-            utils.print_list(to_print, ['a', 'b'], sortby_index=None)
+            shell_utils.print_list(to_print, ['a', 'b'], sortby_index=None)
         # Output should be in the order given
         self.assertEqual("""\
 +---+---+
@@ -283,7 +283,7 @@ class PrintListTestCase(test_utils.TestCase):
             for row in [Row(a=1, b=2), Row(a=3, b=4)]:
                 yield row
         with CaptureStdout() as cso:
-            utils.print_list(gen_rows(), ['a', 'b'])
+            shell_utils.print_list(gen_rows(), ['a', 'b'])
         self.assertEqual("""\
 +---+---+
 | a | b |
@@ -297,7 +297,7 @@ class PrintListTestCase(test_utils.TestCase):
         Row = collections.namedtuple('Row', ['a', 'b'])
         to_print = [Row(a=3, b='a\r'), Row(a=1, b='c\rd')]
         with CaptureStdout() as cso:
-            utils.print_list(to_print, ['a', 'b'])
+            shell_utils.print_list(to_print, ['a', 'b'])
         # Output should be sorted by the first key (a)
         self.assertEqual("""\
 +---+-----+
@@ -314,13 +314,13 @@ class PrintDictTestCase(test_utils.TestCase):
     def test__pretty_format_dict(self):
         content = {'key1': 'value1', 'key2': 'value2'}
         expected = "key1 : value1\nkey2 : value2"
-        result = utils._pretty_format_dict(content)
+        result = shell_utils._pretty_format_dict(content)
         self.assertEqual(expected, result)
 
     def test_print_dict_with_return(self):
         d = {'a': 'A', 'b': 'B', 'c': 'C', 'd': 'test\rcarriage\n\rreturn'}
         with CaptureStdout() as cso:
-            utils.print_dict(d)
+            shell_utils.print_dict(d)
         self.assertEqual("""\
 +----------+---------------+
 | Property | Value         |
@@ -337,7 +337,7 @@ class PrintDictTestCase(test_utils.TestCase):
         content = {'a': 'A', 'b': 'B', 'f_key':
                    {'key1': 'value1', 'key2': 'value2'}}
         with CaptureStdout() as cso:
-            utils.print_dict(content, formatters='f_key')
+            shell_utils.print_dict(content, formatters='f_key')
         self.assertEqual("""\
 +----------+---------------+
 | Property | Value         |

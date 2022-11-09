@@ -15,6 +15,8 @@
 import sys
 import time
 
+import prettytable
+
 from cinderclient import exceptions
 from cinderclient import utils
 
@@ -24,13 +26,109 @@ _quota_resources = ['volumes', 'snapshots', 'gigabytes',
 _quota_infos = ['Type', 'In_use', 'Reserved', 'Limit', 'Allocated']
 
 
+def _print(pt, order):
+    print(pt.get_string(sortby=order))
+
+
+def _pretty_format_dict(data_dict):
+    formatted_data = []
+
+    for k in sorted(data_dict):
+        formatted_data.append("%s : %s" % (k, data_dict[k]))
+
+    return "\n".join(formatted_data)
+
+
+def print_list(objs, fields, exclude_unavailable=False, formatters=None,
+               sortby_index=0):
+    '''Prints a list of objects.
+
+    @param objs: Objects to print
+    @param fields: Fields on each object to be printed
+    @param exclude_unavailable: Boolean to decide if unavailable fields are
+                                removed
+    @param formatters: Custom field formatters
+    @param sortby_index: Results sorted against the key in the fields list at
+                         this index; if None then the object order is not
+                         altered
+    '''
+    formatters = formatters or {}
+    mixed_case_fields = ['serverId']
+    removed_fields = []
+    rows = []
+
+    for o in objs:
+        row = []
+        for field in fields:
+            if field in removed_fields:
+                continue
+            if field in formatters:
+                row.append(formatters[field](o))
+            else:
+                if field in mixed_case_fields:
+                    field_name = field.replace(' ', '_')
+                else:
+                    field_name = field.lower().replace(' ', '_')
+                if isinstance(o, dict) and field in o:
+                    data = o[field]
+                else:
+                    if not hasattr(o, field_name) and exclude_unavailable:
+                        removed_fields.append(field)
+                        continue
+                    else:
+                        data = getattr(o, field_name, '')
+                if data is None:
+                    data = '-'
+                if isinstance(data, str) and "\r" in data:
+                    data = data.replace("\r", " ")
+                row.append(data)
+        rows.append(row)
+
+    for f in removed_fields:
+        fields.remove(f)
+
+    pt = prettytable.PrettyTable((f for f in fields), caching=False)
+    pt.align = 'l'
+    for row in rows:
+        count = 0
+        # Converts unicode values in dictionary to string
+        for part in row:
+            count = count + 1
+            if isinstance(part, dict):
+                row[count - 1] = part
+        pt.add_row(row)
+
+    if sortby_index is None:
+        order_by = None
+    else:
+        order_by = fields[sortby_index]
+    _print(pt, order_by)
+
+
+def print_dict(d, property="Property", formatters=None):
+    pt = prettytable.PrettyTable([property, 'Value'], caching=False)
+    pt.align = 'l'
+    formatters = formatters or {}
+
+    for r in d.items():
+        r = list(r)
+
+        if r[0] in formatters:
+            if isinstance(r[1], dict):
+                r[1] = _pretty_format_dict(r[1])
+        if isinstance(r[1], str) and "\r" in r[1]:
+            r[1] = r[1].replace("\r", " ")
+        pt.add_row(r)
+    _print(pt, property)
+
+
 def print_volume_image(image_resp_tuple):
     # image_resp_tuple = tuple (response, body)
     image = image_resp_tuple[1]
     vt = image['os-volume_upload_image'].get('volume_type')
     if vt is not None:
         image['os-volume_upload_image']['volume_type'] = vt.get('name')
-    utils.print_dict(image['os-volume_upload_image'])
+    print_dict(image['os-volume_upload_image'])
 
 
 def poll_for_status(poll_fn, obj_id, action, final_ok_states,
@@ -120,7 +218,7 @@ def find_message(cs, message):
 
 
 def print_volume_snapshot(snapshot):
-    utils.print_dict(snapshot._info)
+    print_dict(snapshot._info)
 
 
 def translate_keys(collection, convert):
@@ -188,16 +286,16 @@ def extract_metadata(args, type='user_metadata'):
 
 
 def print_volume_type_list(vtypes):
-    utils.print_list(vtypes, ['ID', 'Name', 'Description', 'Is_Public'])
+    print_list(vtypes, ['ID', 'Name', 'Description', 'Is_Public'])
 
 
 def print_group_type_list(gtypes):
-    utils.print_list(gtypes, ['ID', 'Name', 'Description'])
+    print_list(gtypes, ['ID', 'Name', 'Description'])
 
 
 def print_resource_filter_list(filters):
     formatter = {'Filters': lambda resource: ', '.join(resource.filters)}
-    utils.print_list(filters, ['Resource', 'Filters'], formatters=formatter)
+    print_list(filters, ['Resource', 'Filters'], formatters=formatter)
 
 
 def quota_show(quotas):
@@ -211,7 +309,7 @@ def quota_show(quotas):
         if not good_name:
             continue
         quota_dict[resource] = getattr(quotas, resource, None)
-    utils.print_dict(quota_dict)
+    print_dict(quota_dict)
 
 
 def quota_usage_show(quotas):
@@ -228,7 +326,7 @@ def quota_usage_show(quotas):
         quota_info['Type'] = resource
         quota_info = dict((k.capitalize(), v) for k, v in quota_info.items())
         quota_list.append(quota_info)
-    utils.print_list(quota_list, _quota_infos)
+    print_list(quota_list, _quota_infos)
 
 
 def quota_update(manager, identifier, args):
@@ -266,26 +364,26 @@ def print_volume_encryption_type_list(encryption_types):
 
     :param encryption_types: a list of :class: VolumeEncryptionType instances
     """
-    utils.print_list(encryption_types, ['Volume Type ID', 'Provider',
-                                        'Cipher', 'Key Size',
-                                        'Control Location'])
+    print_list(encryption_types, ['Volume Type ID', 'Provider',
+                                  'Cipher', 'Key Size',
+                                  'Control Location'])
 
 
 def print_qos_specs(qos_specs):
     # formatters defines field to be converted from unicode to string
-    utils.print_dict(qos_specs._info, formatters=['specs'])
+    print_dict(qos_specs._info, formatters=['specs'])
 
 
 def print_qos_specs_list(q_specs):
-    utils.print_list(q_specs, ['ID', 'Name', 'Consumer', 'specs'])
+    print_list(q_specs, ['ID', 'Name', 'Consumer', 'specs'])
 
 
 def print_qos_specs_and_associations_list(q_specs):
-    utils.print_list(q_specs, ['ID', 'Name', 'Consumer', 'specs'])
+    print_list(q_specs, ['ID', 'Name', 'Consumer', 'specs'])
 
 
 def print_associations_list(associations):
-    utils.print_list(associations, ['Association_Type', 'Name', 'ID'])
+    print_list(associations, ['Association_Type', 'Name', 'ID'])
 
 
 def _poll_for_status(poll_fn, obj_id, info, action, final_ok_states,
@@ -305,7 +403,7 @@ def _poll_for_status(poll_fn, obj_id, info, action, final_ok_states,
         if status in final_ok_states:
             break
         elif status == "error":
-            utils.print_dict(info)
+            print_dict(info)
             if global_request_id:
                 search_opts = {
                     'request_id': global_request_id
@@ -317,5 +415,5 @@ def _poll_for_status(poll_fn, obj_id, info, action, final_ok_states,
                     fault_msg = "Unknown error. Operation failed."
                 raise exceptions.ResourceInErrorState(obj, fault_msg)
         elif time_elapsed == timeout_period:
-            utils.print_dict(info)
+            print_dict(info)
             raise exceptions.TimeoutException(obj, action)
