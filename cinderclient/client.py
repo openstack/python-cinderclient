@@ -20,6 +20,7 @@ import glob
 import hashlib
 import importlib.util
 import itertools
+import json
 import logging
 import os
 import pkgutil
@@ -45,11 +46,6 @@ try:
     from eventlet import sleep
 except ImportError:
     from time import sleep
-
-try:
-    import json
-except ImportError:
-    import simplejson as json
 
 try:
     osprofiler_web = importutils.try_import("osprofiler.web")
