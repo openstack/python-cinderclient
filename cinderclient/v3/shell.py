@@ -197,7 +197,7 @@ def do_backup_list(cs, args):
         sortby_index = None
     else:
         sortby_index = 0
-    utils.print_list(backups, columns, sortby_index=sortby_index)
+    shell_utils.print_list(backups, columns, sortby_index=sortby_index)
     if show_count:
         print("Backup in total: %s" % total_count)
 
@@ -282,7 +282,7 @@ def do_backup_restore(cs, args):
         info.update(restore._info)
         info.pop('links', None)
 
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('--detail',
@@ -316,7 +316,7 @@ def do_get_pools(cs, args):
         backend['name'] = info['name']
         if args.detail:
             backend.update(info['capabilities'])
-        utils.print_dict(backend)
+        shell_utils.print_dict(backend)
     AppendFilters.filters = []
 
 
@@ -518,7 +518,7 @@ def do_list(cs, args):
         sortby_index = None
     else:
         sortby_index = 0
-    utils.print_list(volumes, key_list, exclude_unavailable=True,
+    shell_utils.print_list(volumes, key_list, exclude_unavailable=True,
                      sortby_index=sortby_index)
     if show_count:
         print("Volume in total: %s" % total_count)
@@ -747,7 +747,7 @@ def do_create(cs, args):
         volume = cs.volumes.get(volume.id)
         info.update(volume._info)
 
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
     with cs.volumes.completion_cache('uuid',
                                      cinderclient.v3.volumes.Volume,
@@ -812,7 +812,7 @@ def do_summary(cs, args):
     if cs.api_version >= api_versions.APIVersion("3.36"):
         formatters.append('metadata')
 
-    utils.print_dict(info['volume-summary'], formatters=formatters)
+    shell_utils.print_dict(info['volume-summary'], formatters=formatters)
 
 
 @api_versions.wraps('3.11')
@@ -853,7 +853,7 @@ def do_group_type_show(cs, args):
     info.update(gtype._info)
 
     info.pop('links', None)
-    utils.print_dict(info, formatters=['group_specs'])
+    shell_utils.print_dict(info, formatters=['group_specs'])
 
 
 @api_versions.wraps('3.11')
@@ -881,7 +881,7 @@ def do_group_type_update(cs, args):
 def do_group_specs_list(cs, args):
     """Lists current group types and specs."""
     gtypes = cs.group_types.list()
-    utils.print_list(gtypes, ['ID', 'Name', 'group_specs'])
+    shell_utils.print_list(gtypes, ['ID', 'Name', 'group_specs'])
 
 
 @api_versions.wraps('3.11')
@@ -1170,7 +1170,7 @@ def do_cluster_list(cs, args):
     if args.detailed:
         columns.extend(('Num Hosts', 'Num Down Hosts', 'Last Heartbeat',
                         'Disabled Reason', 'Created At', 'Updated at'))
-    utils.print_list(clusters, columns)
+    shell_utils.print_list(clusters, columns)
 
 
 @api_versions.wraps('3.7')
@@ -1181,7 +1181,7 @@ def do_cluster_list(cs, args):
 def do_cluster_show(cs, args):
     """Show detailed information on a clustered service."""
     cluster = cs.clusters.show(args.name, args.binary)
-    utils.print_dict(cluster.to_dict())
+    shell_utils.print_dict(cluster.to_dict())
 
 
 @api_versions.wraps('3.7')
@@ -1192,7 +1192,7 @@ def do_cluster_show(cs, args):
 def do_cluster_enable(cs, args):
     """Enables clustered services."""
     cluster = cs.clusters.update(args.name, args.binary, disabled=False)
-    utils.print_dict(cluster.to_dict())
+    shell_utils.print_dict(cluster.to_dict())
 
 
 @api_versions.wraps('3.7')
@@ -1206,7 +1206,7 @@ def do_cluster_disable(cs, args):
     """Disables clustered services."""
     cluster = cs.clusters.update(args.name, args.binary, disabled=True,
                                  disabled_reason=args.reason)
-    utils.print_dict(cluster.to_dict())
+    shell_utils.print_dict(cluster.to_dict())
 
 
 @api_versions.wraps('3.24')
@@ -1251,12 +1251,12 @@ def do_work_cleanup(cs, args):
 
     if cleaning:
         print('Following services will be cleaned:')
-        utils.print_list(cleaning, columns)
+        shell_utils.print_list(cleaning, columns)
 
     if unavailable:
         print('There are no alternative nodes to do cleanup for the following '
               'services:')
-        utils.print_list(unavailable, columns)
+        shell_utils.print_list(unavailable, columns)
 
     if not (cleaning or unavailable):
         print('No cleanable services matched cleanup criteria.')
@@ -1337,7 +1337,7 @@ def do_manage(cs, args):
     volume = cs.volumes.get(volume.id)
     info.update(volume._info)
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @api_versions.wraps('3.8')
@@ -1394,7 +1394,7 @@ def do_manageable_list(cs, args):
     columns = ['reference', 'size', 'safe_to_manage']
     if detailed:
         columns.extend(['reason_not_safe', 'cinder_id', 'extra_info'])
-    utils.print_list(volumes, columns, sortby_index=None)
+    shell_utils.print_list(volumes, columns, sortby_index=None)
 
 
 @api_versions.wraps('3.13')
@@ -1427,7 +1427,7 @@ def do_group_list(cs, args):
     groups = cs.groups.list(search_opts=search_opts)
 
     columns = ['ID', 'Status', 'Name']
-    utils.print_list(groups, columns)
+    shell_utils.print_list(groups, columns)
 
     with cs.groups.completion_cache(
             'uuid',
@@ -1469,7 +1469,7 @@ def do_group_show(cs, args):
     info.update(group._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @api_versions.wraps('3.13')
@@ -1505,7 +1505,7 @@ def do_group_create(cs, args):
     info.update(group._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
     with cs.groups.completion_cache('uuid',
                                     cinderclient.v3.groups.Group,
@@ -1556,7 +1556,7 @@ def do_group_create_from_src(cs, args):
         args.description)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @api_versions.wraps('3.13')
@@ -1696,7 +1696,8 @@ def do_group_list_replication_targets(cs, args):
         cs, args.group).list_replication_targets()
     rep_targets = replication_targets.get('replication_targets')
     if rep_targets and len(rep_targets) > 0:
-        utils.print_list(rep_targets, [key for key in rep_targets[0].keys()])
+        shell_utils.print_list(rep_targets,
+                               [key for key in rep_targets[0].keys()])
 
 
 @api_versions.wraps('3.14')
@@ -1743,7 +1744,7 @@ def do_group_snapshot_list(cs, args):
     group_snapshots = cs.group_snapshots.list(search_opts=search_opts)
 
     columns = ['ID', 'Status', 'Name']
-    utils.print_list(group_snapshots, columns)
+    shell_utils.print_list(group_snapshots, columns)
     AppendFilters.filters = []
 
 
@@ -1758,7 +1759,7 @@ def do_group_snapshot_show(cs, args):
     info.update(group_snapshot._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @api_versions.wraps('3.14')
@@ -1786,7 +1787,7 @@ def do_group_snapshot_create(cs, args):
     info.update(group_snapshot._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @api_versions.wraps('3.14')
@@ -1841,7 +1842,7 @@ def do_service_list(cs, args):
         columns.append("Disabled Reason")
     if cs.api_version.matches('3.49'):
         columns.extend(["Backend State"])
-    utils.print_list(result, columns)
+    shell_utils.print_list(result, columns)
 
 
 @api_versions.wraps('3.8')
@@ -1900,7 +1901,7 @@ def do_snapshot_manageable_list(cs, args):
     columns = ['reference', 'size', 'safe_to_manage', 'source_reference']
     if detailed:
         columns.extend(['reason_not_safe', 'cinder_id', 'extra_info'])
-    utils.print_list(snapshots, columns, sortby_index=None)
+    shell_utils.print_list(snapshots, columns, sortby_index=None)
 
 
 @api_versions.wraps("3.0")
@@ -1908,7 +1909,7 @@ def do_api_version(cs, args):
     """Display the server API version information."""
     columns = ['ID', 'Status', 'Version', 'Min_version']
     response = cs.services.server_api_version()
-    utils.print_list(response, columns)
+    shell_utils.print_list(response, columns)
 
 
 @api_versions.wraps("3.40")
@@ -2010,7 +2011,7 @@ def do_message_list(cs, args):
         sortby_index = None
     else:
         sortby_index = 0
-    utils.print_list(messages, columns, sortby_index=sortby_index)
+    shell_utils.print_list(messages, columns, sortby_index=sortby_index)
     AppendFilters.filters = []
 
 
@@ -2024,7 +2025,7 @@ def do_message_show(cs, args):
     message = shell_utils.find_message(cs, args.message)
     info.update(message._info)
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @api_versions.wraps("3.3")
@@ -2179,11 +2180,11 @@ def do_snapshot_list(cs, args):
     # It's the server's responsibility to return the appropriate fields for the
     # requested microversion, we present all known fields and skip those that
     # are missing.
-    utils.print_list(snapshots,
-                     ['ID', 'Volume ID', 'Status', 'Name', 'Size',
-                      'Consumes Quota', 'User ID'],
-                     exclude_unavailable=True,
-                     sortby_index=sortby_index)
+    shell_utils.print_list(snapshots,
+                           ['ID', 'Volume ID', 'Status', 'Name', 'Size',
+                            'Consumes Quota', 'User ID'],
+                           exclude_unavailable=True,
+                           sortby_index=sortby_index)
     if show_count:
         print("Snapshot in total: %s" % total_count)
 
@@ -2411,7 +2412,7 @@ def do_attachment_list(cs, args):
         sortby_index = None
     else:
         sortby_index = 0
-    utils.print_list(attachments, columns, sortby_index=sortby_index)
+    shell_utils.print_list(attachments, columns, sortby_index=sortby_index)
     AppendFilters.filters = []
 
 
@@ -2424,13 +2425,13 @@ def do_attachment_show(cs, args):
     attachment = cs.attachments.show(args.attachment)
     attachment_dict = attachment.to_dict()
     connection_dict = attachment_dict.pop('connection_info', {})
-    utils.print_dict(attachment_dict)
+    shell_utils.print_dict(attachment_dict)
 
     # TODO(jdg): Need to add checks here like admin/policy for displaying the
     # connection_info, this is still experimental so we'll leave it enabled for
     # now
     if connection_dict:
-        utils.print_dict(connection_dict)
+        shell_utils.print_dict(connection_dict)
 
 
 @api_versions.wraps('3.27')
@@ -2503,9 +2504,9 @@ def do_attachment_create(cs, args):
                                        mode)
 
     connector_dict = attachment.pop('connection_info', None)
-    utils.print_dict(attachment)
+    shell_utils.print_dict(attachment)
     if connector_dict:
-        utils.print_dict(connector_dict)
+        shell_utils.print_dict(connector_dict)
 
 
 @api_versions.wraps('3.27')
@@ -2557,9 +2558,9 @@ def do_attachment_update(cs, args):
                                        connector)
     attachment_dict = attachment.to_dict()
     connector_dict = attachment_dict.pop('connection_info', None)
-    utils.print_dict(attachment_dict)
+    shell_utils.print_dict(attachment_dict)
     if connector_dict:
-        utils.print_dict(connector_dict)
+        shell_utils.print_dict(connector_dict)
 
 
 @api_versions.wraps('3.27')
@@ -2598,7 +2599,7 @@ def do_version_list(cs, args):
           {'v': api_versions.MAX_VERSION})
 
     print("\nServer supported API versions:")
-    utils.print_list(result, columns)
+    shell_utils.print_list(result, columns)
 
 
 @api_versions.wraps('3.32')
@@ -2641,7 +2642,7 @@ def do_service_get_log(cs, args):
     log_levels = cs.services.get_log_levels(args.binary, args.server,
                                             args.prefix)
     columns = ('Binary', 'Host', 'Prefix', 'Level')
-    utils.print_list(log_levels, columns)
+    shell_utils.print_list(log_levels, columns)
 
 
 @utils.arg('volume', metavar='<volume>',
@@ -2718,7 +2719,7 @@ def do_backup_create(cs, args):
     if 'links' in info:
         info.pop('links')
 
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
     with cs.backups.completion_cache(
             'uuid',
@@ -2759,7 +2760,7 @@ def do_transfer_create(cs, args):
     info.update(transfer._info)
 
     info.pop('links', None)
-    utils.print_dict(info)
+    shell_utils.print_dict(info)
 
 
 @utils.arg('--all-tenants',
@@ -2807,7 +2808,7 @@ def do_transfer_list(cs, args):
 
     transfers = cs.transfers.list(search_opts=search_opts, sort=sort)
     columns = ['ID', 'Volume ID', 'Name']
-    utils.print_list(transfers, columns)
+    shell_utils.print_list(transfers, columns)
     AppendFilters.filters = []
 
 
@@ -2824,7 +2825,7 @@ def do_default_type_set(cs, args):
     project = args.project
 
     default_type = cs.default_types.create(volume_type, project)
-    utils.print_dict(default_type._info)
+    shell_utils.print_dict(default_type._info)
 
 
 @api_versions.wraps('3.62')
@@ -2839,9 +2840,9 @@ def do_default_type_list(cs, args):
     default_types = cs.default_types.list(project_id)
     columns = ['Volume Type ID', 'Project ID']
     if project_id:
-        utils.print_dict(default_types._info)
+        shell_utils.print_dict(default_types._info)
     else:
-        utils.print_list(default_types, columns)
+        shell_utils.print_list(default_types, columns)
 
 
 @api_versions.wraps('3.62')

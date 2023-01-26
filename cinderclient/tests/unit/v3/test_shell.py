@@ -352,7 +352,7 @@ class ShellTest(utils.TestCase):
         self.run_command(command)
         self.assert_called('GET', '/volumes/detail?group_id=fake_id')
 
-    @mock.patch("cinderclient.utils.print_list")
+    @mock.patch("cinderclient.shell_utils.print_list")
     def test_list_duplicate_fields(self, mock_print):
         self.run_command('list --field Status,id,Size,status')
         self.assert_called('GET', '/volumes/detail')
@@ -528,7 +528,7 @@ class ShellTest(utils.TestCase):
         self.run_command(command)
         self.assert_called('GET', '/attachments%s' % expected)
 
-    @mock.patch('cinderclient.utils.print_list')
+    @mock.patch('cinderclient.shell_utils.print_list')
     @mock.patch.object(cinderclient.v3.attachments.VolumeAttachmentManager,
             'list')
     def test_attachment_list_setattr(self, mock_list, mock_print):
@@ -1285,7 +1285,7 @@ class ShellTest(utils.TestCase):
         get_levels_mock.assert_not_called()
 
     @mock.patch('cinderclient.v3.services.ServiceManager.get_log_levels')
-    @mock.patch('cinderclient.utils.print_list')
+    @mock.patch('cinderclient.shell_utils.print_list')
     def test_service_get_log_no_params(self, print_mock, get_levels_mock):
         self.run_command('--os-volume-api-version 3.32 service-get-log')
         get_levels_mock.assert_called_once_with('', '', '')
@@ -1296,7 +1296,7 @@ class ShellTest(utils.TestCase):
     @ddt.data('*', 'cinder-api', 'cinder-volume', 'cinder-scheduler',
               'cinder-backup')
     @mock.patch('cinderclient.v3.services.ServiceManager.get_log_levels')
-    @mock.patch('cinderclient.utils.print_list')
+    @mock.patch('cinderclient.shell_utils.print_list')
     def test_service_get_log(self, binary, print_mock, get_levels_mock):
         server = 'host1'
         prefix = 'sqlalchemy'
@@ -1454,7 +1454,7 @@ class ShellTest(utils.TestCase):
                                'availability_zone': 'AZ2'}}
         self.assert_called('POST', '/backups', body=expected)
 
-    @mock.patch("cinderclient.utils.print_list")
+    @mock.patch("cinderclient.shell_utils.print_list")
     def test_snapshot_list(self, mock_print_list):
         """Ensure we always present all existing fields when listing snaps."""
         self.run_command('--os-volume-api-version 3.65 snapshot-list')
@@ -1923,7 +1923,7 @@ class ShellTest(utils.TestCase):
         },
     )
     @ddt.unpack
-    @mock.patch('cinderclient.utils.print_dict')
+    @mock.patch('cinderclient.shell_utils.print_dict')
     @mock.patch('cinderclient.tests.unit.v3.fakes_base._stub_restore')
     def test_do_backup_restore(self,
                                mock_stub_restore,

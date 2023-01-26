@@ -554,7 +554,7 @@ class TestLoadVersionedActions(utils.TestCase):
 
 class ShellUtilsTest(utils.TestCase):
 
-    @mock.patch.object(cinderclient.utils, 'print_dict')
+    @mock.patch.object(cinderclient.shell_utils, 'print_dict')
     def test_print_volume_image(self, mock_print_dict):
         response = {'os-volume_upload_image': {'name': 'myimg1'}}
         image_resp_tuple = (202, response)

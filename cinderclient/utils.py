@@ -18,7 +18,6 @@ import os
 from urllib import parse
 import uuid
 
-import prettytable
 import stevedore
 
 from cinderclient import exceptions
@@ -106,76 +105,6 @@ def isunauthenticated(f):
     return getattr(f, 'unauthenticated', False)
 
 
-def _print(pt, order):
-    print(pt.get_string(sortby=order))
-
-
-def print_list(objs, fields, exclude_unavailable=False, formatters=None,
-               sortby_index=0):
-    '''Prints a list of objects.
-
-    @param objs: Objects to print
-    @param fields: Fields on each object to be printed
-    @param exclude_unavailable: Boolean to decide if unavailable fields are
-                                removed
-    @param formatters: Custom field formatters
-    @param sortby_index: Results sorted against the key in the fields list at
-                         this index; if None then the object order is not
-                         altered
-    '''
-    formatters = formatters or {}
-    mixed_case_fields = ['serverId']
-    removed_fields = []
-    rows = []
-
-    for o in objs:
-        row = []
-        for field in fields:
-            if field in removed_fields:
-                continue
-            if field in formatters:
-                row.append(formatters[field](o))
-            else:
-                if field in mixed_case_fields:
-                    field_name = field.replace(' ', '_')
-                else:
-                    field_name = field.lower().replace(' ', '_')
-                if isinstance(o, dict) and field in o:
-                    data = o[field]
-                else:
-                    if not hasattr(o, field_name) and exclude_unavailable:
-                        removed_fields.append(field)
-                        continue
-                    else:
-                        data = getattr(o, field_name, '')
-                if data is None:
-                    data = '-'
-                if isinstance(data, str) and "\r" in data:
-                    data = data.replace("\r", " ")
-                row.append(data)
-        rows.append(row)
-
-    for f in removed_fields:
-        fields.remove(f)
-
-    pt = prettytable.PrettyTable((f for f in fields), caching=False)
-    pt.align = 'l'
-    for row in rows:
-        count = 0
-        # Converts unicode values in dictionary to string
-        for part in row:
-            count = count + 1
-            if isinstance(part, dict):
-                row[count - 1] = part
-        pt.add_row(row)
-
-    if sortby_index is None:
-        order_by = None
-    else:
-        order_by = fields[sortby_index]
-    _print(pt, order_by)
-
-
 def build_query_param(params, sort=False):
     """parse list to url query parameters"""
 
@@ -204,32 +133,6 @@ def build_query_param(params, sort=False):
         query_string = "?%s" % (query_string,)
 
     return query_string
-
-
-def _pretty_format_dict(data_dict):
-    formatted_data = []
-
-    for k in sorted(data_dict):
-        formatted_data.append("%s : %s" % (k, data_dict[k]))
-
-    return "\n".join(formatted_data)
-
-
-def print_dict(d, property="Property", formatters=None):
-    pt = prettytable.PrettyTable([property, 'Value'], caching=False)
-    pt.align = 'l'
-    formatters = formatters or {}
-
-    for r in d.items():
-        r = list(r)
-
-        if r[0] in formatters:
-            if isinstance(r[1], dict):
-                r[1] = _pretty_format_dict(r[1])
-        if isinstance(r[1], str) and "\r" in r[1]:
-            r[1] = r[1].replace("\r", " ")
-        pt.add_row(r)
-    _print(pt, property)
 
 
 def find_resource(manager, name_or_id, **kwargs):
