@@ -705,6 +705,12 @@ class OpenStackCinderShell(object):
         if not auth_session:
             auth_session = self._get_keystone_session()
 
+        # collect_timing is a keystone session option
+        if (not isinstance(auth_session, session.Session)
+                and getattr(args, 'collect_timing', False) is True):
+            raise exc.AuthorizationFailure("Provided auth plugin doesn't "
+                                           "support collect_timing option")
+
         insecure = self.options.insecure
 
         client_args = dict(
@@ -804,6 +810,17 @@ class OpenStackCinderShell(object):
                 print("Trace ID: %s" % trace_id)
                 print("To display trace use next command:\n"
                       "osprofiler trace show --html %s " % trace_id)
+
+            if getattr(args, 'collect_timing', False) is True:
+                self._print_timings(auth_session)
+
+    def _print_timings(self, session):
+        timings = session.get_timings()
+        utils.print_list(
+            timings,
+            fields=('method', 'url', 'seconds'),
+            sortby_index=None,
+            formatters={'seconds': lambda r: r.elapsed.total_seconds()})
 
     def _discover_client(self,
                          current_client,
