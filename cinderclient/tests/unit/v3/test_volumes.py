@@ -213,3 +213,13 @@ class VolumesTest(utils.TestCase):
                                          'reimage_reserved':
                                          reimage_reserved}})
         self._assert_request_id(vol)
+
+    @ddt.data(False, True)
+    def test_complete_volume_extend(self, error):
+        cs = fakes.FakeClient(api_versions.APIVersion('3.71'))
+        v = cs.volumes.get('1234')
+        self._assert_request_id(v)
+        vol = cs.volumes.extend_volume_completion(v, error)
+        cs.assert_called('POST', '/volumes/1234/action',
+                         {'os-extend_volume_completion': {'error': error}})
+        self._assert_request_id(vol)

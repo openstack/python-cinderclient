@@ -71,6 +71,10 @@ class Volume(volumes_base.Volume):
         """Rebuilds the volume with the new specified image"""
         self.manager.reimage(self, image_id, reimage_reserved)
 
+    def extend_volume_completion(self, volume, error=False):
+        """Complete extending an attached volume"""
+        self.manager.extend_volume_completion(self, volume, error)
+
 
 class VolumeManager(volumes_base.VolumeManager):
     resource_class = Volume
@@ -304,3 +308,15 @@ class VolumeManager(volumes_base.VolumeManager):
                             volume,
                             {'image_id': image_id,
                              'reimage_reserved': reimage_reserved})
+
+    @api_versions.wraps('3.71')
+    def extend_volume_completion(self, volume, error=False):
+        """Complete extending an attached volume.
+
+        :param volume: The UUID of the extended volume
+        :param error: Used to indicate if an error has occured that requires
+                      Cinder to roll back the extend operation.
+        """
+        return self._action('os-extend_volume_completion',
+                            volume,
+                            {'error': error})

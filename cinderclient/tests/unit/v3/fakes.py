@@ -455,6 +455,8 @@ class FakeHTTPClient(fakes_base.FakeHTTPClient):
             assert action in body
         elif action == 'os-reimage':
             assert 'image_id' in body[action]
+        elif action == 'os-extend_volume_completion':
+            assert 'error' in body[action]
         else:
             raise AssertionError("Unexpected action: %s" % action)
         return (resp, {}, {})
