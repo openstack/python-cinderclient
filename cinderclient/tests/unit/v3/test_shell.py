@@ -970,6 +970,15 @@ class ShellTest(utils.TestCase):
         }
     }
 
+    SNAP_BODY_3_66_W_METADATA = {
+        'snapshot': {
+            'volume_id': '123456',
+            'name': None,
+            'description': None,
+            'metadata': {'a': 'b'}
+        }
+    }
+
     @ddt.data(True, 'true', 'on', '1')
     @mock.patch('cinderclient.utils.find_resource')
     def test_snapshot_create_3_66_with_force_true(self, f_val, mock_find_vol):
@@ -1036,6 +1045,15 @@ class ShellTest(utils.TestCase):
         }
         self.assert_called_anytime('POST', '/snapshots',
                                    body=pre_3_66_request_body)
+
+    @mock.patch('cinderclient.utils.find_resource')
+    def test_snapshot_create_w_metadata(self, mock_find_vol):
+        mock_find_vol.return_value = volumes.Volume(
+            self, {'id': '123456'}, loaded=True)
+        self.run_command('--os-volume-api-version 3.66 '
+                         'snapshot-create 123456 --metadata a=b')
+        self.assert_called_anytime('POST', '/snapshots',
+                                   body=self.SNAP_BODY_3_66_W_METADATA)
 
     def test_snapshot_manageable_list(self):
         self.run_command('--os-volume-api-version 3.8 '
