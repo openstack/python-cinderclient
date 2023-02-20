@@ -11,6 +11,9 @@
 #    under the License.
 
 
+import sys
+import unittest
+
 from cinderclient.tests.functional import base
 
 
@@ -93,6 +96,8 @@ class CinderBackupTests(base.ClientTestBase):
 
     BACKUP_PROPERTY = ('id', 'name', 'volume_id')
 
+    @unittest.skipIf((sys.version_info[0] == 3 and sys.version_info[1] == 9),
+                     "This test is failing because of bug#2008010")
     def test_backup_create_and_delete(self):
         """Create a volume backup and then delete."""
         volume = self.object_create('volume', params='1')
