@@ -9,7 +9,6 @@
     vars:
       openrc_enable_export: true
       devstack_localrc:
-        USE_PYTHON3: true
         VOLUME_BACKING_FILE_SIZE: 16G
         CINDER_QUOTA_VOLUMES: 25
         CINDER_QUOTA_BACKUPS: 25
