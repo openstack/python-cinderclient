@@ -21,21 +21,21 @@
       - ^cinderclient/tests/unit/.*$
 
 - job:
-    name: python-cinderclient-functional-py38
-    parent: python-cinderclient-functional-base
-    # need to specify a platform that has python 3.8 available
-    nodeset: openstack-single-node-focal
-    vars:
-      python_version: 3.8
-      tox_envlist: functional-py38
-
-- job:
     name: python-cinderclient-functional-py39
     parent: python-cinderclient-functional-base
     nodeset: devstack-single-node-centos-9-stream
     vars:
       python_version: 3.9
       tox_envlist: functional-py39
+
+- job:
+    name: python-cinderclient-functional-py310
+    parent: python-cinderclient-functional-base
+    # python 3.10 is the default in ubuntu 22.04 (jammy)
+    nodeset: openstack-single-node-jammy
+    vars:
+      python_version: 3.10
+      tox_envlist: functional-py310
 
 - project:
     vars:
@@ -49,11 +49,11 @@
       - release-notes-jobs-python3
     check:
       jobs:
-        - python-cinderclient-functional-py38
         - python-cinderclient-functional-py39
+        - python-cinderclient-functional-py310
         - openstack-tox-pylint:
             voting: false
     gate:
       jobs:
-        - python-cinderclient-functional-py38
         - python-cinderclient-functional-py39
+        - python-cinderclient-functional-py310
