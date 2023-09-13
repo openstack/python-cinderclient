@@ -246,6 +246,28 @@ class ClientTest(utils.TestCase):
         # is not getting called.
         self.assertFalse(mock_from_resp.called)
 
+    @mock.patch('keystoneauth1.adapter.LegacyJsonAdapter.request',
+                return_value=(mock.Mock(), mock.Mock()))
+    @ddt.data(True, False, None)
+    def test_http_log_debug_request(self, http_log_debug, mock_request):
+        args_req = (mock.sentinel.url, mock.sentinel.OP)
+        kwargs_req = {'raise_exc': False}
+        kwargs_expect = {'authenticated': False}
+        kwargs_expect.update(kwargs_req)
+
+        kwargs = {'api_version': '3.0'}
+        if isinstance(http_log_debug, bool):
+            kwargs['http_log_debug'] = http_log_debug
+            if http_log_debug:
+                kwargs_expect['logger'] = mock.ANY
+
+        cs = cinderclient.client.SessionClient(self, **kwargs)
+
+        res = cs.request(*args_req, **kwargs_req)
+
+        mock_request.assert_called_once_with(*args_req, **kwargs_expect)
+        self.assertEqual(mock_request.return_value, res)
+
 
 class ClientTestSensitiveInfo(utils.TestCase):
     def test_req_does_not_log_sensitive_info(self):

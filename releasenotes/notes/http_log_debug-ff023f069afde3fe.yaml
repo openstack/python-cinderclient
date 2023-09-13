@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    `Bug #2035372
+    <https://bugs.launchpad.net/python-cinderclient/+bug/2035372>`_: Fixed
+    not honoring ``http_log_debug`` parameter in ``cinderclient.client.Client``
+    when also providing a session.
