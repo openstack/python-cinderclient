@@ -195,6 +195,7 @@ class ClientTest(utils.TestCase):
 
         @mock.patch.object(requests, "request", request)
         @mock.patch('time.time', mock.Mock(return_value=1234))
+        @mock.patch.object(client, 'sleep', mock.Mock())
         def test_get_call():
             resp, body = cl.get("/hi")
 
@@ -212,6 +213,7 @@ class ClientTest(utils.TestCase):
 
         @mock.patch.object(requests, "request", request)
         @mock.patch('time.time', mock.Mock(return_value=1234))
+        @mock.patch.object(client, 'sleep', mock.Mock())
         def test_get_call():
             resp, body = cl.get("/hi")
 
@@ -225,12 +227,14 @@ class ClientTest(utils.TestCase):
                          bad_413_request,
                          mock_request]
 
+        @mock.patch.object(client, 'sleep', mock.Mock())
         def request(*args, **kwargs):
             next_request = self.requests.pop(0)
             return next_request(*args, **kwargs)
 
         @mock.patch.object(requests, "request", request)
         @mock.patch('time.time', mock.Mock(return_value=1234))
+        @mock.patch.object(client, 'sleep', mock.Mock())
         def test_get_call():
             resp, body = cl.get("/hi")
         self.assertRaises(exceptions.OverLimit, test_get_call)
@@ -247,6 +251,7 @@ class ClientTest(utils.TestCase):
 
         @mock.patch.object(requests, "request", request)
         @mock.patch('time.time', mock.Mock(return_value=1234))
+        @mock.patch.object(client, 'sleep', mock.Mock())
         def test_get_call():
             resp, body = cl.get("/hi")
             return resp, body
@@ -266,6 +271,7 @@ class ClientTest(utils.TestCase):
 
         @mock.patch.object(requests, "request", request)
         @mock.patch('time.time', mock.Mock(return_value=1234))
+        @mock.patch.object(client, 'sleep', mock.Mock())
         def test_get_call():
             resp, body = cl.get("/hi")
 
@@ -300,6 +306,7 @@ class ClientTest(utils.TestCase):
 
         @mock.patch.object(requests, "request", request)
         @mock.patch('time.time', mock.Mock(return_value=1234))
+        @mock.patch.object(client, 'sleep', mock.Mock())
         def test_get_call():
             resp, body = cl.get("/hi")
 
@@ -405,6 +412,7 @@ class ClientTest(utils.TestCase):
 
         @mock.patch.object(requests, "request", request)
         @mock.patch('time.time', mock.Mock(return_value=1234))
+        @mock.patch.object(client, 'sleep', mock.Mock())
         def test_get_call():
             resp, body = cl.get("/hi")
 
