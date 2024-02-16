@@ -1975,7 +1975,9 @@ def do_unmanage(cs, args):
            help='Shows details for all tenants. Admin only.')
 def do_consisgroup_list(cs, args):
     """Lists all consistency groups."""
-    consistencygroups = cs.consistencygroups.list()
+    search_opts = {'all_tenants': args.all_tenants}
+
+    consistencygroups = cs.consistencygroups.list(search_opts=search_opts)
 
     columns = ['ID', 'Status', 'Name']
     shell_utils.print_list(consistencygroups, columns)
