@@ -331,10 +331,7 @@ class OpenStackCinderShell(object):
         parser.add_argument('--os_region_name',
                             help=argparse.SUPPRESS)
 
-        parser.add_argument(
-            '--os-token', metavar='<token>',
-            default=utils.env('OS_TOKEN'),
-            help=_('Defaults to env[OS_TOKEN].'))
+        parser.set_defaults(os_token=utils.env('OS_TOKEN'))
         parser.add_argument(
             '--os_token',
             help=argparse.SUPPRESS)
