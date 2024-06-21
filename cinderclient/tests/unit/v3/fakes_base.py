@@ -1032,6 +1032,14 @@ class FakeHTTPClient(base_client.HTTPClient):
     # VolumeTransfers
     #
 
+    def get_os_volume_transfer_1234(self, **kw):
+        base_uri = 'http://localhost:8776'
+        tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
+        transfer1 = '1234'
+        return (200, {},
+                {'transfer':
+                 _stub_transfer_full(transfer1, base_uri, tenant_id)})
+
     def get_os_volume_transfer_5678(self, **kw):
         base_uri = 'http://localhost:8776'
         tenant_id = '0fa851f6668144cf9cd8c8419c1646c1'
@@ -1049,6 +1057,9 @@ class FakeHTTPClient(base_client.HTTPClient):
                 {'transfers': [
                     _stub_transfer_full(transfer1, base_uri, tenant_id),
                     _stub_transfer_full(transfer2, base_uri, tenant_id)]})
+
+    def delete_os_volume_transfer_1234(self, **kw):
+        return (202, {}, None)
 
     def delete_os_volume_transfer_5678(self, **kw):
         return (202, {}, None)

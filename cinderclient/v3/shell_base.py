@@ -1348,12 +1348,21 @@ def do_transfer_create(cs, args):
     shell_utils.print_dict(info)
 
 
-@utils.arg('transfer', metavar='<transfer>',
+@utils.arg('transfer', metavar='<transfer>', nargs='+',
            help='Name or ID of transfer to delete.')
 def do_transfer_delete(cs, args):
     """Undoes a transfer."""
-    transfer = shell_utils.find_transfer(cs, args.transfer)
-    transfer.delete()
+    failure_count = 0
+    for t in args.transfer:
+        try:
+            transfer = shell_utils.find_transfer(cs, t)
+            transfer.delete()
+        except Exception as e:
+            failure_count += 1
+            print("Delete for volume transfer %s failed: %s" % (t, e))
+    if failure_count == len(args.transfer):
+        raise exceptions.CommandError("Unable to delete any of the specified "
+                                      "volume transfers.")
 
 
 @utils.arg('transfer', metavar='<transfer>',

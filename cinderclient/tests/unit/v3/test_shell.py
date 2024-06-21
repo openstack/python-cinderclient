@@ -1653,6 +1653,15 @@ class ShellTest(utils.TestCase):
         url = ('/volume-transfers/detail')
         self.assert_called('GET', url)
 
+    def test_delete_transfer(self):
+        self.run_command('transfer-delete 1234')
+        self.assert_called('DELETE', '/os-volume-transfer/1234')
+
+    def test_delete_transfers(self):
+        self.run_command('transfer-delete 1234 5678')
+        self.assert_called_anytime('DELETE', '/os-volume-transfer/1234')
+        self.assert_called_anytime('DELETE', '/os-volume-transfer/5678')
+
     def test_subcommand_parser(self):
         """Ensure that all the expected commands show up.
 
