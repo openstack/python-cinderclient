@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    `Bug #2069992 <https://bugs.launchpad.net/python-cinderclient/+bug/2069992>`_:
+    Fixed transfer-delete command to accept multiple transfers.
