@@ -136,4 +136,4 @@ latex_elements = {
     'preamble': r'\setcounter{tocdepth}{3}',
 }
 
-latex_additional_files = ['cinderclient.sty']
+latex_additional_files = []
