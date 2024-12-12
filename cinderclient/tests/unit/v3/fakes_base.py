@@ -772,16 +772,16 @@ class FakeHTTPClient(base_client.HTTPClient):
         return (200, {}, {'extra_specs': {'k': 'v'}})
 
     def delete_types_1_extra_specs_k(self, **kw):
-        return(204, {}, None)
+        return (204, {}, None)
 
     def delete_types_1_extra_specs_m(self, **kw):
-        return(204, {}, None)
+        return (204, {}, None)
 
     def delete_types_1(self, **kw):
         return (202, {}, None)
 
     def delete_types_3_extra_specs_k(self, **kw):
-        return(204, {}, None)
+        return (204, {}, None)
 
     def delete_types_3(self, **kw):
         return (202, {}, None)
@@ -936,13 +936,13 @@ class FakeHTTPClient(base_client.HTTPClient):
                 {'restore': _stub_restore()})
 
     def post_backups_76a17945_3c6f_435c_975b_b5685db10b62_action(self, **kw):
-        return(200, {}, None)
+        return (200, {}, None)
 
     def post_backups_1234_action(self, **kw):
-        return(200, {}, None)
+        return (200, {}, None)
 
     def post_backups_5678_action(self, **kw):
-        return(200, {}, None)
+        return (200, {}, None)
 
     def get_backups_76a17945_3c6f_435c_975b_b5685db10b62_export_record(self,
                                                                        **kw):

@@ -33,7 +33,7 @@ class Volume(base.Resource):
         return self.manager.update(self, **kwargs)
 
     def attach(self, instance_uuid, mountpoint, mode='rw', host_name=None):
-        """Inform Cinder that the given volume is attached to the given instance.
+        """Inform Cinder if the given volume is attached to the given instance.
 
         Calling this method will not actually ask Cinder to attach
         a volume, but to mark it on the DB as attached. If the volume
@@ -54,9 +54,10 @@ class Volume(base.Resource):
                                    host_name)
 
     def detach(self):
-        """Inform Cinder that the given volume is detached from the given instance.
+        """Inform Cinder that the given volume is detached.
 
-        Calling this method will not actually ask Cinder to detach
+        This inform Cinder that the given volume is detached from the given
+        instance. Calling this method will not actually ask Cinder to detach
         a volume, but to mark it on the DB as detached. If the volume
         is not actually detached from the given instance, inconsistent
         data will result.

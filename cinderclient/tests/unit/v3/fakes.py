@@ -401,16 +401,16 @@ class FakeHTTPClient(fakes_base.FakeHTTPClient):
         return (200, {}, {'group_specs': {'k': 'v'}})
 
     def delete_group_types_1_group_specs_k(self, **kw):
-        return(204, {}, None)
+        return (204, {}, None)
 
     def delete_group_types_1_group_specs_m(self, **kw):
-        return(204, {}, None)
+        return (204, {}, None)
 
     def delete_group_types_1(self, **kw):
         return (202, {}, None)
 
     def delete_group_types_3_group_specs_k(self, **kw):
-        return(204, {}, None)
+        return (204, {}, None)
 
     def delete_group_types_3(self, **kw):
         return (202, {}, None)
