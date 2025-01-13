@@ -232,7 +232,7 @@ class ShellTest(utils.TestCase):
             self.list_volumes_on_service(count)
 
     @mock.patch('keystoneauth1.identity.v2.Password')
-    @mock.patch('keystoneauth1.adapter.Adapter.get_token',
+    @mock.patch('keystoneauth1.adapter.LegacyJsonAdapter.get_token',
                 side_effect=ks_exc.ConnectFailure())
     @mock.patch('keystoneauth1.discover.Discover',
                 side_effect=ks_exc.ConnectFailure())

@@ -110,7 +110,7 @@ class ClientTest(utils.TestCase):
         cs = cinderclient.client.SessionClient(self, api_version='3.0')
         self.assertEqual(expected_base, cs._get_base_url())
 
-    @mock.patch.object(adapter.Adapter, 'request')
+    @mock.patch.object(adapter.LegacyJsonAdapter, '_request')
     @mock.patch.object(exceptions, 'from_response')
     def test_sessionclient_request_method(
             self, mock_from_resp, mock_request):
@@ -155,7 +155,7 @@ class ClientTest(utils.TestCase):
         self.assertEqual(202, response.status_code)
         self.assertFalse(mock_from_resp.called)
 
-    @mock.patch.object(adapter.Adapter, 'request')
+    @mock.patch.object(adapter.LegacyJsonAdapter, '_request')
     def test_sessionclient_request_method_raises_badrequest(
             self, mock_request):
         kwargs = {
@@ -193,7 +193,7 @@ class ClientTest(utils.TestCase):
                           mock.sentinel.url, 'POST', **kwargs)
         self.assertIsNotNone(session_client._logger)
 
-    @mock.patch.object(adapter.Adapter, 'request')
+    @mock.patch.object(adapter.LegacyJsonAdapter, '_request')
     def test_sessionclient_request_method_raises_overlimit(
             self, mock_request):
         resp = {
@@ -232,7 +232,7 @@ class ClientTest(utils.TestCase):
             }
         }
 
-        with mock.patch.object(adapter.Adapter, 'request',
+        with mock.patch.object(adapter.LegacyJsonAdapter, '_request',
                                side_effect=
                                keystone_exception.AuthorizationFailure()):
             session_client = cinderclient.client.SessionClient(
