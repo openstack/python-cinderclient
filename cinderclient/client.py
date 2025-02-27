@@ -25,6 +25,7 @@ import logging
 import os
 import pkgutil
 import re
+from time import sleep
 import urllib
 from urllib import parse as urlparse
 
@@ -42,10 +43,6 @@ from cinderclient import api_versions
 from cinderclient import exceptions
 import cinderclient.extension
 
-try:
-    from eventlet import sleep
-except ImportError:
-    from time import sleep
 
 try:
     osprofiler_web = importutils.try_import("osprofiler.web")
