@@ -172,6 +172,7 @@ class SessionClient(adapter.LegacyJsonAdapter):
 
     def __init__(self, *args, **kwargs):
         apiver = kwargs.pop('api_version', None) or api_versions.APIVersion()
+        self.http_log_debug = kwargs.pop('http_log_debug', False)
         if not isinstance(apiver, api_versions.APIVersion):
             apiver = api_versions.APIVersion(str(apiver))
         if apiver.ver_minor != 0:
@@ -182,6 +183,8 @@ class SessionClient(adapter.LegacyJsonAdapter):
 
     def request(self, *args, **kwargs):
         kwargs.setdefault('authenticated', False)
+        if self.http_log_debug:
+            kwargs.setdefault('logger', self._logger)
 
         # Note(tpatil): The standard call raises errors from
         # keystoneauth, here we need to raise the cinderclient errors.
@@ -718,6 +721,7 @@ def _construct_http_client(username=None, password=None, project_id=None,
                              region_name=region_name,
                              retries=retries,
                              api_version=api_version,
+                             http_log_debug=http_log_debug,
                              **kwargs)
     else:
         # FIXME(jamielennox): username and password are now optional. Need
