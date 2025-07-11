@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    `Bug #1998596 <https://bugs.launchpad.net/python-cinderclient/+bug/1998596>`_:
+    fixed version discovery if the server was older than the maximum supported
+    version defined in python-cinderclient.

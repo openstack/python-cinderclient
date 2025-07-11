@@ -771,11 +771,11 @@ class OpenStackCinderShell(object):
                         "using --os-volume-api-version option.")
                 raise exc.UnsupportedVersion(msg)
 
-        API_MAX_VERSION = api_versions.APIVersion(api_versions.MAX_VERSION)
+        API_MIN_VERSION = api_versions.APIVersion(api_versions.MIN_VERSION)
         # FIXME: the endpoint_api_version[0] can ONLY be '3' now, so the
         # above line should probably be ripped out and this condition removed
         if endpoint_api_version[0] == '3':
-            disc_client = client.Client(API_MAX_VERSION,
+            disc_client = client.Client(API_MIN_VERSION,
                                         os_username,
                                         os_password,
                                         os_project_name,
@@ -840,9 +840,9 @@ class OpenStackCinderShell(object):
         if not os_service_type:
             os_service_type = self._discover_service_type(discovered_version)
 
-        API_MAX_VERSION = api_versions.APIVersion(api_versions.MAX_VERSION)
+        API_MIN_VERSION = api_versions.APIVersion(api_versions.MIN_VERSION)
 
-        if (discovered_version != API_MAX_VERSION or
+        if (discovered_version != API_MIN_VERSION or
                 os_service_type != 'volume' or
                 os_endpoint_type != DEFAULT_CINDER_ENDPOINT_TYPE):
             client_args['service_type'] = os_service_type
