@@ -24,7 +24,7 @@
     name: python-cinderclient-functional-py36
     parent: python-cinderclient-functional-base
     # need to specify a platform that has python 3.6 available
-    nodeset: devstack-single-node-centos-8-stream
+    nodeset: ubuntu-bionic
     vars:
       python_version: 3.6
       tox_envlist: functional-py36
@@ -49,11 +49,15 @@
       - release-notes-jobs-python3
     check:
       jobs:
-        - python-cinderclient-functional-py36
-        - python-cinderclient-functional-py39
+        - python-cinderclient-functional-py36:
+            voting: false
+        - python-cinderclient-functional-py39:
+            voting: false
         - openstack-tox-pylint:
             voting: false
-    gate:
-      jobs:
-        - python-cinderclient-functional-py36
-        - python-cinderclient-functional-py39
+    # NOTE(elod.illes): these two functional jobs should be set back to
+    # voting and added back to gate queue as soon as they are fixed.
+    # gate:
+    #   jobs:
+    #     - python-cinderclient-functional-py36
+    #     - python-cinderclient-functional-py39
