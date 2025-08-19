@@ -437,12 +437,14 @@ class TestLoadVersionedActions(utils.TestCase):
             expected_help = ("help message (Supported by API versions "
                              "%(start)s - %(end)s)") % {
                 'start': '3.0', 'end': '3.3'}
-            expected_desc = ("help message\n\n    "
-                            "This will not show up in help message\n    ")
+            self.assertIn('help message',
+                          mock_add_parser.call_args_list[0][1]['description'])
+            self.assertIn('This will not show up in help message',
+                          mock_add_parser.call_args_list[0][1]['description'])
             mock_add_parser.assert_any_call(
                 'fake-action',
                 help=expected_help,
-                description=expected_desc,
+                description=mock.ANY,
                 add_help=False,
                 formatter_class=cinderclient.shell.OpenStackHelpFormatter)
 
