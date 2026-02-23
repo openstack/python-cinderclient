@@ -2,6 +2,12 @@
     name: python-cinderclient-functional-base
     abstract: true
     parent: devstack-tox-functional
+    description: |
+      Abstract job for defining devstack-based functional test jobs for
+      python-cinderclient.  Jobs for particular python versions use this
+      job as a parent, and control what verison of python is used by
+      specifying a nodeset having the desired version of python as the
+      system default.
     timeout: 4500
     required-projects:
       - openstack/cinder
@@ -25,17 +31,23 @@
     # Python 3.10 is the default on Ubuntu 22.04 (Jammy)
     nodeset: openstack-single-node-jammy
     vars:
-      python_version: 3.10
+      devstack_localrc:
+        # current master devstack no longer supports jammy as a platform
+        # (change I796eddac96313584f4a), so we must force install it
+        FORCE: 'yes'
+      bindep_profile: test py310
+      python_version: '3.10'
       tox_envlist: functional-py310
 
 - job:
-    name: python-cinderclient-functional-py312
+    name: python-cinderclient-functional-py313
     parent: python-cinderclient-functional-base
-    # Python 3.12 is the default on Ubuntu 24.04 (Noble)
-    nodeset: openstack-single-node-noble
+    # Python 3.13 is the default on Debian Trixie
+    nodeset: devstack-single-node-debian-trixie
     vars:
-      python_version: 3.12
-      tox_envlist: functional-py312
+      bindep_profile: test py310
+      python_version: '3.13'
+      tox_envlist: functional-py313
 
 - project:
     vars:
@@ -49,11 +61,13 @@
       - release-notes-jobs-python3
     check:
       jobs:
-        - python-cinderclient-functional-py310
-        - python-cinderclient-functional-py312
+        - python-cinderclient-functional-py310:
+            # non-voting because devstack support on python 3.10
+            # is no longer tested (see change I796eddac96313584f4a)
+            voting: false
+        - python-cinderclient-functional-py313
         - openstack-tox-pylint:
             voting: false
     gate:
       jobs:
-        - python-cinderclient-functional-py310
-        - python-cinderclient-functional-py312
+        - python-cinderclient-functional-py313
