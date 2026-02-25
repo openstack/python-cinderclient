@@ -153,7 +153,7 @@ def run_pylint():
     args = [
         "--msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'",
         "-E", "cinderclient"]
-    lint.Run(args, reporter=reporter, do_exit=False)
+    lint.Run(args, reporter=reporter, exit=False)
     val = buff.getvalue()
     buff.close()
     return val
