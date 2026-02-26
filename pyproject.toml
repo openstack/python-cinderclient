@@ -1,3 +1,46 @@
 [build-system]
-requires = ["pbr>=6.0.0", "setuptools>=64.0.0"]
+requires = ["pbr>=7.0.0"]
 build-backend = "pbr.build"
+
+[project]
+name = "python-cinderclient"
+description = "OpenStack Block Storage API Client Library"
+authors = [
+    {name = "OpenStack", email = "openstack-discuss@lists.openstack.org"},
+    ]
+readme = {file = "README.rst", content-type = "text/x-rst"}
+license = {text = "Apache-2.0"}
+dynamic = ["version", "dependencies"]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: OpenStack",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    ]
+
+[project.urls]
+Homepage = "https://docs.openstack.org/python-cinderclient/latest/"
+Repository = "https://opendev.org/openstack/python-cinderclient"
+Bugs = "https://launchpad.net/python-cinderclient"
+
+[tool.setuptools]
+packages = [
+    "cinderclient",
+    ]
+
+[project.scripts]
+cinder = "cinderclient.shell:main"
+
+[project.entry-points."keystoneauth1.plugin"]
+noauth = "cinderclient.contrib.noauth:CinderNoAuthLoader"
