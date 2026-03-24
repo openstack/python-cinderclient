@@ -68,6 +68,24 @@
         - python-cinderclient-functional-py313
         - openstack-tox-pylint:
             voting: false
+    periodic-weekly:
+      jobs:
+        - openstack-tox-pep8:
+            branches: master
+        - openstack-tox-py310:
+            branches: master
+        - openstack-tox-py313:
+            branches: master
+        - openstack-tox-py314:
+            branches: master
+        - openstack-tox-docs:
+            branches: master
+        - build-openstack-releasenotes:
+            vars:
+              sphinx_python: python3
+            branches: master
+        - python-cinderclient-functional-py313:
+            branches: master
     gate:
       jobs:
         - python-cinderclient-functional-py313
